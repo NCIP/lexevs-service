@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<import resource="META-INF/spring/lexevs-context.xml" />
+
+	<bean id="serverContext" class="edu.mayo.cts2.framework.core.config.TestServerContext" />
+
+	<bean id="cts2Marshaller" class="edu.mayo.cts2.framework.core.xml.DelegatingMarshaller" />
+
+	<bean id="urlConstructor" name="urlConstructor"
+		class="edu.mayo.cts2.framework.util.spring.UrlConstructorSpringFactory" />
+
+	<bean id="pluginConfig"
+		class="edu.mayo.cts2.framework.core.config.TestPluginConfigSpringFactory" />
+
+	<bean id="pluginConfigManager"
+		class="edu.mayo.cts2.framework.core.plugin.DefaultPluginConfigManager" />
+
+	<bean id="configInitializer"
+		class="edu.mayo.cts2.framework.core.config.TestConfigInitializerSpringFactory" />
+
+</beans>
