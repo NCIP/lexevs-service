@@ -21,41 +21,31 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package edu.mayo.cts2.framework.plugin.service.lexevs;
+package edu.mayo.cts2.framework.plugin.service.lexevs.service;
 
-import org.LexGrid.LexBIG.Impl.LexBIGServiceImpl;
+import javax.annotation.Resource;
+
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
-import org.springframework.beans.factory.FactoryBean;
-import org.springframework.stereotype.Component;
+import org.apache.log4j.Logger;
 
 /**
- * A factory for creating LexBigService objects.
+ * The base LexEVS CTS2 Service implementation class.
+ *
+ * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
-@Component
-public class LexBigServiceFactory implements FactoryBean<LexBIGService> {
+public class AbstractLexEvsService {
+	
+	protected Logger log = Logger.getLogger(this.getClass());
+	
+	@Resource
+	private LexBIGService lexBigService;
 
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.FactoryBean#getObject()
-	 */
-	@Override
-	public LexBIGService getObject() throws Exception {
-		return LexBIGServiceImpl.defaultInstance();
+	public LexBIGService getLexBigService() {
+		return lexBigService;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
-	 */
-	@Override
-	public Class<?> getObjectType() {
-		return LexBIGService.class;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.FactoryBean#isSingleton()
-	 */
-	@Override
-	public boolean isSingleton() {
-		return true;
+	public void setLexBigService(LexBIGService lexBigService) {
+		this.lexBigService = lexBigService;
 	}
 
 }

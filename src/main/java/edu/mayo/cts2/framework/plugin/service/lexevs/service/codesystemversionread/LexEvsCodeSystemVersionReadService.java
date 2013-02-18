@@ -25,9 +25,10 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversionr
 
 import java.util.List;
 
-import javax.annotation.Resource;
-
-import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
+import org.LexGrid.LexBIG.Exceptions.LBException;
+import org.LexGrid.LexBIG.Utility.Constructors;
+import org.LexGrid.codingSchemes.CodingScheme;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntry;
@@ -37,78 +38,154 @@ import edu.mayo.cts2.framework.model.core.SourceReference;
 import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
+import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersionReadService;
 
+/**
+ * The LexEVS CodeSystemVersionReadService Service implementation.
+ *
+ * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
+ */
 @Component
-public class LexEvsCodeSystemVersionReadService implements CodeSystemVersionReadService {
+public class LexEvsCodeSystemVersionReadService extends AbstractLexEvsService implements CodeSystemVersionReadService {
 
-	@Resource
-	private LexBIGService lexBigService;
+	private CodingSchemeToCodeSystemTransform transformer = new CodingSchemeToCodeSystemTransform();
 	
+	/* (non-Javadoc)
+	 * @see edu.mayo.cts2.framework.service.profile.TagAwareReadService#readByTag(edu.mayo.cts2.framework.model.service.core.NameOrURI, edu.mayo.cts2.framework.model.core.VersionTagReference, edu.mayo.cts2.framework.model.command.ResolvedReadContext)
+	 */
 	@Override
-	public CodeSystemVersionCatalogEntry readByTag(NameOrURI parentIdentifier,
-			VersionTagReference tag, ResolvedReadContext readContext) {
-		throw new UnsupportedOperationException();
+	public CodeSystemVersionCatalogEntry readByTag(
+			NameOrURI codeSystem,
+			VersionTagReference tag, 
+			ResolvedReadContext readContext) {
+		
+		return this.getCodeSystemByVersionIdOrTag(
+				codeSystem, 
+				Constructors.createCodingSchemeVersionOrTagFromTag(tag.getContent()));
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.mayo.cts2.framework.service.profile.TagAwareReadService#existsByTag(edu.mayo.cts2.framework.model.service.core.NameOrURI, edu.mayo.cts2.framework.model.core.VersionTagReference, edu.mayo.cts2.framework.model.command.ResolvedReadContext)
+	 */
 	@Override
 	public boolean existsByTag(NameOrURI parentIdentifier,
 			VersionTagReference tag, ResolvedReadContext readContext) {
 		throw new UnsupportedOperationException();
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.mayo.cts2.framework.service.profile.TagAwareReadService#getSupportedTags()
+	 */
 	@Override
 	public List<VersionTagReference> getSupportedTags() {
 		throw new UnsupportedOperationException();
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.mayo.cts2.framework.service.profile.ReadService#read(java.lang.Object, edu.mayo.cts2.framework.model.command.ResolvedReadContext)
+	 */
 	@Override
 	public CodeSystemVersionCatalogEntry read(NameOrURI identifier,
 			ResolvedReadContext readContext) {
 		throw new UnsupportedOperationException();
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.mayo.cts2.framework.service.profile.ReadService#exists(java.lang.Object, edu.mayo.cts2.framework.model.command.ResolvedReadContext)
+	 */
 	@Override
 	public boolean exists(NameOrURI identifier, ResolvedReadContext readContext) {
 		throw new UnsupportedOperationException();
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.mayo.cts2.framework.service.profile.BaseService#getServiceName()
+	 */
 	@Override
 	public String getServiceName() {
 		throw new UnsupportedOperationException();
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.mayo.cts2.framework.service.profile.BaseService#getServiceDescription()
+	 */
 	@Override
 	public OpaqueData getServiceDescription() {
 		throw new UnsupportedOperationException();
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.mayo.cts2.framework.service.profile.BaseService#getServiceVersion()
+	 */
 	@Override
 	public String getServiceVersion() {
 		throw new UnsupportedOperationException();
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.mayo.cts2.framework.service.profile.BaseService#getServiceProvider()
+	 */
 	@Override
 	public SourceReference getServiceProvider() {
 		throw new UnsupportedOperationException();
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.mayo.cts2.framework.service.profile.BaseService#getKnownNamespaceList()
+	 */
 	@Override
 	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
 		throw new UnsupportedOperationException();
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersionReadService#existsVersionId(edu.mayo.cts2.framework.model.service.core.NameOrURI, java.lang.String)
+	 */
 	@Override
 	public boolean existsVersionId(NameOrURI codeSystem,
 			String officialResourceVersionId) {
 		throw new UnsupportedOperationException();
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersionReadService#getCodeSystemByVersionId(edu.mayo.cts2.framework.model.service.core.NameOrURI, java.lang.String, edu.mayo.cts2.framework.model.command.ResolvedReadContext)
+	 */
 	@Override
 	public CodeSystemVersionCatalogEntry getCodeSystemByVersionId(
 			NameOrURI codeSystem, String officialResourceVersionId,
 			ResolvedReadContext readContext) {
-		throw new UnsupportedOperationException();
+		
+		return this.getCodeSystemByVersionIdOrTag(
+				codeSystem, 
+				Constructors.createCodingSchemeVersionOrTagFromVersion(officialResourceVersionId));
 	}
 
+	/**
+	 * Gets the code system by version id or tag.
+	 *
+	 * @param codeSystem the code system
+	 * @param versionIdOrTag the version id or tag
+	 * @return the code system by version id or tag
+	 */
+	protected CodeSystemVersionCatalogEntry getCodeSystemByVersionIdOrTag(
+			NameOrURI codeSystem, CodingSchemeVersionOrTag versionIdOrTag){
+		String nameOrUri;
+		if(codeSystem.getName() != null){
+			nameOrUri = codeSystem.getName();
+		} else {
+			nameOrUri = codeSystem.getUri();
+		}
+		
+		CodingScheme codingScheme;
+		try {
+			codingScheme = this.getLexBigService().resolveCodingScheme(nameOrUri, versionIdOrTag);
+		} catch (LBException e) {
+			//this could be just that LexEVS didn't find it. If so, return null.
+			log.warn(e);
+			return null;
+		}
+		
+		return this.transformer.transform(codingScheme);
+	}
 }

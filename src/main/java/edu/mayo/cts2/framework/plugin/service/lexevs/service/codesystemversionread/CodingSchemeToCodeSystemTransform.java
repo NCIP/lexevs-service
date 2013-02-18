@@ -21,41 +21,30 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package edu.mayo.cts2.framework.plugin.service.lexevs;
+package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversionread;
 
-import org.LexGrid.LexBIG.Impl.LexBIGServiceImpl;
-import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
-import org.springframework.beans.factory.FactoryBean;
-import org.springframework.stereotype.Component;
+import org.LexGrid.codingSchemes.CodingScheme;
+
+import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntry;
 
 /**
- * A factory for creating LexBigService objects.
+ * Transforms a LexGrid CodingScheme into a CTS2 CodeSystemVersion CatalogEntry.
+ *
+ * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
-@Component
-public class LexBigServiceFactory implements FactoryBean<LexBIGService> {
+public class CodingSchemeToCodeSystemTransform {
 
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.FactoryBean#getObject()
+	/**
+	 * Transform.
+	 *
+	 * @param codingScheme the coding scheme
+	 * @return the code system version catalog entry
 	 */
-	@Override
-	public LexBIGService getObject() throws Exception {
-		return LexBIGServiceImpl.defaultInstance();
-	}
+	public CodeSystemVersionCatalogEntry transform(CodingScheme codingScheme){
+		CodeSystemVersionCatalogEntry codeSystem = new CodeSystemVersionCatalogEntry();
 
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
-	 */
-	@Override
-	public Class<?> getObjectType() {
-		return LexBIGService.class;
+		throw new UnsupportedOperationException(
+				"This method should transform a LexGrid CodingScheme" +
+				"into a CTS2 CodeSystemVersion CatalogEntry");
 	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.FactoryBean#isSingleton()
-	 */
-	@Override
-	public boolean isSingleton() {
-		return true;
-	}
-
 }
