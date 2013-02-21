@@ -21,7 +21,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversionread;
+package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -32,6 +32,7 @@ import org.junit.Test;
 
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion.LexEvsCodeSystemVersionReadService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
 
 
