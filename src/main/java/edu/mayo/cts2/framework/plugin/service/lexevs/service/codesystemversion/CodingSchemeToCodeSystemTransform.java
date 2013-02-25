@@ -23,9 +23,11 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion;
 
+import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.codingSchemes.CodingScheme;
 
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntry;
+import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntrySummary;
 
 /**
  * Transforms a LexGrid CodingScheme into a CTS2 CodeSystemVersion CatalogEntry.
@@ -47,4 +49,13 @@ public class CodingSchemeToCodeSystemTransform {
 				"This method should transform a LexGrid CodingScheme" +
 				"into a CTS2 CodeSystemVersion CatalogEntry");
 	}
+	
+	public CodeSystemVersionCatalogEntrySummary transform(CodingSchemeRendering codingSchemeRendering){
+		throw new UnsupportedOperationException(
+				"This method should transform a LexGrid CodingScheme" +
+				"into a CTS2 CodeSystemVersion CatalogEntrySummary");
+	}
+	
+	
+	
 }

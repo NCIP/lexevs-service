@@ -1,5 +1,6 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -26,6 +27,8 @@ import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersi
 public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		implements CodeSystemVersionQueryService {
 
+	CodingSchemeToCodeSystemTransform codingSchemeTransformer = new CodingSchemeToCodeSystemTransform();
+	
 	@Override
 	public int count(CodeSystemVersionQuery arg0) {
 		// TODO Auto-generated method stub
@@ -41,16 +44,35 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 	@Override
 	public DirectoryResult<CodeSystemVersionCatalogEntrySummary> getResourceSummaries(
 			CodeSystemVersionQuery arg0, SortCriteria arg1, Page arg2) {
-		// TODO Auto-generated method stu
+
 		LexBIGService lexBigService = getLexBigService();
+		ArrayList<CodeSystemVersionCatalogEntrySummary> list = new ArrayList<CodeSystemVersionCatalogEntrySummary>();
+		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = null;
+		boolean atEnd = false;
 		try {
 			CodingSchemeRenderingList csrList = lexBigService.getSupportedCodingSchemes();
 			CodingSchemeRendering[] csRendering = csrList.getCodingSchemeRendering();
+			for(CodingSchemeRendering render : csRendering){
+				list.add(codingSchemeTransformer.transform(render));
+			}
+			
+			ArrayList<CodeSystemVersionCatalogEntrySummary> sublist = new ArrayList<CodeSystemVersionCatalogEntrySummary>();
+			int i;
+			for(i = arg2.getStart(); i < arg2.getEnd() && i < list.size(); i++){
+				sublist.add(list.get(i));
+			}
+
+			if(i == list.size()){
+				atEnd = true;
+			}
+			
+			directoryResult = new DirectoryResult<CodeSystemVersionCatalogEntrySummary>(sublist, atEnd);
 			
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		throw new UnsupportedOperationException();
+		
+		return directoryResult;
 	}
 
 	@Override
