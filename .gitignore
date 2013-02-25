@@ -8,3 +8,4 @@
 /.groovy
 *.iml
 /.idea
+bin/
