@@ -24,43 +24,46 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertNotNull;
 
-import javax.annotation.Resource;
-
-import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
+import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
+import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.easymock.EasyMock;
 import org.junit.Test;
 
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntrySummary;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
-import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
 import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersionQuery;
 
 
 public class LexEvsCodeSystemVersionQueryServiceTest {
-	
-	@Resource
-	private LexEvsCodeSystemVersionQueryService service;
 
-	@Test
-	public void testSetUp() {
-		assertNotNull(this.service);
-	}
+	LexEvsCodeSystemVersionQueryService service = null;
 	
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testQueryByResourceSummaries() throws Exception {
 		Page page = new Page();
 		CodeSystemVersionQuery codeSystemVersionQuery = null;
 		SortCriteria sortCriteria = null;		
 		
-		assertNotNull(this.service.getResourceSummaries(codeSystemVersionQuery, sortCriteria, page));
+		LexEvsCodeSystemVersionQueryService service = 
+			new LexEvsCodeSystemVersionQueryService();
+		
+		LexBIGService lexBigService = 
+			EasyMock.createMock(LexBIGService.class);
+		
+		CodingSchemeRenderingList list = new CodingSchemeRenderingList();
+		EasyMock.expect(lexBigService.getSupportedCodingSchemes()).andReturn(list);
+		
+		EasyMock.replay(lexBigService);
+		
+		service.setLexBigService(lexBigService);
+
+		assertNotNull(service.getResourceSummaries(codeSystemVersionQuery, sortCriteria, page));
 	}
-	
+
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testQueryByResourceSummaries_count() throws Exception {
 		Page page = new Page();
 		CodeSystemVersionQuery codeSystemVersionQuery = null;
@@ -73,7 +76,6 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	}
 	
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testQueryByResourceSummaries_returnZero() throws Exception {
 		Page page = new Page();
 		CodeSystemVersionQuery codeSystemVersionQuery = null;
@@ -88,7 +90,6 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	}
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testQueryByResourceSummaries_returnOne() throws Exception {
 		Page page = new Page();
 		CodeSystemVersionQuery codeSystemVersionQuery = null;
