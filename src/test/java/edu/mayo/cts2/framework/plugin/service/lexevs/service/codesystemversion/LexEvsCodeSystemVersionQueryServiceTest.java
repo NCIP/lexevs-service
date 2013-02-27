@@ -26,6 +26,7 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion;
 import static org.junit.Assert.*;
 
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
+import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -42,63 +43,123 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	LexEvsCodeSystemVersionQueryService service = null;
 	
 	@Test
-	public void testQueryByResourceSummaries() throws Exception {
+	public void testQueryByResourceSummaries_list3() throws Exception {
 		Page page = new Page();
 		CodeSystemVersionQuery codeSystemVersionQuery = null;
 		SortCriteria sortCriteria = null;		
 		
 		LexEvsCodeSystemVersionQueryService service = 
-			new LexEvsCodeSystemVersionQueryService();
-		
-		LexBIGService lexBigService = 
-			EasyMock.createMock(LexBIGService.class);
-		
+				new LexEvsCodeSystemVersionQueryService();
+			
+		LexBIGService lexBigService = EasyMock.createMock(LexBIGService.class);
 		CodingSchemeRenderingList list = new CodingSchemeRenderingList();
+		for(int i=0; i < 3; i++){
+			list.addCodingSchemeRendering(i, new CodingSchemeRendering());
+		}
+		
 		EasyMock.expect(lexBigService.getSupportedCodingSchemes()).andReturn(list);
-		
 		EasyMock.replay(lexBigService);
-		
+			
 		service.setLexBigService(lexBigService);
-
-		assertNotNull(service.getResourceSummaries(codeSystemVersionQuery, sortCriteria, page));
-	}
-
-	@Test
-	public void testQueryByResourceSummaries_count() throws Exception {
-		Page page = new Page();
-		CodeSystemVersionQuery codeSystemVersionQuery = null;
-		SortCriteria sortCriteria = null;		
 		
+		service.setCodingSchemeTransformer(new CodingSchemeToCodeSystemTransform(){
+			public CodeSystemVersionCatalogEntrySummary transform(CodingSchemeRendering codingSchemeRendering){
+				return new CodeSystemVersionCatalogEntrySummary();
+			}
+		});
+
 		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = 
-				this.service.getResourceSummaries(codeSystemVersionQuery, sortCriteria, page); 
+				service.getResourceSummaries(codeSystemVersionQuery, sortCriteria, page); 
 		assertNotNull(directoryResult);
-		assertEquals(1, directoryResult.getEntries().size());
+		assertEquals(3, directoryResult.getEntries().size());
 	}
 	
 	@Test
-	public void testQueryByResourceSummaries_returnZero() throws Exception {
+	public void testQueryByResourceSummaries_list20() throws Exception {
 		Page page = new Page();
 		CodeSystemVersionQuery codeSystemVersionQuery = null;
 		SortCriteria sortCriteria = null;		
-		
-		page.setPage(3);
 		page.setMaxToReturn(10);
-		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = 
-				this.service.getResourceSummaries(codeSystemVersionQuery, sortCriteria, page); 
+		LexEvsCodeSystemVersionQueryService service = 
+				new LexEvsCodeSystemVersionQueryService();
+			
+		LexBIGService lexBigService = EasyMock.createMock(LexBIGService.class);
+		CodingSchemeRenderingList list = new CodingSchemeRenderingList();
+		for(int i=0; i < 20; i++){
+			list.addCodingSchemeRendering(i, new CodingSchemeRendering());
+		}
+		
+		EasyMock.expect(lexBigService.getSupportedCodingSchemes()).andReturn(list).anyTimes();
+		EasyMock.replay(lexBigService);
+			
+		service.setLexBigService(lexBigService);
+		
+		service.setCodingSchemeTransformer(new CodingSchemeToCodeSystemTransform(){
+			public CodeSystemVersionCatalogEntrySummary transform(CodingSchemeRendering codingSchemeRendering){
+				return new CodeSystemVersionCatalogEntrySummary();
+			}
+		});
+		
+		int expecting;
+		int actual;
+		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult;
+		// Test first page
+		page.setPage(0);
+		directoryResult = 
+				service.getResourceSummaries(codeSystemVersionQuery, sortCriteria, page); 
+		expecting = 10;
+		actual = directoryResult.getEntries().size();
 		assertNotNull(directoryResult);
-		assertEquals(0, directoryResult.getEntries().size());
+		assertEquals("Expecting " + expecting + " entries but got " + actual, expecting, actual);
+		
+		// Test second page
+		page.setPage(1);
+		directoryResult = 
+				service.getResourceSummaries(codeSystemVersionQuery, sortCriteria, page); 
+		expecting = 10;
+		actual = directoryResult.getEntries().size();
+		assertNotNull(directoryResult);
+		assertEquals("Expecting " + expecting + " entries but got " + actual, expecting, actual);
+		
+		// Test page that is past data
+		page.setPage(2);
+		directoryResult = 
+				service.getResourceSummaries(codeSystemVersionQuery, sortCriteria, page); 
+		expecting = 0;
+		actual = directoryResult.getEntries().size();
+		assertNotNull(directoryResult);
+		assertEquals("Expecting " + expecting + " entries but got " + actual, expecting, actual);		
 	}
 
 	@Test
-	public void testQueryByResourceSummaries_returnOne() throws Exception {
+	public void testQueryByResourceSummaries_list21_lastPageWithOne() throws Exception {
 		Page page = new Page();
 		CodeSystemVersionQuery codeSystemVersionQuery = null;
 		SortCriteria sortCriteria = null;		
+		page.setMaxToReturn(10);
+		page.setPage(2);
+		LexEvsCodeSystemVersionQueryService service = 
+				new LexEvsCodeSystemVersionQueryService();
+			
+		LexBIGService lexBigService = EasyMock.createMock(LexBIGService.class);
+		CodingSchemeRenderingList list = new CodingSchemeRenderingList();
+		for(int i=0; i < 21; i++){
+			list.addCodingSchemeRendering(i, new CodingSchemeRendering());
+		}
 		
-		page.setPage(0);
-		page.setMaxToReturn(1);
+		EasyMock.expect(lexBigService.getSupportedCodingSchemes()).andReturn(list);
+		EasyMock.replay(lexBigService);
+			
+		service.setLexBigService(lexBigService);
+		
+		service.setCodingSchemeTransformer(new CodingSchemeToCodeSystemTransform(){
+			public CodeSystemVersionCatalogEntrySummary transform(CodingSchemeRendering codingSchemeRendering){
+				return new CodeSystemVersionCatalogEntrySummary();
+			}
+		});
+
 		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = 
-				this.service.getResourceSummaries(codeSystemVersionQuery, sortCriteria, page); 
+				service.getResourceSummaries(codeSystemVersionQuery, sortCriteria, page); 
 		assertNotNull(directoryResult);
 		assertEquals(1, directoryResult.getEntries().size());
 	}

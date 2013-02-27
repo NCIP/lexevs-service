@@ -27,8 +27,18 @@ import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersi
 public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		implements CodeSystemVersionQueryService {
 
-	CodingSchemeToCodeSystemTransform codingSchemeTransformer = new CodingSchemeToCodeSystemTransform();
+	private CodingSchemeToCodeSystemTransform codingSchemeTransformer = new CodingSchemeToCodeSystemTransform();
+
 	
+	public CodingSchemeToCodeSystemTransform getCodingSchemeTransformer() {
+		return codingSchemeTransformer;
+	}
+
+	public void setCodingSchemeTransformer(
+			CodingSchemeToCodeSystemTransform codingSchemeTransformer) {
+		this.codingSchemeTransformer = codingSchemeTransformer;
+	}
+
 	@Override
 	public int count(CodeSystemVersionQuery arg0) {
 		// TODO Auto-generated method stub
@@ -57,8 +67,10 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 			}
 			
 			ArrayList<CodeSystemVersionCatalogEntrySummary> sublist = new ArrayList<CodeSystemVersionCatalogEntrySummary>();
-			int i;
-			for(i = arg2.getStart(); i < arg2.getEnd() && i < list.size(); i++){
+			int start = arg2.getStart();
+			int end = arg2.getEnd();
+			int i = 0;
+			for(i = start; i < end && i < list.size(); i++){
 				sublist.add(list.get(i));
 			}
 
