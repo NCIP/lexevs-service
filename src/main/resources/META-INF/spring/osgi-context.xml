@@ -18,5 +18,5 @@
 	<osgix:cm-properties id="props" persistent-id="edu.mayo.cts2.framework.plugin.service.lexevs"/>
 
 	<context:property-placeholder properties-ref="props" system-properties-mode="OVERRIDE"/>
-	
+		
 </beans>
