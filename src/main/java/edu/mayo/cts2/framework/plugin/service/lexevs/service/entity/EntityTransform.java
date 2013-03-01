@@ -21,41 +21,26 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package edu.mayo.cts2.framework.plugin.service.lexevs;
+package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 
-import org.LexGrid.LexBIG.Impl.LexBIGServiceImpl;
-import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
-import org.springframework.beans.factory.FactoryBean;
-import org.springframework.stereotype.Component;
+import org.LexGrid.concepts.Entity;
+
+import edu.mayo.cts2.framework.model.entity.EntityDescription;
 
 /**
- * A factory for creating LexBigService objects.
+ * 
+ * CTS2 <-> LexEVS Transform dealing with Entities and EntityDescriptions. 
+ *
  */
-@Component
-public class LexBigServiceFactory implements FactoryBean<LexBIGService> {
+public class EntityTransform {
 
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.FactoryBean#getObject()
+	/**
+	 * LexEVS Entity to CTS2 EntityDescription.
+	 *
+	 * @param entity the entity
+	 * @return the entity description
 	 */
-	@Override
-	public LexBIGService getObject() throws Exception {
-		return LexBIGServiceImpl.defaultInstance();
+	public EntityDescription entityToEntityDescription(Entity entity){
+		throw new UnsupportedOperationException();
 	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
-	 */
-	@Override
-	public Class<?> getObjectType() {
-		return LexBIGService.class;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.FactoryBean#isSingleton()
-	 */
-	@Override
-	public boolean isSingleton() {
-		return true;
-	}
-
 }

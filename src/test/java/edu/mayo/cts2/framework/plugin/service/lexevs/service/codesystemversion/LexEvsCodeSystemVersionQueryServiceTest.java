@@ -40,8 +40,6 @@ import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersi
 
 public class LexEvsCodeSystemVersionQueryServiceTest {
 
-	LexEvsCodeSystemVersionQueryService service = null;
-	
 	@Test
 	public void testQueryByResourceSummaries_list3() throws Exception {
 		Page page = new Page();

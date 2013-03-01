@@ -21,41 +21,49 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package edu.mayo.cts2.framework.plugin.service.lexevs;
+package edu.mayo.cts2.framework.plugin.service.lexevs.naming;
 
-import org.LexGrid.LexBIG.Impl.LexBIGServiceImpl;
-import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
-import org.springframework.beans.factory.FactoryBean;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 /**
- * A factory for creating LexBigService objects.
+ * CTS2 CodeSystemVersionNames will generally be in the form:
+ * 
+ * {Name}-{VersionId}
+ * 
+ * For example, SNOMEDCT-20120101
+ * 
+ * LexEVS will need this broken apart, for example
+ * CodingSchemeName: SNOMEDCT, VersionId: 20120101
  */
 @Component
-public class LexBigServiceFactory implements FactoryBean<LexBIGService> {
+public class CodeSystemVersionNameConverter {
 
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.FactoryBean#getObject()
+	private static final String SEPARATOR = "-";
+	
+	/**
+	 * To cts2 code system version name.
+	 *
+	 * @param lexEvsCodingSchemeName the lex evs coding scheme name
+	 * @param version the version
+	 * @return the string
 	 */
-	@Override
-	public LexBIGService getObject() throws Exception {
-		return LexBIGServiceImpl.defaultInstance();
+	public String toCts2CodeSystemVersionName(String lexEvsCodingSchemeName, String version){
+		return lexEvsCodingSchemeName + SEPARATOR + version;
 	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
+	
+	/**
+	 * From cts2 code system version name.
+	 *
+	 * @param cts2CodeSystemVersionName the cts2 code system version name
+	 * @return the name version pair
 	 */
-	@Override
-	public Class<?> getObjectType() {
-		return LexBIGService.class;
+	public NameVersionPair fromCts2CodeSystemVersionName(String cts2CodeSystemVersionName){
+		String[] nameParts = StringUtils.split(cts2CodeSystemVersionName);
+		
+		Assert.isTrue(nameParts.length == 2);
+		
+		return new NameVersionPair(nameParts[0], nameParts[1]);
 	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.FactoryBean#isSingleton()
-	 */
-	@Override
-	public boolean isSingleton() {
-		return true;
-	}
-
 }

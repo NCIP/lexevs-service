@@ -21,41 +21,43 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package edu.mayo.cts2.framework.plugin.service.lexevs;
-
-import org.LexGrid.LexBIG.Impl.LexBIGServiceImpl;
-import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
-import org.springframework.beans.factory.FactoryBean;
-import org.springframework.stereotype.Component;
+package edu.mayo.cts2.framework.plugin.service.lexevs.naming;
 
 /**
- * A factory for creating LexBigService objects.
+ * A Name-Version Pair.
  */
-@Component
-public class LexBigServiceFactory implements FactoryBean<LexBIGService> {
-
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.FactoryBean#getObject()
+public class NameVersionPair {
+	
+	private String name;
+	
+	private String version;
+	
+	/**
+	 * Instantiates a new name version pair.
+	 *
+	 * @param name the name
+	 * @param version the version
 	 */
-	@Override
-	public LexBIGService getObject() throws Exception {
-		return LexBIGServiceImpl.defaultInstance();
+	public NameVersionPair(String name, String version) {
+		super();
+		this.name = name;
+		this.version = version;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
-	 */
-	@Override
-	public Class<?> getObjectType() {
-		return LexBIGService.class;
+	public String getName() {
+		return name;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.FactoryBean#isSingleton()
-	 */
-	@Override
-	public boolean isSingleton() {
-		return true;
+	public void setName(String name) {
+		this.name = name;
 	}
 
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
+	
 }
