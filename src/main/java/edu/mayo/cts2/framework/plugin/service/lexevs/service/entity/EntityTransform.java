@@ -23,9 +23,11 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 
+import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.concepts.Entity;
 
 import edu.mayo.cts2.framework.model.entity.EntityDescription;
+import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 
 /**
  * 
@@ -41,6 +43,10 @@ public class EntityTransform {
 	 * @return the entity description
 	 */
 	public EntityDescription entityToEntityDescription(Entity entity){
+		throw new UnsupportedOperationException();
+	}
+
+	public EntityDirectoryEntry transform(ResolvedConceptReference reference) {
 		throw new UnsupportedOperationException();
 	}
 }
