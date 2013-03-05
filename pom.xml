@@ -194,6 +194,12 @@
 
 		<dependency>
 			<groupId>lexevs</groupId>
+			<artifactId>lexevs-valuesets</artifactId>
+			<version>${lexevs.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>lexevs</groupId>
 			<artifactId>lexbig-impl</artifactId>
 			<version>${lexevs.version}</version>
 			<type>test-jar</type>
