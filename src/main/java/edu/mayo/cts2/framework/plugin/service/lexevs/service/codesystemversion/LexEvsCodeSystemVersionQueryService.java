@@ -13,22 +13,23 @@ import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogE
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntrySummary;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
+import edu.mayo.cts2.framework.model.core.OpaqueData;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
 import edu.mayo.cts2.framework.model.core.PropertyReference;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
+import edu.mayo.cts2.framework.model.core.SourceReference;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersionQuery;
 import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersionQueryService;
-
 @Component
 public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		implements CodeSystemVersionQueryService {
 
+	// ------ Local methods ----------------------
 	private CodingSchemeToCodeSystemTransform codingSchemeTransformer = new CodingSchemeToCodeSystemTransform();
 
-	
 	public CodingSchemeToCodeSystemTransform getCodingSchemeTransformer() {
 		return codingSchemeTransformer;
 	}
@@ -38,6 +39,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		this.codingSchemeTransformer = codingSchemeTransformer;
 	}
 
+	// -------- Implemented methods ----------------
 	@Override
 	public int count(CodeSystemVersionQuery arg0) {
 		// TODO Auto-generated method stub
@@ -52,7 +54,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 
 	@Override
 	public DirectoryResult<CodeSystemVersionCatalogEntrySummary> getResourceSummaries(
-			CodeSystemVersionQuery arg0, SortCriteria arg1, Page arg2) {
+			CodeSystemVersionQuery query, SortCriteria sortCriteria, Page page) {
 
 		LexBIGService lexBigService = getLexBigService();
 		ArrayList<CodeSystemVersionCatalogEntrySummary> list = new ArrayList<CodeSystemVersionCatalogEntrySummary>();
@@ -66,8 +68,8 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 			}
 			
 			ArrayList<CodeSystemVersionCatalogEntrySummary> sublist = new ArrayList<CodeSystemVersionCatalogEntrySummary>();
-			int start = arg2.getStart();
-			int end = arg2.getEnd();
+			int start = page.getStart();
+			int end = page.getEnd();
 			int i = 0;
 			for(i = start; i < end && i < list.size(); i++){
 				sublist.add(list.get(i));
@@ -88,6 +90,30 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 
 	@Override
 	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public OpaqueData getServiceDescription() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public String getServiceName() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public SourceReference getServiceProvider() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public String getServiceVersion() {
+		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException();
 	}
 
