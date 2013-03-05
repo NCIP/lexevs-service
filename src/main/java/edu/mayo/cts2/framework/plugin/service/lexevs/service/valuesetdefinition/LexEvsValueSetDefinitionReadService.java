@@ -27,6 +27,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.stereotype.Component;
+
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
@@ -46,6 +48,7 @@ import edu.mayo.cts2.framework.service.profile.valuesetdefinition.name.ValueSetD
  * @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
  *
  */
+@Component
 public class LexEvsValueSetDefinitionReadService extends AbstractLexEvsService
 		implements ValueSetDefinitionReadService,
 		ValueSetDefinitionHistoryService {

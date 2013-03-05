@@ -26,6 +26,8 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service.valuesetdefinition
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.stereotype.Component;
+
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
@@ -43,6 +45,7 @@ import edu.mayo.cts2.framework.service.profile.valuesetdefinition.ValueSetDefini
  * @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
  *
  */
+@Component
 public class LexEvsValueSetDefinitionQueryService extends AbstractLexEvsService
 		implements ValueSetDefinitionQueryService {
 
