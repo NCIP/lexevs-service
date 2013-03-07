@@ -21,37 +21,32 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion;
+package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 
-import static org.junit.Assert.assertNotNull;
+import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
+import org.LexGrid.concepts.Entity;
 
-import javax.annotation.Resource;
+import edu.mayo.cts2.framework.model.entity.EntityDescription;
+import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 
-import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
-import org.junit.Test;
+/**
+ * 
+ * CTS2 <-> LexEVS Transform dealing with Entities and EntityDescriptions. 
+ *
+ */
+public class EntityTransform {
 
-import edu.mayo.cts2.framework.model.service.core.NameOrURI;
-import edu.mayo.cts2.framework.model.util.ModelUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion.LexEvsCodeSystemVersionReadService;
-import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
-
-
-public class LexEvsCodeSystemVersionReadServiceTestIT extends AbstractTestITBase {
-	
-	@Resource
-	private LexEvsCodeSystemVersionReadService service;
-
-	@Test
-	public void testSetUp() {
-		assertNotNull(this.service);
-	}
-	
-	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-	public void testReadByOfficialVersionId() throws Exception {
-		NameOrURI name = ModelUtils.nameOrUriFromName("Automobiles");
-		
-		assertNotNull(this.service.getCodeSystemByVersionId(name, "1.0", null));
+	/**
+	 * LexEVS Entity to CTS2 EntityDescription.
+	 *
+	 * @param entity the entity
+	 * @return the entity description
+	 */
+	public EntityDescription entityToEntityDescription(Entity entity){
+		throw new UnsupportedOperationException();
 	}
 
+	public EntityDirectoryEntry transform(ResolvedConceptReference reference) {
+		throw new UnsupportedOperationException();
+	}
 }

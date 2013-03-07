@@ -21,37 +21,43 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion;
+package edu.mayo.cts2.framework.plugin.service.lexevs.naming;
 
-import static org.junit.Assert.assertNotNull;
-
-import javax.annotation.Resource;
-
-import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
-import org.junit.Test;
-
-import edu.mayo.cts2.framework.model.service.core.NameOrURI;
-import edu.mayo.cts2.framework.model.util.ModelUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion.LexEvsCodeSystemVersionReadService;
-import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
-
-
-public class LexEvsCodeSystemVersionReadServiceTestIT extends AbstractTestITBase {
+/**
+ * A Name-Version Pair.
+ */
+public class NameVersionPair {
 	
-	@Resource
-	private LexEvsCodeSystemVersionReadService service;
-
-	@Test
-	public void testSetUp() {
-		assertNotNull(this.service);
-	}
+	private String name;
 	
-	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-	public void testReadByOfficialVersionId() throws Exception {
-		NameOrURI name = ModelUtils.nameOrUriFromName("Automobiles");
-		
-		assertNotNull(this.service.getCodeSystemByVersionId(name, "1.0", null));
+	private String version;
+	
+	/**
+	 * Instantiates a new name version pair.
+	 *
+	 * @param name the name
+	 * @param version the version
+	 */
+	public NameVersionPair(String name, String version) {
+		super();
+		this.name = name;
+		this.version = version;
 	}
 
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
+	
 }
