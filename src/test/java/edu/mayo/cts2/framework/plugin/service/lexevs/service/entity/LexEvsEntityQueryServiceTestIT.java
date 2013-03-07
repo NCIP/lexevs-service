@@ -25,6 +25,7 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 
 import static org.junit.Assert.*;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -39,6 +40,9 @@ import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogE
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
+import edu.mayo.cts2.framework.model.core.SortCriteria;
+import edu.mayo.cts2.framework.model.directory.DirectoryResult;
+import edu.mayo.cts2.framework.model.entity.EntityDescription;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.service.core.Query;
@@ -61,6 +65,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	@Test
 	public void testSetUp() {
 		assertNotNull(this.service);
+		assertNotNull(this.lbs);
 	}
 	
 	@Test
@@ -68,12 +73,15 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	public void testReadByOfficialVersionId() throws Exception {
 		final NameOrURI name = ModelUtils.nameOrUriFromName("Automobiles");
 		
+		// Set the Entity Transformer to an anonymous class that returns an
+		// empty EntityDirectoryEntry();
 		service.setEntityTransformer(new EntityTransform(){
 			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
 				return new EntityDirectoryEntry();
 			}
 		});
 			
+		// Create a query from an anonymous EntityDescriptonQuery class
 		EntityDescriptionQuery query = new EntityDescriptionQuery(){
 
 			@Override
@@ -106,7 +114,13 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 			
 		};
 		
-		assertTrue(this.service.getResourceSummaries(query, null, new Page()).getEntries().size() > 0);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
+		List<EntityDirectoryEntry> list = directoryResult.getEntries();
+		assertTrue(list.size() > 0);
 		
 		//PrintUtility.print(lbs.getNodeSet("Automobiles", null, null));
 	}
