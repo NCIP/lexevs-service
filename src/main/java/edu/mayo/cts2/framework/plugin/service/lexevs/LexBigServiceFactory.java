@@ -25,6 +25,7 @@ package edu.mayo.cts2.framework.plugin.service.lexevs;
 
 import org.LexGrid.LexBIG.Impl.LexBIGServiceImpl;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,9 +49,12 @@ public class LexBigServiceFactory implements FactoryBean<LexBIGService> {
 	 */
 	@Override
 	public LexBIGService getObject() throws Exception {
-		log.warn("Setting " + LG_CONFIG_ENV_PROP + " to: " + this.lgConfigFile);
+		if(StringUtils.isNotBlank(this.lgConfigFile)){
+			log.warn("Setting " + LG_CONFIG_ENV_PROP + " to: " + this.lgConfigFile);
+			
+			System.setProperty(LG_CONFIG_ENV_PROP, this.lgConfigFile);
+		}
 		
-		System.setProperty(LG_CONFIG_ENV_PROP, this.lgConfigFile);
 		return LexBIGServiceImpl.defaultInstance();
 	}
 
