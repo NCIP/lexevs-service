@@ -25,6 +25,9 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -33,12 +36,14 @@ import org.LexGrid.LexBIG.DataModel.Collections.ResolvedConceptReferenceList;
 import org.LexGrid.LexBIG.DataModel.Collections.SortOptionList;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
+import org.LexGrid.LexBIG.DataModel.InterfaceElements.ExtensionDescription;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet.PropertyType;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet.SearchDesignationOption;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
 import org.LexGrid.concepts.Entity;
+import org.LexGrid.concepts.Presentation;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.command.Page;
@@ -60,6 +65,10 @@ import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURIList;
 import edu.mayo.cts2.framework.model.service.core.Query;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.PrintUtility;
+import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
+import edu.mayo.cts2.framework.service.profile.entitydescription.EntitiesFromAssociationsQuery;
+import edu.mayo.cts2.framework.service.profile.entitydescription.EntitiesFromAssociationsQuery.EntitiesFromAssociations;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQuery;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQueryService;
 
@@ -108,22 +117,16 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 			
 			CodingSchemeVersionOrTag versionOrTag = null;
 			LocalNameList entityTypes = new LocalNameList();
-		//	entityTypes.addEntry("context"); 
-		//	entityTypes.addEntry("instance");
 			CodedNodeSet codeNodeSet = lexBigService.getNodeSet(codingScheme, versionOrTag, entityTypes);
 			System.out.println("#_#_#_#_CodeNodeSet: " + codeNodeSet.toString());
 			
-			//Look at LexEVS test to see how to filter using following command
-//			codeNodeSet.restrictToMatchingDesignations(matchText, preferredOnly, matchAlgorithm, language)
-			
-//			String matchText = "";
-//			// PREFERRED_ONLY, NON_PREFERRED_ONLY, ALL
-//			SearchDesignationOption preferredOnly = SearchDesignationOption.ALL;
-//			String matchAlgorithm = "";
-//			String language = "";
-//			codeNodeSet.restrictToMatchingDesignations(matchText, preferredOnly, matchAlgorithm, language);
-			
-			
+			Set<ResolvedFilter> filterSet = query.getFilterComponent();
+			for(ResolvedFilter filter : filterSet){
+				filter.getMatchValue();
+//				// PREFERRED_ONLY, NON_PREFERRED_ONLY, ALL
+				codeNodeSet.restrictToMatchingDesignations(filter.getMatchValue(), SearchDesignationOption.ALL, filter.getMatchAlgorithmReference().getContent(), null);
+			}
+		
 			SortOptionList sortOptions = null;
 			LocalNameList propertyNames = null;
 			PropertyType [] propertyTypes = null; 
@@ -137,13 +140,12 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 			ResolvedConceptReference[] resolvedConceptReferences = resolvedConceptReferenceList.getResolvedConceptReference();
 			System.out.println("resolvedConceptReferences: " + resolvedConceptReferences.length);
 			for(ResolvedConceptReference reference : resolvedConceptReferences){
-				System.out.println("ResolvedConceptReference:\n" + resolvedConceptReference_toString(reference));
+				System.out.println("ResolvedConceptReference:\n" + PrintUtility.resolvedConceptReference_toString(reference, 1));
 				EntityDirectoryEntry entry = entityTransform.transform(reference);
-				
 				list.add(entry);
 			}
 
-			if(!iterator.hasNext()){
+			if(!iterator.hasNext()){ 
 				atEnd = true;
 			}
 			
@@ -156,82 +158,22 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		return directoryResult;
 	}
 	
-	private String resolvedConceptReference_toString(ResolvedConceptReference reference){
-		String results = "";
-		
-		results += "\t Code: " + reference.getCode() + "\n";
-		results += "\t CodeNamespace: " + reference.getCodeNamespace() + "\n";
-		results += "\t CodingSchemeName: " + reference.getCodingSchemeName() + "\n";
-		results += "\t CodingSchemeURI: " + reference.getCodingSchemeURI() + "\n";
-		results += "\t CodingSchemeVersion: " + reference.getCodingSchemeVersion() + "\n";
-		results += "\t ConceptCode: " + reference.getConceptCode() + "\n";
-
-		results += "\t Entities: \n";
-		results += "\t\t " + entity_toString(reference.getEntity()) + "\n";
-				
-		results += "\t Entity: " + reference.getEntity().getEntityCode() + "\n";
-		results += "\t EntityDescription: " + reference.getEntityDescription().getContent() + "\n";
-		results += "\t SourceOf: " + reference.getSourceOf() + "\n";
-		results += "\t TargetOf: " + reference.getTargetOf() + "\n";
-		
-		return results;
-	}
-	
-	private String entity_toString(Entity entity){
-		String results = "EntityCode = " + entity.getEntityCode() + ", ";
-		results += "EntityCodeNamespace = " + entity.getEntityCodeNamespace() + ", ";
-		results += "Owner = " + entity.getOwner() + ", ";
-		results += "Status = " + entity.getStatus() + "\n";
-
-		results += "\t\t EntityTypeCount = " + entity.getEntityTypeCount() + ", ";
-		results += "EntityTypes = " + entityTypes_toString(entity) + "\n";
-		
-		results += "\t\t CommentCount = " + entity.getCommentCount() + ", ";
-		results += "Comments = " + comments_toString(entity) + "\n";
-		
-		results += "\t\t DefinitionCount = " + entity.getDefinitionCount() + ", ";
-		results += "Definitions = " + definitions_toString(entity) + "\n";
-		
-		return results;
-	}
-	
-	private String definitions_toString(Entity entity){
-		String results = "";
-		int definitionCount = entity.getDefinitionCount();
-		for(int i=0; i < definitionCount; i++){
-			results += entity.getDefinition(i) + ", ";
-		}
-		return results;
-	}
-	
-	private String comments_toString(Entity entity){
-		String results = "";
-		int commentCount = entity.getCommentCount();
-		for(int i=0; i < commentCount; i++){
-			results += entity.getComment(i) + ", ";
-		}
-		return results;
-	}
-
-	private String entityTypes_toString(Entity entity){
-		String results = "";
-		int typeCount = entity.getEntityTypeCount();
-		for(int i=0; i < typeCount; i++){
-			results += entity.getEntityType(i) + ", ";
-		}
-		return results;
-	}
-
 	@Override
 	public Set<? extends MatchAlgorithmReference> getSupportedMatchAlgorithms() {
-		// TODO Auto-generated method stub
+		for(ExtensionDescription desc :
+			this.getLexBigService().getFilterExtensions().getExtensionDescription()){
+			
+		}
+		
 		return null;
 	}
 
 	@Override
 	public Set<? extends PropertyReference> getSupportedSearchReferences() {
-		// TODO Auto-generated method stub
-		return null;
+		PropertyReference ref = StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference();
+		// presentation
+		// resource_name - code (restricted code method)
+		return new HashSet<PropertyReference>(Arrays.asList(ref)); 
 	}
 
 	@Override
