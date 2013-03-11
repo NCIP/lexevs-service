@@ -27,6 +27,7 @@ import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.apache.log4j.Logger;
+import org.lexgrid.valuesets.LexEVSValueSetDefinitionServices;
 import org.springframework.beans.factory.annotation.Value;
 
 import edu.mayo.cts2.framework.model.core.OpaqueData;
@@ -61,6 +62,18 @@ public abstract class AbstractLexEvsService implements BaseService {
 
 	public void setLexBigService(LexBIGService lexBigService) {
 		this.lexBigService = lexBigService;
+	}
+	
+	@Resource
+	private LexEVSValueSetDefinitionServices lexEVSValueSetDefinitionServices;
+
+	public LexEVSValueSetDefinitionServices getLexEVSValueSetDefinitionServices() {
+		return lexEVSValueSetDefinitionServices;
+	}
+
+	public void setLexEVSValueSetDefinitionServices(
+			LexEVSValueSetDefinitionServices lexEVSValueSetDefinitionServices) {
+		this.lexEVSValueSetDefinitionServices = lexEVSValueSetDefinitionServices;
 	}
 
 	@Override

@@ -23,10 +23,13 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.valuesetdefinition;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
@@ -52,6 +55,8 @@ import edu.mayo.cts2.framework.service.profile.valuesetdefinition.name.ValueSetD
 public class LexEvsValueSetDefinitionReadService extends AbstractLexEvsService
 		implements ValueSetDefinitionReadService,
 		ValueSetDefinitionHistoryService {
+	
+	private LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform vsdTransformer = new LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform();
 
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.service.profile.TagAwareReadService#readByTag(edu.mayo.cts2.framework.model.service.core.NameOrURI, edu.mayo.cts2.framework.model.core.VersionTagReference, edu.mayo.cts2.framework.model.command.ResolvedReadContext)
@@ -59,8 +64,52 @@ public class LexEvsValueSetDefinitionReadService extends AbstractLexEvsService
 	@Override
 	public LocalIdValueSetDefinition readByTag(NameOrURI parentIdentifier,
 			VersionTagReference tag, ResolvedReadContext readContext) {
-		throw new UnsupportedOperationException();
+		
+		if (parentIdentifier == null) {
+			throw new UnsupportedOperationException("The passed in edu.mayo.cts2.framework.model.service.core.NameOrURI parameter cannot be a null value.");
+		} else {
+			return getValueSetDefinition(parentIdentifier, tag);
+		}
+		
 	}
+	
+	protected LocalIdValueSetDefinition getValueSetDefinition(NameOrURI parentIdentifier, VersionTagReference tag) {
+		
+		//String name = parentIdentifier.getName();
+		String uriString = parentIdentifier.getUri();
+		URI valueSetDefinitionURI;
+		try {
+			valueSetDefinitionURI = new URI(uriString);
+		} catch (URISyntaxException uriSyntaxException) {
+			throw new RuntimeException(uriSyntaxException);
+		}
+		
+		String valueSetDefinitionRevisionId = (tag != null) ? tag.getContent() : null;
+		org.LexGrid.valueSets.ValueSetDefinition lexGridValueSetDefinition = new org.LexGrid.valueSets.ValueSetDefinition();
+
+		try {
+			lexGridValueSetDefinition = getLexEVSValueSetDefinitionServices().getValueSetDefinition(valueSetDefinitionURI, valueSetDefinitionRevisionId);
+		} catch (LBException lbe) {
+			throw new RuntimeException(lbe);
+		}
+		
+		// TODO Need to transform org.LexGrid.valueSets.ValueSetDefinition into a 
+		//   edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinition object and use it to
+		//   construct a CTS2 LocalIdValueSetDefinition object	
+		ValueSetDefinition valueSetDefinition = null;
+		if (lexGridValueSetDefinition != null) {
+			valueSetDefinition = vsdTransformer.transformToValueSetDefinition(lexGridValueSetDefinition);			
+		} else {
+			valueSetDefinition = new ValueSetDefinition();
+		}
+		
+		// TODO Need CTS2 ValueSetDefinition as min for LocalIdValueSetDefinition constructor
+		//   and maybe use it's 2 param constructor (has String localID)???
+		LocalIdValueSetDefinition retVal = new LocalIdValueSetDefinition(valueSetDefinition); 
+		
+		return retVal;
+	}
+
 
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.service.profile.TagAwareReadService#existsByTag(edu.mayo.cts2.framework.model.service.core.NameOrURI, edu.mayo.cts2.framework.model.core.VersionTagReference, edu.mayo.cts2.framework.model.command.ResolvedReadContext)

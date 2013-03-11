@@ -30,6 +30,7 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.junit.Test;
 
 import edu.mayo.cts2.framework.model.command.Page;
@@ -59,31 +60,30 @@ public class LexEvsValueSetDefinitionQueryServiceTestIT extends
 		assertNotNull(this.service);
 	}
 	
-	
 	@Test
-//	@LoadContent(contentPath="lexevs/test-content/OvarianMass_SNOMED_ValueSets.owl")
+	@LoadContent(contentPath="lexevs/test-content/VSDOnlyTest.xml")
 	public void testResourceSummaries() throws Exception {
-		//final String srcEntityName = "372087000";  // LexEVS entity code for entity description "Primary malignant neoplasm"
-		String uri = "http://www.OntoReason.com/Ontologies/OvarianMass_SNOMED_ValueSets.owl";
-		NameOrURI uriName = ModelUtils.nameOrUriFromUri(uri);
+		String uri = "SRITEST:AUTO:PropertyRefTest1-VSDONLY";
+		String name = "Automobiles";
+		//NameOrURI uriName = ModelUtils.nameOrUriFromUri(uri);
+		NameOrURI codeSystemName = ModelUtils.nameOrUriFromName(name);
 		
-		Query query = new Query();
-		query.setMatchAlgorithm(uriName);
-		Set<ResolvedFilter> filterComponent = new HashSet<ResolvedFilter>();
+		//uriName.setName("Automobiles");  // LexEVS defaultCodingScheme of ValueSetDefinition
+		
+		Query query = null;
+		Set<ResolvedFilter> filterComponent = null;
 		ResolvedReadContext readContext = null;		
 		ValueSetDefinitionQueryServiceRestrictions vsdQueryServiceRestrictions = new ValueSetDefinitionQueryServiceRestrictions();
-		// Add the source graphNode - using [A0001] Automobile
-		vsdQueryServiceRestrictions.setValueSet(uriName);
+		vsdQueryServiceRestrictions.setValueSet(codeSystemName);
 		
 		ValueSetDefinitionQueryImpl vsdQuery = new ValueSetDefinitionQueryImpl(query,filterComponent,readContext,vsdQueryServiceRestrictions);
-				
-		
+						
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		
-//		DirectoryResult<ValueSetDefinitionDirectoryEntry> resourceSummaries = service.getResourceSummaries(vsdQuery, sortCriteria, page);
+		DirectoryResult<ValueSetDefinitionDirectoryEntry> resourceSummaries = service.getResourceSummaries(vsdQuery, sortCriteria, page);
 		
-//		assertNotNull(resourceSummaries);
+		assertNotNull(resourceSummaries);
 	}
 
 }

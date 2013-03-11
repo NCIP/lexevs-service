@@ -21,46 +21,34 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package edu.mayo.cts2.framework.plugin.service.lexevs.service.valuesetdefinition;
+package edu.mayo.cts2.framework.plugin.service.lexevs;
 
-import static org.junit.Assert.assertNotNull;
-
-import javax.annotation.Resource;
-
-import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
-import org.junit.Test;
-
-import edu.mayo.cts2.framework.model.extension.LocalIdValueSetDefinition;
-import edu.mayo.cts2.framework.model.service.core.NameOrURI;
-import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
+import org.lexgrid.valuesets.LexEVSValueSetDefinitionServices;
+import org.lexgrid.valuesets.impl.LexEVSValueSetDefinitionServicesImpl;
+import org.springframework.beans.factory.FactoryBean;
+import org.springframework.stereotype.Component;
 
 /**
  * @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
  *
  */
-public class LexEvsValueSetDefinitionReadServiceTestIT extends
-		AbstractTestITBase {
+@Component
+public class LexEVSValueSetDefinitionServicesFactory implements
+		FactoryBean<LexEVSValueSetDefinitionServices> {
 
-	@Resource
-	private LexEvsValueSetDefinitionReadService service;
-	
-	@Test
-	public void testSetUp() {
-		assertNotNull(this.service);
+	@Override
+	public LexEVSValueSetDefinitionServices getObject() throws Exception {
+		return LexEVSValueSetDefinitionServicesImpl.defaultInstance();
 	}
-	
-	@Test
-	@LoadContent(contentPath="lexevs/test-content/VSDOnlyTest.xml")
-	public void testReadByTag() {
-		
-		String uri = "SRITEST:AUTO:PropertyRefTest1-VSDONLY";
-		NameOrURI uriIdentifier = new NameOrURI();
-		uriIdentifier.setUri(uri);
-		
-		LocalIdValueSetDefinition liVSD = service.readByTag(uriIdentifier, null, null);
-		
-		assertNotNull(liVSD);
+
+	@Override
+	public Class<?> getObjectType() {
+		return LexEVSValueSetDefinitionServices.class;
 	}
-	
+
+	@Override
+	public boolean isSingleton() {
+		return false;
+	}
 
 }
