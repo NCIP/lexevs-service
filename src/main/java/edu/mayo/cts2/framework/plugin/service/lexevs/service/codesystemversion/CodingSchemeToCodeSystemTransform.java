@@ -28,6 +28,7 @@ import javax.annotation.Resource;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.codingSchemes.CodingScheme;
+import org.LexGrid.commonTypes.EntityDescription;
 import org.LexGrid.commonTypes.Property;
 import org.springframework.stereotype.Component;
 
@@ -50,6 +51,15 @@ public class CodingSchemeToCodeSystemTransform {
 	@Resource
 	private CodeSystemVersionNameConverter codeSystemVersionNameConverter;
 	
+	public CodingSchemeToCodeSystemTransform(){
+		super();
+	}
+	
+	public CodingSchemeToCodeSystemTransform(
+		CodeSystemVersionNameConverter codeSystemVersionNameConverter){
+		super();
+		this.codeSystemVersionNameConverter = codeSystemVersionNameConverter;
+	}
 	/**
 	 * Transform.
 	 *
@@ -67,18 +77,22 @@ public class CodingSchemeToCodeSystemTransform {
 		codeSystem.setDocumentURI(codingScheme.getCodingSchemeURI());
 		codeSystem.setFormalName(codingScheme.getFormalName());
 		
-		for(Property property : codingScheme.getProperties().getProperty()){
-			codeSystem.addProperty(this.toProperty(property));
+		if(codingScheme.getProperties() != null){
+			for(Property property : codingScheme.getProperties().getProperty()){
+				codeSystem.addProperty(this.toProperty(property));
+			}
 		}
 		
 		for(String localName : codingScheme.getLocalName()){
 			codeSystem.addKeyword(localName);
 		}
 		
-		EntryDescription description = new EntryDescription();
-		description.setValue(ModelUtils.toTsAnyType(
-				codingScheme.getEntityDescription().getContent()));
-		codeSystem.setResourceSynopsis(description);
+		EntityDescription entityDescription = codingScheme.getEntityDescription();
+		if(entityDescription != null){
+			EntryDescription description = new EntryDescription();
+			description.setValue(ModelUtils.toTsAnyType(entityDescription.getContent()));
+			codeSystem.setResourceSynopsis(description);
+		}
 		
 		return codeSystem;
 	}
@@ -95,10 +109,13 @@ public class CodingSchemeToCodeSystemTransform {
 		
 		summary.setFormalName(codingSchemeSummary.getFormalName());
 		
-		EntryDescription description = new EntryDescription();
-		description.setValue(ModelUtils.toTsAnyType(
-				summary.getResourceSynopsis().getValue().getContent()));
-		summary.setResourceSynopsis(description);
+		if(summary.getResourceSynopsis() != null &&
+				summary.getResourceSynopsis().getValue() != null){
+			EntryDescription description = new EntryDescription();
+			description.setValue(ModelUtils.toTsAnyType(
+					summary.getResourceSynopsis().getValue().getContent()));
+			summary.setResourceSynopsis(description);
+		}
 		
 		return summary;
 	}
