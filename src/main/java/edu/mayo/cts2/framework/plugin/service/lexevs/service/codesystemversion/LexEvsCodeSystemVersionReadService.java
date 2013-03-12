@@ -72,7 +72,7 @@ public class LexEvsCodeSystemVersionReadService
 		
 		return this.getByVersionIdOrTag(
 				codeSystem, 
-				Constructors.createCodingSchemeVersionOrTagFromTag(tag.getContent()));
+				this.convertTag(tag));
 	}
 
 	/* (non-Javadoc)
