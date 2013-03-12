@@ -29,8 +29,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
-import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.codingSchemes.CodingScheme;
 import org.springframework.stereotype.Component;
@@ -43,7 +41,7 @@ import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
-import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
+import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsCodeSystemService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersionReadService;
 
@@ -53,7 +51,9 @@ import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersi
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
 @Component
-public class LexEvsCodeSystemVersionReadService extends AbstractLexEvsService implements CodeSystemVersionReadService {
+public class LexEvsCodeSystemVersionReadService 
+	extends AbstractLexEvsCodeSystemService<CodeSystemVersionCatalogEntry> 
+	implements CodeSystemVersionReadService {
 	
 	@Resource
 	private CodingSchemeToCodeSystemTransform transformer;
@@ -70,7 +70,7 @@ public class LexEvsCodeSystemVersionReadService extends AbstractLexEvsService im
 			VersionTagReference tag, 
 			ResolvedReadContext readContext) {
 		
-		return this.getCodeSystemByVersionIdOrTag(
+		return this.getByVersionIdOrTag(
 				codeSystem, 
 				Constructors.createCodingSchemeVersionOrTagFromTag(tag.getContent()));
 	}
@@ -109,7 +109,7 @@ public class LexEvsCodeSystemVersionReadService extends AbstractLexEvsService im
 		NameVersionPair namePair = 
 			this.nameConverter.fromCts2CodeSystemVersionName(name);
 		
-		return this.getCodeSystemByVersionIdOrTag(
+		return this.getByVersionIdOrTag(
 			ModelUtils.nameOrUriFromName(namePair.getName()),
 			Constructors.createCodingSchemeVersionOrTagFromVersion(namePair.getVersion()));
 	}
@@ -150,36 +150,13 @@ public class LexEvsCodeSystemVersionReadService extends AbstractLexEvsService im
 			NameOrURI codeSystem, String officialResourceVersionId,
 			ResolvedReadContext readContext) {
 		
-		return this.getCodeSystemByVersionIdOrTag(
+		return this.getByVersionIdOrTag(
 				codeSystem, 
 				Constructors.createCodingSchemeVersionOrTagFromVersion(officialResourceVersionId));
 	}
 
-	/**
-	 * Gets the code system by version id or tag.
-	 *
-	 * @param codeSystem the code system
-	 * @param versionIdOrTag the version id or tag
-	 * @return the code system by version id or tag
-	 */
-	protected CodeSystemVersionCatalogEntry getCodeSystemByVersionIdOrTag(
-			NameOrURI codeSystem, CodingSchemeVersionOrTag versionIdOrTag){
-		String nameOrUri;
-		if(codeSystem.getName() != null){
-			nameOrUri = codeSystem.getName();
-		} else {
-			nameOrUri = codeSystem.getUri();
-		}
-		
-		CodingScheme codingScheme;
-		try {
-			codingScheme = this.getLexBigService().resolveCodingScheme(nameOrUri, versionIdOrTag);
-		} catch (LBException e) {
-			//this could be just that LexEVS didn't find it. If so, return null.
-			log.warn(e);
-			return null;
-		}
-		
+	@Override
+	protected CodeSystemVersionCatalogEntry transform(CodingScheme codingScheme) {
 		return this.transformer.transform(codingScheme);
 	}
 }
