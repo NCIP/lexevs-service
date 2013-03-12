@@ -23,11 +23,16 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 
+import javax.annotation.Resource;
+
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.concepts.Entity;
 
 import edu.mayo.cts2.framework.model.entity.EntityDescription;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
+import edu.mayo.cts2.framework.model.entity.NamedEntityDescription;
+import edu.mayo.cts2.framework.model.util.ModelUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.uri.EntityUriHandler;
 
 /**
  * 
@@ -36,6 +41,8 @@ import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
  */
 public class EntityTransform {
 
+	@Resource 
+	private EntityUriHandler entityUriHandler;
 	/**
 	 * LexEVS Entity to CTS2 EntityDescription.
 	 *
@@ -43,10 +50,24 @@ public class EntityTransform {
 	 * @return the entity description
 	 */
 	public EntityDescription entityToEntityDescription(Entity entity){
-		throw new UnsupportedOperationException();
+		NamedEntityDescription namedEntity = new NamedEntityDescription();
+		namedEntity.setAbout(this.entityUriHandler.getUri(entity));
+		
+		namedEntity.setEntityID(
+				ModelUtils.createScopedEntityName(
+						entity.getEntityCode(), 
+						entity.getEntityCodeNamespace()));
+		
+		EntityDescription ed = new EntityDescription();
+		ed.setNamedEntity(namedEntity);
+		
+		return ed;
 	}
 
 	public EntityDirectoryEntry transform(ResolvedConceptReference reference) {
-		throw new UnsupportedOperationException();
+		EntityDirectoryEntry entry = new EntityDirectoryEntry();
+		entry.setAbout(this.entityUriHandler.getUri(reference));
+		
+		return entry;
 	}
 }
