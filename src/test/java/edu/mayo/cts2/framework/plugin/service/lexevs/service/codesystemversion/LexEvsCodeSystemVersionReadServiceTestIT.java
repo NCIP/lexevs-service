@@ -23,6 +23,7 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertNotNull;
 
 import javax.annotation.Resource;
@@ -30,10 +31,13 @@ import javax.annotation.Resource;
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.junit.Test;
 
+import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntry;
+import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
+import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion.LexEvsCodeSystemVersionReadService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 
 
 public class LexEvsCodeSystemVersionReadServiceTestIT extends AbstractTestITBase {
@@ -53,5 +57,121 @@ public class LexEvsCodeSystemVersionReadServiceTestIT extends AbstractTestITBase
 		
 		assertNotNull(this.service.getCodeSystemByVersionId(name, "1.0", null));
 	}
+	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testReadByTag() throws Exception {
+		String nameOrUri = "Automobiles";
+		NameOrURI codeSystem = ModelUtils.nameOrUriFromName(nameOrUri);
+		VersionTagReference tag = Constants.CURRENT_TAG; 
+		ResolvedReadContext readContext = null;
+		CodeSystemVersionCatalogEntry csvCatalogEntry = this.service.readByTag(codeSystem, tag, readContext);
+		assertNotNull(csvCatalogEntry);
+	}
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testReadByTagNotFound() throws Exception {
+		String nameOrUri = "Automooobiles";
+		NameOrURI codeSystem = ModelUtils.nameOrUriFromName(nameOrUri);
+		VersionTagReference tag = Constants.CURRENT_TAG; 
+		ResolvedReadContext readContext = null;
+		CodeSystemVersionCatalogEntry csvCatalogEntry = this.service.readByTag(codeSystem, tag, readContext);
+		assertNull(csvCatalogEntry);
+	}
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testRead() throws Exception {
+		String nameOrUri = "Automobiles-1.0";
+		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
+		ResolvedReadContext readContext = null;
+		CodeSystemVersionCatalogEntry csvCatalogEntry = this.service.read(identifier, readContext);
+		assertNotNull(csvCatalogEntry);		
+	}
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testRead_ErrorWithoutDash() throws Exception {
+		String nameOrUri = "Automobiles1.0";
+		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
+		ResolvedReadContext readContext = null;
+		CodeSystemVersionCatalogEntry csvCatalogEntry = this.service.read(identifier, readContext);
+		assertNull(csvCatalogEntry);		
+	}
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testRead_WithSpace() throws Exception {
+		String nameOrUri = "Automobiles - 1.0";
+		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
+		ResolvedReadContext readContext = null;
+		CodeSystemVersionCatalogEntry csvCatalogEntry = this.service.read(identifier, readContext);
+		assertNull(csvCatalogEntry);		
+	}
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testReadNotFound() throws Exception {
+		String nameOrUri = "Automooobiles-1.0";
+		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
+		ResolvedReadContext readContext = null;
+		CodeSystemVersionCatalogEntry csvCatalogEntry = this.service.read(identifier, readContext);
+		assertNull(csvCatalogEntry);		
+	}
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testExistsTrue() throws Exception {
+		String nameOrUri = "Automobiles-1.0";
+		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
+		ResolvedReadContext readContext = null;
+		assertTrue(this.service.exists(identifier, readContext));
+	}
+	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testExistsFalse() throws Exception {
+		String nameOrUri = "Automooobiles-1.0";
+		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
+		ResolvedReadContext readContext = null;
+		assertFalse(this.service.exists(identifier, readContext));
+	}
+	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testExistsByTagTrue() throws Exception {
+		String nameOrUri = "Automobiles";
+		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
+		VersionTagReference tag = Constants.CURRENT_TAG; 
+		ResolvedReadContext readContext = null;
+		assertTrue(this.service.existsByTag(identifier, tag, readContext));
+	}
+	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testExistsByTagFalse() throws Exception {
+		String nameOrUri = "Automooobiles";
+		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
+		VersionTagReference tag = Constants.CURRENT_TAG; 
+		ResolvedReadContext readContext = null;
+		assertFalse(this.service.existsByTag(identifier, tag, readContext));
+	}
+	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testExistsByVersionIdTrue() throws Exception {
+		NameOrURI codeSystem = ModelUtils.nameOrUriFromName("Automobiles");
+		String officialResourceVersionId = "1.0";
+		assertTrue(this.service.existsVersionId(codeSystem, officialResourceVersionId));
+	}
+	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testExistsByVersionIdFalse() throws Exception {
+		NameOrURI codeSystem = ModelUtils.nameOrUriFromName("Automooobiles");
+		String officialResourceVersionId = "1.0";
+		assertFalse(this.service.existsVersionId(codeSystem, officialResourceVersionId));
+	}	
 
 }

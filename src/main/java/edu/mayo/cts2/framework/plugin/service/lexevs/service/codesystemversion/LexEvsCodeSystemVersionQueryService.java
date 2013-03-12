@@ -30,6 +30,7 @@ import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.service.command.restriction.CodeSystemVersionQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
@@ -53,6 +54,9 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 	@Resource
 	private CodingSchemeToCodeSystemTransform codingSchemeTransformer;
 
+	@Resource
+	private CodeSystemVersionNameConverter nameConverter;
+	
 	public CodingSchemeToCodeSystemTransform getCodingSchemeTransformer() {
 		return codingSchemeTransformer;
 	}
@@ -196,7 +200,10 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 				// TODO resourceName typically is CTS2 CodeSystemCatalogEntry codeSystemName attribute and 
 				// maps to LexEVS CodingScheme codingSchemeName attribute.  What is the mapping attribute for
 				// LexEVS CodingSchemeRendering or CodingSchemeSummary objects?  
-				retrievedAttrValue = codingSchemeSummary.getLocalName();
+				retrievedAttrValue = 
+					this.nameConverter.toCts2CodeSystemVersionName(
+						codingSchemeSummary.getLocalName(), 
+						codingSchemeSummary.getRepresentsVersion());
 			}
 			if (retrievedAttrValue != null) {
 				if (searchType.equals(SEARCH_TYPE_EXACT_MATCH)) {
