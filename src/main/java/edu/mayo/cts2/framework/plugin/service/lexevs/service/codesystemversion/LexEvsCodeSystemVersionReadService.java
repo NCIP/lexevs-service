@@ -23,6 +23,7 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,6 +40,9 @@ import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
+import edu.mayo.cts2.framework.model.util.ModelUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersionReadService;
@@ -53,6 +57,9 @@ public class LexEvsCodeSystemVersionReadService extends AbstractLexEvsService im
 	
 	@Resource
 	private CodingSchemeToCodeSystemTransform transformer;
+	
+	@Resource
+	private CodeSystemVersionNameConverter nameConverter;
 	
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.service.profile.TagAwareReadService#readByTag(edu.mayo.cts2.framework.model.service.core.NameOrURI, edu.mayo.cts2.framework.model.core.VersionTagReference, edu.mayo.cts2.framework.model.command.ResolvedReadContext)
@@ -92,7 +99,19 @@ public class LexEvsCodeSystemVersionReadService extends AbstractLexEvsService im
 	public CodeSystemVersionCatalogEntry read(
 			NameOrURI identifier,
 			ResolvedReadContext readContext) {
-		throw new UnsupportedOperationException();
+		String name;
+		if(identifier.getName() != null){
+			name = identifier.getName();
+		} else {
+			throw new UnsupportedOperationException("Cannot resolve by DocumentURI yet.");
+		}
+		
+		NameVersionPair namePair = 
+			this.nameConverter.fromCts2CodeSystemVersionName(name);
+		
+		return this.getCodeSystemByVersionIdOrTag(
+			ModelUtils.nameOrUriFromName(namePair.getName()),
+			Constructors.createCodingSchemeVersionOrTagFromVersion(namePair.getVersion()));
 	}
 
 	/* (non-Javadoc)
@@ -100,7 +119,7 @@ public class LexEvsCodeSystemVersionReadService extends AbstractLexEvsService im
 	 */
 	@Override
 	public boolean exists(NameOrURI identifier, ResolvedReadContext readContext) {
-		throw new UnsupportedOperationException();
+		return this.read(identifier, readContext) != null;
 	}
 
 	/* (non-Javadoc)
@@ -108,7 +127,7 @@ public class LexEvsCodeSystemVersionReadService extends AbstractLexEvsService im
 	 */
 	@Override
 	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
-		throw new UnsupportedOperationException();
+		return new ArrayList<DocumentedNamespaceReference>();
 	}
 
 	/* (non-Javadoc)
