@@ -28,11 +28,14 @@ import javax.annotation.Resource;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.codingSchemes.CodingScheme;
+import org.LexGrid.commonTypes.Property;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntry;
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntrySummary;
 import edu.mayo.cts2.framework.model.core.EntryDescription;
+import edu.mayo.cts2.framework.model.core.PredicateReference;
+import edu.mayo.cts2.framework.model.core.StatementTarget;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 
@@ -62,6 +65,11 @@ public class CodingSchemeToCodeSystemTransform {
 		
 		codeSystem.setCodeSystemVersionName(name);
 		codeSystem.setDocumentURI(codingScheme.getCodingSchemeURI());
+		codeSystem.setFormalName(codingScheme.getFormalName());
+		
+		for(Property property : codingScheme.getProperties().getProperty()){
+			codeSystem.addProperty(this.toProperty(property));
+		}
 		
 		for(String localName : codingScheme.getLocalName()){
 			codeSystem.addKeyword(localName);
@@ -93,6 +101,22 @@ public class CodingSchemeToCodeSystemTransform {
 		summary.setResourceSynopsis(description);
 		
 		return summary;
+	}
+	
+	protected edu.mayo.cts2.framework.model.core.Property toProperty(Property property){
+		edu.mayo.cts2.framework.model.core.Property cts2Prop = 
+			new edu.mayo.cts2.framework.model.core.Property();
+		
+		PredicateReference predicateRef = 
+			new PredicateReference();
+		cts2Prop.setPredicate(predicateRef);
+		
+		StatementTarget target = new StatementTarget();
+		target.setLiteral(ModelUtils.createOpaqueData(property.getValue().getContent()));
+		
+		cts2Prop.addValue(target);
+		
+		return cts2Prop;
 	}
 	
 	private String getName(CodingScheme codingScheme){
