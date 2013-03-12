@@ -77,26 +77,26 @@ public class PrintUtility {
 		int count = entity.getPresentationCount();
 		for(int i=0; i < count; i++){
 			presentation = entity.getPresentation(i);
-			results += tabs + " Value = " + presentation.getValue().getContent() + ", ";
-			results += "DegreeOfFidelity = " + presentation.getDegreeOfFidelity() + ", ";
-			results += "Language = " + presentation.getLanguage() + ", ";
-			results += "Owner = " + presentation.getOwner() + ", ";
-			results += "PropertyID = " + presentation.getPropertyId() + ", ";
-			results += "PropertyName = " + presentation.getPropertyName() + ", ";
-			results += "PropertyType = " + presentation.getPropertyType() + ", ";
-			results += "RepresentationalForm = " + presentation.getRepresentationalForm() + ", ";
-			results += "Status = " + presentation.getStatus() + "\n";
+			results += tabs + "Value = " + presentation.getValue().getContent() + "\n";
+			results += tabs + "--DegreeOfFidelity = " + presentation.getDegreeOfFidelity() + "\n";
+			results += tabs + "--Language = " + presentation.getLanguage() + "\n";
+			results += tabs + "--Owner = " + presentation.getOwner() + "\n";
+			results += tabs + "--PropertyID = " + presentation.getPropertyId() + "\n";
+			results += tabs + "--PropertyName = " + presentation.getPropertyName() + "\n";
+			results += tabs + "--PropertyType = " + presentation.getPropertyType() + "\n";
+			results += tabs + "--RepresentationalForm = " + presentation.getRepresentationalForm() + "\n";
+			results += tabs + "--Status = " + presentation.getStatus() + "\n";
 			
-			results += tabs + " SourceCount = " + presentation.getSourceCount() + "\n";
-			results += tabs + " Sources:\n";
+			results += tabs + "--SourceCount = " + presentation.getSourceCount() + "\n";
+			results += tabs + "--Sources:\n";
 			results += source_toString(presentation, tabCount + 1);
 			
-			results += tabs + " PropertyQualifierCount = " + presentation.getPropertyQualifierCount() + "\n";
-			results += tabs + " PropertyQualifiers:\n";
+			results += tabs + "--PropertyQualifierCount = " + presentation.getPropertyQualifierCount() + "\n";
+			results += tabs + "--PropertyQualifiers:\n";
 			results += propertyQualifiers_toString(presentation, tabCount + 1);
 			
-			results += tabs + " UsageContextCount = " + presentation.getUsageContextCount() + "\n";
-			results += tabs + " UsageContexts:\n";
+			results += tabs + "--UsageContextCount = " + presentation.getUsageContextCount() + "\n";
+			results += tabs + "--UsageContexts:\n";
 			results += usageContexts_toString(presentation, tabCount + 1);			
 		}
 		return results;
