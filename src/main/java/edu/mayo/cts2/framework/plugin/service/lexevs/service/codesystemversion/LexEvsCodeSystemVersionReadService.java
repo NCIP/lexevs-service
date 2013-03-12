@@ -102,6 +102,9 @@ public class LexEvsCodeSystemVersionReadService
 		String name;
 		if(identifier.getName() != null){
 			name = identifier.getName();
+			if(!this.nameConverter.isValidCodeSystemVersionName(name)){
+				return null;
+			}
 		} else {
 			throw new UnsupportedOperationException("Cannot resolve by DocumentURI yet.");
 		}

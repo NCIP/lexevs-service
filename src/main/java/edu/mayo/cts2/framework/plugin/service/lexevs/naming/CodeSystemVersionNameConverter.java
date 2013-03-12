@@ -60,10 +60,21 @@ public class CodeSystemVersionNameConverter {
 	 * @return the name version pair
 	 */
 	public NameVersionPair fromCts2CodeSystemVersionName(String cts2CodeSystemVersionName){
-		String[] nameParts = StringUtils.split(cts2CodeSystemVersionName);
+		String[] nameParts = StringUtils.split(cts2CodeSystemVersionName, SEPARATOR);
 		
 		Assert.isTrue(nameParts.length == 2);
 		
 		return new NameVersionPair(nameParts[0], nameParts[1]);
+	}
+	
+	public boolean isValidCodeSystemVersionName(String cts2CodeSystemVersionName){
+		boolean answer = false;
+		
+		String[] nameParts = StringUtils.split(cts2CodeSystemVersionName, SEPARATOR);
+		if(nameParts.length == 2){
+			answer = true;
+		}
+		
+		return answer;
 	}
 }

@@ -134,4 +134,37 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 		assertEquals(1, dirResult.getEntries().size());
 	}
 	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testQueryByExactResourceName() throws Exception {
+
+		Page page = new Page();
+		SortCriteria sortCriteria = null;	
+		
+		Query query = null;
+		
+		MatchAlgorithmReference exactMatch = StandardMatchAlgorithmReference.EXACT_MATCH
+				.getMatchAlgorithmReference();
+	
+		PropertyReference resourceName = StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference();	
+
+		ResolvedFilter resourceNameExactMatch = new ResolvedFilter();
+		resourceNameExactMatch.setMatchValue("Automobiles-1.0");
+		resourceNameExactMatch.setMatchAlgorithmReference(exactMatch);
+		resourceNameExactMatch.setPropertyReference(resourceName);		
+
+		Set<ResolvedFilter> filterComponent = new HashSet<ResolvedFilter>(Arrays.asList(resourceNameExactMatch));
+		
+		ResolvedReadContext readContext = null;
+		
+		CodeSystemVersionQueryServiceRestrictions csvQueryServiceRestrictions = null;
+		
+		CodeSystemVersionQueryImpl codeSystemVersionQuery = new CodeSystemVersionQueryImpl(query,filterComponent,readContext,csvQueryServiceRestrictions);
+
+		DirectoryResult<CodeSystemVersionCatalogEntrySummary> dirResult = this.service.getResourceSummaries(codeSystemVersionQuery, sortCriteria, page);
+		assertNotNull(dirResult);
+		assertEquals(1, dirResult.getEntries().size());
+	}
+	
+	
 }
