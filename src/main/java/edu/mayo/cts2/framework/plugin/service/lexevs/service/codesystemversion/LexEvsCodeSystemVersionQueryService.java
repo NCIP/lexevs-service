@@ -7,11 +7,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Resource;
+
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.filter.match.ContainsMatcher;
@@ -23,11 +24,9 @@ import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogE
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
-import edu.mayo.cts2.framework.model.core.OpaqueData;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
 import edu.mayo.cts2.framework.model.core.PropertyReference;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
-import edu.mayo.cts2.framework.model.core.SourceReference;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
@@ -37,6 +36,7 @@ import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersionQuery;
 import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersionQueryService;
+
 @Component
 public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		implements CodeSystemVersionQueryService {
@@ -49,9 +49,9 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 	public final static String ATTRIBUTE_NAME_RESOURCE_SYNOPSIS = "resourceSynopsis";
 	public final static String ATTRIBUTE_NAME_RESOURCE_NAME = "resourceName";
 
-	
 	// ------ Local methods ----------------------
-	private CodingSchemeToCodeSystemTransform codingSchemeTransformer = new CodingSchemeToCodeSystemTransform();
+	@Resource
+	private CodingSchemeToCodeSystemTransform codingSchemeTransformer;
 
 	public CodingSchemeToCodeSystemTransform getCodingSchemeTransformer() {
 		return codingSchemeTransformer;
@@ -244,30 +244,6 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 	}
 
 	@Override
-	public OpaqueData getServiceDescription() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public String getServiceName() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public SourceReference getServiceProvider() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public String getServiceVersion() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public Set<PredicateReference> getKnownProperties() {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException();
@@ -319,8 +295,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 
 	@Override
 	public Set<? extends PropertyReference> getSupportedSortReferences() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+		return new HashSet<PropertyReference>();
 	}
 
 }
