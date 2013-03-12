@@ -23,19 +23,30 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion;
 
+import javax.annotation.Resource;
+
+import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.codingSchemes.CodingScheme;
+import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntry;
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntrySummary;
+import edu.mayo.cts2.framework.model.core.EntryDescription;
+import edu.mayo.cts2.framework.model.util.ModelUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 
 /**
  * Transforms a LexGrid CodingScheme into a CTS2 CodeSystemVersion CatalogEntry.
  *
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
+@Component
 public class CodingSchemeToCodeSystemTransform {
-
+	
+	@Resource
+	private CodeSystemVersionNameConverter codeSystemVersionNameConverter;
+	
 	/**
 	 * Transform.
 	 *
@@ -45,17 +56,58 @@ public class CodingSchemeToCodeSystemTransform {
 	public CodeSystemVersionCatalogEntry transform(CodingScheme codingScheme){
 		CodeSystemVersionCatalogEntry codeSystem = new CodeSystemVersionCatalogEntry();
 
-		throw new UnsupportedOperationException(
-				"This method should transform a LexGrid CodingScheme" +
-				"into a CTS2 CodeSystemVersion CatalogEntry");
+		codeSystem.setAbout(codingScheme.getCodingSchemeURI());
+		
+		String name = this.getName(codingScheme);
+		
+		codeSystem.setCodeSystemVersionName(name);
+		codeSystem.setDocumentURI(codingScheme.getCodingSchemeURI());
+		
+		for(String localName : codingScheme.getLocalName()){
+			codeSystem.addKeyword(localName);
+		}
+		
+		EntryDescription description = new EntryDescription();
+		description.setValue(ModelUtils.toTsAnyType(
+				codingScheme.getEntityDescription().getContent()));
+		codeSystem.setResourceSynopsis(description);
+		
+		return codeSystem;
 	}
 	
 	public CodeSystemVersionCatalogEntrySummary transform(CodingSchemeRendering codingSchemeRendering){
-		throw new UnsupportedOperationException(
-				"This method should transform a LexGrid CodingScheme" +
-				"into a CTS2 CodeSystemVersion CatalogEntrySummary");
+		CodeSystemVersionCatalogEntrySummary summary = new CodeSystemVersionCatalogEntrySummary();
+		
+		CodingSchemeSummary codingSchemeSummary = codingSchemeRendering.getCodingSchemeSummary();
+		
+		String name = this.getName(codingSchemeRendering);
+		
+		summary.setCodeSystemVersionName(name);
+		summary.setDocumentURI(codingSchemeSummary.getCodingSchemeURI());
+		
+		summary.setFormalName(codingSchemeSummary.getFormalName());
+		
+		EntryDescription description = new EntryDescription();
+		description.setValue(ModelUtils.toTsAnyType(
+				summary.getResourceSynopsis().getValue().getContent()));
+		summary.setResourceSynopsis(description);
+		
+		return summary;
 	}
 	
+	private String getName(CodingScheme codingScheme){
+		return this.getName(codingScheme.getCodingSchemeName(), 
+					codingScheme.getRepresentsVersion());
+	}
 	
+	private String getName(CodingSchemeRendering codingScheme){
+		return this.getName(codingScheme.getCodingSchemeSummary().getLocalName(), 
+					codingScheme.getCodingSchemeSummary().getRepresentsVersion());
+	}
+	
+	private String getName(String name, String version){
+		return this.codeSystemVersionNameConverter.
+				toCts2CodeSystemVersionName(name, version);
+	}
 	
 }
