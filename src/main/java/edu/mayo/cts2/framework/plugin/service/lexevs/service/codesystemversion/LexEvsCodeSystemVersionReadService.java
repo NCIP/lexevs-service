@@ -23,7 +23,10 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion;
 
+import java.util.Arrays;
 import java.util.List;
+
+import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.Exceptions.LBException;
@@ -33,12 +36,11 @@ import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntry;
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
-import edu.mayo.cts2.framework.model.core.OpaqueData;
-import edu.mayo.cts2.framework.model.core.SourceReference;
 import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersionReadService;
 
 /**
@@ -48,8 +50,9 @@ import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersi
  */
 @Component
 public class LexEvsCodeSystemVersionReadService extends AbstractLexEvsService implements CodeSystemVersionReadService {
-
-	private CodingSchemeToCodeSystemTransform transformer = new CodingSchemeToCodeSystemTransform();
+	
+	@Resource
+	private CodingSchemeToCodeSystemTransform transformer;
 	
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.service.profile.TagAwareReadService#readByTag(edu.mayo.cts2.framework.model.service.core.NameOrURI, edu.mayo.cts2.framework.model.core.VersionTagReference, edu.mayo.cts2.framework.model.command.ResolvedReadContext)
@@ -71,7 +74,7 @@ public class LexEvsCodeSystemVersionReadService extends AbstractLexEvsService im
 	@Override
 	public boolean existsByTag(NameOrURI parentIdentifier,
 			VersionTagReference tag, ResolvedReadContext readContext) {
-		throw new UnsupportedOperationException();
+		return this.readByTag(parentIdentifier, tag, readContext) != null;
 	}
 
 	/* (non-Javadoc)
@@ -79,14 +82,15 @@ public class LexEvsCodeSystemVersionReadService extends AbstractLexEvsService im
 	 */
 	@Override
 	public List<VersionTagReference> getSupportedTags() {
-		throw new UnsupportedOperationException();
+		return Arrays.asList(Constants.CURRENT_TAG);
 	}
 
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.service.profile.ReadService#read(java.lang.Object, edu.mayo.cts2.framework.model.command.ResolvedReadContext)
 	 */
 	@Override
-	public CodeSystemVersionCatalogEntry read(NameOrURI identifier,
+	public CodeSystemVersionCatalogEntry read(
+			NameOrURI identifier,
 			ResolvedReadContext readContext) {
 		throw new UnsupportedOperationException();
 	}
@@ -96,38 +100,6 @@ public class LexEvsCodeSystemVersionReadService extends AbstractLexEvsService im
 	 */
 	@Override
 	public boolean exists(NameOrURI identifier, ResolvedReadContext readContext) {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.mayo.cts2.framework.service.profile.BaseService#getServiceName()
-	 */
-	@Override
-	public String getServiceName() {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.mayo.cts2.framework.service.profile.BaseService#getServiceDescription()
-	 */
-	@Override
-	public OpaqueData getServiceDescription() {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.mayo.cts2.framework.service.profile.BaseService#getServiceVersion()
-	 */
-	@Override
-	public String getServiceVersion() {
-		throw new UnsupportedOperationException();
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.mayo.cts2.framework.service.profile.BaseService#getServiceProvider()
-	 */
-	@Override
-	public SourceReference getServiceProvider() {
 		throw new UnsupportedOperationException();
 	}
 
@@ -145,7 +117,10 @@ public class LexEvsCodeSystemVersionReadService extends AbstractLexEvsService im
 	@Override
 	public boolean existsVersionId(NameOrURI codeSystem,
 			String officialResourceVersionId) {
-		throw new UnsupportedOperationException();
+		return this.getCodeSystemByVersionId(
+			codeSystem, 
+			officialResourceVersionId, 
+			null) != null;
 	}
 
 	/* (non-Javadoc)
