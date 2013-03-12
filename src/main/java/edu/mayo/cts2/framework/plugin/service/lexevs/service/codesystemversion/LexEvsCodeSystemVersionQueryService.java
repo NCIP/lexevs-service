@@ -68,9 +68,8 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 
 	// -------- Implemented methods ----------------
 	@Override
-	public int count(CodeSystemVersionQuery arg0) {
-		// TODO Auto-generated method stub
-		return 0;
+	public int count(CodeSystemVersionQuery query) {
+		return this.doGetResourceSummaries(query, null).length;
 	}
 
 	@Override
@@ -82,6 +81,42 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 	@Override
 	public DirectoryResult<CodeSystemVersionCatalogEntrySummary> getResourceSummaries(
 			CodeSystemVersionQuery query, SortCriteria sortCriteria, Page page) {
+
+		CodingSchemeRendering[] csRendering = this.doGetResourceSummaries(
+				query, sortCriteria);
+
+		List<CodeSystemVersionCatalogEntrySummary> list = new ArrayList<CodeSystemVersionCatalogEntrySummary>();
+
+		for (CodingSchemeRendering render : csRendering) {
+			list.add(codingSchemeTransformer.transform(render));
+		}
+
+		List<CodeSystemVersionCatalogEntrySummary> sublist = new ArrayList<CodeSystemVersionCatalogEntrySummary>();
+		boolean atEnd = false;
+		int start = page.getStart();
+		int end = page.getEnd();
+		int i = 0;
+		if ((start == 0) && ((end == list.size()) || (end > list.size()))) {
+			i = list.size();
+			sublist = list;
+		} else {
+			for (i = start; i < end && i < list.size(); i++) {
+				sublist.add(list.get(i));
+			}
+		}
+
+		if (i == list.size()) {
+			atEnd = true;
+		}
+
+		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = new DirectoryResult<CodeSystemVersionCatalogEntrySummary>(
+				sublist, atEnd);
+
+		return directoryResult;
+	}
+
+	protected CodingSchemeRendering[] doGetResourceSummaries(
+			CodeSystemVersionQuery query, SortCriteria sortCriteria) {
 
 		Set<ResolvedFilter> filters = null; 
 		
@@ -104,9 +139,6 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		}
 		
 		LexBIGService lexBigService = getLexBigService();
-		ArrayList<CodeSystemVersionCatalogEntrySummary> list = new ArrayList<CodeSystemVersionCatalogEntrySummary>();
-		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = null;
-		boolean atEnd = false;
 		try {
 			CodingSchemeRenderingList csrFilteredList = lexBigService.getSupportedCodingSchemes();
 			
@@ -128,38 +160,12 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 				}
 			}
 			
-			CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
-			for(CodingSchemeRendering render : csRendering){
-				list.add(codingSchemeTransformer.transform(render));
-			} 			
-			
-			ArrayList<CodeSystemVersionCatalogEntrySummary> sublist = new ArrayList<CodeSystemVersionCatalogEntrySummary>();
-			int start = page.getStart();
-			int end = page.getEnd();
-			int i = 0;
-			if ((start == 0) && ((end == list.size()) || (end > list.size()))) {
-				i = list.size();
-				sublist = list;
-			} else {
-				for(i = start; i < end && i < list.size(); i++){
-					sublist.add(list.get(i));
-				}
-			}
-			
-			if(i == list.size()){
-				atEnd = true;
-			}
-			
-			directoryResult = new DirectoryResult<CodeSystemVersionCatalogEntrySummary>(sublist, atEnd);
-			
-		} catch (Exception e) {
+			return csrFilteredList.getCodingSchemeRendering();
+		} catch(Exception e){
 			throw new RuntimeException(e);
 		}
-		
-		return directoryResult;
 	}
 	
-	// TODO Verify LexEVS local name maps to LexEVS codingSchemeName - not obvious it should
 	private CodingSchemeRenderingList filterResourceSummariesByCodingSchemeName(String searchCodingSchemeName, CodingSchemeRenderingList csrFilteredList) {
 		CodingSchemeRenderingList temp = new CodingSchemeRenderingList();
 		
@@ -186,7 +192,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		String searchAttribute = propertyReference.getReferenceTarget().getName();
 		
 		String matchStr = resolvedFilter.getMatchValue();	
-		String lowerCaseMatchStr = matchStr.toLowerCase(); // TODO Assuming default Locale is ok to use
+		String lowerCaseMatchStr = matchStr.toLowerCase(); // Assuming default Locale is ok to use
 		
 		CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
 		for (CodingSchemeRendering render : csRendering) {
@@ -197,9 +203,6 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 			} else if (searchAttribute.equals(ATTRIBUTE_NAME_RESOURCE_SYNOPSIS)) {
 				retrievedAttrValue = codingSchemeSummary.getCodingSchemeDescription().getContent();
 			} else if (searchAttribute.equals(ATTRIBUTE_NAME_RESOURCE_NAME)) {
-				// TODO resourceName typically is CTS2 CodeSystemCatalogEntry codeSystemName attribute and 
-				// maps to LexEVS CodingScheme codingSchemeName attribute.  What is the mapping attribute for
-				// LexEVS CodingSchemeRendering or CodingSchemeSummary objects?  
 				retrievedAttrValue = 
 					this.nameConverter.toCts2CodeSystemVersionName(
 						codingSchemeSummary.getLocalName(), 
@@ -222,7 +225,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 							temp.addCodingSchemeRendering(render);
 						}
 					} else {
-						retrievedAttrValue = retrievedAttrValue.toLowerCase(); // TODO Assuming default Locale is ok to use
+						retrievedAttrValue = retrievedAttrValue.toLowerCase(); // Assuming default Locale is ok to use
 						if (retrievedAttrValue.indexOf(lowerCaseMatchStr) != -1) {
 							temp.addCodingSchemeRendering(render);
 						}						
@@ -233,7 +236,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 							temp.addCodingSchemeRendering(render);
 						}
 					} else {
-						retrievedAttrValue = retrievedAttrValue.toLowerCase(); // TODO Assuming default Locale is ok to use
+						retrievedAttrValue = retrievedAttrValue.toLowerCase(); // Assuming default Locale is ok to use
 						if (retrievedAttrValue.startsWith(lowerCaseMatchStr)) {
 							temp.addCodingSchemeRendering(render);
 						}						
@@ -252,8 +255,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 
 	@Override
 	public Set<PredicateReference> getKnownProperties() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+		return new HashSet<PredicateReference>();
 	}
 
 	@Override
