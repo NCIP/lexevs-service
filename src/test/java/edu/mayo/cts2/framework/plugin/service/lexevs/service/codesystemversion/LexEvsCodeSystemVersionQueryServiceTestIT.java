@@ -23,7 +23,8 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -34,6 +35,7 @@ import javax.annotation.Resource;
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.junit.Test;
 
+import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntry;
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntrySummary;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
@@ -202,6 +204,54 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 		assertEquals(1, dirResult.getEntries().size());
 	}
 
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testQueryByResourceListAllFilters() throws Exception {
+
+		Page page = new Page();
+		SortCriteria sortCriteria = null;	
+		
+		Query query = null;
+		
+		MatchAlgorithmReference contains = StandardMatchAlgorithmReference.CONTAINS
+				.getMatchAlgorithmReference();
+		MatchAlgorithmReference startsWith = StandardMatchAlgorithmReference.STARTS_WITH
+				.getMatchAlgorithmReference();
+		MatchAlgorithmReference exactMatch = StandardMatchAlgorithmReference.EXACT_MATCH
+				.getMatchAlgorithmReference();
+		
+		PropertyReference about = StandardModelAttributeReference.ABOUT.getPropertyReference();
+		PropertyReference resourceSynopsis = StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference();
+		PropertyReference resourceName = StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference();	
+		
+		ResolvedFilter aboutContains = new ResolvedFilter();
+		aboutContains.setMatchValue("11.11.0.1");
+		aboutContains.setMatchAlgorithmReference(contains);
+		aboutContains.setPropertyReference(about);
+		
+		ResolvedFilter resourceSynopsisStartsWith = new ResolvedFilter();
+		resourceSynopsisStartsWith.setMatchValue("Auto");
+		resourceSynopsisStartsWith.setMatchAlgorithmReference(startsWith);
+		resourceSynopsisStartsWith.setPropertyReference(resourceSynopsis);
+		
+		ResolvedFilter resourceNameExactMatch = new ResolvedFilter();
+		resourceNameExactMatch.setMatchValue("Automobiles-1.0");
+		resourceNameExactMatch.setMatchAlgorithmReference(exactMatch);
+		resourceNameExactMatch.setPropertyReference(resourceName);		
+
+		Set<ResolvedFilter> filterComponent = new HashSet<ResolvedFilter>(Arrays.asList(aboutContains,resourceSynopsisStartsWith,resourceNameExactMatch));
+		
+		ResolvedReadContext readContext = null;
+		
+		CodeSystemVersionQueryServiceRestrictions csvQueryServiceRestrictions = null;
+		
+		CodeSystemVersionQueryImpl codeSystemVersionQuery = new CodeSystemVersionQueryImpl(query,filterComponent,readContext,csvQueryServiceRestrictions);
+
+		DirectoryResult<CodeSystemVersionCatalogEntry> dirResult = this.service.getResourceList(codeSystemVersionQuery, sortCriteria, page);
+		assertNotNull(dirResult);
+		assertEquals(1, dirResult.getEntries().size());		
+	}
+	
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testQueryByCount() throws Exception {

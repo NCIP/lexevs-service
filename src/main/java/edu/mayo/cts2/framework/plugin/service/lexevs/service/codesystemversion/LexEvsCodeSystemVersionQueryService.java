@@ -11,8 +11,12 @@ import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
+import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
+import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.LexGrid.LexBIG.Utility.Constructors;
+import org.LexGrid.codingSchemes.CodingScheme;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.filter.match.ContainsMatcher;
@@ -30,6 +34,7 @@ import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
+import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.service.command.restriction.CodeSystemVersionQueryServiceRestrictions;
@@ -74,8 +79,48 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 
 	@Override
 	public DirectoryResult<CodeSystemVersionCatalogEntry> getResourceList(
-			CodeSystemVersionQuery arg0, SortCriteria arg1, Page arg2) {
-		throw new UnsupportedOperationException();
+			CodeSystemVersionQuery query, SortCriteria sortCriteria, Page page) {
+
+		CodingSchemeRendering[] csRendering = this.doGetResourceSummaries(
+				query, sortCriteria);
+
+		List<CodeSystemVersionCatalogEntry> list = new ArrayList<CodeSystemVersionCatalogEntry>();
+
+		for (CodingSchemeRendering render : csRendering) {
+			String codingSchemeName = render.getCodingSchemeSummary().getCodingSchemeURI();			
+			String version = render.getCodingSchemeSummary().getRepresentsVersion();
+			CodingSchemeVersionOrTag tagOrVersion = Constructors.createCodingSchemeVersionOrTagFromVersion(version);
+			CodingScheme codingScheme;
+			try {
+				codingScheme = this.getLexBigService().resolveCodingScheme(codingSchemeName, tagOrVersion);
+				list.add(codingSchemeTransformer.transform(codingScheme));
+			} catch (LBException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		List<CodeSystemVersionCatalogEntry> sublist = new ArrayList<CodeSystemVersionCatalogEntry>();
+		boolean atEnd = false;
+		int start = page.getStart();
+		int end = page.getEnd();
+		int i = 0;
+		if ((start == 0) && ((end == list.size()) || (end > list.size()))) {
+			i = list.size();
+			sublist = list;
+		} else {
+			for (i = start; i < end && i < list.size(); i++) {
+				sublist.add(list.get(i));
+			}
+		}
+
+		if (i == list.size()) {
+			atEnd = true;
+		}
+
+		DirectoryResult<CodeSystemVersionCatalogEntry> directoryResult = new DirectoryResult<CodeSystemVersionCatalogEntry>(
+				sublist, atEnd);
+
+		return directoryResult;
 	}
 
 	@Override
@@ -250,7 +295,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 
 	@Override
 	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
-		throw new UnsupportedOperationException();
+		return new ArrayList<DocumentedNamespaceReference>();
 	}
 
 	@Override
