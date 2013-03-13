@@ -153,6 +153,21 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 		DirectoryResult<CodeSystemVersionCatalogEntrySummary> dirResult = this.service.getResourceSummaries(codeSystemVersionQuery, sortCriteria, page);
 		assertNotNull(dirResult);
 		assertEquals(1, dirResult.getEntries().size());
+		
+		// Verify LexEVS to CTS2 transform worked 
+		CodeSystemVersionCatalogEntrySummary csvCatalogEntrySummary = dirResult.getEntries().get(0);
+		assertNotNull(csvCatalogEntrySummary.getFormalName());
+		assertEquals("Formal name not transformed - ", "autos", csvCatalogEntrySummary.getFormalName());
+		assertNotNull(csvCatalogEntrySummary.getCodeSystemVersionName());
+		assertEquals("CodeSystemVersionName not transformed - ","Automobiles-1.0",csvCatalogEntrySummary.getCodeSystemVersionName());
+		assertNotNull(csvCatalogEntrySummary.getDocumentURI());
+		assertEquals("DocumentURI not transformed - ","urn:oid:11.11.0.1",csvCatalogEntrySummary.getDocumentURI());		
+		assertNotNull(csvCatalogEntrySummary.getAbout());
+		assertEquals("About not transformed - ","urn:oid:11.11.0.1",csvCatalogEntrySummary.getAbout());		
+		assertNotNull(csvCatalogEntrySummary.getResourceSynopsis());
+		assertNotNull(csvCatalogEntrySummary.getResourceSynopsis().getValue());
+		assertNotNull(csvCatalogEntrySummary.getResourceSynopsis().getValue().getContent());
+		assertEquals("Resource Synopsis not transformed - ","Automobiles",csvCatalogEntrySummary.getResourceSynopsis().getValue().getContent());						
 	}
 	
 	@Test

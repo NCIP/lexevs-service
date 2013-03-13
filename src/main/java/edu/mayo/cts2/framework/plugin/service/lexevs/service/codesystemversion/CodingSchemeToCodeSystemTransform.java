@@ -106,15 +106,16 @@ public class CodingSchemeToCodeSystemTransform {
 		
 		summary.setCodeSystemVersionName(name);
 		summary.setDocumentURI(codingSchemeSummary.getCodingSchemeURI());
+		summary.setAbout(codingSchemeSummary.getCodingSchemeURI());
 		
 		summary.setFormalName(codingSchemeSummary.getFormalName());
 		
-		if(summary.getResourceSynopsis() != null &&
-				summary.getResourceSynopsis().getValue() != null){
+		if (codingSchemeRendering.getCodingSchemeSummary().getCodingSchemeDescription() != null && 
+				codingSchemeRendering.getCodingSchemeSummary().getCodingSchemeDescription().getContent() != null) {
 			EntryDescription description = new EntryDescription();
 			description.setValue(ModelUtils.toTsAnyType(
-					summary.getResourceSynopsis().getValue().getContent()));
-			summary.setResourceSynopsis(description);
+					codingSchemeRendering.getCodingSchemeSummary().getCodingSchemeDescription().getContent()));
+			summary.setResourceSynopsis(description);			
 		}
 		
 		return summary;

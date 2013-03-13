@@ -23,8 +23,11 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import javax.annotation.Resource;
 
@@ -67,6 +70,26 @@ public class LexEvsCodeSystemVersionReadServiceTestIT extends AbstractTestITBase
 		ResolvedReadContext readContext = null;
 		CodeSystemVersionCatalogEntry csvCatalogEntry = this.service.readByTag(codeSystem, tag, readContext);
 		assertNotNull(csvCatalogEntry);
+		
+		// Verify LexEVS to CTS2 transform worked 
+		assertNotNull(csvCatalogEntry.getFormalName());
+		assertEquals("Formal name not transformed - ", "autos", csvCatalogEntry.getFormalName());
+		assertNotNull(csvCatalogEntry.getCodeSystemVersionName());
+		assertEquals("CodeSystemVersionName not transformed - ","Automobiles-1.0",csvCatalogEntry.getCodeSystemVersionName());
+		assertNotNull(csvCatalogEntry.getDocumentURI());
+		assertEquals("DocumentURI not transformed - ","urn:oid:11.11.0.1",csvCatalogEntry.getDocumentURI());		
+		assertNotNull(csvCatalogEntry.getAbout());
+		assertEquals("About not transformed - ","urn:oid:11.11.0.1",csvCatalogEntry.getAbout());		
+		assertNotNull(csvCatalogEntry.getResourceSynopsis());
+		assertNotNull(csvCatalogEntry.getResourceSynopsis().getValue());
+		assertNotNull(csvCatalogEntry.getResourceSynopsis().getValue().getContent());
+		assertEquals("Resource Synopsis not transformed - ","Automobiles",csvCatalogEntry.getResourceSynopsis().getValue().getContent());
+		assertNotNull(csvCatalogEntry.getKeyword());
+		assertEquals("Number of KeyWords not transformed correctly - ",3,csvCatalogEntry.getKeywordCount());
+		String[] keyWordsArray = csvCatalogEntry.getKeyword();
+		assertEquals("KeyWord value not transformed correctly - ","11.11.0.1",keyWordsArray[0]);
+		assertEquals("KeyWord value not transformed correctly - ","Automobiles",keyWordsArray[1]);
+		assertEquals("KeyWord value not transformed correctly - ","SomeOtherValue",keyWordsArray[2]);		
 	}
 
 	@Test
