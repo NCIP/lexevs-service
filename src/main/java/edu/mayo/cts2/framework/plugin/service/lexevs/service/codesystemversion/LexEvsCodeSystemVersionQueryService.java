@@ -34,9 +34,9 @@ import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
-import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
 import edu.mayo.cts2.framework.service.command.restriction.CodeSystemVersionQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
@@ -99,27 +99,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 			}
 		}
 
-		List<CodeSystemVersionCatalogEntry> sublist = new ArrayList<CodeSystemVersionCatalogEntry>();
-		boolean atEnd = false;
-		int start = page.getStart();
-		int end = page.getEnd();
-		int i = 0;
-		if ((start == 0) && ((end == list.size()) || (end > list.size()))) {
-			i = list.size();
-			sublist = list;
-		} else {
-			for (i = start; i < end && i < list.size(); i++) {
-				sublist.add(list.get(i));
-			}
-		}
-
-		if (i == list.size()) {
-			atEnd = true;
-		}
-
-		DirectoryResult<CodeSystemVersionCatalogEntry> directoryResult = new DirectoryResult<CodeSystemVersionCatalogEntry>(
-				sublist, atEnd);
-
+		DirectoryResult<CodeSystemVersionCatalogEntry> directoryResult = CommonUtils.getSublist(list, page);
 		return directoryResult;
 	}
 
@@ -136,27 +116,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 			list.add(codingSchemeTransformer.transform(render));
 		}
 
-		List<CodeSystemVersionCatalogEntrySummary> sublist = new ArrayList<CodeSystemVersionCatalogEntrySummary>();
-		boolean atEnd = false;
-		int start = page.getStart();
-		int end = page.getEnd();
-		int i = 0;
-		if ((start == 0) && ((end == list.size()) || (end > list.size()))) {
-			i = list.size();
-			sublist = list;
-		} else {
-			for (i = start; i < end && i < list.size(); i++) {
-				sublist.add(list.get(i));
-			}
-		}
-
-		if (i == list.size()) {
-			atEnd = true;
-		}
-
-		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = new DirectoryResult<CodeSystemVersionCatalogEntrySummary>(
-				sublist, atEnd);
-
+		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = CommonUtils.getSublist(list, page);
 		return directoryResult;
 	}
 
