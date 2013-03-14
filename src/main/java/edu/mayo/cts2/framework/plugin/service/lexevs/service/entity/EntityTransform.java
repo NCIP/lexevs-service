@@ -70,4 +70,11 @@ public class EntityTransform {
 		
 		return entry;
 	}
+	
+	
+	public EntityDescription transform_EntityDescription(ResolvedConceptReference reference) {
+		// TODO need to implement
+		return null;
+	}
+	
 }
