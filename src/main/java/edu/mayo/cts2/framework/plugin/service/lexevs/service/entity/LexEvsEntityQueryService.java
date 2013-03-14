@@ -26,7 +26,6 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,13 +36,15 @@ import org.LexGrid.LexBIG.DataModel.Collections.SortOptionList;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.ExtensionDescription;
+import org.LexGrid.LexBIG.Exceptions.LBException;
+import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
+import org.LexGrid.LexBIG.Exceptions.LBParameterException;
+import org.LexGrid.LexBIG.Exceptions.LBResourceUnavailableException;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet.PropertyType;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet.SearchDesignationOption;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
-import org.LexGrid.concepts.Entity;
-import org.LexGrid.concepts.Presentation;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.command.Page;
@@ -63,18 +64,28 @@ import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURIList;
+import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.service.core.Query;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.PrintUtility;
+import edu.mayo.cts2.framework.service.command.restriction.EntityDescriptionQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
-import edu.mayo.cts2.framework.service.profile.entitydescription.EntitiesFromAssociationsQuery;
-import edu.mayo.cts2.framework.service.profile.entitydescription.EntitiesFromAssociationsQuery.EntitiesFromAssociations;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQuery;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQueryService;
 
 @Component
 public class LexEvsEntityQueryService extends AbstractLexEvsService 
 		implements EntityDescriptionQueryService {
+	
+	private class ResolvedConceptReferenceResults{
+		public boolean atEnd;
+		public ResolvedConceptReference [] resolvedConceptReference;
+		
+		public ResolvedConceptReferenceResults(ResolvedConceptReference [] references, boolean atEnd){
+			this.resolvedConceptReference = references;
+			this.atEnd = atEnd;
+		}
+	}
 
 	// ------ Local methods ----------------------
 	private EntityTransform entityTransform = new EntityTransform();
@@ -88,12 +99,135 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		this.entityTransform = entityTransform;
 	}
 
+	protected ResolvedConceptReferenceResults doGetResourceSummaryResults(EntityDescriptionQuery query, SortCriteria sortCriteria, Page page){
+		ResolvedConceptReferenceResults results = null;
+		
+		// * if codingSchemeName exists within the query, get CodedNodeSet
+		// * for each filter existing within the query, execute restrictToMatchingDesignations on the codedNodeSet
+		CodedNodeSet codedNodeSet = this.getCodedNodeSet(query, sortCriteria);
+		
+		if(codedNodeSet != null){
+			// Using filtered codeNodeSet get ResolvedConceptReferenceResults
+			// -- contains an array of ResolvedConceptReference and a boolean indicating if at end of resultSet
+			results = this.getResolvedConceptReferenceResults(codedNodeSet, page);
+		}
+		
+		return results;
+	}
+
+	protected ResolvedConceptReferenceResults getResolvedConceptReferenceResults(CodedNodeSet codedNodeSet, Page page){
+		boolean atEnd = false;
+		ResolvedConceptReference[] resolvedConceptReferences = null;
+		SortOptionList sortOptions = null;
+		LocalNameList propertyNames = null;
+		PropertyType [] propertyTypes = null; 
+		// With all null arguments the iterator will access the entire codeNodeSet
+		// This call will execute the set of filters determined in loop above
+		ResolvedConceptReferencesIterator iterator;
+		ResolvedConceptReferenceList resolvedConceptReferenceList = null;
+		int start = 0, end = 0;
+		try {
+			iterator = codedNodeSet.resolve(sortOptions, propertyNames, propertyTypes);
+			if(page != null){
+				// Get on requested "page" of entities.  
+				// In this case we can get the "page" from the iterator, unlike in LexEvsCodeSystemVersionQueryService.
+				start = page.getStart();
+				end = page.getEnd();
+			}	
+			else{
+				start = 0;
+				end = iterator.numberRemaining();
+			}
+			resolvedConceptReferenceList = iterator.get(start, end);
+			// Get array of resolved concept references
+			resolvedConceptReferences = resolvedConceptReferenceList.getResolvedConceptReference();
+			System.out.println("resolvedConceptReferences: " + resolvedConceptReferences.length);
+			
+			// Determine if this is the last "page"
+			if(!iterator.hasNext()){ 
+				atEnd = true;
+			}
+				
+		} catch (LBInvocationException e) {
+			throw new RuntimeException(e);
+		} catch (LBParameterException e) {
+			throw new RuntimeException(e);
+		} catch (LBResourceUnavailableException e) {
+			throw new RuntimeException(e);
+		}
+		
+		return new ResolvedConceptReferenceResults(resolvedConceptReferences, atEnd);
+	}
+	
+	
+	protected CodedNodeSet getCodedNodeSet(EntityDescriptionQuery query, SortCriteria sortCriteria){
+		CodedNodeSet codedNodeSet = null;
+		Set<ResolvedFilter> filters = null; 		
+		NameOrURI codeSystem = null;
+		EntityDescriptionQueryServiceRestrictions entityDescriptionQueryServiceRestrictions = null;
+		String codingSchemeName = null;
+		boolean haveSchemeName = false;
+		
+		if (query != null) {
+			entityDescriptionQueryServiceRestrictions = query.getRestrictions();
+			filters = query.getFilterComponent();
+			if (entityDescriptionQueryServiceRestrictions != null) {
+				codeSystem = entityDescriptionQueryServiceRestrictions.getCodeSystemVersion();
+				if(codeSystem != null){
+					codingSchemeName = codeSystem.getName();
+					if(codingSchemeName != null){
+						haveSchemeName = true;
+					}
+				}
+			}
+		}		
+				
+
+		if(haveSchemeName){
+			LexBIGService lexBigService = getLexBigService();
+			
+			try {
+				// Get Code Node Set from LexBIG service for given coding scheme
+				// TODO do we need non-null values here?
+				CodingSchemeVersionOrTag versionOrTag = null;
+				LocalNameList entityTypes = new LocalNameList();
+				
+				codedNodeSet = lexBigService.getNodeSet(codingSchemeName, versionOrTag, entityTypes);
+			} catch (LBException e) {
+				throw new RuntimeException(e);
+			}
+				
+			if(filters != null){
+				for(ResolvedFilter filter : filters){
+					filterCodedNodeSetByResolvedFilter(filter, codedNodeSet);
+				}
+			}
+		}
+	
+		
+		return codedNodeSet;
+	}
+
+	protected void filterCodedNodeSetByResolvedFilter(ResolvedFilter filter, CodedNodeSet codedNodeSet){
+		// TODO: is this enough??
+		try {
+			String matchText = filter.getMatchValue();										// Value to search with 
+			SearchDesignationOption option = SearchDesignationOption.ALL;					// Other options: PREFERRED_ONLY, NON_PREFERRED_ONLY, ALL 
+			String matchAlgorithm = filter.getMatchAlgorithmReference().getContent();		// Extract from filter the match algorithm to use
+			String language = null;															// This field is not really used, uses default "en"
+			
+			codedNodeSet.restrictToMatchingDesignations(matchText, option, matchAlgorithm, language);
+		} catch (LBInvocationException e) {
+			throw new RuntimeException(e);
+		} catch (LBParameterException e) {
+			throw new RuntimeException(e);
+		}
+	}
 	
 	// -------- Implemented methods ----------------
 	@Override
 	public int count(EntityDescriptionQuery query) {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.doGetResourceSummaryResults(query, null, null).resolvedConceptReference.length;
 	}
 
 	@Override
@@ -104,76 +238,21 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 	}
 
 	@Override
-	public DirectoryResult<EntityDirectoryEntry> getResourceSummaries(
-			EntityDescriptionQuery query, SortCriteria sortCriteria, Page page) {
-		
-		LexBIGService lexBigService = getLexBigService();
-		ArrayList<EntityDirectoryEntry> list = new ArrayList<EntityDirectoryEntry>();
+	public DirectoryResult<EntityDirectoryEntry> getResourceSummaries(EntityDescriptionQuery query, SortCriteria sortCriteria, Page page) {	
 		DirectoryResult<EntityDirectoryEntry> directoryResult = null;
-		boolean atEnd = false;
+		List<EntityDirectoryEntry> list = new ArrayList<EntityDirectoryEntry>();
 		
-		try {		
-			// Get codingScheme name
-			String codingScheme = query.getRestrictions().getCodeSystemVersion().getName();			
-			
-			// Get Code Node Set from LexBIG service for given coding scheme
-			CodingSchemeVersionOrTag versionOrTag = null;
-			LocalNameList entityTypes = new LocalNameList();
-			CodedNodeSet codeNodeSet = lexBigService.getNodeSet(codingScheme, versionOrTag, entityTypes);
-			
-			// Get resolved filter set from query argument
-			Set<ResolvedFilter> filterSet = query.getFilterComponent();
-			
-			if(filterSet != null){
-				// Restrict code node set using each filter in set
-				for(ResolvedFilter filter : filterSet){
-					String matchText = filter.getMatchValue();										// Value to search with 
-					SearchDesignationOption option = SearchDesignationOption.ALL;					// Other options: PREFERRED_ONLY, NON_PREFERRED_ONLY, ALL 
-					String matchAlgorithm = filter.getMatchAlgorithmReference().getContent();		// Extract from filter the match algorithm to use
-					String language = null;															// This field is not really used, uses default "en"
-					
-					codeNodeSet.restrictToMatchingDesignations(matchText, option, matchAlgorithm, language);
-				}
-			}
-			
-			
-			SortOptionList sortOptions = null;
-			LocalNameList propertyNames = null;
-			PropertyType [] propertyTypes = null; 
-			// With all null arguments the iterator will access the entire codeNodeSet
-			// This call will execute the set of filters determined in loop above
-			ResolvedConceptReferencesIterator iterator = codeNodeSet.resolve(sortOptions, propertyNames, propertyTypes);
-			
-			// Get on requested "page" of entities.  
-			// In this case we can get the "page" from the iterator, unlike in LexEvsCodeSystemVersionQueryService.
-			int start = page.getStart();
-			int end = page.getEnd();
-			ResolvedConceptReferenceList resolvedConceptReferenceList = iterator.get(start, end);
-			
-			
-//			System.out.println("resolvedConcpetReferenceList: " + resolvedConceptReferenceList.getResolvedConceptReferenceCount());
-			
-			// Get array of resolved concept references
-			ResolvedConceptReference[] resolvedConceptReferences = resolvedConceptReferenceList.getResolvedConceptReference();
-			System.out.println("resolvedConceptReferences: " + resolvedConceptReferences.length);
-			
-			// Transform each reference into a CTS2 entry and add to list
-			for(ResolvedConceptReference reference : resolvedConceptReferences){
-				System.out.println("ResolvedConceptReference:\n" + PrintUtility.resolvedConceptReference_toString(reference, 1));
-				EntityDirectoryEntry entry = entityTransform.transform(reference);
-				list.add(entry);
-			}
-
-			// Determine if this is the last "page"
-			if(!iterator.hasNext()){ 
-				atEnd = true;
-			}
-			
-			directoryResult = new DirectoryResult<EntityDirectoryEntry>(list, atEnd);
-			
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+		ResolvedConceptReferenceResults resolvedConceptReferenceResults = this.doGetResourceSummaryResults(query, sortCriteria, page);
+		
+		// Transform each reference into a CTS2 entry and add to list
+		ResolvedConceptReference[] resolvedConceptReferences = resolvedConceptReferenceResults.resolvedConceptReference;
+		for(ResolvedConceptReference reference : resolvedConceptReferences){
+			System.out.println("ResolvedConceptReference:\n" + PrintUtility.resolvedConceptReference_toString(reference, 1));
+			EntityDirectoryEntry entry = entityTransform.transform(reference);
+			list.add(entry);
 		}
+		
+		directoryResult = new DirectoryResult<EntityDirectoryEntry>(list, resolvedConceptReferenceResults.atEnd);
 		
 		return directoryResult;
 	}

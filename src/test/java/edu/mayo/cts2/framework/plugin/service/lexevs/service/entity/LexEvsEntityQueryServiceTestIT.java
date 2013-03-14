@@ -138,11 +138,11 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		
 		// Configure service to use an anonymous transformer class
 		// -------------------------------------------------------
-//		service.setEntityTransformer(new EntityTransform(){
-//			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-//				return new EntityDirectoryEntry();
-//			}
-//		});
+		service.setEntityTransformer(new EntityTransform(){
+			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
+				return new EntityDirectoryEntry();
+			}
+		});
 		
 		// Create filters for query
 		// ------------------------
@@ -184,12 +184,12 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		
 		// Configure service to use an anonymous transformer class
 		// -------------------------------------------------------
-//		service.setEntityTransformer(new EntityTransform(){
-//			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-//				return new EntityDirectoryEntry();
-//			}
-//		});
-//		
+		service.setEntityTransformer(new EntityTransform(){
+			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
+				return new EntityDirectoryEntry();
+			}
+		});
+		
 		// Create filters for query
 		// ------------------------
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
