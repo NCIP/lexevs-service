@@ -1,5 +1,6 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
 
+import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.concepts.Entity;
 import org.LexGrid.concepts.Presentation;
@@ -179,6 +180,18 @@ public class PrintUtility {
 		for(int i=0; i < count; i++){
 			results += tabs + " " + entity.getEntityType(i) + "\n";
 		}
+		return results;
+	}
+
+	public static String codingSchemeSummary(CodingSchemeSummary codingSchemeSummary, int tabCount) {
+		String results = "";
+		String tabs = createTabs(tabCount);
+
+		results += tabs + "CodingSchemeURI = " + codingSchemeSummary.getCodingSchemeURI() + "\n";
+		results += tabs + "FormalName = " + codingSchemeSummary.getFormalName() + "\n";
+		results += tabs + "LocalName = " + codingSchemeSummary.getLocalName() + "\n";
+		results += tabs + "RepresentsVersion = " + codingSchemeSummary.getRepresentsVersion() + "\n";
+
 		return results;
 	}
 
