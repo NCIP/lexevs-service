@@ -23,6 +23,8 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -32,16 +34,15 @@ import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
 import org.LexGrid.concepts.Entity;
+import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.core.CodeSystemReference;
 import edu.mayo.cts2.framework.model.core.CodeSystemVersionReference;
 import edu.mayo.cts2.framework.model.core.EntityReference;
-import edu.mayo.cts2.framework.model.core.OpaqueData;
 import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
-import edu.mayo.cts2.framework.model.core.SourceReference;
 import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.entity.EntityDescription;
@@ -52,12 +53,14 @@ import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionReadService;
 import edu.mayo.cts2.framework.service.profile.entitydescription.name.EntityDescriptionReadId;
 
 /**
  * LexEVS CodedNodeSet implementation of EntityDescriptionReadService.
  */
+@Component
 public class LexEvsEntityReadService extends AbstractLexEvsService 
 	implements EntityDescriptionReadService {
 
@@ -73,6 +76,33 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 	public EntityDescription read(
 			EntityDescriptionReadId identifier,
 			ResolvedReadContext readContext) {
+
+		Entity entity = getLexGridEntityByRead(identifier,	readContext);
+		if(entity == null){
+			return null;
+		} else {
+			return this.entityTransform.entityToEntityDescription(entity);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see edu.mayo.cts2.framework.service.profile.ReadService#exists(java.lang.Object, edu.mayo.cts2.framework.model.command.ResolvedReadContext)
+	 */
+	@Override
+	public boolean exists(EntityDescriptionReadId identifier,
+			ResolvedReadContext readContext) {
+		
+		Entity entity = getLexGridEntityByRead(identifier,	readContext);
+		if (entity == null) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	protected Entity getLexGridEntityByRead(EntityDescriptionReadId identifier,
+			ResolvedReadContext readContext) {
+
 		String cts2CodeSystemVersionName = identifier.getCodeSystemVersion().getName();
 		
 		NameVersionPair codingSchemeName =
@@ -100,52 +130,17 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 				return null;
 			} else {
 				Entity entity = iterator.next().getEntity();
-				
-				return this.entityTransform.entityToEntityDescription(entity);
+				return entity;
 			}
 		} catch (LBException e) {
 			throw new RuntimeException();
 		}
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.mayo.cts2.framework.service.profile.ReadService#exists(java.lang.Object, edu.mayo.cts2.framework.model.command.ResolvedReadContext)
-	 */
-	@Override
-	public boolean exists(EntityDescriptionReadId identifier,
-			ResolvedReadContext readContext) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public String getServiceName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public OpaqueData getServiceDescription() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getServiceVersion() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public SourceReference getServiceProvider() {
-		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
 	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<DocumentedNamespaceReference>();
 	}
 
 	/* (non-Javadoc)
@@ -155,8 +150,9 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 	public DirectoryResult<EntityListEntry> readEntityDescriptions(
 			EntityNameOrURI entityId, SortCriteria sortCriteria,
 			ResolvedReadContext readContext, Page page) {
+		
 		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	/* (non-Javadoc)
@@ -166,7 +162,7 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 	public EntityReference availableDescriptions(EntityNameOrURI entityId,
 			ResolvedReadContext readContext) {
 		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	/* (non-Javadoc)
@@ -176,25 +172,22 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 	public EntityList readEntityDescriptions(EntityNameOrURI entityId,
 			ResolvedReadContext readContext) {
 		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public List<CodeSystemReference> getKnownCodeSystems() {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<CodeSystemReference>();
 	}
 
 	@Override
 	public List<CodeSystemVersionReference> getKnownCodeSystemVersions() {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<CodeSystemVersionReference>();
 	}
 
 	@Override
 	public List<VersionTagReference> getSupportedVersionTags() {
-		// TODO Auto-generated method stub
-		return null;
+		return Arrays.asList(Constants.CURRENT_TAG);
 	}
 	
 	public CodeSystemVersionNameConverter getCodeSystemVersionNameConverter() {
