@@ -143,6 +143,7 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 			end = page.getEnd();
 			if(end > iterator.numberRemaining()){
 				end = iterator.numberRemaining();
+				atEnd = true;				
 			}
 			resolvedConceptReferenceList = iterator.get(start, end);
 			// Get array of resolved concept references
@@ -151,10 +152,6 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 				resolvedConceptReferences = resolvedConceptReferenceList.getResolvedConceptReference();
 				if(printObjects){
 					System.out.println("resolvedConceptReferences: " + resolvedConceptReferences.length);
-				}
-				// Determine if this is the last "page"
-				if(!iterator.hasNext()){ 
-					atEnd = true;
 				}
 			}	
 		} catch (LBInvocationException e) {
