@@ -55,13 +55,14 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 	public final static String ATTRIBUTE_NAME_RESOURCE_SYNOPSIS = "resourceSynopsis";
 	public final static String ATTRIBUTE_NAME_RESOURCE_NAME = "resourceName";
 
-	// ------ Local methods ----------------------
 	@Resource
 	private CodingSchemeToCodeSystemTransform codingSchemeTransformer;
 
 	@Resource
 	private CodeSystemVersionNameConverter nameConverter;
 	
+
+	// ------ Local methods ----------------------
 	public CodingSchemeToCodeSystemTransform getCodingSchemeTransformer() {
 		return codingSchemeTransformer;
 	}
@@ -71,69 +72,22 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		this.codingSchemeTransformer = codingSchemeTransformer;
 	}
 
-	// -------- Implemented methods ----------------
-	@Override
-	public int count(CodeSystemVersionQuery query) {
-		return this.doGetResourceSummaries(query, null).length;
-	}
-
-	@Override
-	public DirectoryResult<CodeSystemVersionCatalogEntry> getResourceList(
-			CodeSystemVersionQuery query, SortCriteria sortCriteria, Page page) {
-
-		CodingSchemeRendering[] csRendering = this.doGetResourceSummaries(
-				query, sortCriteria);
-
-		List<CodeSystemVersionCatalogEntry> list = new ArrayList<CodeSystemVersionCatalogEntry>();
-
-		for (CodingSchemeRendering render : csRendering) {
-			String codingSchemeName = render.getCodingSchemeSummary().getCodingSchemeURI();			
-			String version = render.getCodingSchemeSummary().getRepresentsVersion();
-			CodingSchemeVersionOrTag tagOrVersion = Constructors.createCodingSchemeVersionOrTagFromVersion(version);
-			CodingScheme codingScheme;
-			try {
-				codingScheme = this.getLexBigService().resolveCodingScheme(codingSchemeName, tagOrVersion);
-				list.add(codingSchemeTransformer.transform(codingScheme));
-			} catch (LBException e) {
-				throw new RuntimeException(e);
-			}
-		}
-
-		DirectoryResult<CodeSystemVersionCatalogEntry> directoryResult = CommonUtils.getSublist(list, page);
-		return directoryResult;
-	}
-
-	@Override
-	public DirectoryResult<CodeSystemVersionCatalogEntrySummary> getResourceSummaries(
-			CodeSystemVersionQuery query, SortCriteria sortCriteria, Page page) {
-
-		CodingSchemeRendering[] csRendering = this.doGetResourceSummaries(
-				query, sortCriteria);
-
-		List<CodeSystemVersionCatalogEntrySummary> list = new ArrayList<CodeSystemVersionCatalogEntrySummary>();
-
-		for (CodingSchemeRendering render : csRendering) {
-			list.add(codingSchemeTransformer.transform(render));
-		}
-
-		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = CommonUtils.getSublist(list, page);
-		return directoryResult;
-	}
-
 	protected CodingSchemeRendering[] doGetResourceSummaries(
 			CodeSystemVersionQuery query, SortCriteria sortCriteria) {
 
 		Set<ResolvedFilter> filters = null; 
-		
 		CodeSystemVersionQueryServiceRestrictions codeSystemVersionQueryServiceRestrictions = null;
+		
 		if (query != null) {
 			codeSystemVersionQueryServiceRestrictions = query.getRestrictions();
 			filters = query.getFilterComponent();
 		}		
+		
 		NameOrURI codeSystem = null;
 		if (codeSystemVersionQueryServiceRestrictions != null) {
 			codeSystem = query.getRestrictions().getCodeSystem();
 		}
+		
 		String searchCodingSchemeName = null;
 		if (codeSystem != null) {
 			if (codeSystem.getUri() != null) {
@@ -150,6 +104,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 			if (searchCodingSchemeName != null) {
 				csrFilteredList = filterResourceSummariesByCodingSchemeName(searchCodingSchemeName, csrFilteredList);
 			}
+			
 			if (filters != null)  {
 				// Check csrFilteredList size up front and don't enter filtering legs if list is empty
 				if ((csrFilteredList != null) && (csrFilteredList.getCodingSchemeRenderingCount() > 0)) {
@@ -251,6 +206,55 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		}  // end brace for loop
 		
 		return temp;
+	}
+
+	// -------- Implemented methods ----------------
+	@Override
+	public int count(CodeSystemVersionQuery query) {
+		return this.doGetResourceSummaries(query, null).length;
+	}
+
+	@Override
+	public DirectoryResult<CodeSystemVersionCatalogEntry> getResourceList(
+			CodeSystemVersionQuery query, SortCriteria sortCriteria, Page page) {
+
+		CodingSchemeRendering[] csRendering = this.doGetResourceSummaries(
+				query, sortCriteria);
+
+		List<CodeSystemVersionCatalogEntry> list = new ArrayList<CodeSystemVersionCatalogEntry>();
+
+		for (CodingSchemeRendering render : csRendering) {
+			String codingSchemeName = render.getCodingSchemeSummary().getCodingSchemeURI();			
+			String version = render.getCodingSchemeSummary().getRepresentsVersion();
+			CodingSchemeVersionOrTag tagOrVersion = Constructors.createCodingSchemeVersionOrTagFromVersion(version);
+			CodingScheme codingScheme;
+			try {
+				codingScheme = this.getLexBigService().resolveCodingScheme(codingSchemeName, tagOrVersion);
+				list.add(codingSchemeTransformer.transform(codingScheme));
+			} catch (LBException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		DirectoryResult<CodeSystemVersionCatalogEntry> directoryResult = CommonUtils.getSublist(list, page);
+		return directoryResult;
+	}
+
+	@Override
+	public DirectoryResult<CodeSystemVersionCatalogEntrySummary> getResourceSummaries(
+			CodeSystemVersionQuery query, SortCriteria sortCriteria, Page page) {
+
+		CodingSchemeRendering[] csRendering = this.doGetResourceSummaries(
+				query, sortCriteria);
+
+		List<CodeSystemVersionCatalogEntrySummary> list = new ArrayList<CodeSystemVersionCatalogEntrySummary>();
+
+		for (CodingSchemeRendering render : csRendering) {
+			list.add(codingSchemeTransformer.transform(render));
+		}
+
+		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = CommonUtils.getSublist(list, page);
+		return directoryResult;
 	}
 
 	@Override
