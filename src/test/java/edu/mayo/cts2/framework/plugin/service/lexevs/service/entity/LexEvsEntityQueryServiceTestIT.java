@@ -23,7 +23,10 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
 import java.util.List;
@@ -32,30 +35,22 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
-import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.junit.Test;
 
-import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntrySummary;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
-import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PropertyReference;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
-import edu.mayo.cts2.framework.model.entity.EntityDescription;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
-import edu.mayo.cts2.framework.model.service.core.Query;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion.CodingSchemeToCodeSystemTransform;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
 import edu.mayo.cts2.framework.service.command.restriction.EntityDescriptionQueryServiceRestrictions;
-import edu.mayo.cts2.framework.service.profile.entitydescription.EntitiesFromAssociationsQuery;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQuery;
-
 
 public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	
@@ -65,6 +60,36 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	@Resource
 	private LexBIGService lbs;
 
+	// local methods
+	// --------------
+	private EntityDescriptionQuery createQuery(String matchAlgorithmReference, String matchValue, String codeSystemVersion){
+		// Create filters for query
+		// ------------------------
+		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();	
+		ResolvedFilter filter = this.createFilter(matchAlgorithmReference,  matchValue, null);				
+		filters.add(filter);
+		
+		// Create restriction for query
+		// ----------------------------
+		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
+		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName(codeSystemVersion));
+		
+		
+		EntityDescriptionQuery query = new EntityDescriptionQueryImpl(null, filters, restrictions);
+		return query;
+	}
+	
+	private ResolvedFilter createFilter(String matchAlgorithmReference, String matchValue, PropertyReference propertyReference){
+		ResolvedFilter filter = new ResolvedFilter();			
+		filter.setMatchAlgorithmReference(new MatchAlgorithmReference(matchAlgorithmReference));
+		filter.setMatchValue(matchValue);
+		filter.setPropertyReference(propertyReference);				// Should this field be used??			
+		return filter;
+	}
+
+
+	
+	
 	@Test
 	public void testSetUp() {
 		assertNotNull(this.service);
@@ -73,7 +98,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-	public void testReadByOfficialVersionId() throws Exception {
+	public void testGetResourceSummaries_CodingSchemeExists_andNotEmpty() throws Exception {
 		final NameOrURI name = ModelUtils.nameOrUriFromName("Automobiles");
 		
 		// Configure service to use an anonymous transformer class
@@ -83,41 +108,51 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 				return new EntityDirectoryEntry();
 			}
 		});
-			
-		// Create a query from an anonymous EntityDescriptonQuery class
-		// ------------------------------------------------------------
-		EntityDescriptionQuery query = new EntityDescriptionQuery(){
-
-			@Override
-			public Query getQuery() {
-				return null;
-			}
-
-			@Override
-			public Set<ResolvedFilter> getFilterComponent() {
-				return null;
-			}
-
-			@Override
-			public ResolvedReadContext getReadContext() {
-				return null;
-			}
-
-			@Override
-			public EntitiesFromAssociationsQuery getEntitiesFromAssociationsQuery() {
-				return null;
-			}
-
-			@Override
-			public EntityDescriptionQueryServiceRestrictions getRestrictions() {
-				EntityDescriptionQueryServiceRestrictions query = new EntityDescriptionQueryServiceRestrictions();
-				query.setCodeSystemVersion(name);
-				
-				return query;
-			}
-			
-		};
 		
+		// Create restriction for query
+		// ----------------------------
+		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
+		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName(name.getName()));
+		
+		// Create query, no filters
+		// -------------------------
+		EntityDescriptionQuery query = new EntityDescriptionQueryImpl(null, null, restrictions);	
+		
+		// Call getResourceSummaries from service
+		// --------------------------------------
+		SortCriteria sortCriteria = null;
+		Page page = new Page();		
+		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
+		assertNotNull(directoryResult);
+		
+		// Test results
+		// ------------
+		List<EntityDirectoryEntry> list = directoryResult.getEntries();
+		assertNotNull(list);
+		assertTrue(list.size() > 0);		
+	}
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testGetResourceSummaries_CodingSchemeDoesNotExist() throws Exception {
+		final NameOrURI name = ModelUtils.nameOrUriFromName("Automooobiles");
+		
+		// Configure service to use an anonymous transformer class
+		// -------------------------------------------------------
+		service.setEntityTransformer(new EntityTransform(){
+			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
+				return new EntityDirectoryEntry();
+			}
+		});
+		
+		// Create restriction for query
+		// ----------------------------
+		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
+		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName(name.getName()));
+		
+		// Create query, no filters
+		// -------------------------
+		EntityDescriptionQuery query = new EntityDescriptionQueryImpl(null, null, restrictions);	
 		
 		// Call getResourceSummaries from service
 		// --------------------------------------
@@ -127,100 +162,500 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		
 		// Test results
 		// ------------
-		List<EntityDirectoryEntry> list = directoryResult.getEntries();
-		assertTrue(list.size() > 0);		
+		assertNull(directoryResult);		
 	}
+	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testGetResourceSummaries_Filter_startsWith() throws Exception {
+		
+		// Configure service to use an anonymous transformer class
+		// -------------------------------------------------------
+		service.setEntityTransformer(new EntityTransform(){
+			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
+				return new EntityDirectoryEntry();
+			}
+		});
+				
+		// Create query
+		// ------------
+		EntityDescriptionQuery query = this.createQuery("startsWith", "Jaguar", "Automobiles");	
+				
+		// Call getResourceSummaries from service
+		// --------------------------------------
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
+		assertNotNull(directoryResult);
+
+		
+		// Test results
+		// ------------
+		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
+		assertNotNull(list);
+		assertTrue(list.size() > 0);
+	}	
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testGetResourceSummaries_Filter_startsWith_Empty() throws Exception {
+		
+		// Configure service to use an anonymous transformer class
+		// -------------------------------------------------------
+		service.setEntityTransformer(new EntityTransform(){
+			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
+				return new EntityDirectoryEntry();
+			}
+		});
+				
+		// Create query
+		// ------------
+		EntityDescriptionQuery query = this.createQuery("startsWith", "JUGUAR", "Automobiles");	
+				
+		// Call getResourceSummaries from service
+		// --------------------------------------
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
+		assertNotNull(directoryResult);
+
+		
+		// Test results
+		// ------------
+		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
+		assertNotNull(list);
+		assertTrue(list.size() == 0);
+	}	
 
 	
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-	public void testFilter_startsWith() throws Exception {
+	public void testGetResourceSummaries_Filter_exactMatch() throws Exception {
 		
 		// Configure service to use an anonymous transformer class
 		// -------------------------------------------------------
-//		service.setEntityTransformer(new EntityTransform(){
-//			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-//				return new EntityDirectoryEntry();
-//			}
-//		});
-		
-		// Create filters for query
-		// ------------------------
-		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
-		
-		ResolvedFilter filter = new ResolvedFilter();			
-		filter.setMatchAlgorithmReference(new MatchAlgorithmReference("startsWith"));
-		filter.setMatchValue("Jaguar");
-		filter.setPropertyReference(null);				// Should this field be used??			
-		filters.add(filter);
-		
-		// Create restriction for query
-		// ----------------------------
-		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
-		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName("Automobiles"));
-		
+		service.setEntityTransformer(new EntityTransform(){
+			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
+				return new EntityDirectoryEntry();
+			}
+		});
+				
 		// Create query
 		// ------------
-		EntityDescriptionQuery query = new EntityDescriptionQueryImpl(null, filters, restrictions);	
-		
-		
+		EntityDescriptionQuery query = this.createQuery("exactMatch", "Jaguar", "Automobiles");	
+				
 		// Call getResourceSummaries from service
 		// --------------------------------------
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		
+		assertNotNull(directoryResult);
+
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
+		assertNotNull(list);
 		assertTrue(list.size() > 0);
 	}	
 
-
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-	public void testFilter_contains() throws Exception {
+	public void testGetResourceSummaries_Filter_exactMatch_Empty() throws Exception {
 		
 		// Configure service to use an anonymous transformer class
 		// -------------------------------------------------------
-//		service.setEntityTransformer(new EntityTransform(){
-//			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-//				return new EntityDirectoryEntry();
-//			}
-//		});
-//		
-		// Create filters for query
-		// ------------------------
-		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
-		
-		ResolvedFilter filter = new ResolvedFilter();			
-		filter.setMatchAlgorithmReference(new MatchAlgorithmReference("contains"));
-		filter.setMatchValue("GE");
-		filter.setPropertyReference(null);				// Should this field be used??			
-		filters.add(filter);
-		
-		// Create restriction for query
-		// ----------------------------
-		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
-		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName("Automobiles"));
-		
+		service.setEntityTransformer(new EntityTransform(){
+			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
+				return new EntityDirectoryEntry();
+			}
+		});
+				
 		// Create query
 		// ------------
-		EntityDescriptionQuery query = new EntityDescriptionQueryImpl(null, filters, restrictions);	
-		
-		
+		EntityDescriptionQuery query = this.createQuery("exactMatch", "Jagua", "Automobiles");	
+				
 		// Call getResourceSummaries from service
 		// --------------------------------------
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
+		assertNotNull(directoryResult);
+
+		
+		// Test results
+		// ------------
+		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
+		assertNotNull(list);
+		assertTrue(list.size() == 0);
+	}	
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testGetResourceSummaries_Filter_contains() throws Exception {
+		
+		// NOTE:  The CTS2 "word starts with" filtered query maps to the LexEVS "contains" registered
+		//   filter extension
+		
+		// Configure service to use an anonymous transformer class
+		// -------------------------------------------------------
+		service.setEntityTransformer(new EntityTransform(){
+			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
+				return new EntityDirectoryEntry();
+			}
+		});
+		
+		// Create query
+		// ------------
+		EntityDescriptionQuery query = this.createQuery("contains", "GE", "Automobiles");	
+				
+		// Call getResourceSummaries from service
+		// --------------------------------------
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
+		assertNotNull(directoryResult);
 		
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
+		assertNotNull(list);
 		assertTrue(list.size() > 0);
+	}	
+	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testGetResourceSummaries_Filter_contains_Empty() throws Exception {
+		
+		// Configure service to use an anonymous transformer class
+		// -------------------------------------------------------
+		service.setEntityTransformer(new EntityTransform(){
+			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
+				return new EntityDirectoryEntry();
+			}
+		});
+		
+		// Create query
+		// ------------
+		EntityDescriptionQuery query = this.createQuery("contains", "MOOVIES", "Automobiles");	
+				
+		// Call getResourceSummaries from service
+		// --------------------------------------
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
+		assertNotNull(directoryResult);
+		
+		
+		// Test results
+		// ------------
+		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
+		assertNotNull(list);
+		assertTrue(list.size() == 0);
+	}	
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testGetResourceSummaries_Filter_contains_Multiple() throws Exception {
+		
+		// NOTE:  The CTS2 "word starts with" filtered query maps to the LexEVS "contains" registered
+		//   filter extension
+		
+		// Configure service to use an anonymous transformer class
+		// -------------------------------------------------------
+		service.setEntityTransformer(new EntityTransform(){
+			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
+				return new EntityDirectoryEntry();
+			}
+		});
+		
+		// Create query
+		// ------------
+		EntityDescriptionQuery query = this.createQuery("contains", "Car", "Automobiles");	
+				
+		// Call getResourceSummaries from service
+		// --------------------------------------
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
+		assertNotNull(directoryResult);
+		
+		
+		// Test results
+		// ------------
+		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
+		assertNotNull(list);
+		assertTrue(list.size() == 4);
+	}	
+	
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testGetResourceSummaries_Filter_Leading_Wildcard() throws Exception {
+		
+		// Configure service to use an anonymous transformer class
+		// -------------------------------------------------------
+		service.setEntityTransformer(new EntityTransform(){
+			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
+				return new EntityDirectoryEntry();
+			}
+		});
+		
+		// Create query - searching for "General Motors" entity
+		// ------------
+		EntityDescriptionQuery query = this.createQuery("LuceneQuery", "*neRal motors", "Automobiles");	
+				
+		// Call getResourceSummaries from service
+		// --------------------------------------
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
+		assertNotNull(directoryResult);
+		
+		
+		// Test results
+		// ------------
+		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
+		assertNotNull(list);
+		assertTrue(list.size() > 0);
+	}	
+	
+	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testGetResourceSummaries_Filter_Leading_Wildcard_Empty() throws Exception {
+		
+		// Configure service to use an anonymous transformer class
+		// -------------------------------------------------------
+		service.setEntityTransformer(new EntityTransform(){
+			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
+				return new EntityDirectoryEntry();
+			}
+		});
+		
+		// Create query
+		// ------------
+		EntityDescriptionQuery query = this.createQuery("LuceneQuery", "* eral", "Automobiles");
+				
+		// Call getResourceSummaries from service
+		// --------------------------------------
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
+		assertNotNull(directoryResult);
+		
+		
+		// Test results
+		// ------------
+		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
+		assertNotNull(list);
+		assertTrue(list.size() == 0);
+	}	
+	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testGetResourceSummaries_Filter_Lagging_Wildcard() throws Exception {
+		
+		// Configure service to use an anonymous transformer class
+		// -------------------------------------------------------
+		service.setEntityTransformer(new EntityTransform(){
+			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
+				return new EntityDirectoryEntry();
+			}
+		});
+		
+		// Create query - searching for "General Motors" entity
+		// ------------
+		EntityDescriptionQuery query = this.createQuery("LuceneQuery", "general *", "Automobiles");	
+				
+		// Call getResourceSummaries from service
+		// --------------------------------------
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
+		assertNotNull(directoryResult);
+		
+		
+		// Test results
+		// ------------
+		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
+		assertNotNull(list);
+		assertTrue(list.size() > 0);
+	}	
+	
+	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testGetResourceSummaries_Filter_Lagging_Wildcard_Empty() throws Exception {
+		
+		// Configure service to use an anonymous transformer class
+		// -------------------------------------------------------
+		service.setEntityTransformer(new EntityTransform(){
+			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
+				return new EntityDirectoryEntry();
+			}
+		});
+		
+		// Create query
+		// ------------
+		EntityDescriptionQuery query = this.createQuery("LuceneQuery", "eneral*", "Automobiles");	
+				
+		// Call getResourceSummaries from service
+		// --------------------------------------
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
+		assertNotNull(directoryResult);
+		
+		
+		// Test results
+		// ------------
+		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
+		assertNotNull(list);
+		assertTrue(list.size() == 0);
+	}	
+	
+	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testGetResourceSummaries_Filter_LeadingAndLagging_Wildcard() throws Exception {
+		
+		// Configure service to use an anonymous transformer class
+		// -------------------------------------------------------
+		service.setEntityTransformer(new EntityTransform(){
+			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
+				return new EntityDirectoryEntry();
+			}
+		});
+		
+		// Create query - searching for "General Motors" entity
+		// ------------
+		EntityDescriptionQuery query = this.createQuery("LuceneQuery", "*eneRal *", "Automobiles");	
+				
+		// Call getResourceSummaries from service
+		// --------------------------------------
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
+		assertNotNull(directoryResult);
+		
+		
+		// Test results
+		// ------------
+		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
+		assertNotNull(list);
+		assertTrue(list.size() > 0);
+	}	
+	
+	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testGetResourceSummaries_Filter_LeadingAndLagging_Wildcard_Empty() throws Exception {
+		
+		// Configure service to use an anonymous transformer class
+		// -------------------------------------------------------
+		service.setEntityTransformer(new EntityTransform(){
+			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
+				return new EntityDirectoryEntry();
+			}
+		});
+		
+		// Create query
+		// ------------
+		EntityDescriptionQuery query = this.createQuery("LuceneQuery", "* eneRal*", "Automobiles");	
+				
+		// Call getResourceSummaries from service
+		// --------------------------------------
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
+		assertNotNull(directoryResult);
+		
+		
+		// Test results
+		// ------------
+		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
+		assertNotNull(list);
+		assertTrue(list.size() == 0);
+	}	
+	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testGetResourceSummaries_Filter_Paging() throws Exception {
+		
+		// NOTE:  The CTS2 "word starts with" filtered query maps to the LexEVS "contains" registered
+		//   filter extension
+		
+		// Configure service to use an anonymous transformer class
+		// -------------------------------------------------------
+		service.setEntityTransformer(new EntityTransform(){
+			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
+				return new EntityDirectoryEntry();
+			}
+		});
+		
+		// Create query
+		// ------------
+		EntityDescriptionQuery query = this.createQuery("contains", "Car", "Automobiles");	
+				
+		// Call getResourceSummaries from service
+		// --------------------------------------
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		page.setMaxToReturn(3);
+		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
+		assertNotNull(directoryResult);
+				
+		// Test results
+		// ------------
+		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
+		assertNotNull(list);
+		assertTrue("Expected first 1 of 2 pages returned ",list.size() == 3);
+		assertFalse("Expected not to be at the end of the pages ", directoryResult.isAtEnd());
+		
+		page.setPage(1);
+		directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
+		assertNotNull(directoryResult);
+		list = directoryResult.getEntries();		
+		assertNotNull(list);
+		assertTrue("Expected 1 page being the last page returned ", list.size() == 1);
+		assertTrue("Expected to be at the end of the pages ", directoryResult.isAtEnd());
+
+	}	
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testGetResourceSummaries_Filter_Paging_Empty() throws Exception {
+		
+		// NOTE:  The CTS2 "word starts with" filtered query maps to the LexEVS "contains" registered
+		//   filter extension
+		
+		// Configure service to use an anonymous transformer class
+		// -------------------------------------------------------
+		service.setEntityTransformer(new EntityTransform(){
+			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
+				return new EntityDirectoryEntry();
+			}
+		});
+		
+		// Create query
+		// ------------
+		EntityDescriptionQuery query = this.createQuery("exactMatch", "waz up", "Automobiles");	
+				
+		// Call getResourceSummaries from service
+		// --------------------------------------
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
+		assertNotNull(directoryResult);
+				
+		// Test results
+		// ------------
+		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
+		assertNotNull(list);
+		assertTrue(list.size() == 0);
+		assertTrue("Expected to be at the end of the pages ", directoryResult.isAtEnd());
 	}	
 
 }

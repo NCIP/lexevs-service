@@ -28,6 +28,7 @@ import javax.annotation.Resource;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.concepts.Entity;
 
+import edu.mayo.cts2.framework.model.core.EntityReference;
 import edu.mayo.cts2.framework.model.entity.EntityDescription;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.entity.NamedEntityDescription;
@@ -70,4 +71,16 @@ public class EntityTransform {
 		
 		return entry;
 	}
+	
+	
+	public EntityDescription transform_EntityDescription(ResolvedConceptReference reference) {
+		// TODO need to implement
+		throw new UnsupportedOperationException();
+	}
+	
+	public EntityReference transform_EntityReference(ResolvedConceptReference reference) {
+		// TODO need to implement
+		throw new UnsupportedOperationException();
+	}
+	
 }

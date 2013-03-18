@@ -23,7 +23,8 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -34,6 +35,7 @@ import javax.annotation.Resource;
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.junit.Test;
 
+import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntry;
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntrySummary;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
@@ -56,236 +58,489 @@ import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
  */
 public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 		AbstractTestITBase {
-
+	
+	private final static String ABOUT_CONTAINS = "11.11.0.1";
+	private final static String RESOURCESYNOPSIS_STARTSWITH = "Auto";
+	private final static String RESOURCENAME_EXACTMATCH = "Automobiles-1.0";
+	
+	
 	@Resource
 	private LexEvsCodeSystemVersionQueryService service;
 
+	// ---- Local Methods -----
+	private CodeSystemVersionQueryServiceRestrictions createRestrictions_NameOnly(String nameOrURI){
+		NameOrURI codeSystem = ModelUtils.nameOrUriFromName(nameOrURI);	
+		CodeSystemVersionQueryServiceRestrictions restrictions = new CodeSystemVersionQueryServiceRestrictions();
+		restrictions.setCodeSystem(codeSystem);
+		return restrictions;
+	}
+	
+	private CodeSystemVersionQueryImpl createQuery_RestrictionsOnly(CodeSystemVersionQueryServiceRestrictions restrictions){
+		Query query = null;
+		Set<ResolvedFilter> filterComponent = null;
+		ResolvedReadContext readContext = null;		
+		CodeSystemVersionQueryImpl codeSystemVersionQuery = new CodeSystemVersionQueryImpl(query, filterComponent, readContext, restrictions);
+		return codeSystemVersionQuery;
+	}
+	
+	private ResolvedFilter createFilter(PropertyReference property, MatchAlgorithmReference algorithm, String matchValue){
+		ResolvedFilter filter = new ResolvedFilter();
+		filter.setMatchValue(matchValue);
+		filter.setMatchAlgorithmReference(algorithm);
+		filter.setPropertyReference(property);
+		
+		return filter;
+	}
+
+	private Set<ResolvedFilter> createFilterSet(PropertyReference property, MatchAlgorithmReference algorithm, String matchValue){
+		ResolvedFilter filter = new ResolvedFilter();
+		filter.setMatchValue(matchValue);
+		filter.setMatchAlgorithmReference(algorithm);
+		filter.setPropertyReference(property);
+		
+		Set<ResolvedFilter> filterSet = new HashSet<ResolvedFilter>(
+				Arrays.asList(filter));
+		
+		return filterSet;
+	}
+	
+	private Set<ResolvedFilter> createFilterSet(String about_contains, String resourceSynopsis_startsWith, String resourceName_exactMatch){
+		ResolvedFilter aboutFilter = this.createFilter(
+				StandardModelAttributeReference.ABOUT.getPropertyReference(),
+				StandardMatchAlgorithmReference.CONTAINS
+						.getMatchAlgorithmReference(), about_contains);
+
+		ResolvedFilter synopsisFilter = this.createFilter(
+				StandardModelAttributeReference.RESOURCE_SYNOPSIS
+						.getPropertyReference(),
+				StandardMatchAlgorithmReference.STARTS_WITH
+						.getMatchAlgorithmReference(), resourceSynopsis_startsWith);
+
+		ResolvedFilter nameFilter = this.createFilter(
+				StandardModelAttributeReference.RESOURCE_NAME
+						.getPropertyReference(),
+				StandardMatchAlgorithmReference.EXACT_MATCH
+						.getMatchAlgorithmReference(), resourceName_exactMatch);
+		
+		Set<ResolvedFilter> filterSet = new HashSet<ResolvedFilter>(
+				Arrays.asList(aboutFilter, synopsisFilter, nameFilter));
+		
+		return filterSet;
+	}
+	
+	private CodeSystemVersionQueryImpl createQuery_FiltersOnly(Set<ResolvedFilter> filters){
+		Query query = null;
+		ResolvedReadContext readContext = null;
+		CodeSystemVersionQueryServiceRestrictions csvQueryServiceRestrictions = null;
+		CodeSystemVersionQueryImpl codeSystemQuery = new CodeSystemVersionQueryImpl(query, filters, readContext, csvQueryServiceRestrictions);
+		
+		return codeSystemQuery;
+	}
+	
+	private DirectoryResult<CodeSystemVersionCatalogEntrySummary> createResourceSummaries_DirectoryResults_QueryOnly(CodeSystemVersionQueryImpl query){
+		SortCriteria sortCriteria = null;	
+		Page page = new Page();
+		DirectoryResult<CodeSystemVersionCatalogEntrySummary> dirResult = this.service.getResourceSummaries(query, sortCriteria, page);
+		
+		return dirResult;
+	}
+
+	private DirectoryResult<CodeSystemVersionCatalogEntry> createResourceList_DirectoryResults_QueryOnly(CodeSystemVersionQueryImpl query){
+		SortCriteria sortCriteria = null;	
+		Page page = new Page();
+		DirectoryResult<CodeSystemVersionCatalogEntry> dirResult = this.service.getResourceList(query, sortCriteria, page);
+		
+		return dirResult;
+	}
+
+	
+	
+	// ---- Test methods ----
 	@Test
 	public void testSetUp() {
 		assertNotNull(this.service);
 	}
 
+	// -----------------------------
+	// Count with All valid filters
+	// -----------------------------
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-	public void testQueryByResourceSummariesCodeSetName() throws Exception {
-
-		Page page = new Page();
-		SortCriteria sortCriteria = null;	
+	public void testCount_FilterSet() throws Exception {
+		// Call local method to create set of all filters
+		Set<ResolvedFilter> filterComponent = this.createFilterSet(ABOUT_CONTAINS, RESOURCESYNOPSIS_STARTSWITH, RESOURCENAME_EXACTMATCH);
 		
-		Query query = null;
-		Set<ResolvedFilter> filterComponent = null;
-		ResolvedReadContext readContext = null;
-		NameOrURI codeSystem = ModelUtils.nameOrUriFromName("Automobiles");
-		CodeSystemVersionQueryServiceRestrictions csvQueryServiceRestrictions = new CodeSystemVersionQueryServiceRestrictions();
-		csvQueryServiceRestrictions.setCodeSystem(codeSystem);
-		
-		CodeSystemVersionQueryImpl codeSystemVersionQuery = new CodeSystemVersionQueryImpl(query,filterComponent,readContext,csvQueryServiceRestrictions);
+		// Build query using filters
+		CodeSystemVersionQueryImpl query = this.createQuery_FiltersOnly(filterComponent);
 
-		DirectoryResult<CodeSystemVersionCatalogEntrySummary> dirResult = this.service.getResourceSummaries(codeSystemVersionQuery, sortCriteria, page);
-		assertNotNull(dirResult);
-		assertEquals(1, dirResult.getEntries().size());
+		int expecting = 1;
+		int actual = this.service.count(query);
+		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
+	}
+		
+	// -------------------------
+	// Count with valid filters
+	// -------------------------
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testCount_Filter_About_Found() throws Exception {
+
+		// Build query using filters
+		Set<ResolvedFilter> filter = this.createFilterSet(StandardModelAttributeReference.ABOUT.getPropertyReference(), 
+												  		  StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), 
+												  		  ABOUT_CONTAINS);
+
+		// Build query using filters
+		CodeSystemVersionQueryImpl query = this.createQuery_FiltersOnly(filter);
+
+		int expecting = 1;
+		int actual = this.service.count(query);
+		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
+	}
+		
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testCount_Filter_ResorceSynopsis_Found() throws Exception {
+
+		// Build query using filters
+		Set<ResolvedFilter> filter = this.createFilterSet(StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference(), 
+														  StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference(), 
+														  RESOURCESYNOPSIS_STARTSWITH);
+
+		CodeSystemVersionQueryImpl query = this.createQuery_FiltersOnly(filter);
+
+		int expecting = 1;
+		int actual = this.service.count(query);
+		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
+	}
+		
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testCount_Filter_ResourceName_Found() throws Exception {
+
+		// Build query using filters
+		Set<ResolvedFilter> filter = this.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
+												  		  StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference(), 
+												  		  RESOURCENAME_EXACTMATCH);
+
+		CodeSystemVersionQueryImpl query = this.createQuery_FiltersOnly(filter);
+
+		int expecting = 1;
+		int actual = this.service.count(query);
+		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
+	}
+		
+
+	// ---------------------------
+	// Count with invalid filters
+	// ---------------------------
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testCount_Filter_About_NotFound() throws Exception {
+
+		// Call local method to create set of all filters, Create error in resource name
+		Set<ResolvedFilter> filterComponent = this.createFilterSet(ABOUT_CONTAINS + "FOO", RESOURCESYNOPSIS_STARTSWITH, RESOURCENAME_EXACTMATCH);
+	
+		// Build query using filters
+		CodeSystemVersionQueryImpl query = this.createQuery_FiltersOnly(filterComponent);
+
+		int expecting = 0;
+		int actual = this.service.count(query);
+		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
 	}
 	
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-	public void testQueryByResourceSummariesCodeSetNameNotFound() throws Exception {
+	public void testCount_Filter_ResourceName_NotFound() throws Exception {
 
-		Page page = new Page();
-		SortCriteria sortCriteria = null;	
+		// Call local method to create set of all filters, Create error in resource name
+		Set<ResolvedFilter> filterComponent = this.createFilterSet(ABOUT_CONTAINS, RESOURCESYNOPSIS_STARTSWITH, RESOURCENAME_EXACTMATCH + "FOO");
 		
-		Query query = null;
-		Set<ResolvedFilter> filterComponent = null;
-		ResolvedReadContext readContext = null;
-		NameOrURI codeSystem = ModelUtils.nameOrUriFromName("Automooobiles");
-		CodeSystemVersionQueryServiceRestrictions csvQueryServiceRestrictions = new CodeSystemVersionQueryServiceRestrictions();
-		csvQueryServiceRestrictions.setCodeSystem(codeSystem);
-		
-		CodeSystemVersionQueryImpl codeSystemVersionQuery = new CodeSystemVersionQueryImpl(query,filterComponent,readContext,csvQueryServiceRestrictions);
+		// Build query using filters
+		CodeSystemVersionQueryImpl query = this.createQuery_FiltersOnly(filterComponent);
 
-		DirectoryResult<CodeSystemVersionCatalogEntrySummary> dirResult = this.service.getResourceSummaries(codeSystemVersionQuery, sortCriteria, page);
+		int expecting = 0;
+		int actual = this.service.count(query);
+		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
+	}
+		
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testCount_Filter_ResorceSynopsis_NotFound() throws Exception {
+
+		// Call local method to create set of all filters, Create error in resource name
+		Set<ResolvedFilter> filterComponent = this.createFilterSet(ABOUT_CONTAINS, RESOURCESYNOPSIS_STARTSWITH + "FOO", RESOURCENAME_EXACTMATCH);
+		
+		// Build query using filters
+		CodeSystemVersionQueryImpl query = this.createQuery_FiltersOnly(filterComponent);
+
+		int expecting = 0;
+		int actual = this.service.count(query);
+		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
+	}
+	
+	// ----------------------------------------
+	// resourceSummaries test codeSetName
+	// -----------------------------------------
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testGetResourceSummaries_Restriction_CodeSetName_Found() throws Exception {
+
+		// Create empty query for given codeSet with no restrictions
+		CodeSystemVersionQueryServiceRestrictions restrictions = this.createRestrictions_NameOnly("Automobiles");
+		CodeSystemVersionQueryImpl query = this.createQuery_RestrictionsOnly(restrictions);
+
+		// Get Directory Results for given codeSystem (no restrictions and empty query so return all entities)
+		DirectoryResult<CodeSystemVersionCatalogEntrySummary> dirResult = this.createResourceSummaries_DirectoryResults_QueryOnly(query);
+		
+		// Test results, Automobiles has one entity
 		assertNotNull(dirResult);
-		assertEquals(0, dirResult.getEntries().size());
+		int expecting = 1;
+		int actual = dirResult.getEntries().size();
+		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
 	}
 	
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-	public void testQueryByResourceSummariesAllFilters() throws Exception {
+	public void testGetResourceSummaries_Restriction_CodeSetName_NotFound() throws Exception {
 
-		Page page = new Page();
-		SortCriteria sortCriteria = null;	
+		// Create empty query for given codeSet with no restrictions
+		CodeSystemVersionQueryServiceRestrictions restrictions = this.createRestrictions_NameOnly("Automoooobiles");
+		CodeSystemVersionQueryImpl query = this.createQuery_RestrictionsOnly(restrictions);
 		
-		Query query = null;
+		// Get Directory Results for given codeSystem
+		DirectoryResult<CodeSystemVersionCatalogEntrySummary> dirResult = this.createResourceSummaries_DirectoryResults_QueryOnly(query);
 		
-		MatchAlgorithmReference contains = StandardMatchAlgorithmReference.CONTAINS
-				.getMatchAlgorithmReference();
-		MatchAlgorithmReference startsWith = StandardMatchAlgorithmReference.STARTS_WITH
-				.getMatchAlgorithmReference();
-		MatchAlgorithmReference exactMatch = StandardMatchAlgorithmReference.EXACT_MATCH
-				.getMatchAlgorithmReference();
-		
-		PropertyReference about = StandardModelAttributeReference.ABOUT.getPropertyReference();
-		PropertyReference resourceSynopsis = StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference();
-		PropertyReference resourceName = StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference();	
-		
-		ResolvedFilter aboutContains = new ResolvedFilter();
-		aboutContains.setMatchValue("11.11.0.1");
-		aboutContains.setMatchAlgorithmReference(contains);
-		aboutContains.setPropertyReference(about);
-		
-		ResolvedFilter resourceSynopsisStartsWith = new ResolvedFilter();
-		resourceSynopsisStartsWith.setMatchValue("Auto");
-		resourceSynopsisStartsWith.setMatchAlgorithmReference(startsWith);
-		resourceSynopsisStartsWith.setPropertyReference(resourceSynopsis);
-		
-		ResolvedFilter resourceNameExactMatch = new ResolvedFilter();
-		resourceNameExactMatch.setMatchValue("Automobiles-1.0");
-		resourceNameExactMatch.setMatchAlgorithmReference(exactMatch);
-		resourceNameExactMatch.setPropertyReference(resourceName);		
-
-		Set<ResolvedFilter> filterComponent = new HashSet<ResolvedFilter>(Arrays.asList(aboutContains,resourceSynopsisStartsWith,resourceNameExactMatch));
-		
-		ResolvedReadContext readContext = null;
-		
-		CodeSystemVersionQueryServiceRestrictions csvQueryServiceRestrictions = null;
-		
-		CodeSystemVersionQueryImpl codeSystemVersionQuery = new CodeSystemVersionQueryImpl(query,filterComponent,readContext,csvQueryServiceRestrictions);
-
-		DirectoryResult<CodeSystemVersionCatalogEntrySummary> dirResult = this.service.getResourceSummaries(codeSystemVersionQuery, sortCriteria, page);
+		// Test results, Automoooobiles doesn't exist so will return list with no elements.
 		assertNotNull(dirResult);
-		assertEquals(1, dirResult.getEntries().size());
+		int expecting = 0;
+		int actual = dirResult.getEntries().size();
+		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
+	}
+	
+	// ----------------------------------------
+	// resourceSummaries with All valid filters
+	// -----------------------------------------
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testGetResourceSummaries_FiltersSet() throws Exception {
+
+		// Call local method to create set of all filters
+		Set<ResolvedFilter> filterComponent = this.createFilterSet(ABOUT_CONTAINS, RESOURCESYNOPSIS_STARTSWITH, RESOURCENAME_EXACTMATCH);
+		
+		// Build query using filters
+		CodeSystemVersionQueryImpl query = this.createQuery_FiltersOnly(filterComponent);
+
+		// Call getResourceSummaries with query created.
+		DirectoryResult<CodeSystemVersionCatalogEntrySummary> dirResult = this.createResourceSummaries_DirectoryResults_QueryOnly(query);
+		
+		// Test results
+		assertNotNull(dirResult);
+		int expecting = 1;
+		int actual = dirResult.getEntries().size();
+		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
+	}
+	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testGetResourceSummaries_FilterSet_VerifyTransformation() throws Exception {
+
+		// Call local method to create set of all filters
+		Set<ResolvedFilter> filterComponent = this.createFilterSet(ABOUT_CONTAINS, RESOURCESYNOPSIS_STARTSWITH, RESOURCENAME_EXACTMATCH);
+		
+		// Build query using filters
+		CodeSystemVersionQueryImpl query = this.createQuery_FiltersOnly(filterComponent);
+
+		// Call getResourceSummaries with query created.
+		DirectoryResult<CodeSystemVersionCatalogEntrySummary> dirResult = this.createResourceSummaries_DirectoryResults_QueryOnly(query);
+		
+		// Test results, should return one entity
+		assertNotNull(dirResult);
+		int expecting = 1;
+		int actual = dirResult.getEntries().size();
+		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
 		
 		// Verify LexEVS to CTS2 transform worked 
 		CodeSystemVersionCatalogEntrySummary csvCatalogEntrySummary = dirResult.getEntries().get(0);
 		assertNotNull(csvCatalogEntrySummary.getFormalName());
 		assertEquals("Formal name not transformed - ", "autos", csvCatalogEntrySummary.getFormalName());
+		
 		assertNotNull(csvCatalogEntrySummary.getCodeSystemVersionName());
 		assertEquals("CodeSystemVersionName not transformed - ","Automobiles-1.0",csvCatalogEntrySummary.getCodeSystemVersionName());
+
 		assertNotNull(csvCatalogEntrySummary.getDocumentURI());
 		assertEquals("DocumentURI not transformed - ","urn:oid:11.11.0.1",csvCatalogEntrySummary.getDocumentURI());		
+
 		assertNotNull(csvCatalogEntrySummary.getAbout());
 		assertEquals("About not transformed - ","urn:oid:11.11.0.1",csvCatalogEntrySummary.getAbout());		
+
 		assertNotNull(csvCatalogEntrySummary.getResourceSynopsis());
 		assertNotNull(csvCatalogEntrySummary.getResourceSynopsis().getValue());
 		assertNotNull(csvCatalogEntrySummary.getResourceSynopsis().getValue().getContent());
 		assertEquals("Resource Synopsis not transformed - ","Automobiles",csvCatalogEntrySummary.getResourceSynopsis().getValue().getContent());						
 	}
 	
+	// ----------------------------------------
+	// resourceSummaries with individual filters
+	// -----------------------------------------
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-	public void testQueryByExactResourceName() throws Exception {
+	public void testGetResourceSummaries_Filter_About_Contains_Found() throws Exception {
 
-		Page page = new Page();
-		SortCriteria sortCriteria = null;	
-		
-		Query query = null;
-		
-		MatchAlgorithmReference exactMatch = StandardMatchAlgorithmReference.EXACT_MATCH
-				.getMatchAlgorithmReference();
-	
-		PropertyReference resourceName = StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference();	
+		// Build query using filters
+		Set<ResolvedFilter> filter = this.createFilterSet(StandardModelAttributeReference.ABOUT.getPropertyReference(), 
+				   										  StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), 
+				   										  ABOUT_CONTAINS);
+		CodeSystemVersionQueryImpl query = this.createQuery_FiltersOnly(filter);
 
-		ResolvedFilter resourceNameExactMatch = new ResolvedFilter();
-		resourceNameExactMatch.setMatchValue("Automobiles-1.0");
-		resourceNameExactMatch.setMatchAlgorithmReference(exactMatch);
-		resourceNameExactMatch.setPropertyReference(resourceName);		
-
-		Set<ResolvedFilter> filterComponent = new HashSet<ResolvedFilter>(Arrays.asList(resourceNameExactMatch));
+		// Call getResourceSummaries with query created.
+		DirectoryResult<CodeSystemVersionCatalogEntrySummary> dirResult = this.createResourceSummaries_DirectoryResults_QueryOnly(query);
 		
-		ResolvedReadContext readContext = null;
-		
-		CodeSystemVersionQueryServiceRestrictions csvQueryServiceRestrictions = null;
-		
-		CodeSystemVersionQueryImpl codeSystemVersionQuery = new CodeSystemVersionQueryImpl(query,filterComponent,readContext,csvQueryServiceRestrictions);
-
-		DirectoryResult<CodeSystemVersionCatalogEntrySummary> dirResult = this.service.getResourceSummaries(codeSystemVersionQuery, sortCriteria, page);
+		// Test results, should return one entity
 		assertNotNull(dirResult);
-		assertEquals(1, dirResult.getEntries().size());
+		int expecting = 1;
+		int actual = dirResult.getEntries().size();
+		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
 	}
 
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-	public void testQueryByCount() throws Exception {
+	public void testGetResourceSummaries_Filter_ResourceSynopsis_StartsWith_Found() throws Exception {
 
-		Query query = null;
-		
-		MatchAlgorithmReference contains = StandardMatchAlgorithmReference.CONTAINS
-				.getMatchAlgorithmReference();
-		MatchAlgorithmReference startsWith = StandardMatchAlgorithmReference.STARTS_WITH
-				.getMatchAlgorithmReference();
-		MatchAlgorithmReference exactMatch = StandardMatchAlgorithmReference.EXACT_MATCH
-				.getMatchAlgorithmReference();
-		
-		PropertyReference about = StandardModelAttributeReference.ABOUT.getPropertyReference();
-		PropertyReference resourceSynopsis = StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference();
-		PropertyReference resourceName = StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference();	
-		
-		ResolvedFilter aboutContains = new ResolvedFilter();
-		aboutContains.setMatchValue("11.11.0.1");
-		aboutContains.setMatchAlgorithmReference(contains);
-		aboutContains.setPropertyReference(about);
-		
-		ResolvedFilter resourceSynopsisStartsWith = new ResolvedFilter();
-		resourceSynopsisStartsWith.setMatchValue("Auto");
-		resourceSynopsisStartsWith.setMatchAlgorithmReference(startsWith);
-		resourceSynopsisStartsWith.setPropertyReference(resourceSynopsis);
-		
-		ResolvedFilter resourceNameExactMatch = new ResolvedFilter();
-		resourceNameExactMatch.setMatchValue("Automobiles-1.0");
-		resourceNameExactMatch.setMatchAlgorithmReference(exactMatch);
-		resourceNameExactMatch.setPropertyReference(resourceName);		
+		// Build query using filters
+		Set<ResolvedFilter> filter = this.createFilterSet(StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference(), 
+														  StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference(), 
+				   										  RESOURCESYNOPSIS_STARTSWITH);
+		CodeSystemVersionQueryImpl query = this.createQuery_FiltersOnly(filter);
 
-		Set<ResolvedFilter> filterComponent = new HashSet<ResolvedFilter>(Arrays.asList(aboutContains,resourceSynopsisStartsWith,resourceNameExactMatch));
+		// Call getResourceSummaries with query created.
+		DirectoryResult<CodeSystemVersionCatalogEntrySummary> dirResult = this.createResourceSummaries_DirectoryResults_QueryOnly(query);
 		
-		ResolvedReadContext readContext = null;
-		
-		CodeSystemVersionQueryServiceRestrictions csvQueryServiceRestrictions = null;
-		
-		CodeSystemVersionQueryImpl codeSystemVersionQuery = new CodeSystemVersionQueryImpl(query,filterComponent,readContext,csvQueryServiceRestrictions);
-
-		assertEquals(1, this.service.count(codeSystemVersionQuery));
+		// Test results, should return one entity
+		assertNotNull(dirResult);
+		int expecting = 1;
+		int actual = dirResult.getEntries().size();
+		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
 	}
-		
+
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-	public void testQueryByCountFilterMismatch() throws Exception {
+	public void testGetResourceSummaries_Filter_ResourceName_ExactMatch_Found() throws Exception {
 
-		Query query = null;
-		
-		MatchAlgorithmReference contains = StandardMatchAlgorithmReference.CONTAINS
-				.getMatchAlgorithmReference();
-		MatchAlgorithmReference startsWith = StandardMatchAlgorithmReference.STARTS_WITH
-				.getMatchAlgorithmReference();
-		MatchAlgorithmReference exactMatch = StandardMatchAlgorithmReference.EXACT_MATCH
-				.getMatchAlgorithmReference();
-		
-		PropertyReference about = StandardModelAttributeReference.ABOUT.getPropertyReference();
-		PropertyReference resourceSynopsis = StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference();
-		PropertyReference resourceName = StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference();	
-		
-		ResolvedFilter aboutContains = new ResolvedFilter();
-		aboutContains.setMatchValue("11.11.0.1");
-		aboutContains.setMatchAlgorithmReference(contains);
-		aboutContains.setPropertyReference(about);
-		
-		ResolvedFilter resourceSynopsisStartsWith = new ResolvedFilter();
-		resourceSynopsisStartsWith.setMatchValue("Auto");
-		resourceSynopsisStartsWith.setMatchAlgorithmReference(startsWith);
-		resourceSynopsisStartsWith.setPropertyReference(resourceSynopsis);
-		
-		ResolvedFilter resourceNameExactMatch = new ResolvedFilter();
-		resourceNameExactMatch.setMatchValue("Automooobiles-1.0");
-		resourceNameExactMatch.setMatchAlgorithmReference(exactMatch);
-		resourceNameExactMatch.setPropertyReference(resourceName);		
+		// Build query using filters
+		Set<ResolvedFilter> filter = this.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
+														  StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference(), 
+														  RESOURCENAME_EXACTMATCH);
+		CodeSystemVersionQueryImpl query = this.createQuery_FiltersOnly(filter);
 
-		Set<ResolvedFilter> filterComponent = new HashSet<ResolvedFilter>(Arrays.asList(aboutContains,resourceSynopsisStartsWith,resourceNameExactMatch));
+		// Call getResourceSummaries with query created.
+		DirectoryResult<CodeSystemVersionCatalogEntrySummary> dirResult = this.createResourceSummaries_DirectoryResults_QueryOnly(query);
 		
-		ResolvedReadContext readContext = null;
-		
-		CodeSystemVersionQueryServiceRestrictions csvQueryServiceRestrictions = null;
-		
-		CodeSystemVersionQueryImpl codeSystemVersionQuery = new CodeSystemVersionQueryImpl(query,filterComponent,readContext,csvQueryServiceRestrictions);
-
-		assertEquals(0, this.service.count(codeSystemVersionQuery));
+		// Test results, should return one entity
+		assertNotNull(dirResult);
+		int expecting = 1;
+		int actual = dirResult.getEntries().size();
+		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
 	}
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testGetResourceSummaries_Filter_About_Contains_NotFound() throws Exception {
+
+		// Build query using filters
+		Set<ResolvedFilter> filter = this.createFilterSet(StandardModelAttributeReference.ABOUT.getPropertyReference(), 
+														  StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), 
+														  ABOUT_CONTAINS + "FOO");
+		CodeSystemVersionQueryImpl query = this.createQuery_FiltersOnly(filter);
+
+		// Call getResourceSummaries with query created.
+		DirectoryResult<CodeSystemVersionCatalogEntrySummary> dirResult = this.createResourceSummaries_DirectoryResults_QueryOnly(query);
 		
+		// Test results, should return one entity
+		assertNotNull(dirResult);
+		int expecting = 0;
+		int actual = dirResult.getEntries().size();
+		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
+	}
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testGetResourceSummaries_Filter_ResourceSynopsis_StartsWith_NotFound() throws Exception {
+
+		// Build query using filters
+		Set<ResolvedFilter> filter = this.createFilterSet(StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference(), 
+														  StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference(), 
+														  RESOURCESYNOPSIS_STARTSWITH + "FOO");
+		CodeSystemVersionQueryImpl query = this.createQuery_FiltersOnly(filter);
+
+		// Call getResourceSummaries with query created.
+		DirectoryResult<CodeSystemVersionCatalogEntrySummary> dirResult = this.createResourceSummaries_DirectoryResults_QueryOnly(query);
+		
+		// Test results, should return one entity
+		assertNotNull(dirResult);
+		int expecting = 0;
+		int actual = dirResult.getEntries().size();
+		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
+	}
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testGetResourceSummaries_Filter_ResourceName_ExactMatch_NotFound() throws Exception {
+
+		// Build query using filters
+		Set<ResolvedFilter> filter = this.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
+														  StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference(), 
+														  RESOURCENAME_EXACTMATCH + "FOO");
+		CodeSystemVersionQueryImpl query = this.createQuery_FiltersOnly(filter);
+
+		// Call getResourceSummaries with query created.
+		DirectoryResult<CodeSystemVersionCatalogEntrySummary> dirResult = this.createResourceSummaries_DirectoryResults_QueryOnly(query);
+		
+		// Test results, should return one entity
+		assertNotNull(dirResult);
+		int expecting = 0;
+		int actual = dirResult.getEntries().size();
+		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
+	}	
+
+
+	// ----------------------------------------
+	// resourceList test codeSetName
+	// -----------------------------------------
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testGetResourceList_Restriction_CodeSetName_Found() throws Exception {
+
+		// Create empty query for given codeSet with no restrictions
+		CodeSystemVersionQueryServiceRestrictions restrictions = this.createRestrictions_NameOnly("Automobiles");
+		CodeSystemVersionQueryImpl query = this.createQuery_RestrictionsOnly(restrictions);
+
+		// Get Directory Results for given codeSystem (no restrictions and empty query so return all entities)
+		DirectoryResult<CodeSystemVersionCatalogEntry> dirResult = this.createResourceList_DirectoryResults_QueryOnly(query);
+		
+		// Test results, Automobiles has one entity
+		assertNotNull(dirResult);
+		int expecting = 1;
+		int actual = dirResult.getEntries().size();
+		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
+	}
+	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testGetResourceList_Restriction_CodeSetName_NotFound() throws Exception {
+
+		// Create empty query for given codeSet with no restrictions
+		CodeSystemVersionQueryServiceRestrictions restrictions = this.createRestrictions_NameOnly("Automo000biles");
+		CodeSystemVersionQueryImpl query = this.createQuery_RestrictionsOnly(restrictions);
+
+		// Get Directory Results for given codeSystem (no restrictions and empty query so return all entities)
+		DirectoryResult<CodeSystemVersionCatalogEntry> dirResult = this.createResourceList_DirectoryResults_QueryOnly(query);
+		
+		// Test results, Automobiles has one entity
+		assertNotNull(dirResult);
+		int expecting = 0;
+		int actual = dirResult.getEntries().size();
+		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
+	}
+
 }
