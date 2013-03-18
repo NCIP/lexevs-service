@@ -29,11 +29,15 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.StringWriter;
+
 import javax.annotation.Resource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.junit.Test;
 
+import edu.mayo.cts2.framework.core.xml.Cts2Marshaller;
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntry;
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.core.VersionTagReference;
@@ -47,6 +51,9 @@ public class LexEvsCodeSystemVersionReadServiceTestIT extends AbstractTestITBase
 	
 	@Resource
 	private LexEvsCodeSystemVersionReadService service;
+	
+	@Resource
+	private Cts2Marshaller marshaller;
 
 	@Test
 	public void testSetUp() {
@@ -113,6 +120,17 @@ public class LexEvsCodeSystemVersionReadServiceTestIT extends AbstractTestITBase
 		assertNotNull(csvCatalogEntry);		
 	}
 
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testReadValidXML() throws Exception {
+		String nameOrUri = "Automobiles-1.0";
+		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
+		ResolvedReadContext readContext = null;
+		CodeSystemVersionCatalogEntry csvCatalogEntry = this.service.read(identifier, readContext);
+		
+		marshaller.marshal(csvCatalogEntry, new StreamResult(new StringWriter()));		
+	}
+	
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testRead_ErrorWithoutDash() throws Exception {

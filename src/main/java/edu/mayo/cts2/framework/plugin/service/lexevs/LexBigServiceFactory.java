@@ -23,12 +23,11 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs;
 
-import org.LexGrid.LexBIG.Impl.LexBIGServiceImpl;
+import javax.annotation.Resource;
+
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,26 +35,23 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class LexBigServiceFactory implements FactoryBean<LexBIGService> {
-	
-	private static final String LG_CONFIG_ENV_PROP = "LG_CONFIG_FILE";
-	
+
 	protected Logger log = Logger.getLogger(this.getClass());
 	
-	@Value("${LG_CONFIG_FILE}")
-	private String lgConfigFile;
+	@Resource
+	private LexEvsOsgiClassLoader lexEvsOsgiClassLoader;
 
 	/* (non-Javadoc)
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */
 	@Override
 	public LexBIGService getObject() throws Exception {
-		if(StringUtils.isNotBlank(this.lgConfigFile)){
-			log.warn("Setting " + LG_CONFIG_ENV_PROP + " to: " + this.lgConfigFile);
-			
-			System.setProperty(LG_CONFIG_ENV_PROP, this.lgConfigFile);
-		}
+
+		LexBIGService impl = 
+			(LexBIGService) 
+				this.lexEvsOsgiClassLoader.getServiceClass("org.LexGrid.LexBIG.Impl.LexBIGServiceImpl");
 		
-		return LexBIGServiceImpl.defaultInstance();
+		return impl;
 	}
 
 	/* (non-Javadoc)
@@ -73,13 +69,4 @@ public class LexBigServiceFactory implements FactoryBean<LexBIGService> {
 	public boolean isSingleton() {
 		return true;
 	}
-
-	public String getLgConfigFile() {
-		return lgConfigFile;
-	}
-
-	public void setLgConfigFile(String lgConfigFile) {
-		this.lgConfigFile = lgConfigFile;
-	}
-
 }
