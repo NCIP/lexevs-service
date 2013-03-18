@@ -23,13 +23,11 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs;
 
-import java.net.URL;
-import java.net.URLClassLoader;
+import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,56 +37,19 @@ import org.springframework.stereotype.Component;
 public class LexBigServiceFactory implements FactoryBean<LexBIGService> {
 
 	protected Logger log = Logger.getLogger(this.getClass());
-
-	@Value("${LG_RUNTIME_JAR}")
-	private String lgRuntimeJar;
 	
-	@Value("${LG_PATCH_JAR}")
-	private String lgPatchJar;
+	@Resource
+	private LexEvsOsgiClassLoader lexEvsOsgiClassLoader;
 
 	/* (non-Javadoc)
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public LexBIGService getObject() throws Exception {
 
-		final ClassLoader parent = Thread.currentThread().getContextClassLoader();
-		
-		try {
-			//it may be present in the classpath (for testing, especially)
-			Class<LexBIGService> impl = 
-				(Class<LexBIGService>) parent.loadClass("org.LexGrid.LexBIG.Impl.LexBIGServiceImpl");
-		
-			return impl.newInstance();
-		} catch (ClassNotFoundException e) {
-			//this is ok - we'll get it from the specified lbRuntime.jar
-		}
-
-		URLClassLoader cl = new URLClassLoader(
-			new URL[]{new URL(this.lgRuntimeJar)}){
-
-				@Override
-				public Class<?> loadClass(String clazz)
-						throws ClassNotFoundException {
-					if(clazz.toLowerCase().contains("lexevs") ||
-							clazz.toLowerCase().contains("lexbig") ||
-							clazz.toLowerCase().contains("lexgrid")){
-						try {
-							return parent.loadClass(clazz);
-						} catch (ClassNotFoundException e) {
-							return super.loadClass(clazz);
-						}
-					} else {
-						return super.loadClass(clazz);
-					}
-				}	
-		};
-		
-		Thread.currentThread().setContextClassLoader(cl);
-	
 		LexBIGService impl = 
-				(LexBIGService) cl.loadClass("org.LexGrid.LexBIG.Impl.LexBIGServiceImpl").newInstance();
+			(LexBIGService) 
+				this.lexEvsOsgiClassLoader.getServiceClass("org.LexGrid.LexBIG.Impl.LexBIGServiceImpl");
 		
 		return impl;
 	}
