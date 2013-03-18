@@ -34,8 +34,10 @@ import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntry;
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntrySummary;
+import edu.mayo.cts2.framework.model.core.CodeSystemReference;
 import edu.mayo.cts2.framework.model.core.EntryDescription;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
+import edu.mayo.cts2.framework.model.core.SourceAndNotation;
 import edu.mayo.cts2.framework.model.core.StatementTarget;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
@@ -67,34 +69,44 @@ public class CodingSchemeToCodeSystemTransform {
 	 * @return the code system version catalog entry
 	 */
 	public CodeSystemVersionCatalogEntry transform(CodingScheme codingScheme){
-		CodeSystemVersionCatalogEntry codeSystem = new CodeSystemVersionCatalogEntry();
+		CodeSystemVersionCatalogEntry codeSystemVersion = new CodeSystemVersionCatalogEntry();
 
-		codeSystem.setAbout(codingScheme.getCodingSchemeURI());
+		codeSystemVersion.setAbout(codingScheme.getCodingSchemeURI());
 		
 		String name = this.getName(codingScheme);
 		
-		codeSystem.setCodeSystemVersionName(name);
-		codeSystem.setDocumentURI(codingScheme.getCodingSchemeURI());
-		codeSystem.setFormalName(codingScheme.getFormalName());
+		codeSystemVersion.setCodeSystemVersionName(name);
+		codeSystemVersion.setDocumentURI(codingScheme.getCodingSchemeURI());
+		codeSystemVersion.setFormalName(codingScheme.getFormalName());
 		
 		if(codingScheme.getProperties() != null){
 			for(Property property : codingScheme.getProperties().getProperty()){
-				codeSystem.addProperty(this.toProperty(property));
+				codeSystemVersion.addProperty(this.toProperty(property));
 			}
 		}
 		
 		for(String localName : codingScheme.getLocalName()){
-			codeSystem.addKeyword(localName);
+			codeSystemVersion.addKeyword(localName);
 		}
 		
 		EntityDescription entityDescription = codingScheme.getEntityDescription();
 		if(entityDescription != null){
 			EntryDescription description = new EntryDescription();
 			description.setValue(ModelUtils.toTsAnyType(entityDescription.getContent()));
-			codeSystem.setResourceSynopsis(description);
+			codeSystemVersion.setResourceSynopsis(description);
 		}
 		
-		return codeSystem;
+		SourceAndNotation sourceAndNotation = new SourceAndNotation();
+		sourceAndNotation.setSourceAndNotationDescription("LexEVS");
+		
+		codeSystemVersion.setSourceAndNotation(sourceAndNotation);
+		
+		CodeSystemReference codeSystemReference = new CodeSystemReference();
+		codeSystemReference.setContent(codingScheme.getCodingSchemeName());
+		codeSystemReference.setUri(codingScheme.getCodingSchemeURI());
+		codeSystemVersion.setVersionOf(codeSystemReference);
+		
+		return codeSystemVersion;
 	}
 	
 	public CodeSystemVersionCatalogEntrySummary transform(CodingSchemeRendering codingSchemeRendering){
@@ -125,8 +137,10 @@ public class CodingSchemeToCodeSystemTransform {
 		edu.mayo.cts2.framework.model.core.Property cts2Prop = 
 			new edu.mayo.cts2.framework.model.core.Property();
 		
-		PredicateReference predicateRef = 
-			new PredicateReference();
+		PredicateReference predicateRef = new PredicateReference();
+		predicateRef.setName(property.getPropertyName());
+		predicateRef.setUri(property.getPropertyName());
+		
 		cts2Prop.setPredicate(predicateRef);
 		
 		StatementTarget target = new StatementTarget();
