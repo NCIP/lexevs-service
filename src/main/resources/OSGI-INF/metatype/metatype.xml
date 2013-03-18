@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0">
 	<OCD description="LexEVS Plugin" name="LexEVS Plugin" id="edu.mayo.cts2.framework.plugin.service.lexevs">
-		<AD name="LexEVS Config Location" id="LG_CONFIG_FILE" required="true" type="String" />
+		<AD name="LexEVS Runtime Jar" id="LG_RUNTIME_JAR" required="true" type="String" />
+		<AD name="LexEVS Patch Jar" id="LG_PATCH_JAR" required="true" type="String" />
 	</OCD>
 	<Designate pid="edu.mayo.cts2.framework.plugin.service.lexevs">
         <Object ocdref="edu.mayo.cts2.framework.plugin.service.lexevs"/>

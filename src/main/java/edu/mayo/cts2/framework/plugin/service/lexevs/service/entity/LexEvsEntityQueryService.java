@@ -246,9 +246,10 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		return false;
 	}
 
+
+
 	@Override
-	public EntityReferenceList resolveAsEntityReferenceList(Query query,
-			Set<ResolvedFilter> filterComponent,
+	public EntityReferenceList resolveAsEntityReferenceList(
 			EntityDescriptionQuery restrictions, ResolvedReadContext readContext) {
 		// TODO Auto-generated method stub
 		return null;
@@ -256,9 +257,8 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 
 	@Override
 	public EntityNameOrURIList intersectEntityList(
-			Set<EntityNameOrURI> entities, Query query,
-			Set<ResolvedFilter> filterComponent,
-			EntityDescriptionQuery restrictions, ResolvedReadContext readContext) {
+			Set<EntityNameOrURI> entities, EntityDescriptionQuery restrictions,
+			ResolvedReadContext readContext) {
 		// TODO Auto-generated method stub
 		return null;
 	}

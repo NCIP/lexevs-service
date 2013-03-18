@@ -23,9 +23,10 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs;
 
-import org.LexGrid.LexBIG.Impl.LexBIGServiceImpl;
+import java.net.URL;
+import java.net.URLClassLoader;
+
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,26 +37,60 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class LexBigServiceFactory implements FactoryBean<LexBIGService> {
-	
-	private static final String LG_CONFIG_ENV_PROP = "LG_CONFIG_FILE";
-	
+
 	protected Logger log = Logger.getLogger(this.getClass());
+
+	@Value("${LG_RUNTIME_JAR}")
+	private String lgRuntimeJar;
 	
-	@Value("${LG_CONFIG_FILE}")
-	private String lgConfigFile;
+	@Value("${LG_PATCH_JAR}")
+	private String lgPatchJar;
 
 	/* (non-Javadoc)
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public LexBIGService getObject() throws Exception {
-		if(StringUtils.isNotBlank(this.lgConfigFile)){
-			log.warn("Setting " + LG_CONFIG_ENV_PROP + " to: " + this.lgConfigFile);
-			
-			System.setProperty(LG_CONFIG_ENV_PROP, this.lgConfigFile);
-		}
+
+		final ClassLoader parent = Thread.currentThread().getContextClassLoader();
 		
-		return LexBIGServiceImpl.defaultInstance();
+		try {
+			//it may be present in the classpath (for testing, especially)
+			Class<LexBIGService> impl = 
+				(Class<LexBIGService>) parent.loadClass("org.LexGrid.LexBIG.Impl.LexBIGServiceImpl");
+		
+			return impl.newInstance();
+		} catch (ClassNotFoundException e) {
+			//this is ok - we'll get it from the specified lbRuntime.jar
+		}
+
+		URLClassLoader cl = new URLClassLoader(
+			new URL[]{new URL(this.lgRuntimeJar)}){
+
+				@Override
+				public Class<?> loadClass(String clazz)
+						throws ClassNotFoundException {
+					if(clazz.toLowerCase().contains("lexevs") ||
+							clazz.toLowerCase().contains("lexbig") ||
+							clazz.toLowerCase().contains("lexgrid")){
+						try {
+							return parent.loadClass(clazz);
+						} catch (ClassNotFoundException e) {
+							return super.loadClass(clazz);
+						}
+					} else {
+						return super.loadClass(clazz);
+					}
+				}	
+		};
+		
+		Thread.currentThread().setContextClassLoader(cl);
+	
+		LexBIGService impl = 
+				(LexBIGService) cl.loadClass("org.LexGrid.LexBIG.Impl.LexBIGServiceImpl").newInstance();
+		
+		return impl;
 	}
 
 	/* (non-Javadoc)
@@ -73,13 +108,4 @@ public class LexBigServiceFactory implements FactoryBean<LexBIGService> {
 	public boolean isSingleton() {
 		return true;
 	}
-
-	public String getLgConfigFile() {
-		return lgConfigFile;
-	}
-
-	public void setLgConfigFile(String lgConfigFile) {
-		this.lgConfigFile = lgConfigFile;
-	}
-
 }
