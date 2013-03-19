@@ -258,12 +258,12 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 	public DirectoryResult<CodeSystemVersionCatalogEntry> getResourceList(
 			CodeSystemVersionQuery query, SortCriteria sortCriteria, Page page) {
 
-		CodingSchemeRendering[] csRendering = this.doGetResourceSummaries(
-				query, sortCriteria);
-
+		CodingSchemeRendering[] csRendering = this.doGetResourceSummaries(query, sortCriteria);
+		CodingSchemeRendering[] csRenderingPage = CommonUtils.getRenderingPage(csRendering, page);
+		
 		List<CodeSystemVersionCatalogEntry> list = new ArrayList<CodeSystemVersionCatalogEntry>();
 
-		for (CodingSchemeRendering render : csRendering) {
+		for (CodingSchemeRendering render : csRenderingPage) {
 			String codingSchemeName = render.getCodingSchemeSummary().getCodingSchemeURI();			
 			String version = render.getCodingSchemeSummary().getRepresentsVersion();
 			CodingSchemeVersionOrTag tagOrVersion = Constructors.createCodingSchemeVersionOrTagFromVersion(version);
@@ -276,7 +276,9 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 			}
 		}
 
-		DirectoryResult<CodeSystemVersionCatalogEntry> directoryResult = CommonUtils.getSublist(list, page);
+		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
+		
+		DirectoryResult<CodeSystemVersionCatalogEntry> directoryResult = new DirectoryResult<CodeSystemVersionCatalogEntry>(list, atEnd);
 		return directoryResult;
 	}
 
@@ -284,16 +286,18 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 	public DirectoryResult<CodeSystemVersionCatalogEntrySummary> getResourceSummaries(
 			CodeSystemVersionQuery query, SortCriteria sortCriteria, Page page) {
 
-		CodingSchemeRendering[] csRendering = this.doGetResourceSummaries(
-				query, sortCriteria);
+		CodingSchemeRendering[] csRendering = this.doGetResourceSummaries(query, sortCriteria);
+		CodingSchemeRendering[] csRenderingPage = CommonUtils.getRenderingPage(csRendering, page);
 
 		List<CodeSystemVersionCatalogEntrySummary> list = new ArrayList<CodeSystemVersionCatalogEntrySummary>();
 
-		for (CodingSchemeRendering render : csRendering) {
+		for (CodingSchemeRendering render : csRenderingPage) {
 			list.add(codingSchemeTransformer.transform(render));
 		}
 
-		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = CommonUtils.getSublist(list, page);
+		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
+		
+		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = new DirectoryResult<CodeSystemVersionCatalogEntrySummary>(list, atEnd);
 		return directoryResult;
 	}
 

@@ -381,8 +381,30 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		return answer;
 	}
 
+//	@Override
+//	public EntityReferenceList resolveAsEntityReferenceList(
+//			EntityDescriptionQuery restrictions, ResolvedReadContext readContext) {
+//		
+//		EntityReferenceList entityReferenceList = new EntityReferenceList();		
+//		
+//		ResolvedConceptReferenceResults resolvedConceptReferenceResults = this.doGetResourceSummaryResults(restrictions, null, null);
+//		
+//		// Transform each reference into a CTS2 entry and add to list
+//		ResolvedConceptReference[] resolvedConceptReferences = resolvedConceptReferenceResults.resolvedConceptReference;
+//		for(ResolvedConceptReference reference : resolvedConceptReferences){
+//			if(printObjects){
+//				System.out.println("ResolvedConceptReference:\n" + PrintUtility.resolvedConceptReference_toString(reference, 1));
+//			}
+//			EntityReference entry = entityTransform.transform_EntityReference(reference);
+//			entityReferenceList.addEntry(entry);
+//		}
+//		
+//		return entityReferenceList;
+//	}
+//
 	@Override
-	public EntityReferenceList resolveAsEntityReferenceList(
+	public EntityReferenceList resolveAsEntityReferenceList(Query query,
+			Set<ResolvedFilter> filterComponent,
 			EntityDescriptionQuery restrictions, ResolvedReadContext readContext) {
 		
 		EntityReferenceList entityReferenceList = new EntityReferenceList();		
@@ -402,11 +424,20 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		return entityReferenceList;
 	}
 
+//	@Override
+//	public EntityNameOrURIList intersectEntityList(
+//			Set<EntityNameOrURI> entities,
+//			EntityDescriptionQuery restrictions, 
+//			ResolvedReadContext readContext) {
+//		// TODO Auto-generated method stub
+//		throw new UnsupportedOperationException();
+//	}
+
 	@Override
 	public EntityNameOrURIList intersectEntityList(
-			Set<EntityNameOrURI> entities,
-			EntityDescriptionQuery restrictions, 
-			ResolvedReadContext readContext) {
+			Set<EntityNameOrURI> entities, Query query,
+			Set<ResolvedFilter> filterComponent,
+			EntityDescriptionQuery restrictions, ResolvedReadContext readContext) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException();
 	}

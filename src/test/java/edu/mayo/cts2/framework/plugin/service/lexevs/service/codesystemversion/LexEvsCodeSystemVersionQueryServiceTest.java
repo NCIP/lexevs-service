@@ -59,7 +59,7 @@ import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersi
  */
 public class LexEvsCodeSystemVersionQueryServiceTest {
 	private final static int SCHEME_COUNT = 3;
-	private final static String [] ABOUT_VALUES = {"11.11.0.1", "9.0.0.1", "11.11.0.2"};
+	private final static String [] ABOUT_VALUES = {"11.11.0.1", "9.0.0.1", "13.11.0.2"};
 	private final static String [] SYNOPSIS_VALUES = {"Auto", "Car", "Auto2"};
 	private final static String [] LOCALNAME_VALUES = {"Automobiles", "Vehicles", "Automobiles"};
 	private final static String [] VERSION_VALUES = {"1.0", "1.0", "1.1"};
@@ -408,17 +408,16 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	}
 	
 	
-	// ----------------------------------------
+	// -----------------------------------------
 	// resourceSummaries with individual filters
 	// -----------------------------------------
 	@Test
-	public void testGetResourceSummaries_Filter_About_Found() throws Exception {
-		int matchingCodingSchemeIndex = 2;
-		int testLength = ABOUT_VALUES.length;
+	public void testGetResourceSummaries_Filter_About_Found_IndexLast_SchemeCountTimes1() throws Exception {
+		int matchingCodingSchemeIndex = (SCHEME_COUNT - 1);
 		String testValue = ABOUT_VALUES[matchingCodingSchemeIndex];
-		int schemeCount = (testLength * 2);
-		int expecting = (schemeCount / testLength);
-		if(matchingCodingSchemeIndex < (schemeCount % testLength)){
+		int schemeCount = SCHEME_COUNT;
+		int expecting = (schemeCount / SCHEME_COUNT);
+		if(matchingCodingSchemeIndex < (schemeCount % SCHEME_COUNT)){
 			expecting++;
 		}
 		
@@ -430,4 +429,59 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 				StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), 
 				testValue);
 	}
+	
+	@Test
+	public void testGetResourceSummaries_Filter_ResourceSynopsis_Found() throws Exception {
+		int matchingCodingSchemeIndex = (SCHEME_COUNT - 1);
+		String testValue = SYNOPSIS_VALUES[matchingCodingSchemeIndex];
+		int schemeCount = SCHEME_COUNT;
+		int expecting = (schemeCount / SCHEME_COUNT);
+		if(matchingCodingSchemeIndex < (schemeCount % SCHEME_COUNT)){
+			expecting++;
+		}
+		
+		int pageSize = 50;
+		int pageIndex = 0;
+
+		this.executeGetResourceSummaries_1_Filter(schemeCount, pageSize, pageIndex, expecting, 				
+				StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference(), 
+				StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference(), 
+				testValue);
+	}
+
+	@Test
+	public void testGetResourceSummaries_Filter_ResourceName_Found() throws Exception {
+		int matchingCodingSchemeIndex = (SCHEME_COUNT - 1);
+		int schemeCount = SCHEME_COUNT;
+		
+		String testValue = LOCALNAME_VALUES[matchingCodingSchemeIndex] + ":" + matchingCodingSchemeIndex + "-" + 
+				VERSION_VALUES[matchingCodingSchemeIndex] + ":" + matchingCodingSchemeIndex;
+		int expecting = 1;
+		
+		int pageSize = 50;
+		int pageIndex = 0;
+
+		this.executeGetResourceSummaries_1_Filter(schemeCount, pageSize, pageIndex, expecting, 				
+				StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
+				StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference(), 
+				testValue);
+	}
+	
+	@Test
+	public void testGetResourceSummaries_Filter_About_Found_Index2_SchemeCountTimes1_PageSize1_PageIndex0() throws Exception {
+		int matchingCodingSchemeIndex = 2;
+		String testValue = ABOUT_VALUES[matchingCodingSchemeIndex];
+		int schemeCount = SCHEME_COUNT;
+		int expecting = 1;
+		
+		int pageSize = 1;
+		int pageIndex = 0;
+
+		this.executeGetResourceSummaries_1_Filter(schemeCount, pageSize, pageIndex, expecting, 				
+				StandardModelAttributeReference.ABOUT.getPropertyReference(), 
+				StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), 
+				testValue);
+	}
+	
+
 }
