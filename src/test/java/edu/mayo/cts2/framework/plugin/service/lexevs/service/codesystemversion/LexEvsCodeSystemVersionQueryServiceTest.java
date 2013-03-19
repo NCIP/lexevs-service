@@ -42,6 +42,8 @@ import org.junit.Test;
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntrySummary;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
+import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
+import edu.mayo.cts2.framework.model.core.PropertyReference;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
@@ -56,51 +58,97 @@ import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersi
  *
  */
 public class LexEvsCodeSystemVersionQueryServiceTest {
+	private final static int SCHEME_COUNT = 3;
 	private final static String [] ABOUT_VALUES = {"11.11.0.1", "9.0.0.1", "11.11.0.2"};
 	private final static String [] SYNOPSIS_VALUES = {"Auto", "Car", "Auto2"};
 	private final static String [] LOCALNAME_VALUES = {"Automobiles", "Vehicles", "Automobiles"};
 	private final static String [] VERSION_VALUES = {"1.0", "1.0", "1.1"};
 	
 	
-	private LexBIGService createMock_controlSupportedCodingSchemes_blank(int size) throws LBInvocationException{
-		LexBIGService lexBigService = EasyMock.createMock(LexBIGService.class);
+	// Setup mocked environment
+	// -------------------------
+	private LexEvsCodeSystemVersionQueryService createService(int schemeCount, boolean withData) throws Exception{
+		LexEvsCodeSystemVersionQueryService service = new LexEvsCodeSystemVersionQueryService();
+
+		// Mock LexBIGService, overwrite return value for getSupportedCodingSchemes
+		LexBIGService lexBigService = this.createMockedService_spoofSupportedCodingSchemes(schemeCount, withData);
 		
-		CodingSchemeRenderingList list = new CodingSchemeRenderingList();
-		for(int i=0; i < size; i++){
-			list.addCodingSchemeRendering(i, new CodingSchemeRendering());
-		}
+		service.setLexBigService(lexBigService);
+
+		// Overwrite objects in service object 
+		service.setCodingSchemeTransformer(new CodingSchemeToCodeSystemTransform(new CodeSystemVersionNameConverter()));
+		service.setCodeSystemVersionNameConverter(new CodeSystemVersionNameConverter());
 		
-		EasyMock.expect(lexBigService.getSupportedCodingSchemes()).andReturn(list);
-		EasyMock.replay(lexBigService);
+		return service;
+	}
+
+	private void executeGetResourceSummaries_0_Filter(int schemeCount,  int pageSize, int pageIndex, int expecting) throws Exception{
+		LexEvsCodeSystemVersionQueryService service = this.createService(schemeCount, false);
+				
+		SortCriteria sortCriteria = null;		
+		Page page = new Page();
+		page.setMaxToReturn(pageSize);
+		page.setPage(pageIndex);
 		
-		return lexBigService;
+		CodeSystemVersionQuery query = null;
+		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = 
+				service.getResourceSummaries(query, sortCriteria, page);
+		
+		assertNotNull(directoryResult);
+		
+		int actual = directoryResult.getEntries().size();
+		assertEquals("Expecting " + expecting + " entries but got " + actual, expecting, actual);
 	}
 	
-	private LexBIGService createMock_controlSupportedCodingSchemes_withData(int size) throws LBInvocationException{
+	private void executeGetResourceSummaries_1_Filter(int schemeCount,  int pageSize, int pageIndex, int expecting, 
+			PropertyReference propertyReference, MatchAlgorithmReference matchAlgorithmReference, String matchValue) throws Exception{
+		LexEvsCodeSystemVersionQueryService service = this.createService(schemeCount, true);
+				
+		SortCriteria sortCriteria = null;		
+		Page page = new Page();
+		page.setMaxToReturn(pageSize);
+		page.setPage(pageIndex);
+		
+		// Build query using filters
+		Set<ResolvedFilter> filter = TestUtils.createFilterSet(propertyReference, matchAlgorithmReference, matchValue);
+		CodeSystemVersionQueryImpl query = TestUtils.createQuery_FiltersOnly(filter);
+		
+		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = 
+				service.getResourceSummaries(query, sortCriteria, page);
+		
+		assertNotNull(directoryResult);
+		
+		int actual = directoryResult.getEntries().size();
+		assertEquals("Expecting " + expecting + " entries but got " + actual, expecting, actual);
+	}
+	
+	// Create Mocked Service and generate a codingSchemeRenderingList filled with data stored in local arrays.
+	// -------------------------------------------------------------------------------------------------------
+	private LexBIGService createMockedService_spoofSupportedCodingSchemes(int size, boolean withData) throws Exception{
 		LexBIGService lexBigService = EasyMock.createMock(LexBIGService.class);
 		
 		CodingSchemeRenderingList list = new CodingSchemeRenderingList();
 		for(int i=0; i < size; i++){
 			CodingSchemeRendering render = new CodingSchemeRendering();
-			
 			CodingSchemeSummary codingSchemeSummary = new CodingSchemeSummary();
 			
-			// Synopsis
-			EntityDescription codingSchemeDescription = new EntityDescription();
-			codingSchemeDescription.setContent(SYNOPSIS_VALUES[(i % SYNOPSIS_VALUES.length)] + ":" + i);
-			codingSchemeSummary.setCodingSchemeDescription(codingSchemeDescription);
+			if(withData){				
+				// Synopsis
+				EntityDescription codingSchemeDescription = new EntityDescription();
+				codingSchemeDescription.setContent(SYNOPSIS_VALUES[(i % SYNOPSIS_VALUES.length)] + ":" + i);
+				codingSchemeSummary.setCodingSchemeDescription(codingSchemeDescription);
+				
+				
+				// About
+				codingSchemeSummary.setCodingSchemeURI(ABOUT_VALUES[(i % ABOUT_VALUES.length)] + ":" + i);
+				
+				
+				// resource name
+				codingSchemeSummary.setLocalName(LOCALNAME_VALUES[(i % LOCALNAME_VALUES.length)] + ":" + i);
+				codingSchemeSummary.setRepresentsVersion(VERSION_VALUES[(i % VERSION_VALUES.length)] + ":" + i);	
+			}
 			
-			
-			// About
-			codingSchemeSummary.setCodingSchemeURI(ABOUT_VALUES[(i % ABOUT_VALUES.length)] + ":" + i);
-			
-			
-			// resource name
-			codingSchemeSummary.setLocalName(LOCALNAME_VALUES[(i % LOCALNAME_VALUES.length)] + ":" + i);
-			codingSchemeSummary.setRepresentsVersion(VERSION_VALUES[(i % VERSION_VALUES.length)] + ":" + i);
-
 			render.setCodingSchemeSummary(codingSchemeSummary);
-			
 			list.addCodingSchemeRendering(i, render);
 		}
 		
@@ -110,169 +158,253 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 		return lexBigService;
 	}
 	
+	private void executeCount_3_Filters(int aboutIndex, int synopsisIndex, int nameIndex, int schemeCount, int expecting) throws Exception{
+		LexEvsCodeSystemVersionQueryService service = this.createService(schemeCount, true);
+		
+		// Build query using filters
+		String about = ABOUT_VALUES[aboutIndex];
+		String resourceSynopsis = SYNOPSIS_VALUES[synopsisIndex];
+		String resourceName = LOCALNAME_VALUES[nameIndex] + ":" + nameIndex + "-" + 
+				   			  VERSION_VALUES[nameIndex] + ":" + nameIndex;
+		
+		Set<ResolvedFilter> filterComponent = TestUtils.createFilterSet(about, resourceSynopsis, resourceName);
+		CodeSystemVersionQueryImpl query = TestUtils.createQuery_FiltersOnly(filterComponent);
+
+		// Test results
+		int actual = service.count(query);
+		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
+	}
+	
+	private void executeCount_1_Filter(int schemeCount, String testValue, int expecting, 
+			PropertyReference propertyReference, 
+			MatchAlgorithmReference matchAlgorithmReference) throws Exception{
+		
+		LexEvsCodeSystemVersionQueryService service = this.createService(schemeCount, true);
+		
+		// Build query using filters
+		Set<ResolvedFilter> filter = TestUtils.createFilterSet(propertyReference, matchAlgorithmReference, testValue); 
+		CodeSystemVersionQueryImpl query = TestUtils.createQuery_FiltersOnly(filter);
+
+		// Test results
+		int actual = service.count(query);
+		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
+	}
+	
+	// =============
+	// Test methods
+	// =============
+	
+	// Count with VALID filters
+	// -------------------------
+	@Test
+	public void testCount_Filter_About_Found_Index2_SchemeCountTimes2() throws Exception {
+		int matchingCodingSchemeIndex = 2;
+		int schemeCount = (SCHEME_COUNT * 2);
+		
+		String testValue = ABOUT_VALUES[matchingCodingSchemeIndex];
+		int expecting = (schemeCount / SCHEME_COUNT);
+		if(matchingCodingSchemeIndex < (schemeCount % SCHEME_COUNT)){
+			expecting++;
+		}
+
+		this.executeCount_1_Filter(schemeCount, testValue, expecting, 
+				StandardModelAttributeReference.ABOUT.getPropertyReference(), 
+				StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference());
+	}
+	
+	@Test
+	public void testCount_Filter_ResorceSynopsis_Found_Index2_SchemeCountTimes2() throws Exception {
+		int matchingCodingSchemeIndex = 2;
+		int schemeCount = (SCHEME_COUNT * 2);
+		
+		String testValue = SYNOPSIS_VALUES[matchingCodingSchemeIndex];
+		int expecting = (schemeCount / SCHEME_COUNT);
+		if(matchingCodingSchemeIndex < (schemeCount % SCHEME_COUNT)){
+			expecting++;
+		}
+
+		this.executeCount_1_Filter(schemeCount, testValue, expecting, 
+				StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference(), 
+				StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference());
+	}
+		
+	@Test
+	public void testCount_Filter_ResourceName_Found_Index2_SchemeCountTimes2() throws Exception {
+		int matchingCodingSchemeIndex = 2;
+		int schemeCount = (SCHEME_COUNT * 2);
+		
+		String testValue = LOCALNAME_VALUES[matchingCodingSchemeIndex] + ":" + matchingCodingSchemeIndex + "-" + 
+						   VERSION_VALUES[matchingCodingSchemeIndex] + ":" + matchingCodingSchemeIndex;
+		int expecting = 1;
+		
+		this.executeCount_1_Filter(schemeCount, testValue, expecting, 
+				StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
+				StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference());
+	}
+		
+	// Count with INVALID filters
+	// -------------------------
+	@Test
+	public void testCount_Filter_About_NotFound() throws Exception {
+		int matchingCodingSchemeIndex = 2;
+		String testValue = ABOUT_VALUES[matchingCodingSchemeIndex] + "FOO";
+		int schemeCount = (SCHEME_COUNT * 2);
+		int expecting = 0;
+
+		this.executeCount_1_Filter(schemeCount, testValue, expecting, 
+				StandardModelAttributeReference.ABOUT.getPropertyReference(), 
+				StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference());
+	}
+	
+	@Test
+	public void testCount_Filter_ResorceSynopsis_NotFound() throws Exception {
+		int matchingCodingSchemeIndex = 2;
+		String testValue = SYNOPSIS_VALUES[matchingCodingSchemeIndex] + "FOO";
+		int schemeCount = (SCHEME_COUNT * 2);
+		int expecting = 0;
+
+		this.executeCount_1_Filter(schemeCount, testValue, expecting, 
+				StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference(), 
+				StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference());
+	}
+		
+	@Test
+	public void testCount_Filter_ResourceName_NotFound() throws Exception {
+		int matchingCodingSchemeIndex = 2;
+		String testValue = LOCALNAME_VALUES[matchingCodingSchemeIndex] + ":" + matchingCodingSchemeIndex + "-" + 
+						   VERSION_VALUES[matchingCodingSchemeIndex] + ":" + matchingCodingSchemeIndex + "FOO";
+		int schemeCount = (SCHEME_COUNT * 2);
+		int expecting = 0;
+		
+		this.executeCount_1_Filter(schemeCount, testValue, expecting, 
+				StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
+				StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference());
+	}
+		
+	// Count with All VALID filters
+	// -----------------------------
+	@Test
+	public void testCount_FilterSet_Found_Index0_SchemeCountTimes2() throws Exception {
+		int aboutIndex = 0;
+		int schemeCount = (SCHEME_COUNT * 2);
+		
+		int synopsisIndex = aboutIndex;
+		int nameIndex = aboutIndex;
+		int expecting = 1;
+		
+		this.executeCount_3_Filters(aboutIndex, synopsisIndex, nameIndex, schemeCount, expecting);
+	}
 
 	@Test
-	public void testGetResourceSummaries_3Summaries_Page0_Size50_Return3() throws LBInvocationException {
-		LexEvsCodeSystemVersionQueryService service = new LexEvsCodeSystemVersionQueryService();
+	public void testCount_FilterSet_Found_Index1_SchemeCountTimes2() throws Exception {
+		int aboutIndex = 1;
+		int schemeCount = (SCHEME_COUNT * 2);
 		
-		Page page = new Page();
-		CodeSystemVersionQuery codeSystemVersionQuery = null;
-		SortCriteria sortCriteria = null;		
+		int synopsisIndex = aboutIndex;
+		int nameIndex = aboutIndex;
+		int expecting = 1;
 		
-		// Mock LexBIGService, overwrite return value for getSupportedCodingSchemes
-		LexBIGService lexBigService = this.createMock_controlSupportedCodingSchemes_blank(3);
-		service.setLexBigService(lexBigService);
-				
-		// Overwrite transformer to an anonymous transformer
-		service.setCodingSchemeTransformer(new CodingSchemeToCodeSystemTransform(){
-			public CodeSystemVersionCatalogEntrySummary transform(CodingSchemeRendering codingSchemeRendering){
-				return new CodeSystemVersionCatalogEntrySummary();
-			}
-		});
+		this.executeCount_3_Filters(aboutIndex, synopsisIndex, nameIndex, schemeCount, expecting);
+	}
 
+	@Test
+	public void testCount_FilterSet_Found_IndexLast_SchemeCountTimes1() throws Exception {
+		int aboutIndex = (SCHEME_COUNT - 1);
+		int schemeCount = SCHEME_COUNT;
 		
-		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = 
-				service.getResourceSummaries(codeSystemVersionQuery, sortCriteria, page);
+		int synopsisIndex = aboutIndex;
+		int nameIndex = aboutIndex;
+		int expecting = 1;
 		
-		assertNotNull(directoryResult);
+		this.executeCount_3_Filters(aboutIndex, synopsisIndex, nameIndex, schemeCount, expecting);
+	}
+
+	// Count with VALID values with one MISMATCHED
+	// --------------------------------------------
+	@Test
+	public void testCount_FilterSet_NotFound_IndexError_About() throws Exception {
+		int aboutIndex = SCHEME_COUNT % 3;
+		int synopsisIndex = SCHEME_COUNT % 2;
+		int nameIndex = synopsisIndex;
+		int schemeCount = (SCHEME_COUNT * 2);
+		int expecting = 0;
+
+		this.executeCount_3_Filters(aboutIndex, synopsisIndex, nameIndex, schemeCount, expecting);
+	}
+	
+	@Test
+	public void testCount_FilterSet_NotFound_IndexError_Synopsis() throws Exception {
+		int aboutIndex = SCHEME_COUNT % 3;
+		int synopsisIndex = SCHEME_COUNT % 2;
+		int nameIndex = aboutIndex;
+		int schemeCount = (SCHEME_COUNT * 2);
+		int expecting = 0;
+
+		this.executeCount_3_Filters(aboutIndex, synopsisIndex, nameIndex, schemeCount, expecting);
+	}
+	
+	@Test
+	public void testCount_FilterSet_NotFound_IndexError_Name() throws Exception {
+		int aboutIndex = SCHEME_COUNT % 3;
+		int synopsisIndex = aboutIndex;
+		int nameIndex = SCHEME_COUNT % 2;
+		int schemeCount = (SCHEME_COUNT * 2);
+		int expecting = 0;
+
+		this.executeCount_3_Filters(aboutIndex, synopsisIndex, nameIndex, schemeCount, expecting);
+	}
 		
+	// --------------------------------------------
+	@Test
+	public void testGetResourceSummaries_3Summaries_Page0_Size50_Return3() throws Exception {
+		int schemeCount = 3;
 		int expecting = 3;
-		int actual = directoryResult.getEntries().size();
-		assertEquals("Expecting " + expecting + " entries but got " + actual, expecting, actual);
+		int pageSize = 50;
+		int pageIndex = 0;
+
+		this.executeGetResourceSummaries_0_Filter(schemeCount, pageSize, pageIndex, expecting);
 	}
 	
 	@Test
 	public void testGetResourceSummaries_20Summaries_Page0_Size10_Return10() throws Exception {
-		LexEvsCodeSystemVersionQueryService service = new LexEvsCodeSystemVersionQueryService();
-		
-		Page page = new Page();
-		page.setMaxToReturn(10);
-		
-		CodeSystemVersionQuery codeSystemVersionQuery = null;
-		SortCriteria sortCriteria = null;		
-		
-			
-		// Mock LexBIGService, overwrite return value for getSupportedCodingSchemes
-		LexBIGService lexBigService = this.createMock_controlSupportedCodingSchemes_blank(20);
-		service.setLexBigService(lexBigService);
-		
-		// Overwrite transformer to an anonymous transformer
-		service.setCodingSchemeTransformer(new CodingSchemeToCodeSystemTransform(){
-			public CodeSystemVersionCatalogEntrySummary transform(CodingSchemeRendering codingSchemeRendering){
-				return new CodeSystemVersionCatalogEntrySummary();
-			}
-		});
-		
-		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult;
-		directoryResult = service.getResourceSummaries(codeSystemVersionQuery, sortCriteria, page); 
-		
-		assertNotNull(directoryResult);
-		
+		int schemeCount = 20;
 		int expecting = 10;
-		int actual = directoryResult.getEntries().size();
-		assertEquals("Expecting " + expecting + " entries but got " + actual, expecting, actual);
+		int pageSize = 10;
+		int pageIndex = 0;
+
+		this.executeGetResourceSummaries_0_Filter(schemeCount, pageSize, pageIndex, expecting);
 	}
 	
 	
 	@Test
 	public void testGetResourceSummaries_20Summaries_Page1_Size10_Return10() throws Exception {
-		LexEvsCodeSystemVersionQueryService service = new LexEvsCodeSystemVersionQueryService();
-		
-		Page page = new Page();
-		page.setMaxToReturn(10);
-		
-		CodeSystemVersionQuery codeSystemVersionQuery = null;
-		SortCriteria sortCriteria = null;		
-		
-			
-		// Mock LexBIGService, overwrite return value for getSupportedCodingSchemes
-		LexBIGService lexBigService = this.createMock_controlSupportedCodingSchemes_blank(20);
-		service.setLexBigService(lexBigService);
-		
-		// Overwrite transformer to an anonymous transformer
-		service.setCodingSchemeTransformer(new CodingSchemeToCodeSystemTransform(){
-			public CodeSystemVersionCatalogEntrySummary transform(CodingSchemeRendering codingSchemeRendering){
-				return new CodeSystemVersionCatalogEntrySummary();
-			}
-		});
-		
-		// Test second page
-		page.setPage(1);
-		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult;
-		directoryResult = service.getResourceSummaries(codeSystemVersionQuery, sortCriteria, page); 
-		
-		assertNotNull(directoryResult);
-		
+		int schemeCount = 20;
 		int expecting = 10;
-		int actual = directoryResult.getEntries().size();
-		assertEquals("Expecting " + expecting + " entries but got " + actual, expecting, actual);
+		int pageSize = 10;
+		int pageIndex = 1;
+
+		this.executeGetResourceSummaries_0_Filter(schemeCount, pageSize, pageIndex, expecting);
 	}
 	
 	
 	@Test
 	public void testGetResourceSummaries_20Summaries_Page2_Size10_Return0() throws Exception {
-		LexEvsCodeSystemVersionQueryService service = new LexEvsCodeSystemVersionQueryService();
-		
-		Page page = new Page();
-		page.setMaxToReturn(10);
-		
-		CodeSystemVersionQuery codeSystemVersionQuery = null;
-		SortCriteria sortCriteria = null;		
-		
-			
-		// Mock LexBIGService, overwrite return value for getSupportedCodingSchemes
-		LexBIGService lexBigService = this.createMock_controlSupportedCodingSchemes_blank(20);
-		service.setLexBigService(lexBigService);
-		
-		// Overwrite transformer to an anonymous transformer
-		service.setCodingSchemeTransformer(new CodingSchemeToCodeSystemTransform(){
-			public CodeSystemVersionCatalogEntrySummary transform(CodingSchemeRendering codingSchemeRendering){
-				return new CodeSystemVersionCatalogEntrySummary();
-			}
-		});
-		
-		page.setPage(2);
-		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult;
-		directoryResult = service.getResourceSummaries(codeSystemVersionQuery, sortCriteria, page); 
-		
-		assertNotNull(directoryResult);
-		
+		int schemeCount = 20;
 		int expecting = 0;
-		int actual = directoryResult.getEntries().size();
-		assertEquals("Expecting " + expecting + " entries but got " + actual, expecting, actual);		
+		int pageSize = 10;
+		int pageIndex = 2;
+
+		this.executeGetResourceSummaries_0_Filter(schemeCount, pageSize, pageIndex, expecting);
 	}
 
 	@Test
 	public void testGetResourceSummaries_21Summaries_Page2_Size10_Return1() throws Exception {
-		LexEvsCodeSystemVersionQueryService service = new LexEvsCodeSystemVersionQueryService();
-		
-		Page page = new Page();
-		page.setMaxToReturn(10);
-		
-		CodeSystemVersionQuery codeSystemVersionQuery = null;
-		SortCriteria sortCriteria = null;		
-		
-			
-		// Mock LexBIGService, overwrite return value for getSupportedCodingSchemes
-		LexBIGService lexBigService = this.createMock_controlSupportedCodingSchemes_blank(21);
-		service.setLexBigService(lexBigService);
-		
-		// Overwrite transformer to an anonymous transformer
-		service.setCodingSchemeTransformer(new CodingSchemeToCodeSystemTransform(){
-			public CodeSystemVersionCatalogEntrySummary transform(CodingSchemeRendering codingSchemeRendering){
-				return new CodeSystemVersionCatalogEntrySummary();
-			}
-		});
-		
-		page.setPage(2);
-		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult;
-		directoryResult = service.getResourceSummaries(codeSystemVersionQuery, sortCriteria, page); 
-
-		assertNotNull(directoryResult);
-
+		int schemeCount = 21;
 		int expecting = 1;
-		int actual = directoryResult.getEntries().size();
-		assertEquals("Expecting " + expecting + " entries but got " + actual, expecting, actual);		
+		int pageSize = 10;
+		int pageIndex = 2;
+
+		this.executeGetResourceSummaries_0_Filter(schemeCount, pageSize, pageIndex, expecting);
 	}
 	
 	
@@ -280,98 +412,22 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	// resourceSummaries with individual filters
 	// -----------------------------------------
 	@Test
-	public void testGetResourceSummaries_Filter_About_Contains_Several() throws Exception {
-		LexEvsCodeSystemVersionQueryService service = new LexEvsCodeSystemVersionQueryService();
-		int supportedCodingSchemeCount = (ABOUT_VALUES.length * 2);
-		int matchingCodingSchemeIndex = 0;
-
-		// ---------- MOCK SOME OBJECTS REQUIRED -----------
-		// Mock LexBIGService, overwrite return value for getSupportedCodingSchemes
-		LexBIGService lexBigService = this.createMock_controlSupportedCodingSchemes_withData(supportedCodingSchemeCount);
-		service.setLexBigService(lexBigService);
-
-		// Create an instance of CodingSchemeToCodeSystemTransform, must pass in a new CodeSystemVersionNameConverter
-		service.setCodingSchemeTransformer(new CodingSchemeToCodeSystemTransform(new CodeSystemVersionNameConverter()));
-		// --------------------------------------------------
-
-		// Build query using filters
-		Set<ResolvedFilter> filter = TestUtils.createFilterSet(StandardModelAttributeReference.ABOUT.getPropertyReference(), 
-				   										  	   StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), 
-				   										  	   ABOUT_VALUES[matchingCodingSchemeIndex]);
-		CodeSystemVersionQueryImpl query = TestUtils.createQuery_FiltersOnly(filter);
-
-		// Call getResourceSummaries with query created.
-		DirectoryResult<CodeSystemVersionCatalogEntrySummary> dirResult = TestUtils.createResourceSummaries_DirectoryResults_QueryOnly(service, query);
-		
-		// Test results, should return one entity
-		assertNotNull(dirResult);
-		int expecting = (supportedCodingSchemeCount / ABOUT_VALUES.length);
-		if(matchingCodingSchemeIndex < (supportedCodingSchemeCount % ABOUT_VALUES.length)){
-			expecting++;
-		}
-		int actual = dirResult.getEntries().size();
-		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
-	}
-
-	@Test
-	public void testCount_Filter_ResorceSynopsis_Found() throws Exception {
-		LexEvsCodeSystemVersionQueryService service = new LexEvsCodeSystemVersionQueryService();
-		int supportedCodingSchemeCount = (SYNOPSIS_VALUES.length * 2);
+	public void testGetResourceSummaries_Filter_About_Found() throws Exception {
 		int matchingCodingSchemeIndex = 2;
-
-		// ---------- MOCK SOME OBJECTS REQUIRED -----------
-		// Mock LexBIGService, overwrite return value for getSupportedCodingSchemes
-		LexBIGService lexBigService = this.createMock_controlSupportedCodingSchemes_withData(supportedCodingSchemeCount);
-		service.setLexBigService(lexBigService);
-
-		// Create an instance of CodingSchemeToCodeSystemTransform, must pass in a new CodeSystemVersionNameConverter
-		service.setCodingSchemeTransformer(new CodingSchemeToCodeSystemTransform(new CodeSystemVersionNameConverter()));
-		// --------------------------------------------------
-		
-		// Build query using filters
-		Set<ResolvedFilter> filter = TestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference(), 
-														  	   StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference(), 
-														  	   SYNOPSIS_VALUES[matchingCodingSchemeIndex]);
-
-		CodeSystemVersionQueryImpl query = TestUtils.createQuery_FiltersOnly(filter);
-
-		int expecting = (supportedCodingSchemeCount / SYNOPSIS_VALUES.length);
-		if(matchingCodingSchemeIndex < (supportedCodingSchemeCount % SYNOPSIS_VALUES.length)){
+		int testLength = ABOUT_VALUES.length;
+		String testValue = ABOUT_VALUES[matchingCodingSchemeIndex];
+		int schemeCount = (testLength * 2);
+		int expecting = (schemeCount / testLength);
+		if(matchingCodingSchemeIndex < (schemeCount % testLength)){
 			expecting++;
 		}
-		int actual = service.count(query);
-		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
+		
+		int pageSize = 50;
+		int pageIndex = 0;
+
+		this.executeGetResourceSummaries_1_Filter(schemeCount, pageSize, pageIndex, expecting, 				
+				StandardModelAttributeReference.ABOUT.getPropertyReference(), 
+				StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), 
+				testValue);
 	}
-		
-	@Test
-	public void testCount_Filter_ResourceName_Found() throws Exception {
-		LexEvsCodeSystemVersionQueryService service = new LexEvsCodeSystemVersionQueryService();
-		int supportedCodingSchemeCount = (LOCALNAME_VALUES.length * 2);
-		int matchingCodingSchemeIndex = 1;
-
-		// ---------- MOCK SOME OBJECTS REQUIRED -----------
-		// Mock LexBIGService, overwrite return value for getSupportedCodingSchemes
-		LexBIGService lexBigService = this.createMock_controlSupportedCodingSchemes_withData(supportedCodingSchemeCount);
-		service.setLexBigService(lexBigService);
-
-		// Create an instance of CodingSchemeToCodeSystemTransform, must pass in a new CodeSystemVersionNameConverter
-		service.setCodingSchemeTransformer(new CodingSchemeToCodeSystemTransform(new CodeSystemVersionNameConverter()));
-		service.setCodeSystemVersionNameConverter(new CodeSystemVersionNameConverter());
-		// --------------------------------------------------
-		
-		// Build query using filters
-		Set<ResolvedFilter> filter = TestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
-												  		       StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference(), 
-												  		       LOCALNAME_VALUES[matchingCodingSchemeIndex] + ":" + matchingCodingSchemeIndex + "-" + VERSION_VALUES[matchingCodingSchemeIndex] + ":" + matchingCodingSchemeIndex);
-
-		CodeSystemVersionQueryImpl query = TestUtils.createQuery_FiltersOnly(filter);
-
-		int expecting = 1;
-		
-		int actual = service.count(query);
-		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
-	}
-		
-
-
 }
