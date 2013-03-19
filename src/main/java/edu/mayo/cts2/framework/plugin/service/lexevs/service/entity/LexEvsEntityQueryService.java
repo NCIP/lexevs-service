@@ -68,8 +68,6 @@ import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURIList;
-import edu.mayo.cts2.framework.model.service.core.NameOrURI;
-import edu.mayo.cts2.framework.model.service.core.Query;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
@@ -385,8 +383,7 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 	}
 
 	@Override
-	public boolean isEntityInSet(EntityNameOrURI entity, Query query,
-			Set<ResolvedFilter> filterComponent,
+	public boolean isEntityInSet(EntityNameOrURI entity,
 			EntityDescriptionQuery restrictions, ResolvedReadContext readContext) {
 		boolean answer = false;
 		CodedNodeSet codedNodeSet = this.getCodedNodeSet(restrictions, null);
@@ -406,30 +403,8 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		return answer;
 	}
 
-//	@Override
-//	public EntityReferenceList resolveAsEntityReferenceList(
-//			EntityDescriptionQuery restrictions, ResolvedReadContext readContext) {
-//		
-//		EntityReferenceList entityReferenceList = new EntityReferenceList();		
-//		
-//		ResolvedConceptReferenceResults resolvedConceptReferenceResults = this.doGetResourceSummaryResults(restrictions, null, null);
-//		
-//		// Transform each reference into a CTS2 entry and add to list
-//		ResolvedConceptReference[] resolvedConceptReferences = resolvedConceptReferenceResults.resolvedConceptReference;
-//		for(ResolvedConceptReference reference : resolvedConceptReferences){
-//			if(printObjects){
-//				System.out.println("ResolvedConceptReference:\n" + PrintUtility.resolvedConceptReference_toString(reference, 1));
-//			}
-//			EntityReference entry = entityTransform.transform_EntityReference(reference);
-//			entityReferenceList.addEntry(entry);
-//		}
-//		
-//		return entityReferenceList;
-//	}
-//
 	@Override
-	public EntityReferenceList resolveAsEntityReferenceList(Query query,
-			Set<ResolvedFilter> filterComponent,
+	public EntityReferenceList resolveAsEntityReferenceList(
 			EntityDescriptionQuery restrictions, ResolvedReadContext readContext) {
 		
 		EntityReferenceList entityReferenceList = new EntityReferenceList();		
@@ -449,28 +424,23 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		return entityReferenceList;
 	}
 
-//	@Override
-//	public EntityNameOrURIList intersectEntityList(
-//			Set<EntityNameOrURI> entities,
-//			EntityDescriptionQuery restrictions, 
-//			ResolvedReadContext readContext) {
-//		// TODO Auto-generated method stub
-//		throw new UnsupportedOperationException();
-//	}
-
 	@Override
 	public EntityNameOrURIList intersectEntityList(
-			Set<EntityNameOrURI> entities, Query query,
-			Set<ResolvedFilter> filterComponent,
-			EntityDescriptionQuery restrictions, ResolvedReadContext readContext) {
+			Set<EntityNameOrURI> entities,
+			EntityDescriptionQuery restrictions, 
+			ResolvedReadContext readContext) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException();
 	}
 
+
 	@Override
-	public Set<? extends VersionTagReference> getSupportedTags() {
-		return (Set<? extends VersionTagReference>) Arrays.asList(Constants.CURRENT_TAG);
+	public Set<VersionTagReference> getSupportedTags() {
+		return new HashSet<VersionTagReference>(Arrays.asList(Constants.CURRENT_TAG));
 	}
+
+
+
 
 }
 

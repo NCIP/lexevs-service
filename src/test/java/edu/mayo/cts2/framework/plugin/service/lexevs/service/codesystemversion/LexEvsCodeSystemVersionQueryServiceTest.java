@@ -125,9 +125,7 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 		LexBIGService lexBigService = EasyMock.createMock(LexBIGService.class);
 		
 		CodingSchemeRenderingList list = new CodingSchemeRenderingList();
-		
-		int codeSystemCount = fakeData.getCodeSystemCount();
-		
+				
 		for(int i=0; i < size; i++){
 			CodingSchemeRendering render = new CodingSchemeRendering();
 			CodingSchemeSummary codingSchemeSummary = new CodingSchemeSummary();
@@ -135,17 +133,17 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 			if(withData){				
 				// Synopsis
 				EntityDescription codingSchemeDescription = new EntityDescription();
-				codingSchemeDescription.setContent(SYNOPSIS_VALUES[(i % SYNOPSIS_VALUES.length)] + ":" + i);
+				codingSchemeDescription.setContent(fakeData.getResourceSynopsis(i)); 
 				codingSchemeSummary.setCodingSchemeDescription(codingSchemeDescription);
 				
 				
 				// About
-				codingSchemeSummary.setCodingSchemeURI(ABOUT_VALUES[(i % ABOUT_VALUES.length)] + ":" + i);
+				codingSchemeSummary.setCodingSchemeURI(fakeData.getAbout(i)); //  ABOUT_VALUES[(i % ABOUT_VALUES.length)] + ":" + i);
 				
 				
 				// resource name
-				codingSchemeSummary.setLocalName(LOCALNAME_VALUES[(i % LOCALNAME_VALUES.length)] + ":" + i);
-				codingSchemeSummary.setRepresentsVersion(VERSION_VALUES[(i % VERSION_VALUES.length)] + ":" + i);	
+				codingSchemeSummary.setLocalName(fakeData.getResourceLocalName(i)); //  LOCALNAME_VALUES[(i % LOCALNAME_VALUES.length)] + ":" + i);
+				codingSchemeSummary.setRepresentsVersion(fakeData.getResourceVersion(i)); //  VERSION_VALUES[(i % VERSION_VALUES.length)] + ":" + i);	
 			}
 			
 			render.setCodingSchemeSummary(codingSchemeSummary);
@@ -162,10 +160,9 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 		LexEvsCodeSystemVersionQueryService service = this.createService(schemeCount, true);
 		
 		// Build query using filters
-		String about = ABOUT_VALUES[aboutIndex];
-		String resourceSynopsis = SYNOPSIS_VALUES[synopsisIndex];
-		String resourceName = LOCALNAME_VALUES[nameIndex] + ":" + nameIndex + "-" + 
-				   			  VERSION_VALUES[nameIndex] + ":" + nameIndex;
+		String about = fakeData.getAbout(aboutIndex); 
+		String resourceSynopsis = fakeData.getResourceSynopsis(synopsisIndex); 
+		String resourceName = fakeData.getResourceName(nameIndex); 
 		
 		Set<ResolvedFilter> filterComponent = TestUtils.createFilterSet(about, resourceSynopsis, resourceName);
 		CodeSystemVersionQueryImpl query = TestUtils.createQuery_FiltersOnly(filterComponent);
@@ -199,13 +196,10 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	@Test
 	public void testCount_Filter_About_Found_Index2_SchemeCountTimes2() throws Exception {
 		int matchingCodingSchemeIndex = 2;
-		int schemeCount = (SCHEME_COUNT * 2);
+		int schemeCount = (fakeData.getCodeSystemCount() * 2);
 		
-		String testValue = ABOUT_VALUES[matchingCodingSchemeIndex];
-		int expecting = (schemeCount / SCHEME_COUNT);
-		if(matchingCodingSchemeIndex < (schemeCount % SCHEME_COUNT)){
-			expecting++;
-		}
+		String testValue = fakeData.getAbout(matchingCodingSchemeIndex);
+		int expecting = fakeData.getAboutContainsCount(matchingCodingSchemeIndex, testValue);
 
 		this.executeCount_1_Filter(schemeCount, testValue, expecting, 
 				StandardModelAttributeReference.ABOUT.getPropertyReference(), 
@@ -215,13 +209,10 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	@Test
 	public void testCount_Filter_ResorceSynopsis_Found_Index2_SchemeCountTimes2() throws Exception {
 		int matchingCodingSchemeIndex = 2;
-		int schemeCount = (SCHEME_COUNT * 2);
+		int schemeCount = (fakeData.getCodeSystemCount() * 2);
 		
-		String testValue = SYNOPSIS_VALUES[matchingCodingSchemeIndex];
-		int expecting = (schemeCount / SCHEME_COUNT);
-		if(matchingCodingSchemeIndex < (schemeCount % SCHEME_COUNT)){
-			expecting++;
-		}
+		String testValue = fakeData.getResourceSynopsis(matchingCodingSchemeIndex);
+		int expecting = fakeData.getSynopsisStartWithCount(matchingCodingSchemeIndex, testValue);
 
 		this.executeCount_1_Filter(schemeCount, testValue, expecting, 
 				StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference(), 
@@ -231,11 +222,10 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	@Test
 	public void testCount_Filter_ResourceName_Found_Index2_SchemeCountTimes2() throws Exception {
 		int matchingCodingSchemeIndex = 2;
-		int schemeCount = (SCHEME_COUNT * 2);
+		int schemeCount = (fakeData.getCodeSystemCount() * 2);
 		
-		String testValue = LOCALNAME_VALUES[matchingCodingSchemeIndex] + ":" + matchingCodingSchemeIndex + "-" + 
-						   VERSION_VALUES[matchingCodingSchemeIndex] + ":" + matchingCodingSchemeIndex;
-		int expecting = 1;
+		String testValue = fakeData.getResourceName(matchingCodingSchemeIndex);
+		int expecting = fakeData.getNameExactMatchCount(matchingCodingSchemeIndex, testValue);
 		
 		this.executeCount_1_Filter(schemeCount, testValue, expecting, 
 				StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
@@ -247,9 +237,9 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	@Test
 	public void testCount_Filter_About_NotFound() throws Exception {
 		int matchingCodingSchemeIndex = 2;
-		String testValue = ABOUT_VALUES[matchingCodingSchemeIndex] + "FOO";
-		int schemeCount = (SCHEME_COUNT * 2);
-		int expecting = 0;
+		String testValue = fakeData.getAbout(matchingCodingSchemeIndex) + "FOO";
+		int schemeCount = (fakeData.getCodeSystemCount() * 2);
+		int expecting = fakeData.getAboutContainsCount(matchingCodingSchemeIndex, testValue);
 
 		this.executeCount_1_Filter(schemeCount, testValue, expecting, 
 				StandardModelAttributeReference.ABOUT.getPropertyReference(), 
@@ -259,9 +249,9 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	@Test
 	public void testCount_Filter_ResorceSynopsis_NotFound() throws Exception {
 		int matchingCodingSchemeIndex = 2;
-		String testValue = SYNOPSIS_VALUES[matchingCodingSchemeIndex] + "FOO";
-		int schemeCount = (SCHEME_COUNT * 2);
-		int expecting = 0;
+		String testValue = fakeData.getResourceSynopsis(matchingCodingSchemeIndex) + "FOO";
+		int schemeCount = (fakeData.getCodeSystemCount() * 2);
+		int expecting = fakeData.getSynopsisStartWithCount(matchingCodingSchemeIndex, testValue);
 
 		this.executeCount_1_Filter(schemeCount, testValue, expecting, 
 				StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference(), 
@@ -271,10 +261,9 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	@Test
 	public void testCount_Filter_ResourceName_NotFound() throws Exception {
 		int matchingCodingSchemeIndex = 2;
-		String testValue = LOCALNAME_VALUES[matchingCodingSchemeIndex] + ":" + matchingCodingSchemeIndex + "-" + 
-						   VERSION_VALUES[matchingCodingSchemeIndex] + ":" + matchingCodingSchemeIndex + "FOO";
-		int schemeCount = (SCHEME_COUNT * 2);
-		int expecting = 0;
+		String testValue = fakeData.getResourceName(matchingCodingSchemeIndex) + "FOO";
+		int schemeCount = (fakeData.getCodeSystemCount());
+		int expecting = fakeData.getNameExactMatchCount(matchingCodingSchemeIndex, testValue);
 		
 		this.executeCount_1_Filter(schemeCount, testValue, expecting, 
 				StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
@@ -286,11 +275,11 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	@Test
 	public void testCount_FilterSet_Found_Index0_SchemeCountTimes2() throws Exception {
 		int aboutIndex = 0;
-		int schemeCount = (SCHEME_COUNT * 2);
+		int schemeCount = (fakeData.getCodeSystemCount() * 2);
 		
 		int synopsisIndex = aboutIndex;
 		int nameIndex = aboutIndex;
-		int expecting = 1;
+		int expecting = fakeData.getAllFiltersCount(aboutIndex, synopsisIndex, nameIndex);
 		
 		this.executeCount_3_Filters(aboutIndex, synopsisIndex, nameIndex, schemeCount, expecting);
 	}
@@ -298,23 +287,23 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	@Test
 	public void testCount_FilterSet_Found_Index1_SchemeCountTimes2() throws Exception {
 		int aboutIndex = 1;
-		int schemeCount = (SCHEME_COUNT * 2);
+		int schemeCount = (fakeData.getCodeSystemCount() * 2);
 		
 		int synopsisIndex = aboutIndex;
 		int nameIndex = aboutIndex;
-		int expecting = 1;
+		int expecting = fakeData.getAllFiltersCount(aboutIndex, synopsisIndex, nameIndex);;
 		
 		this.executeCount_3_Filters(aboutIndex, synopsisIndex, nameIndex, schemeCount, expecting);
 	}
 
 	@Test
 	public void testCount_FilterSet_Found_IndexLast_SchemeCountTimes1() throws Exception {
-		int aboutIndex = (SCHEME_COUNT - 1);
-		int schemeCount = SCHEME_COUNT;
+		int aboutIndex = (fakeData.getCodeSystemCount() - 1);
+		int schemeCount = fakeData.getCodeSystemCount();
 		
 		int synopsisIndex = aboutIndex;
 		int nameIndex = aboutIndex;
-		int expecting = 1;
+		int expecting = fakeData.getAllFiltersCount(aboutIndex, synopsisIndex, nameIndex);;
 		
 		this.executeCount_3_Filters(aboutIndex, synopsisIndex, nameIndex, schemeCount, expecting);
 	}
@@ -323,33 +312,33 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	// --------------------------------------------
 	@Test
 	public void testCount_FilterSet_NotFound_IndexError_About() throws Exception {
-		int aboutIndex = SCHEME_COUNT - 1;
+		int aboutIndex = fakeData.getCodeSystemCount() - 1;
 		int synopsisIndex = (aboutIndex > 0) ? (aboutIndex - 1) : 0;
 		int nameIndex = synopsisIndex;
-		int schemeCount = (SCHEME_COUNT * 2);
-		int expecting = 0;
+		int schemeCount = (fakeData.getCodeSystemCount() * 2);
+		int expecting = fakeData.getAllFiltersCount(aboutIndex, synopsisIndex, nameIndex);
 
 		this.executeCount_3_Filters(aboutIndex, synopsisIndex, nameIndex, schemeCount, expecting);
 	}
 	
 	@Test
 	public void testCount_FilterSet_NotFound_IndexError_Synopsis() throws Exception {
-		int aboutIndex = SCHEME_COUNT - 1;
+		int aboutIndex = fakeData.getCodeSystemCount() - 1;
 		int synopsisIndex = (aboutIndex > 0) ? (aboutIndex - 1) : 0;
 		int nameIndex = aboutIndex;
-		int schemeCount = (SCHEME_COUNT * 2);
-		int expecting = 0;
+		int schemeCount = (fakeData.getCodeSystemCount() * 2);
+		int expecting = fakeData.getAllFiltersCount(aboutIndex, synopsisIndex, nameIndex);
 
 		this.executeCount_3_Filters(aboutIndex, synopsisIndex, nameIndex, schemeCount, expecting);
 	}
 	
 	@Test
 	public void testCount_FilterSet_NotFound_IndexError_Name() throws Exception {
-		int aboutIndex = SCHEME_COUNT - 1;
+		int aboutIndex = fakeData.getCodeSystemCount() - 1;
 		int synopsisIndex = aboutIndex;
 		int nameIndex = (aboutIndex > 0) ? (aboutIndex - 1) : 0;
-		int schemeCount = (SCHEME_COUNT * 2);
-		int expecting = 0;
+		int schemeCount = (fakeData.getCodeSystemCount() * 2);
+		int expecting = fakeData.getAllFiltersCount(aboutIndex, synopsisIndex, nameIndex);
 
 		this.executeCount_3_Filters(aboutIndex, synopsisIndex, nameIndex, schemeCount, expecting);
 	}
@@ -413,11 +402,11 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	// -----------------------------------------
 	@Test
 	public void testGetResourceSummaries_Filter_About_Found_IndexLast_SchemeCountTimes1() throws Exception {
-		int matchingCodingSchemeIndex = (SCHEME_COUNT - 1);
-		String testValue = ABOUT_VALUES[matchingCodingSchemeIndex];
-		int schemeCount = SCHEME_COUNT;
-		int expecting = (schemeCount / SCHEME_COUNT);
-		if(matchingCodingSchemeIndex < (schemeCount % SCHEME_COUNT)){
+		int matchingCodingSchemeIndex = (fakeData.getCodeSystemCount() - 1);
+		String testValue = fakeData.getAbout(matchingCodingSchemeIndex);
+		int schemeCount = fakeData.getCodeSystemCount();
+		int expecting = (schemeCount / fakeData.getCodeSystemCount());
+		if(matchingCodingSchemeIndex < (schemeCount % fakeData.getCodeSystemCount())){
 			expecting++;
 		}
 		
@@ -432,11 +421,11 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	
 	@Test
 	public void testGetResourceSummaries_Filter_ResourceSynopsis_Found() throws Exception {
-		int matchingCodingSchemeIndex = (SCHEME_COUNT - 1);
-		String testValue = SYNOPSIS_VALUES[matchingCodingSchemeIndex];
-		int schemeCount = SCHEME_COUNT;
-		int expecting = (schemeCount / SCHEME_COUNT);
-		if(matchingCodingSchemeIndex < (schemeCount % SCHEME_COUNT)){
+		int matchingCodingSchemeIndex = (fakeData.getCodeSystemCount() - 1);
+		String testValue = fakeData.getResourceSynopsis(matchingCodingSchemeIndex);
+		int schemeCount = fakeData.getCodeSystemCount();
+		int expecting = (schemeCount / fakeData.getCodeSystemCount());
+		if(matchingCodingSchemeIndex < (schemeCount % fakeData.getCodeSystemCount())){
 			expecting++;
 		}
 		
@@ -451,12 +440,11 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 
 	@Test
 	public void testGetResourceSummaries_Filter_ResourceName_Found() throws Exception {
-		int matchingCodingSchemeIndex = (SCHEME_COUNT - 1);
-		int schemeCount = SCHEME_COUNT;
+		int matchingCodingSchemeIndex = (fakeData.getCodeSystemCount() - 1);
+		int schemeCount = fakeData.getCodeSystemCount();
 		
-		String testValue = LOCALNAME_VALUES[matchingCodingSchemeIndex] + ":" + matchingCodingSchemeIndex + "-" + 
-				VERSION_VALUES[matchingCodingSchemeIndex] + ":" + matchingCodingSchemeIndex;
-		int expecting = 1;
+		String testValue = fakeData.getResourceName(matchingCodingSchemeIndex);
+		int expecting = fakeData.getNameExactMatchCount(matchingCodingSchemeIndex, testValue);
 		
 		int pageSize = 50;
 		int pageIndex = 0;
@@ -470,8 +458,8 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	@Test
 	public void testGetResourceSummaries_Filter_About_Found_Index2_SchemeCountTimes1_PageSize1_PageIndex0() throws Exception {
 		int matchingCodingSchemeIndex = 2;
-		String testValue = ABOUT_VALUES[matchingCodingSchemeIndex];
-		int schemeCount = SCHEME_COUNT;
+		String testValue = fakeData.getAbout(matchingCodingSchemeIndex);
+		int schemeCount = fakeData.getCodeSystemCount();
 		int expecting = 1;
 		
 		int pageSize = 1;
@@ -486,8 +474,8 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	@Test
 	public void testGetResourceSummaries_Filter_Synopsis_Found_Index0_SchemeCountTimes1_PageSize1_PageIndex0() throws Exception {
 		int matchingCodingSchemeIndex = 0;
-		String testValue = SYNOPSIS_VALUES[matchingCodingSchemeIndex];
-		int schemeCount = SCHEME_COUNT;
+		String testValue = fakeData.getResourceSynopsis(matchingCodingSchemeIndex);
+		int schemeCount = fakeData.getCodeSystemCount();
 		int expecting = 1;
 		
 		int pageSize = 1;
