@@ -1,3 +1,27 @@
+/*
+* Copyright: (c) 2004-2013 Mayo Foundation for Medical Education and
+* Research (MFMER). All rights reserved. MAYO, MAYO CLINIC, and the
+* triple-shield Mayo logo are trademarks and service marks of MFMER.
+*
+* Except as contained in the copyright notice above, or as used to identify
+* MFMER as the author of this software, the trade names, trademarks, service
+* marks, or product names of the copyright holder shall not be used in
+* advertising, promotion or otherwise in connection with this software without
+* prior written authorization of the copyright holder.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*
+*/
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion;
 
 import java.util.ArrayList;
@@ -43,6 +67,11 @@ import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersionQuery;
 import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersionQueryService;
 
+/**
+ *  @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
+ *  @author <a href="mailto:hardie.linda@mayo.edu">Linda Hardie</a>
+ *
+*/
 @Component
 public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		implements CodeSystemVersionQueryService {
@@ -71,7 +100,15 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 			CodingSchemeToCodeSystemTransform codingSchemeTransformer) {
 		this.codingSchemeTransformer = codingSchemeTransformer;
 	}
+	
+	public CodeSystemVersionNameConverter getCodeSystemVersionNameConverter(){
+		return nameConverter;
+	}
 
+	public void setCodeSystemVersionNameConverter(CodeSystemVersionNameConverter converter){
+		this.nameConverter = converter;
+	}
+	
 	protected CodingSchemeRendering[] doGetResourceSummaries(
 			CodeSystemVersionQuery query, SortCriteria sortCriteria) {
 
@@ -157,6 +194,9 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
 		for (CodingSchemeRendering render : csRendering) {
 			CodingSchemeSummary codingSchemeSummary = render.getCodingSchemeSummary();
+			if(codingSchemeSummary == null){
+				break;
+			}
 			String retrievedAttrValue = null;
 			if (searchAttribute.equals(ATTRIBUTE_NAME_ABOUT)) {
 				retrievedAttrValue = codingSchemeSummary.getCodingSchemeURI();
@@ -218,12 +258,12 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 	public DirectoryResult<CodeSystemVersionCatalogEntry> getResourceList(
 			CodeSystemVersionQuery query, SortCriteria sortCriteria, Page page) {
 
-		CodingSchemeRendering[] csRendering = this.doGetResourceSummaries(
-				query, sortCriteria);
-
+		CodingSchemeRendering[] csRendering = this.doGetResourceSummaries(query, sortCriteria);
+		CodingSchemeRendering[] csRenderingPage = CommonUtils.getRenderingPage(csRendering, page);
+		
 		List<CodeSystemVersionCatalogEntry> list = new ArrayList<CodeSystemVersionCatalogEntry>();
 
-		for (CodingSchemeRendering render : csRendering) {
+		for (CodingSchemeRendering render : csRenderingPage) {
 			String codingSchemeName = render.getCodingSchemeSummary().getCodingSchemeURI();			
 			String version = render.getCodingSchemeSummary().getRepresentsVersion();
 			CodingSchemeVersionOrTag tagOrVersion = Constructors.createCodingSchemeVersionOrTagFromVersion(version);
@@ -236,7 +276,9 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 			}
 		}
 
-		DirectoryResult<CodeSystemVersionCatalogEntry> directoryResult = CommonUtils.getSublist(list, page);
+		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
+		
+		DirectoryResult<CodeSystemVersionCatalogEntry> directoryResult = new DirectoryResult<CodeSystemVersionCatalogEntry>(list, atEnd);
 		return directoryResult;
 	}
 
@@ -244,16 +286,18 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 	public DirectoryResult<CodeSystemVersionCatalogEntrySummary> getResourceSummaries(
 			CodeSystemVersionQuery query, SortCriteria sortCriteria, Page page) {
 
-		CodingSchemeRendering[] csRendering = this.doGetResourceSummaries(
-				query, sortCriteria);
+		CodingSchemeRendering[] csRendering = this.doGetResourceSummaries(query, sortCriteria);
+		CodingSchemeRendering[] csRenderingPage = CommonUtils.getRenderingPage(csRendering, page);
 
 		List<CodeSystemVersionCatalogEntrySummary> list = new ArrayList<CodeSystemVersionCatalogEntrySummary>();
 
-		for (CodingSchemeRendering render : csRendering) {
+		for (CodingSchemeRendering render : csRenderingPage) {
 			list.add(codingSchemeTransformer.transform(render));
 		}
 
-		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = CommonUtils.getSublist(list, page);
+		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
+		
+		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = new DirectoryResult<CodeSystemVersionCatalogEntrySummary>(list, atEnd);
 		return directoryResult;
 	}
 
@@ -272,22 +316,19 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 
 		Set<MatchAlgorithmReference> returnSet = new HashSet<MatchAlgorithmReference>();
 
-		MatchAlgorithmReference exactMatch = StandardMatchAlgorithmReference.EXACT_MATCH
-				.getMatchAlgorithmReference();
+		MatchAlgorithmReference exactMatch = StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference();
 
 		returnSet.add(ResolvableMatchAlgorithmReference
 				.toResolvableMatchAlgorithmReference(exactMatch,
 						new ExactMatcher()));
 
-		MatchAlgorithmReference contains = StandardMatchAlgorithmReference.CONTAINS
-				.getMatchAlgorithmReference();
+		MatchAlgorithmReference contains = StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference();
 
 		returnSet.add(ResolvableMatchAlgorithmReference
 				.toResolvableMatchAlgorithmReference(contains,
 						new ContainsMatcher()));
 
-		MatchAlgorithmReference startsWith = StandardMatchAlgorithmReference.STARTS_WITH
-				.getMatchAlgorithmReference();
+		MatchAlgorithmReference startsWith = StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference();
 
 		returnSet.add(ResolvableMatchAlgorithmReference
 				.toResolvableMatchAlgorithmReference(startsWith,
