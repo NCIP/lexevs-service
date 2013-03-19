@@ -403,8 +403,7 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 //	}
 //
 	@Override
-	public EntityReferenceList resolveAsEntityReferenceList(Query query,
-			Set<ResolvedFilter> filterComponent,
+	public EntityReferenceList resolveAsEntityReferenceList(
 			EntityDescriptionQuery restrictions, ResolvedReadContext readContext) {
 		
 		EntityReferenceList entityReferenceList = new EntityReferenceList();		
@@ -435,16 +434,16 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 
 	@Override
 	public EntityNameOrURIList intersectEntityList(
-			Set<EntityNameOrURI> entities, Query query,
-			Set<ResolvedFilter> filterComponent,
-			EntityDescriptionQuery restrictions, ResolvedReadContext readContext) {
+			Set<EntityNameOrURI> entities,
+			EntityDescriptionQuery restrictions,
+			ResolvedReadContext readContext) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Set<? extends VersionTagReference> getSupportedTags() {
-		return (Set<? extends VersionTagReference>) Arrays.asList(Constants.CURRENT_TAG);
+	public Set<VersionTagReference> getSupportedTags() {
+		return new HashSet<VersionTagReference>(Arrays.asList(Constants.CURRENT_TAG));
 	}
 
 }
