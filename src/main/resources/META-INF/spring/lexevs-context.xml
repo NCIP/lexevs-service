@@ -15,7 +15,11 @@
 	<context:component-scan base-package="edu.mayo.cts2.framework.plugin.service.lexevs" />
 
 	<bean class="edu.mayo.cts2.framework.util.spring.UrlConstructorSpringFactory" />
+	
+	<bean name="lexBigServiceFactory" class="edu.mayo.cts2.framework.plugin.service.lexevs.LexBigServiceFactory" />
 
+	<bean name="lexEvsOsgiClassLoader" class="edu.mayo.cts2.framework.plugin.service.lexevs.LexEvsOsgiClassLoader" />
+	
 	<util:properties id="buildProperties" location="classpath:build-info.properties" />
 
 </beans>

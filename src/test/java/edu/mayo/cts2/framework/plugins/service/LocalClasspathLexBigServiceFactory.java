@@ -21,35 +21,23 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package edu.mayo.cts2.framework.plugin.service.lexevs;
+package edu.mayo.cts2.framework.plugins.service;
 
-import javax.annotation.Resource;
-
+import org.LexGrid.LexBIG.Impl.LexBIGServiceImpl;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.FactoryBean;
 
 /**
  * A factory for creating LexBigService objects.
  */
-public class LexBigServiceFactory implements FactoryBean<LexBIGService> {
-
-	protected Logger log = Logger.getLogger(this.getClass());
-	
-	@Resource
-	private LexEvsOsgiClassLoader lexEvsOsgiClassLoader;
+public class LocalClasspathLexBigServiceFactory implements FactoryBean<LexBIGService> {
 
 	/* (non-Javadoc)
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */
 	@Override
 	public LexBIGService getObject() throws Exception {
-
-		LexBIGService impl = 
-			(LexBIGService) 
-				this.lexEvsOsgiClassLoader.getServiceClass("org.LexGrid.LexBIG.Impl.LexBIGServiceImpl");
-		
-		return impl;
+		return LexBIGServiceImpl.defaultInstance();
 	}
 
 	/* (non-Javadoc)
