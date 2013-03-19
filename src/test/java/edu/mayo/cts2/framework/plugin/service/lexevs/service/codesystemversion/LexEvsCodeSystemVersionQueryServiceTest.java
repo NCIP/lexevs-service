@@ -47,6 +47,7 @@ import edu.mayo.cts2.framework.model.core.PropertyReference;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.LexEvsFakeData;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersionQuery;
@@ -58,12 +59,8 @@ import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersi
  *
  */
 public class LexEvsCodeSystemVersionQueryServiceTest {
-	private final static int SCHEME_COUNT = 3;
-	private final static String [] ABOUT_VALUES = {"11.11.0.1", "9.0.0.1", "13.11.0.2"};
-	private final static String [] SYNOPSIS_VALUES = {"Auto", "Car", "Auto2"};
-	private final static String [] LOCALNAME_VALUES = {"Automobiles", "Vehicles", "Automobiles"};
-	private final static String [] VERSION_VALUES = {"1.0", "1.0", "1.1"};
-	
+
+	LexEvsFakeData fakeData = new LexEvsFakeData();
 	
 	// Setup mocked environment
 	// -------------------------
@@ -128,6 +125,9 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 		LexBIGService lexBigService = EasyMock.createMock(LexBIGService.class);
 		
 		CodingSchemeRenderingList list = new CodingSchemeRenderingList();
+		
+		int codeSystemCount = fakeData.getCodeSystemCount();
+		
 		for(int i=0; i < size; i++){
 			CodingSchemeRendering render = new CodingSchemeRendering();
 			CodingSchemeSummary codingSchemeSummary = new CodingSchemeSummary();
@@ -323,8 +323,8 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	// --------------------------------------------
 	@Test
 	public void testCount_FilterSet_NotFound_IndexError_About() throws Exception {
-		int aboutIndex = SCHEME_COUNT % 3;
-		int synopsisIndex = SCHEME_COUNT % 2;
+		int aboutIndex = SCHEME_COUNT - 1;
+		int synopsisIndex = (aboutIndex > 0) ? (aboutIndex - 1) : 0;
 		int nameIndex = synopsisIndex;
 		int schemeCount = (SCHEME_COUNT * 2);
 		int expecting = 0;
@@ -334,8 +334,8 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	
 	@Test
 	public void testCount_FilterSet_NotFound_IndexError_Synopsis() throws Exception {
-		int aboutIndex = SCHEME_COUNT % 3;
-		int synopsisIndex = SCHEME_COUNT % 2;
+		int aboutIndex = SCHEME_COUNT - 1;
+		int synopsisIndex = (aboutIndex > 0) ? (aboutIndex - 1) : 0;
 		int nameIndex = aboutIndex;
 		int schemeCount = (SCHEME_COUNT * 2);
 		int expecting = 0;
@@ -345,9 +345,9 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	
 	@Test
 	public void testCount_FilterSet_NotFound_IndexError_Name() throws Exception {
-		int aboutIndex = SCHEME_COUNT % 3;
+		int aboutIndex = SCHEME_COUNT - 1;
 		int synopsisIndex = aboutIndex;
-		int nameIndex = SCHEME_COUNT % 2;
+		int nameIndex = (aboutIndex > 0) ? (aboutIndex - 1) : 0;
 		int schemeCount = (SCHEME_COUNT * 2);
 		int expecting = 0;
 
@@ -480,6 +480,23 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 		this.executeGetResourceSummaries_1_Filter(schemeCount, pageSize, pageIndex, expecting, 				
 				StandardModelAttributeReference.ABOUT.getPropertyReference(), 
 				StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), 
+				testValue);
+	}
+	
+	@Test
+	public void testGetResourceSummaries_Filter_Synopsis_Found_Index0_SchemeCountTimes1_PageSize1_PageIndex0() throws Exception {
+		int matchingCodingSchemeIndex = 0;
+		String testValue = SYNOPSIS_VALUES[matchingCodingSchemeIndex];
+		int schemeCount = SCHEME_COUNT;
+		int expecting = 1;
+		
+		int pageSize = 1;
+		int pageIndex = 0;
+
+		// This will match for two codeSystemVersions but should return one due to page limits.
+		this.executeGetResourceSummaries_1_Filter(schemeCount, pageSize, pageIndex, expecting, 				
+				StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference(), 
+				StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference(), 
 				testValue);
 	}
 	
