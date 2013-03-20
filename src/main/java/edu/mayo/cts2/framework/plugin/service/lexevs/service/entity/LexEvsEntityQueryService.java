@@ -30,13 +30,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Resource;
+
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.Collections.LocalNameList;
 import org.LexGrid.LexBIG.DataModel.Collections.ResolvedConceptReferenceList;
 import org.LexGrid.LexBIG.DataModel.Collections.SortOptionList;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
-import org.LexGrid.LexBIG.DataModel.Core.ConceptReference;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.ExtensionDescription;
 import org.LexGrid.LexBIG.Exceptions.LBException;
@@ -53,7 +54,6 @@ import org.springframework.stereotype.Component;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
-import edu.mayo.cts2.framework.model.core.EntityReference;
 import edu.mayo.cts2.framework.model.core.EntityReferenceList;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
@@ -66,8 +66,9 @@ import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURIList;
-import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.service.core.Query;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.PrintUtility;
@@ -79,7 +80,8 @@ import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescripti
 @Component
 public class LexEvsEntityQueryService extends AbstractLexEvsService 
 		implements EntityDescriptionQueryService {
-	
+
+	// Local class defined
 	private class ResolvedConceptReferenceResults{
 		public boolean atEnd;
 		public ResolvedConceptReference [] resolvedConceptReference;
@@ -90,11 +92,24 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		}
 	}
 
+	// Local variables
 	private EntityTransform entityTransform = new EntityTransform();
 	private boolean printObjects = false;
 
+	@Resource
+	private CodeSystemVersionNameConverter codeSystemVersionNameConverter;
+	
 	
 	// ------ Local methods ----------------------
+	public CodeSystemVersionNameConverter getCodeSystemVersionNameConverter() {
+		return codeSystemVersionNameConverter;
+	}
+
+	public void setCodeSystemVersionNameConverter(
+			CodeSystemVersionNameConverter codeSystemVersionNameConverter) {
+		this.codeSystemVersionNameConverter = codeSystemVersionNameConverter;
+	}
+	
 	public EntityTransform getEntityTransformer() {
 		return entityTransform;
 	}
@@ -183,22 +198,29 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 	protected CodedNodeSet getCodedNodeSet(EntityDescriptionQuery query, SortCriteria sortCriteria){
 		CodedNodeSet codedNodeSet = null;
 		Set<ResolvedFilter> filters = null; 		
-		NameOrURI codeSystem = null;
+		String codeSystem = null;
 		EntityDescriptionQueryServiceRestrictions entityDescriptionQueryServiceRestrictions = null;
 		String codingSchemeName = null;
+		CodingSchemeVersionOrTag versionOrTag = null;
 		boolean haveSchemeName = false;
 		
 		if (query != null) {
 			entityDescriptionQueryServiceRestrictions = query.getRestrictions();
 			filters = query.getFilterComponent();
 			if (entityDescriptionQueryServiceRestrictions != null) {
-				codeSystem = entityDescriptionQueryServiceRestrictions.getCodeSystemVersion();
+				codeSystem = entityDescriptionQueryServiceRestrictions.getCodeSystemVersion().getName();
+				
 				if(codeSystem != null){
-					codingSchemeName = codeSystem.getName();
+					NameVersionPair nameVersionPair =
+							this.codeSystemVersionNameConverter.fromCts2CodeSystemVersionName(codeSystem);					
+					versionOrTag = new CodingSchemeVersionOrTag();
+					codingSchemeName = nameVersionPair.getName();
+					versionOrTag.setTag(nameVersionPair.getVersion());
 					if(printObjects){
 						System.out.println("CodingSchemeName: " + codingSchemeName);
+						System.out.println("VersionOrTag: " + versionOrTag.getVersion());
 					}
-					if(codingSchemeName != null){
+					if((codingSchemeName != null) && (versionOrTag != null)){
 						haveSchemeName = true;
 					}
 				}
@@ -212,8 +234,6 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 			
 			try {
 				// Get Code Node Set from LexBIG service for given coding scheme
-				// TODO do we need non-null values here?
-				CodingSchemeVersionOrTag versionOrTag = null;
 				LocalNameList entityTypes = new LocalNameList();
 				CodingSchemeRenderingList codingSchemeRenderingList = lexBigService.getSupportedCodingSchemes();
 				int count = codingSchemeRenderingList.getCodingSchemeRenderingCount();
@@ -223,13 +243,15 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 						System.out.println("CodingSchemeRendering: ");
 						System.out.println(PrintUtility.codingSchemeSummary(codingSchemeSummary, 1));
 					}
+					
 					if(codingSchemeSummary.getLocalName().equals(codingSchemeName)){
 						found = true;
 					}
 				}
 				
+				
 				if(found){
-					codedNodeSet = lexBigService.getNodeSet(codingSchemeName, versionOrTag, entityTypes);
+					codedNodeSet = lexBigService.getNodeSet(codingSchemeName, versionOrTag , entityTypes);
 				}
 			} catch (LBException e) {
 				throw new RuntimeException(e);
@@ -359,27 +381,26 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		return new ArrayList<DocumentedNamespaceReference>();
 	}
 
-	@Override
-	public boolean isEntityInSet(EntityNameOrURI entity, Query query,
-			Set<ResolvedFilter> filterComponent,
-			EntityDescriptionQuery restrictions, ResolvedReadContext readContext) {
-		boolean answer = false;
-		CodedNodeSet codedNodeSet = this.getCodedNodeSet(restrictions, null);
-		
-		ConceptReference code = new ConceptReference();
-		code.setCode(entity.getEntityName().getName());
-		code.setCodeNamespace(entity.getEntityName().getNamespace());
-	
-		try {
-			answer = codedNodeSet.isCodeInSet(code);
-		} catch (LBInvocationException e) {
-			throw new UnsupportedOperationException();
-		} catch (LBParameterException e) {
-			throw new UnsupportedOperationException();
-		}
-		
-		return answer;
-	}
+//	@Override
+//	public boolean isEntityInSet(EntityNameOrURI entity,
+//			EntityDescriptionQuery restrictions, ResolvedReadContext readContext) {
+//		boolean answer = false;
+//		CodedNodeSet codedNodeSet = this.getCodedNodeSet(restrictions, null);
+//		
+//		ConceptReference code = new ConceptReference();
+//		code.setCode(entity.getEntityName().getName());
+//		code.setCodeNamespace(entity.getEntityName().getNamespace());
+//	
+//		try {
+//			answer = codedNodeSet.isCodeInSet(code);
+//		} catch (LBInvocationException e) {
+//			throw new UnsupportedOperationException();
+//		} catch (LBParameterException e) {
+//			throw new UnsupportedOperationException();
+//		}
+//		
+//		return answer;
+//	}
 
 //	@Override
 //	public EntityReferenceList resolveAsEntityReferenceList(
@@ -403,48 +424,36 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 //	}
 //
 	@Override
-	public EntityReferenceList resolveAsEntityReferenceList(
-			EntityDescriptionQuery restrictions, ResolvedReadContext readContext) {
-		
-		EntityReferenceList entityReferenceList = new EntityReferenceList();		
-		
-		ResolvedConceptReferenceResults resolvedConceptReferenceResults = this.doGetResourceSummaryResults(restrictions, null, null);
-		
-		// Transform each reference into a CTS2 entry and add to list
-		ResolvedConceptReference[] resolvedConceptReferences = resolvedConceptReferenceResults.resolvedConceptReference;
-		for(ResolvedConceptReference reference : resolvedConceptReferences){
-			if(printObjects){
-				System.out.println("ResolvedConceptReference:\n" + PrintUtility.resolvedConceptReference_toString(reference, 1));
-			}
-			EntityReference entry = entityTransform.transform_EntityReference(reference);
-			entityReferenceList.addEntry(entry);
-		}
-		
-		return entityReferenceList;
-	}
-
-//	@Override
-//	public EntityNameOrURIList intersectEntityList(
-//			Set<EntityNameOrURI> entities,
-//			EntityDescriptionQuery restrictions, 
-//			ResolvedReadContext readContext) {
-//		// TODO Auto-generated method stub
-//		throw new UnsupportedOperationException();
-//	}
-
-	@Override
 	public EntityNameOrURIList intersectEntityList(
 			Set<EntityNameOrURI> entities,
-			EntityDescriptionQuery restrictions,
+			EntityDescriptionQuery restrictions, 
 			ResolvedReadContext readContext) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException();
 	}
 
+
 	@Override
 	public Set<VersionTagReference> getSupportedTags() {
 		return new HashSet<VersionTagReference>(Arrays.asList(Constants.CURRENT_TAG));
 	}
+
+	@Override
+	public boolean isEntityInSet(EntityNameOrURI arg0,
+			EntityDescriptionQuery arg1, ResolvedReadContext arg2) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public EntityReferenceList resolveAsEntityReferenceList(
+			EntityDescriptionQuery arg0, ResolvedReadContext arg1) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
 
 }
 
