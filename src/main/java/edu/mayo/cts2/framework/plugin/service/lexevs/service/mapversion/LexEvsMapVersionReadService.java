@@ -6,10 +6,12 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.LexGrid.LexBIG.Extensions.Generic.GenericExtension;
+import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
+import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.codingSchemes.CodingScheme;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
@@ -17,6 +19,7 @@ import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.mapversion.MapVersion;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
+import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsCodeSystemService;
@@ -26,40 +29,73 @@ import edu.mayo.cts2.framework.service.profile.mapversion.MapVersionReadService;
 @Component
 public class LexEvsMapVersionReadService
 	extends AbstractLexEvsCodeSystemService<MapVersion>
-	implements MapVersionReadService {
+	implements MapVersionReadService, InitializingBean {
 
 	@Resource
 	private CodeSystemVersionNameConverter nameConverter;
 	
+	@Resource
+	private CodingSchemeToMapVersionTransform codingSchemeToMapVersionTransform;
+	
+	private MappingExtension mappingExtension;
+	
 	public static final String MAPPING_EXTENSION = "MappingExtension";
+	
 
 	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(MAPPING_EXTENSION);
+	}
+
+	/*
+	 * As part of the transfrom service, validate if it is in fact a valid
+	 * LexEVS Mapping CodingScheme. If not, return null.
+	 * 
+	 * (non-Javadoc)
+	 * @see edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsCodeSystemService#transform(org.LexGrid.codingSchemes.CodingScheme)
+	 */
+	@Override
 	protected MapVersion transform(CodingScheme codingScheme) {
-		// TODO Auto-generated method stub
-		return null;
+		if(! this.validateMappingCodingScheme(
+				codingScheme.getCodingSchemeURI(), 
+				codingScheme.getRepresentsVersion())){
+			return null;
+		} else {
+			return this.codingSchemeToMapVersionTransform.transform(codingScheme);
+		}
+	}
+	
+	protected boolean validateMappingCodingScheme(String uri, String version){
+		try {
+			return this.mappingExtension.
+				isMappingCodingScheme(
+						uri, 
+						Constructors.createCodingSchemeVersionOrTagFromVersion(version));
+		} catch (LBParameterException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	@Override
-	public MapVersion readByTag(NameOrURI parentIdentifier,
-			VersionTagReference tag, ResolvedReadContext readContext) {
+	public MapVersion readByTag(
+			NameOrURI parentIdentifier,
+			VersionTagReference tag, 
+			ResolvedReadContext readContext) {
 		
 		// parentIdentifier has the mapped "codingSchemeName-version" value of the map - i.e. "Mapping Sample-1.0"
 		// tag should be defaulted to current tag since that is the only one being supported for now
 		// assume readContext is null 
 		
-		
-		
-		return null;
+		return this.getByVersionIdOrTag(parentIdentifier, 
+			Constructors.createCodingSchemeVersionOrTagFromTag(tag.getContent()));
 	}
 
 	@Override
-	public boolean existsByTag(NameOrURI parentIdentifier,
-			VersionTagReference tag, ResolvedReadContext readContext) {
-		// TODO Auto-generated method stub
-		
-		// Will leverage a shared code method with readByTag method
-		
-		return false;
+	public boolean existsByTag(
+			NameOrURI parentIdentifier,
+			VersionTagReference tag, 
+			ResolvedReadContext readContext) {
+		return this.readByTag(parentIdentifier, tag, readContext) != null;
 	}
 
 	@Override
@@ -69,8 +105,6 @@ public class LexEvsMapVersionReadService
 
 	@Override
 	public MapVersion read(NameOrURI identifier, ResolvedReadContext readContext) {
-		// TODO Auto-generated method stub
-		
 		// Similiar to readByTag but only passing in "codingSchemeName-version" value for identifier
 		
 		String name;
@@ -83,36 +117,23 @@ public class LexEvsMapVersionReadService
 			throw new UnsupportedOperationException("Cannot resolve by DocumentURI yet.");
 		}
 		
-		
 		NameVersionPair namePair = this.nameConverter.fromCts2CodeSystemVersionName(name);
-		Constructors.createCodingSchemeVersionOrTagFromVersion(namePair.getVersion());
-
-		MappingExtension mappingExtension = null;
-		try {
-			mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(MAPPING_EXTENSION);
-			//mappingExtension.
-			// TODO What MappingExtensionImpl method needs to be called and what LexEVS object needs to be returned? Most 
-			//   methods need the container name of the Relations (i.e. AutoToGMPMappings) as an input param.  Don't see
-			//   how CTS2 is going to supply this value.
-			
-			// MappingExtensionImpl has isMappingCodingScheme method that returns boolean
-			
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		CodingSchemeVersionOrTag version = 
+			Constructors.createCodingSchemeVersionOrTagFromVersion(namePair.getVersion());
 		
-		return null;
+		return this.getByVersionIdOrTag
+				(ModelUtils.nameOrUriFromName(
+						namePair.getName()), 
+						version);
 	}
 
 	@Override
 	public boolean exists(NameOrURI identifier, ResolvedReadContext readContext) {
-		// TODO Auto-generated method stub
-		return false;
+		return this.read(identifier, readContext) != null;
 	}
 
 	@Override
 	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
-		// TODO Auto-generated method stub
 		return new ArrayList<DocumentedNamespaceReference>();
 	}
 
