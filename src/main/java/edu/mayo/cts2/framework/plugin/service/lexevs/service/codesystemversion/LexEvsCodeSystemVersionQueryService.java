@@ -291,10 +291,12 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 
 		List<CodeSystemVersionCatalogEntrySummary> list = new ArrayList<CodeSystemVersionCatalogEntrySummary>();
 
-		for (CodingSchemeRendering render : csRenderingPage) {
-			list.add(codingSchemeTransformer.transform(render));
+		if(csRenderingPage != null){
+			for (CodingSchemeRendering render : csRenderingPage) {
+				list.add(codingSchemeTransformer.transform(render));
+			}
 		}
-
+		
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
 		
 		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = new DirectoryResult<CodeSystemVersionCatalogEntrySummary>(list, atEnd);

@@ -47,7 +47,7 @@ public class CommonUtils {
 		if ((start == 0) && (end == csRendering.length)) {
 			csRenderingPage = csRendering;
 		} 
-		else {
+		else if(start < end){
 			
 			int size = end - start;
 			csRenderingPage = new CodingSchemeRendering [size];
