@@ -82,12 +82,8 @@ public class LexEvsMapVersionReadService
 			VersionTagReference tag, 
 			ResolvedReadContext readContext) {
 		
-		// parentIdentifier has the mapped "codingSchemeName-version" value of the map - i.e. "Mapping Sample-1.0"
-		// tag should be defaulted to current tag since that is the only one being supported for now
-		// assume readContext is null 
-		
 		return this.getByVersionIdOrTag(parentIdentifier, 
-			Constructors.createCodingSchemeVersionOrTagFromTag(tag.getContent()));
+				this.convertTag(tag));
 	}
 
 	@Override
@@ -105,7 +101,6 @@ public class LexEvsMapVersionReadService
 
 	@Override
 	public MapVersion read(NameOrURI identifier, ResolvedReadContext readContext) {
-		// Similiar to readByTag but only passing in "codingSchemeName-version" value for identifier
 		
 		String name;
 		if(identifier.getName() != null){
