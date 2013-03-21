@@ -29,12 +29,8 @@ import java.util.Set;
 
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
-import org.LexGrid.LexBIG.DataModel.Core.ReferenceLink;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
-import org.LexGrid.LexBIG.DataModel.InterfaceElements.RenderingDetail;
-import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
-import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.LexGrid.commonTypes.EntityDescription;
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -43,15 +39,13 @@ import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogE
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
-import edu.mayo.cts2.framework.model.core.PropertyReference;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.LexEvsFakeData;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.LexEvsFakeData.DataFields;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.LexEvsFakeData.DataField;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.LexEvsUtils;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
-import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
-import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersionQuery;
 
 
 /**
@@ -65,11 +59,11 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	
 	// Setup mocked environment
 	// -------------------------
-	private LexEvsCodeSystemVersionQueryService createService(int schemeCount, boolean withData) throws Exception{
+	private LexEvsCodeSystemVersionQueryService createService(boolean withData) throws Exception{
 		LexEvsCodeSystemVersionQueryService service = new LexEvsCodeSystemVersionQueryService();
 
 		// Mock LexBIGService, overwrite return value for getSupportedCodingSchemes
-		LexBIGService lexBigService = this.createMockedService_spoofSupportedCodingSchemes(schemeCount, withData);
+		LexBIGService lexBigService = this.createMockedService_spoofSupportedCodingSchemes(withData);
 		
 		service.setLexBigService(lexBigService);
 
@@ -82,33 +76,33 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 
 	// Create Mocked Service and generate a codingSchemeRenderingList filled with fake data
 	// ------------------------------------------------------------------------------------
-	private LexBIGService createMockedService_spoofSupportedCodingSchemes(int size, boolean withData) throws Exception{
+	private LexBIGService createMockedService_spoofSupportedCodingSchemes(boolean withData) throws Exception{
 		LexBIGService lexBigService = EasyMock.createMock(LexBIGService.class);
 		CodingSchemeRenderingList list = new CodingSchemeRenderingList();
 		
 				
-		for(int i=0; i < size; i++){
+		for(int schemeIndex=0; schemeIndex < fakeData.size(); schemeIndex++){
 			CodingSchemeRendering render = new CodingSchemeRendering();
 			CodingSchemeSummary codingSchemeSummary = new CodingSchemeSummary();
 			
 			if(withData){				
 				// Synopsis
 				EntityDescription codingSchemeDescription = new EntityDescription();
-				codingSchemeDescription.setContent(fakeData.get(DataFields.RESOURCE_SYNOPSIS, i)); 
+				codingSchemeDescription.setContent(fakeData.getScheme_DataField(schemeIndex, DataField.RESOURCE_SYNOPSIS)); 
 				codingSchemeSummary.setCodingSchemeDescription(codingSchemeDescription);
 				
 				
 				// About
-				codingSchemeSummary.setCodingSchemeURI(fakeData.get(DataFields.ABOUT, i)); 
+				codingSchemeSummary.setCodingSchemeURI(fakeData.getScheme_DataField(schemeIndex, DataField.ABOUT)); 
 				
 				
 				// resource name
-				codingSchemeSummary.setLocalName(fakeData.get(DataFields.RESOURCE_LOCALNAME, i));
-				codingSchemeSummary.setRepresentsVersion(fakeData.get(DataFields.RESOURCE_VERSION, i)); 	
+				codingSchemeSummary.setLocalName(fakeData.getScheme_DataField(schemeIndex, DataField.RESOURCE_LOCALNAME));
+				codingSchemeSummary.setRepresentsVersion(fakeData.getScheme_DataField(schemeIndex, DataField.RESOURCE_VERSION)); 	
 			}
 			
 			render.setCodingSchemeSummary(codingSchemeSummary);
-			list.addCodingSchemeRendering(i, render);
+			list.addCodingSchemeRendering(schemeIndex, render);
 		}
 		
 		EasyMock.expect(lexBigService.getSupportedCodingSchemes()).andReturn(list);
@@ -117,299 +111,214 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 		return lexBigService;
 	}
 	
-	private void executeGetResourceSummaries_0_Filter(int schemeCount,  int pageSize, int pageIndex, int expecting) throws Exception{
-		LexEvsCodeSystemVersionQueryService service = this.createService(schemeCount, false);
-				
-		SortCriteria sortCriteria = null;		
-		Page page = new Page();
-		page.setMaxToReturn(pageSize);
-		page.setPage(pageIndex);
+    private void executeCount(int expecting, Set<ResolvedFilter> filters) throws Exception {		
 		
-		CodeSystemVersionQuery query = null;
-		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = 
-				service.getResourceSummaries(query, sortCriteria, page);
-		
-		assertNotNull(directoryResult);
-		
-		int actual = directoryResult.getEntries().size();
-		assertEquals("Expecting " + expecting + " entries but got " + actual, expecting, actual);
-	}
-	
-	private void executeGetResourceSummaries_1_Filter(int schemeCount,  int pageSize, int pageIndex, int expecting, 
-			PropertyReference propertyReference, MatchAlgorithmReference matchAlgorithmReference, String matchValue) throws Exception{
-		LexEvsCodeSystemVersionQueryService service = this.createService(schemeCount, true);
-				
-		SortCriteria sortCriteria = null;		
-		Page page = new Page();
-		page.setMaxToReturn(pageSize);
-		page.setPage(pageIndex);
+		LexEvsCodeSystemVersionQueryService service = this.createService(true);
 		
 		// Build query using filters
-		Set<ResolvedFilter> filter = TestUtils.createFilterSet(propertyReference, matchAlgorithmReference, matchValue);
-		CodeSystemVersionQueryImpl query = TestUtils.createQuery_FiltersOnly(filter);
-		
-		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = 
-				service.getResourceSummaries(query, sortCriteria, page);
-		
-		assertNotNull(directoryResult);
-		
-		int actual = directoryResult.getEntries().size();
-		assertEquals("Expecting " + expecting + " entries but got " + actual, expecting, actual);
-	}
-	
-	private void executeCount_3_Filters(int aboutIndex, int synopsisIndex, int nameIndex, int schemeCount, int expecting) throws Exception{
-		LexEvsCodeSystemVersionQueryService service = this.createService(schemeCount, true);
-		
-		// Build query using filters
-		String about = fakeData.get(DataFields.ABOUT, aboutIndex); 
-		String resourceSynopsis = fakeData.get(DataFields.RESOURCE_SYNOPSIS, synopsisIndex); 
-		String resourceName = fakeData.get(DataFields.RESOURCE_NAME, nameIndex); 
-		
-		Set<ResolvedFilter> filterComponent = TestUtils.createFilterSet(about, resourceSynopsis, resourceName);
-		CodeSystemVersionQueryImpl query = TestUtils.createQuery_FiltersOnly(filterComponent);
+		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filters, null, null);
 
 		// Test results
 		int actual = service.count(query);
 		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
 	}
 	
-	private void executeCount_1_Filter(int schemeCount, String testValue, int expecting, 
-			PropertyReference propertyReference, 
-			MatchAlgorithmReference matchAlgorithmReference) throws Exception{
-		
-		LexEvsCodeSystemVersionQueryService service = this.createService(schemeCount, true);
-		
-		// Build query using filters
-		Set<ResolvedFilter> filter = TestUtils.createFilterSet(propertyReference, matchAlgorithmReference, testValue); 
-		CodeSystemVersionQueryImpl query = TestUtils.createQuery_FiltersOnly(filter);
-
-		// Test results
-		int actual = service.count(query);
-		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
-	}
-	
-	private int calculateExpecting_WithPage(int schemeCount, int pageSize, int pageIndex) {
+	private int calculateExpecting_WithPage(int resultsCount, Page page) {
 		int expecting = 0;
-		if(schemeCount >= (pageSize * (pageIndex + 1))){
-			if(schemeCount < pageSize){
-				expecting = schemeCount;
+		if(resultsCount >= (page.getMaxToReturn() * (page.getPage() + 1))){
+			if(resultsCount < page.getMaxToReturn()){
+				expecting = resultsCount;
 			}
 			else{
-				expecting = pageSize;
+				expecting = page.getMaxToReturn();
 			}
 		}
 		else{
-			expecting = schemeCount - (pageSize * pageIndex);
+			expecting = resultsCount - (page.getMaxToReturn() * page.getPage());
 			expecting = (expecting < 0) ? 0 : expecting;
 		}
 		
 		return expecting;
 	}
 	
-	private void performCountFilterTests_Valid(int schemeCount, DataFields field,
-			PropertyReference propertyReference,
+	private void executeCount_WithFilter_Valid(DataField dataField,
 			MatchAlgorithmReference matchAlgorithmReference) throws Exception {
 		
-		for(int i=0; i < schemeCount; i++){
-			String testValue = fakeData.get(field, i);
-			int expecting = fakeData.getCount(field, matchAlgorithmReference, testValue);
-	
-			this.executeCount_1_Filter(schemeCount, testValue, expecting, propertyReference, matchAlgorithmReference);
+		for(int schemeIndex=0; schemeIndex < fakeData.size(); schemeIndex++){
+			String testValue = fakeData.getScheme_DataField(schemeIndex,  dataField);
+			Set<ResolvedFilter> filter = LexEvsUtils.createFilterSet(dataField.propertyReference(), matchAlgorithmReference, testValue);
+			int expecting = fakeData.getCount(filter);
+			
+			this.executeCount(expecting, filter);
 		}
 	}
 
-	private void performCountFilterTests_InValid(int schemeCount, DataFields field,
-			PropertyReference propertyReference,
+	private void executeCount_WithFilter_InValid(DataField dataField,
 			MatchAlgorithmReference matchAlgorithmReference) throws Exception {
 		
-		for(int i=0; i < schemeCount; i++){
-			String testValue = fakeData.get(field, i) + "FOO";
-			int expecting = fakeData.getCount(field, matchAlgorithmReference, testValue);
+		for(int schemeIndex=0; schemeIndex < fakeData.size(); schemeIndex++){
+			String testValue = fakeData.getScheme_DataField(schemeIndex, dataField) + "FOO";
+			Set<ResolvedFilter> filter = LexEvsUtils.createFilterSet(dataField.propertyReference(), matchAlgorithmReference, testValue);
+			int expecting = fakeData.getCount(filter);
 	
-			this.executeCount_1_Filter(schemeCount, testValue, expecting, propertyReference, matchAlgorithmReference);
+			this.executeCount(expecting, filter);
 		}
 	}
+
 
 	
 	// =============
 	// Test methods
 	// =============
 	
-	// Count with VALID filters
-	// -------------------------
+	// Count with VALID and INVALID filters
+	// ------------------------------------
 	@Test
-	public void testCount_Filter_About_Found_CheckAll() throws Exception {
+	public void testCount_Filter_About_Contains() throws Exception {
 		fakeData = new LexEvsFakeData();
-		int schemeCount = fakeData.size();
-		performCountFilterTests_Valid(schemeCount, DataFields.ABOUT, 
-				StandardModelAttributeReference.ABOUT.getPropertyReference(), 
+		executeCount_WithFilter_Valid(DataField.ABOUT, 
+				StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference());		
+		executeCount_WithFilter_InValid(DataField.ABOUT, 
 				StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference());		
 	}
 	
 	@Test
-	public void testCount_Filter_ResorceSynopsis_Found_CheckAll() throws Exception {
+	public void testCount_Filter_ResorceSynopsis_StartsWith() throws Exception {
 		fakeData = new LexEvsFakeData();
-		int schemeCount = fakeData.size();
-		performCountFilterTests_Valid(schemeCount, DataFields.RESOURCE_SYNOPSIS, 					
-				StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference(), 
+		executeCount_WithFilter_Valid(DataField.RESOURCE_SYNOPSIS, 					
+				StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference());
+		executeCount_WithFilter_InValid(DataField.RESOURCE_SYNOPSIS, 					
 				StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference());
 	}
 		
 	@Test
-	public void testCount_Filter_ResourceName_Found_CheckAll() throws Exception {
+	public void testCount_Filter_ResourceName_ExactMatch() throws Exception {
 		fakeData = new LexEvsFakeData();
-		int schemeCount = fakeData.size();
-		performCountFilterTests_Valid(schemeCount, DataFields.RESOURCE_NAME, 
-					StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
+		executeCount_WithFilter_Valid(DataField.RESOURCE_NAME, 
 					StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference());		
-	}
-		
-	// Count with INVALID filters
-	// -------------------------
-	@Test
-	public void testCount_Filter_About_NotFound() throws Exception {
-		fakeData = new LexEvsFakeData();
-		int schemeCount = fakeData.size();
-		performCountFilterTests_InValid(schemeCount, DataFields.ABOUT, 
-				StandardModelAttributeReference.ABOUT.getPropertyReference(), 
-				StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference());		
-	}
-	
-	@Test
-	public void testCount_Filter_ResorceSynopsis_NotFound() throws Exception {
-		fakeData = new LexEvsFakeData();
-		int schemeCount = fakeData.size();
-		performCountFilterTests_InValid(schemeCount, DataFields.RESOURCE_SYNOPSIS, 					
-				StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference(), 
-				StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference());
-	}
-		
-	@Test
-	public void testCount_Filter_ResourceName_NotFound() throws Exception {
-		fakeData = new LexEvsFakeData();
-		int schemeCount = fakeData.size();
-		performCountFilterTests_InValid(schemeCount, DataFields.RESOURCE_NAME, 
-				StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
+		executeCount_WithFilter_InValid(DataField.RESOURCE_NAME, 
 				StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference());		
-}
+	}
 		
-	// Count with All VALID filters
-	// -----------------------------
+	// Count with All VALID Default filters
+	// -------------------------------------
 	@Test
-	public void testCount_FilterSet_Found_CheckAll() throws Exception {
+	public void testCount_Filter_AllDefault() throws Exception {
 		fakeData = new LexEvsFakeData();
 		int schemeCount = fakeData.size();
+		Set<ResolvedFilter> filters;
+		int expecting;
 		
-		for(int i=0; i < schemeCount; i++){
-			int expecting = fakeData.getAllFilters_Count(
-					fakeData.get(DataFields.ABOUT, i), 
-					fakeData.get(DataFields.RESOURCE_SYNOPSIS, i), 
-					fakeData.get(DataFields.RESOURCE_NAME, i));
-			
-			this.executeCount_3_Filters(i, i, i, schemeCount, expecting);
+		for(int schemeIndex=0; schemeIndex < schemeCount; schemeIndex++){
+			filters = LexEvsUtils.createFilterSet(fakeData, schemeIndex, schemeIndex, schemeIndex);
+		
+			expecting = fakeData.getCount(filters);
+			this.executeCount(expecting, filters);
 		}
 	}
 
 	// Count with VALID values with one MISMATCHED
 	// --------------------------------------------
 	@Test
-	public void testCount_FilterSet_NotFound_IndexError_About() throws Exception {
+	public void testCount_Filter_AllDefault_WrongIndex_About() throws Exception {
 		fakeData = new LexEvsFakeData();
 		int schemeCount = fakeData.size();
+		Set<ResolvedFilter> filters;
+		int expecting;
 		
-		for(int i=0; i < schemeCount; i++){
-			int aboutIndex = ((i+1) % schemeCount);
-			int synopsisIndex =  i;
-			int nameIndex = synopsisIndex;
-			
-			int expecting = fakeData.getAllFilters_Count(
-					fakeData.get(DataFields.ABOUT, aboutIndex), 
-					fakeData.get(DataFields.RESOURCE_SYNOPSIS, synopsisIndex), 
-					fakeData.get(DataFields.RESOURCE_NAME, nameIndex));
-	
-			this.executeCount_3_Filters(aboutIndex, synopsisIndex, nameIndex, schemeCount, expecting);
+		for(int schemeIndex=0; schemeIndex < schemeCount; schemeIndex++){
+			filters = LexEvsUtils.createFilterSet(fakeData, ((schemeIndex+1) % schemeCount), schemeIndex, schemeIndex);
+		
+			expecting = fakeData.getCount(filters);
+			this.executeCount(expecting, filters);
 		}
 	}
 	
 	@Test
-	public void testCount_FilterSet_NotFound_IndexError_Synopsis() throws Exception {
+	public void testCount_Filter_AllDefault_WrongIndex_ResourceSynopsis() throws Exception {
 		fakeData = new LexEvsFakeData();
 		int schemeCount = fakeData.size();
+		Set<ResolvedFilter> filters;
+		int expecting;
 		
-		for(int i=0; i < schemeCount; i++){
-			int aboutIndex = i;
-			int synopsisIndex =  ((i+1) % schemeCount);
-			int nameIndex = aboutIndex;
+		for(int schemeIndex=0; schemeIndex < schemeCount; schemeIndex++){
+			filters = LexEvsUtils.createFilterSet(fakeData, schemeIndex, ((schemeIndex+1) % schemeCount), schemeIndex);
 			
-			int expecting = fakeData.getAllFilters_Count(
-					fakeData.get(DataFields.ABOUT, aboutIndex), 
-					fakeData.get(DataFields.RESOURCE_SYNOPSIS, synopsisIndex), 
-					fakeData.get(DataFields.RESOURCE_NAME, nameIndex));
-	
-			this.executeCount_3_Filters(aboutIndex, synopsisIndex, nameIndex, schemeCount, expecting);
-		}
-	}
-	
-	@Test
-	public void testCount_FilterSet_NotFound_IndexError_Name() throws Exception {
-		fakeData = new LexEvsFakeData();
-		int schemeCount = fakeData.size();
-		
-		for(int i=0; i < schemeCount; i++){
-			int aboutIndex = i;
-			int synopsisIndex =  aboutIndex;
-			int nameIndex = ((i+1) % schemeCount);
-			
-			int expecting = fakeData.getAllFilters_Count(
-					fakeData.get(DataFields.ABOUT, aboutIndex), 
-					fakeData.get(DataFields.RESOURCE_SYNOPSIS, synopsisIndex), 
-					fakeData.get(DataFields.RESOURCE_NAME, nameIndex));
-	
-			this.executeCount_3_Filters(aboutIndex, synopsisIndex, nameIndex, schemeCount, expecting);
-		}
-	}
-		
-	// --------------------------------------------
-	@Test
-	public void testGetResourceSummaries_3Summaries_Page0to2_Size50() throws Exception {
-		int schemeCount = 3;
-		int firstPage = 0;
-		int lastPage = 2;
-		int pageSize = 50;
-		
-		fakeData = new LexEvsFakeData(schemeCount);
-		
-		for(int pageIndex = firstPage; pageIndex <= lastPage; pageIndex++){
-			int expecting = calculateExpecting_WithPage(schemeCount, pageSize, pageIndex);
-			this.executeGetResourceSummaries_0_Filter(schemeCount, pageSize, pageIndex, expecting);
-		}
-	}
-	
-	@Test
-	public void testGetResourceSummaries_20Summaries_Page0to3_Size10() throws Exception {
-		int schemeCount = 20;
-		int firstPage = 0;
-		int lastPage = 3;
-		int pageSize = 10;
-		fakeData = new LexEvsFakeData(schemeCount);
-		
-		for(int pageIndex = firstPage; pageIndex <= lastPage; pageIndex++){
-			int expecting = calculateExpecting_WithPage(schemeCount, pageSize, pageIndex);
-			this.executeGetResourceSummaries_0_Filter(schemeCount, pageSize, pageIndex, expecting);
+			expecting = fakeData.getCount(filters);
+			this.executeCount(expecting, filters);
 		}
 	}
 
 	@Test
-	public void testGetResourceSummaries_21Summaries_Page1to3_Size10() throws Exception {
+	public void testCount_Filter_AllDefault_WrongIndex_ResourceName() throws Exception {
+		fakeData = new LexEvsFakeData();
+		int schemeCount = fakeData.size();
+		Set<ResolvedFilter> filters;
+		int expecting;
+		
+		for(int schemeIndex=0; schemeIndex < schemeCount; schemeIndex++){
+			filters = LexEvsUtils.createFilterSet(fakeData, schemeIndex, schemeIndex, ((schemeIndex+1) % schemeCount));
+			
+			expecting = fakeData.getCount(filters);
+			this.executeCount(expecting, filters);
+		}
+	}
+
+	// --------------------------------------------
+	@Test
+	public void testGetResourceSummaries_FilterNone_3Summaries_Page0to2_Size50() throws Exception {
+		int schemeCount = 3;
+		int firstPage = 0;
+		int lastPage = 2;
+		int pageSize = 50;
+		Page page = new Page();
+		page.setMaxToReturn(pageSize);
+		
+		fakeData = new LexEvsFakeData(schemeCount);
+		schemeCount = fakeData.size();
+		
+		for(int pageIndex = firstPage; pageIndex <= lastPage; pageIndex++){
+			page.setPage(pageIndex);
+			int expecting = calculateExpecting_WithPage(schemeCount, page);
+			this.executeGetResourceSummaries(page, expecting, null);
+		}
+	}
+	
+	@Test
+	public void testGetResourceSummaries_FilterNone_20Summaries_Page0to3_Size10() throws Exception {
+		int schemeCount = 20;
+		int firstPage = 0;
+		int lastPage = 3;
+		int pageSize = 10;
+		Page page = new Page();
+		page.setMaxToReturn(pageSize);
+		
+		fakeData = new LexEvsFakeData(schemeCount);
+		schemeCount = fakeData.size();
+		
+		for(int pageIndex = firstPage; pageIndex <= lastPage; pageIndex++){
+			page.setPage(pageIndex);
+			int expecting = calculateExpecting_WithPage(schemeCount, page);
+			this.executeGetResourceSummaries(page, expecting, null);
+		}
+	}
+
+	@Test
+	public void testGetResourceSummaries_FilterNone_21Summaries_Page1to3_Size10() throws Exception {
 		int schemeCount = 21;
 		int firstPage = 1;
 		int lastPage = 3;
 		int pageSize = 10;
+		Page page = new Page();
+		page.setMaxToReturn(pageSize);
+		
 		fakeData = new LexEvsFakeData(schemeCount);
+		schemeCount = fakeData.size();
 		
 		for(int pageIndex = firstPage; pageIndex <= lastPage; pageIndex++){			
-			int expecting = calculateExpecting_WithPage(schemeCount, pageSize, pageIndex);
-			this.executeGetResourceSummaries_0_Filter(schemeCount, pageSize, pageIndex, expecting);
+			page.setPage(pageIndex);
+			int expecting = calculateExpecting_WithPage(schemeCount, page);
+			this.executeGetResourceSummaries(page, expecting, null);
 		}
 	}
 	
@@ -417,89 +326,109 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	// -----------------------------------------
 	// resourceSummaries with individual filters
 	// -----------------------------------------
+	private void executeGetResourceSummaries_Pages_1Filter(int pageSize, int firstPage, int lastPage, DataField dataField, MatchAlgorithmReference matchAlgorithmReference) throws Exception{
+		Page page = new Page();
+		for(int pageIndex = firstPage; pageIndex <= lastPage; pageIndex++){
+			page.setMaxToReturn(pageSize);
+			page.setPage(pageIndex);
+			for(int schemeIndex = 0; schemeIndex < fakeData.size(); schemeIndex++){
+				String testValue = fakeData.getScheme_DataField(schemeIndex, dataField);
+				executeGetResourceSummaries_Substrings_1Filter(testValue, page, dataField, matchAlgorithmReference);				
+			}
+		}
+	}
+
+	private void executeGetResourceSummaries_Substrings_1Filter(
+			String testValue, Page page, DataField dataField,
+			MatchAlgorithmReference matchAlgorithmReference)
+			throws Exception {
+		for (int start = 0; start < testValue.length(); start++) {
+			for (int end = start; end < testValue.length(); end++) {
+				testValue = testValue.substring(start, end);
+				Set<ResolvedFilter> filter = LexEvsUtils.createFilterSet(dataField.propertyReference(), matchAlgorithmReference, testValue);
+
+				int fakeResults = fakeData.getCount(filter);
+				int expecting = calculateExpecting_WithPage(fakeResults, page);
+				
+				this.executeGetResourceSummaries(page, expecting, filter);
+			}
+		}
+	}
+	
+	private void executeGetResourceSummaries(Page page, int expecting, Set<ResolvedFilter> filters) throws Exception {		
+		LexEvsCodeSystemVersionQueryService service = this.createService(true);
+				
+		SortCriteria sortCriteria = null;		
+		
+		// Build query using filters
+		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filters, null, null);
+		
+		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = 
+				service.getResourceSummaries(query, sortCriteria, page);
+		
+		assertNotNull(directoryResult);
+		
+		int actual = directoryResult.getEntries().size();
+		assertEquals("Expecting " + expecting + " entries but got " + actual, expecting, actual);
+	}
+	
 	@Test
 	public void testGetResourceSummaries_FilterSubstring_About_Page0to2_Size50() throws Exception {
 		fakeData = new LexEvsFakeData();		
-		int schemeCount = fakeData.size();
 		int firstPage = 0;
 		int lastPage = 2;
 		int pageSize = 50;
-				
-		for(int pageIndex = firstPage; pageIndex <= lastPage; pageIndex++){
-			for(int schemeIndex = 0; schemeIndex < schemeCount; schemeIndex++){
-				String testValue = fakeData.get(DataFields.ABOUT, schemeIndex);
-				
-				for(int start=0; start < testValue.length(); start++){
-					for(int end=start; end < testValue.length(); end++){
-						testValue = testValue.substring(start, end);
-						
-						int fakeResults = fakeData.getAbout_ContainsCount(testValue);
-						int expecting = calculateExpecting_WithPage(fakeResults, pageSize, pageIndex);
-						this.executeGetResourceSummaries_1_Filter(schemeCount, pageSize, pageIndex, expecting, 				
-								StandardModelAttributeReference.ABOUT.getPropertyReference(), 
-								StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), 
-								testValue);
-					}
-				}
-			}
-		}
+		
+		DataField dataField = DataField.ABOUT;
+		
+		MatchAlgorithmReference matchAlgorithmReference;
+		matchAlgorithmReference = StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference();
+		executeGetResourceSummaries_Pages_1Filter(pageSize, firstPage, lastPage, dataField, matchAlgorithmReference);
+		
+		matchAlgorithmReference = StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference();
+		executeGetResourceSummaries_Pages_1Filter(pageSize, firstPage, lastPage, dataField, matchAlgorithmReference);
+		
+		matchAlgorithmReference = StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference();
+		executeGetResourceSummaries_Pages_1Filter(pageSize, firstPage, lastPage, dataField, matchAlgorithmReference);
 	}
 	
 	@Test
 	public void testGetResourceSummaries_FilterSubstring_ResourceSynopsis_Page0to2_Size50() throws Exception {
 		fakeData = new LexEvsFakeData();		
-		int schemeCount = fakeData.size();
 		int firstPage = 0;
 		int lastPage = 2;
 		int pageSize = 50;
 		
-		for(int pageIndex = firstPage; pageIndex <= lastPage; pageIndex++){
-			for(int schemeIndex = 0; schemeIndex < schemeCount; schemeIndex++){
-				String testValue = fakeData.get(DataFields.RESOURCE_SYNOPSIS, schemeIndex);
-				
-				for(int start=0; start < testValue.length(); start++){
-					for(int end=start; end < testValue.length(); end++){
-						testValue = testValue.substring(start, end);
-						
-						int fakeResults = fakeData.getResourceSynopsis_StartWithCount(testValue);
-						int expecting = calculateExpecting_WithPage(fakeResults, pageSize, pageIndex);
+		DataField dataField = DataField.RESOURCE_SYNOPSIS;
 		
-						this.executeGetResourceSummaries_1_Filter(schemeCount, pageSize, pageIndex, expecting, 				
-								StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference(), 
-								StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference(), 
-								testValue);
-					}
-				}
-			}
-		}
+		MatchAlgorithmReference matchAlgorithmReference;
+		matchAlgorithmReference = StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference();
+		executeGetResourceSummaries_Pages_1Filter(pageSize, firstPage, lastPage, dataField, matchAlgorithmReference);
+		
+		matchAlgorithmReference = StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference();
+		executeGetResourceSummaries_Pages_1Filter(pageSize, firstPage, lastPage, dataField, matchAlgorithmReference);
+		
+		matchAlgorithmReference = StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference();
+		executeGetResourceSummaries_Pages_1Filter(pageSize, firstPage, lastPage, dataField, matchAlgorithmReference);
 	}
 	
 	@Test
 	public void testGetResourceSummaries_FilterSubstring_ResourceName_Page0to2_Size50() throws Exception {
 		fakeData = new LexEvsFakeData();		
-		int schemeCount = fakeData.size();
 		int firstPage = 0;
 		int lastPage = 2;
 		int pageSize = 50;
 		
-		for(int pageIndex = firstPage; pageIndex <= lastPage; pageIndex++){
-			for(int schemeIndex = 0; schemeIndex < schemeCount; schemeIndex++){
-				String testValue = fakeData.get(DataFields.RESOURCE_NAME, schemeIndex);
-
-				for(int start=0; start < testValue.length(); start++){
-					for(int end=start; end < testValue.length(); end++){
-						testValue = testValue.substring(start, end);
-						
-						int fakeResults = fakeData.getResourceName_ExactMatchCount(testValue);
-						int expecting = calculateExpecting_WithPage(fakeResults, pageSize, pageIndex);
+		DataField dataField = DataField.RESOURCE_NAME;
 		
-						this.executeGetResourceSummaries_1_Filter(schemeCount, pageSize, pageIndex, expecting, 				
-								StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
-								StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference(), 
-								testValue);
-					}
-				}
-			}
-		}
+		MatchAlgorithmReference matchAlgorithmReference;
+		matchAlgorithmReference = StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference();
+		executeGetResourceSummaries_Pages_1Filter(pageSize, firstPage, lastPage, dataField, matchAlgorithmReference);
+		
+		matchAlgorithmReference = StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference();
+		executeGetResourceSummaries_Pages_1Filter(pageSize, firstPage, lastPage, dataField, matchAlgorithmReference);
+		
+		matchAlgorithmReference = StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference();
+		executeGetResourceSummaries_Pages_1Filter(pageSize, firstPage, lastPage, dataField, matchAlgorithmReference);
 	}	
 }

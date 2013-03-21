@@ -1,40 +1,76 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.LexEvsFakeData.DataFields;
+import edu.mayo.cts2.framework.model.core.PropertyReference;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
+import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 
 import scala.actors.threadpool.Arrays;
 
 public class LexEvsFakeData {	
-	public static enum DataFields{
-		ABOUT (0),
-		RESOURCE_SYNOPSIS (1),
-		RESOURCE_LOCALNAME (2),
-		RESOURCE_VERSION (3),
-		RESOURCE_NAME (4);
+	public static enum DataField{
+		ABOUT (0, StandardModelAttributeReference.ABOUT.getPropertyReference()),
+		RESOURCE_SYNOPSIS (1, StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference()),
+		RESOURCE_LOCALNAME (2, null),
+		RESOURCE_VERSION (3, null),
+		RESOURCE_NAME (4, StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference());
 		
 		private int index;
-		
-		DataFields(int index){
+		private PropertyReference propertyReference;
+		DataField(int index, PropertyReference propertyReference){
 			this.index = index;
+			this.propertyReference = propertyReference;
 		}
 		
 		public int index(){
-			return index;
+			return this.index;
 		}
+		
+		public PropertyReference propertyReference(){
+			return this.propertyReference;
+		}
+	}
+	
+	public static enum FakeMatchAlgorithmReference{
+		CONTAINS (StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference()),
+		STARTS_WITH (StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference()),
+		EXACT_MATCH (StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference());
+		
+		MatchAlgorithmReference matchAlgorithmReference;
+		
+		FakeMatchAlgorithmReference(MatchAlgorithmReference ref){
+			this.matchAlgorithmReference = ref;
+		}
+		
+		public MatchAlgorithmReference getMatchAlgorithmReference(){
+			return matchAlgorithmReference;
+		}
+	}
+	
+	public static class FakeDataFilter{
+		DataField dataField;
+		FakeMatchAlgorithmReference matchAlgorithmReference;
+		
+		public FakeDataFilter(DataField field, FakeMatchAlgorithmReference ref){
+			this.dataField = field;
+			this.matchAlgorithmReference = ref;
+		}
+		
+		public DataField getDataField(){
+			return dataField;
+		}
+		
+		public FakeMatchAlgorithmReference getMatchAlgorithmReference(){
+			return matchAlgorithmReference;
+		}
+		
 	}
 	
 	private final static String [][] DEFAULT_DATA = {
@@ -45,7 +81,8 @@ public class LexEvsFakeData {
 		{"5.6.7.8", "auto", "vehicles", "1.0", ""},
 		{"7.6.5.4", "utoA", "hicle", "1.0", ""}
 	};
-	private final static int CODESYSTEM_FIELDCOUNT = DataFields.values().length;
+	
+	private final static int CODESYSTEM_FIELDCOUNT = DataField.values().length;
 	
 	private List<String[]> codeSystemList = null;
 	
@@ -53,9 +90,9 @@ public class LexEvsFakeData {
 	
 	private void initializeDefaultData(){
 		for(int i=0; i < DEFAULT_DATA.length; i++){
-			DEFAULT_DATA[i][DataFields.RESOURCE_NAME.index()] = DEFAULT_DATA[i][DataFields.RESOURCE_LOCALNAME.index()];
-			DEFAULT_DATA[i][DataFields.RESOURCE_NAME.index()] += "-";
-			DEFAULT_DATA[i][DataFields.RESOURCE_NAME.index()] += DEFAULT_DATA[i][DataFields.RESOURCE_VERSION.index()];
+			DEFAULT_DATA[i][DataField.RESOURCE_NAME.index()] = DEFAULT_DATA[i][DataField.RESOURCE_LOCALNAME.index()];
+			DEFAULT_DATA[i][DataField.RESOURCE_NAME.index()] += "-";
+			DEFAULT_DATA[i][DataField.RESOURCE_NAME.index()] += DEFAULT_DATA[i][DataField.RESOURCE_VERSION.index()];
 		}
 	}
 	
@@ -92,7 +129,7 @@ public class LexEvsFakeData {
 	}
 	
 	private void setFields(int index, String [] values){
-		DataFields[] fields = DataFields.values();
+		DataField[] fields = DataField.values();
 		if(index < this.codeSystemList.size()){
 			for(int i=0; i < fields.length; i++){
 				this.codeSystemList.get(index)[fields[i].index()] = values[i];
@@ -100,113 +137,80 @@ public class LexEvsFakeData {
 		}
 	}
 	
-	public String get(DataFields field, int i){
+	public String getScheme_DataField(int schemeIndex, DataField dataField){
 		String results = null;
-		if(i < this.codeSystemCount){
-			results = this.codeSystemList.get(i)[field.index()];
+		if(schemeIndex < this.codeSystemCount){
+			results = this.codeSystemList.get(schemeIndex)[dataField.index()];
 		}
 		return results;
 	}
+
+	public String getScheme_DataField(int schemeIndex,
+			PropertyReference propertyReference) {
+		String results = null;
+		if(schemeIndex < this.codeSystemCount){
+			int fieldIndex = this.getPropertyReferenceIndex(propertyReference);
+			
+			results = this.codeSystemList.get(schemeIndex)[fieldIndex];
+		}
+		return results;
+	}
+
 	
-//	public String getAbout(int i){
-//		String results = null;
-//		if(i < this.codeSystemCount){
-//			results = this.codeSystemList.get(i)[DataFields.ABOUT.index()];
-//		}
-//		return results;
-//	}
-//
-//	public String getResourceSynopsis(int i){
-//		String results = null;
-//		if(i < this.codeSystemCount){
-//			results = this.codeSystemList.get(i)[DataFields.RESOURCE_SYNOPSIS.index()];
-//		}
-//		return results;
-//	}
-//	
-//	public String getResourceLocalName(int i){
-//		String results = null;
-//		if(i < this.codeSystemCount){
-//			results = this.codeSystemList.get(i)[DataFields.RESOURCE_LOCALNAME.index()];
-//		}
-//		return results;
-//	}
-//	
-//	public String getResourceVersion(int i){
-//		String results = null;
-//		if(i < this.codeSystemCount){
-//			results = this.codeSystemList.get(i)[DataFields.RESOURCE_VERSION.index()];
-//		}
-//		return results;
-//	}
-//	
-//	public String getResourceName(int i){
-//		String results = null;
-//		if(i < this.codeSystemCount){
-//			results = this.get(DataFields.RESOURCE_LOCALNAME, i);
-//			results += "-";
-//			results += this.get(DataFields.RESOURCE_VERSION, i); 
-//		}
-//		return results;
-//	}
-	
-	public int getAbout_ContainsCount(String testValue) {
+	private int getPropertyReferenceIndex(PropertyReference propertyReference) {
+		int index = 0;
+		DataField [] fields = DataField.values();
+		for(int i=0; i < fields.length; i++){
+			PropertyReference ref = fields[i].propertyReference();
+			if(ref != null){
+				if(ref.equals(propertyReference)){
+					index = i;
+				}
+			}
+		}
+		return index;
+	}
+
+	public int getCount(Set<ResolvedFilter> filters) {
 		int count = 0;
-		for(int i=0; i < this.codeSystemCount; i++){
-			if(this.get(DataFields.ABOUT, i).toLowerCase().contains(testValue.toLowerCase())){ 
+		String exactMatch = StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference().getContent().toLowerCase();
+		String contains = StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference().getContent().toLowerCase();
+		String startsWith = StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference().getContent().toLowerCase();
+		
+		for(int schemeIndex=0; schemeIndex < this.codeSystemCount; schemeIndex++){
+			boolean found = true;
+			Iterator<ResolvedFilter> filterIterator = filters.iterator();
+			while(found && filterIterator.hasNext()){
+				ResolvedFilter filter = filterIterator.next();
+				String matchAlgorithmReferenceName = filter.getMatchAlgorithmReference().getContent().toLowerCase();
+				PropertyReference propertyReference = filter.getPropertyReference();
+				String matchValue = filter.getMatchValue().toLowerCase();
+				
+				String dataValue = this.getScheme_DataField(schemeIndex, propertyReference).toLowerCase();
+				if(matchAlgorithmReferenceName.equals(exactMatch)){
+					if(dataValue.equals(matchValue) == false){
+						found = false;
+					}
+				}
+				else if(matchAlgorithmReferenceName.equals(contains)){
+					if(dataValue.contains(matchValue) == false){
+						found = false;
+					}
+				}
+				else if(matchAlgorithmReferenceName.equals(startsWith)){
+					if(dataValue.startsWith(matchValue) == false){
+						found = false;
+					}
+				}
+				else{
+					found = false;
+				}
+				
+			}
+			if(found){
 				count++;
 			}
 		}
 		return count;
-	}
-
-	public int getResourceSynopsis_StartWithCount(String testValue) {
-		int count = 0;
-		for(int i=0; i < this.codeSystemCount; i++){
-			if(this.get(DataFields.RESOURCE_SYNOPSIS, i).toLowerCase().startsWith(testValue.toLowerCase())){
-				count++;
-			}
-		}
-		return count;
-	}
-
-	public int getResourceName_ExactMatchCount(String testValue) {
-		int count = 0;
-		for(int i=0; i < this.codeSystemCount; i++){
-			if(this.get(DataFields.RESOURCE_NAME, i).toLowerCase().equals(testValue.toLowerCase())){
-				count++;
-			}
-		}
-		return count;
-	}
-
-	public int getAllFilters_Count(String aboutValue, String synopsisValue, String nameValue) {
-		int count = 0;
-		for(int i=0; i < this.codeSystemCount; i++){
-			if (this.get(DataFields.ABOUT, i).toLowerCase().contains(aboutValue.toLowerCase())
-					&& this.get(DataFields.RESOURCE_SYNOPSIS, i).toLowerCase().startsWith(synopsisValue.toLowerCase())
-					&& this.get(DataFields.RESOURCE_NAME, i).toLowerCase().equals(nameValue.toLowerCase())) {
-				count++;
-			}
-		}
-		return count;
-	}
-
-	public int getCount(DataFields field,
-			MatchAlgorithmReference matchAlgorithmReference, String testValue) {
-		return 0;
-	}			
-//	public int getCount(DataFields field,
-//			MatchAlgorithmReference matchAlgorithmReference, String testValue) {
-//		int count = 0;
-//		for(int i=0; i < this.codeSystemCount; i++){
-//			String fieldValue = this.get(field, i).toLowerCase();
-//			testValue = testValue.toLowerCase();
-//			if(StandardMatchAlgorithmReference.EXACT_MATCH.equals(matchAlgorithmReference)){
-//				if(this.get(field, i).toLowerCase().startsWith(testValue.toLowerCase())){
-//					count++;
-//				}
-//		}
-//		return count;
-//	}
+	}	
 }
