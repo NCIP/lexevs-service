@@ -61,6 +61,7 @@ import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.service.command.restriction.CodeSystemVersionQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
@@ -75,14 +76,6 @@ import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersi
 @Component
 public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		implements CodeSystemVersionQueryService {
-
-	public final static String SEARCH_TYPE_CONTAINS = "contains";
-	public final static String SEARCH_TYPE_EXACT_MATCH = "exactMatch";
-	public final static String SEARCH_TYPE_STARTS_WITH = "startsWith";
-	
-	public final static String ATTRIBUTE_NAME_ABOUT = "about";
-	public final static String ATTRIBUTE_NAME_RESOURCE_SYNOPSIS = "resourceSynopsis";
-	public final static String ATTRIBUTE_NAME_RESOURCE_NAME = "resourceName";
 
 	@Resource
 	private CodingSchemeToCodeSystemTransform codingSchemeTransformer;
@@ -198,18 +191,18 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 				break;
 			}
 			String retrievedAttrValue = null;
-			if (searchAttribute.equals(ATTRIBUTE_NAME_ABOUT)) {
+			if (searchAttribute.equals(Constants.ATTRIBUTE_NAME_ABOUT)) {
 				retrievedAttrValue = codingSchemeSummary.getCodingSchemeURI();
-			} else if (searchAttribute.equals(ATTRIBUTE_NAME_RESOURCE_SYNOPSIS)) {
+			} else if (searchAttribute.equals(Constants.ATTRIBUTE_NAME_RESOURCE_SYNOPSIS)) {
 				retrievedAttrValue = codingSchemeSummary.getCodingSchemeDescription().getContent();
-			} else if (searchAttribute.equals(ATTRIBUTE_NAME_RESOURCE_NAME)) {
+			} else if (searchAttribute.equals(Constants.ATTRIBUTE_NAME_RESOURCE_NAME)) {
 				retrievedAttrValue = 
 					this.nameConverter.toCts2CodeSystemVersionName(
 						codingSchemeSummary.getLocalName(), 
 						codingSchemeSummary.getRepresentsVersion());
 			}
 			if (retrievedAttrValue != null) {
-				if (searchType.equals(SEARCH_TYPE_EXACT_MATCH)) {
+				if (searchType.equals(Constants.SEARCH_TYPE_EXACT_MATCH)) {
 					if (caseSensitive) {
 						if (retrievedAttrValue.equals(matchStr)) {
 							temp.addCodingSchemeRendering(render);
@@ -219,7 +212,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 							temp.addCodingSchemeRendering(render);
 						}						
 					}
-				} else if (searchType.equals(SEARCH_TYPE_CONTAINS)) {
+				} else if (searchType.equals(Constants.SEARCH_TYPE_CONTAINS)) {
 					if (caseSensitive) {
 						if (retrievedAttrValue.indexOf(matchStr) != -1) {
 							temp.addCodingSchemeRendering(render);
@@ -230,7 +223,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 							temp.addCodingSchemeRendering(render);
 						}						
 					}
-				} else if (searchType.equals(SEARCH_TYPE_STARTS_WITH)) {
+				} else if (searchType.equals(Constants.SEARCH_TYPE_STARTS_WITH)) {
 					if (caseSensitive) {
 						if (retrievedAttrValue.startsWith(matchStr)) {
 							temp.addCodingSchemeRendering(render);
