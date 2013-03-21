@@ -165,7 +165,51 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 		}
 	}
 
+	private void executeGetResourceSummaries_Pages_1Filter(int pageSize, int firstPage, int lastPage, DataField dataField, MatchAlgorithmReference matchAlgorithmReference) throws Exception{
+		Page page = new Page();
+		for(int pageIndex = firstPage; pageIndex <= lastPage; pageIndex++){
+			page.setMaxToReturn(pageSize);
+			page.setPage(pageIndex);
+			for(int schemeIndex = 0; schemeIndex < fakeData.size(); schemeIndex++){
+				String testValue = fakeData.getScheme_DataField(schemeIndex, dataField);
+				executeGetResourceSummaries_Substrings_1Filter(testValue, page, dataField, matchAlgorithmReference);				
+			}
+		}
+	}
 
+	private void executeGetResourceSummaries_Substrings_1Filter(
+			String testValue, Page page, DataField dataField,
+			MatchAlgorithmReference matchAlgorithmReference)
+			throws Exception {
+		for (int start = 0; start < testValue.length(); start++) {
+			for (int end = start; end < testValue.length(); end++) {
+				testValue = testValue.substring(start, end);
+				Set<ResolvedFilter> filter = LexEvsUtils.createFilterSet(dataField.propertyReference(), matchAlgorithmReference, testValue);
+
+				int fakeResults = fakeData.getCount(filter);
+				int expecting = calculateExpecting_WithPage(fakeResults, page);
+				
+				this.executeGetResourceSummaries(page, expecting, filter);
+			}
+		}
+	}
+	
+	private void executeGetResourceSummaries(Page page, int expecting, Set<ResolvedFilter> filters) throws Exception {		
+		LexEvsCodeSystemVersionQueryService service = this.createService(true);
+				
+		SortCriteria sortCriteria = null;		
+		
+		// Build query using filters
+		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filters, null, null);
+		
+		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = 
+				service.getResourceSummaries(query, sortCriteria, page);
+		
+		assertNotNull(directoryResult);
+		
+		int actual = directoryResult.getEntries().size();
+		assertEquals("Expecting " + expecting + " entries but got " + actual, expecting, actual);
+	}
 	
 	// =============
 	// Test methods
@@ -326,52 +370,6 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	// -----------------------------------------
 	// resourceSummaries with individual filters
 	// -----------------------------------------
-	private void executeGetResourceSummaries_Pages_1Filter(int pageSize, int firstPage, int lastPage, DataField dataField, MatchAlgorithmReference matchAlgorithmReference) throws Exception{
-		Page page = new Page();
-		for(int pageIndex = firstPage; pageIndex <= lastPage; pageIndex++){
-			page.setMaxToReturn(pageSize);
-			page.setPage(pageIndex);
-			for(int schemeIndex = 0; schemeIndex < fakeData.size(); schemeIndex++){
-				String testValue = fakeData.getScheme_DataField(schemeIndex, dataField);
-				executeGetResourceSummaries_Substrings_1Filter(testValue, page, dataField, matchAlgorithmReference);				
-			}
-		}
-	}
-
-	private void executeGetResourceSummaries_Substrings_1Filter(
-			String testValue, Page page, DataField dataField,
-			MatchAlgorithmReference matchAlgorithmReference)
-			throws Exception {
-		for (int start = 0; start < testValue.length(); start++) {
-			for (int end = start; end < testValue.length(); end++) {
-				testValue = testValue.substring(start, end);
-				Set<ResolvedFilter> filter = LexEvsUtils.createFilterSet(dataField.propertyReference(), matchAlgorithmReference, testValue);
-
-				int fakeResults = fakeData.getCount(filter);
-				int expecting = calculateExpecting_WithPage(fakeResults, page);
-				
-				this.executeGetResourceSummaries(page, expecting, filter);
-			}
-		}
-	}
-	
-	private void executeGetResourceSummaries(Page page, int expecting, Set<ResolvedFilter> filters) throws Exception {		
-		LexEvsCodeSystemVersionQueryService service = this.createService(true);
-				
-		SortCriteria sortCriteria = null;		
-		
-		// Build query using filters
-		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filters, null, null);
-		
-		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = 
-				service.getResourceSummaries(query, sortCriteria, page);
-		
-		assertNotNull(directoryResult);
-		
-		int actual = directoryResult.getEntries().size();
-		assertEquals("Expecting " + expecting + " entries but got " + actual, expecting, actual);
-	}
-	
 	@Test
 	public void testGetResourceSummaries_FilterSubstring_About_Page0to2_Size50() throws Exception {
 		fakeData = new LexEvsFakeData();		
