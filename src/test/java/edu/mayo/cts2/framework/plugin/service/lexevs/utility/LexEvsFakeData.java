@@ -6,6 +6,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
+import org.LexGrid.commonTypes.EntityDescription;
+
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PropertyReference;
@@ -15,12 +18,20 @@ import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 import scala.actors.threadpool.Arrays;
 
 public class LexEvsFakeData {	
+	final static PropertyReference ABOUT_REF = StandardModelAttributeReference.ABOUT.getPropertyReference();
+	final static PropertyReference RESOURCE_SYNOPSIS_REF = StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference();
+	final static PropertyReference RESOURCE_NAME_REF = StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference();
+	
+	final static MatchAlgorithmReference CONTAINS_REF = StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference();
+	final static MatchAlgorithmReference STARTS_WITH_REF = StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference();
+	final static MatchAlgorithmReference EXACT_MATCH_REF = StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference();
+	
 	public static enum DataField{
-		ABOUT (0, StandardModelAttributeReference.ABOUT.getPropertyReference()),
-		RESOURCE_SYNOPSIS (1, StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference()),
+		ABOUT (0, ABOUT_REF),
+		RESOURCE_SYNOPSIS (1, RESOURCE_SYNOPSIS_REF),
 		RESOURCE_LOCALNAME (2, null),
 		RESOURCE_VERSION (3, null),
-		RESOURCE_NAME (4, StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference());
+		RESOURCE_NAME (4, RESOURCE_NAME_REF);
 		
 		private int index;
 		private PropertyReference propertyReference;
@@ -36,41 +47,6 @@ public class LexEvsFakeData {
 		public PropertyReference propertyReference(){
 			return this.propertyReference;
 		}
-	}
-	
-	public static enum FakeMatchAlgorithmReference{
-		CONTAINS (StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference()),
-		STARTS_WITH (StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference()),
-		EXACT_MATCH (StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference());
-		
-		MatchAlgorithmReference matchAlgorithmReference;
-		
-		FakeMatchAlgorithmReference(MatchAlgorithmReference ref){
-			this.matchAlgorithmReference = ref;
-		}
-		
-		public MatchAlgorithmReference getMatchAlgorithmReference(){
-			return matchAlgorithmReference;
-		}
-	}
-	
-	public static class FakeDataFilter{
-		DataField dataField;
-		FakeMatchAlgorithmReference matchAlgorithmReference;
-		
-		public FakeDataFilter(DataField field, FakeMatchAlgorithmReference ref){
-			this.dataField = field;
-			this.matchAlgorithmReference = ref;
-		}
-		
-		public DataField getDataField(){
-			return dataField;
-		}
-		
-		public FakeMatchAlgorithmReference getMatchAlgorithmReference(){
-			return matchAlgorithmReference;
-		}
-		
 	}
 	
 	private final static String [][] DEFAULT_DATA = {
@@ -96,7 +72,6 @@ public class LexEvsFakeData {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public LexEvsFakeData() throws IOException{
 		initializeDefaultData();
 		codeSystemList = Arrays.asList(DEFAULT_DATA);
@@ -173,9 +148,9 @@ public class LexEvsFakeData {
 
 	public int getCount(Set<ResolvedFilter> filters) {
 		int count = 0;
-		String exactMatch = StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference().getContent().toLowerCase();
-		String contains = StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference().getContent().toLowerCase();
-		String startsWith = StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference().getContent().toLowerCase();
+		String exactMatch = EXACT_MATCH_REF.getContent().toLowerCase();
+		String contains = CONTAINS_REF.getContent().toLowerCase();
+		String startsWith = STARTS_WITH_REF.getContent().toLowerCase();
 		
 		for(int schemeIndex=0; schemeIndex < this.codeSystemCount; schemeIndex++){
 			boolean found = true;
@@ -212,5 +187,20 @@ public class LexEvsFakeData {
 			}
 		}
 		return count;
+	}
+
+	public void setProperty(CodingSchemeSummary codingSchemeSummary, int schemeIndex, PropertyReference property) {
+		if(property.equals(RESOURCE_SYNOPSIS_REF)){
+			EntityDescription codingSchemeDescription = new EntityDescription();
+			codingSchemeDescription.setContent(this.getScheme_DataField(schemeIndex, DataField.RESOURCE_SYNOPSIS)); 
+			codingSchemeSummary.setCodingSchemeDescription(codingSchemeDescription);
+		}		
+		else if(property.equals(ABOUT_REF)){
+			codingSchemeSummary.setCodingSchemeURI(this.getScheme_DataField(schemeIndex, DataField.ABOUT)); 
+		}
+		else if(property.equals(RESOURCE_NAME_REF)){
+			codingSchemeSummary.setLocalName(this.getScheme_DataField(schemeIndex, DataField.RESOURCE_LOCALNAME));
+			codingSchemeSummary.setRepresentsVersion(this.getScheme_DataField(schemeIndex, DataField.RESOURCE_VERSION)); 	
+		}
 	}	
 }
