@@ -56,6 +56,25 @@ import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
  *
  */
 public class LexEvsCodeSystemVersionQueryServiceTest {
+	// Setup mocked environment
+	// -------------------------
+	public static LexEvsCodeSystemVersionQueryService createService(
+			LexEvsFakeData fakeData, 
+			boolean withData) throws Exception{
+		LexEvsCodeSystemVersionQueryService service = new LexEvsCodeSystemVersionQueryService();
+		
+		// Mock LexBIGService, overwrite return value for getSupportedCodingSchemes
+		LexBIGService lexBigService = fakeData.createMockedService_spoofSupportedCodingSchemes(service, fakeData, withData);
+		
+		service.setLexBigService(lexBigService);
+
+		// Overwrite objects in service object 
+		service.setCodingSchemeTransformer(new CodingSchemeToCodeSystemTransform(new CodeSystemVersionNameConverter()));
+		service.setCodeSystemVersionNameConverter(new CodeSystemVersionNameConverter());
+		
+		return service;
+	}
+
 	// =============
 	// Test methods
 	// =============
@@ -65,33 +84,33 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	@Test
 	public void testCount_Filter_About_Contains() throws Exception {
 		LexEvsFakeData fakeData = new LexEvsFakeData();		
-		LexEvsCodeSystemVersionQueryService service = LexEvsUtils.createService(fakeData, true); 
+		LexEvsCodeSystemVersionQueryService service = this.createService(fakeData, true); 
 		boolean testValidData = true;
-		LexEvsUtils.executeCount_WithFilter(service, fakeData, DataField.ABOUT, 
+		fakeData.executeCount_WithFilter(service, fakeData, DataField.ABOUT, 
 				StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), testValidData);		
-		LexEvsUtils.executeCount_WithFilter(service, fakeData, DataField.ABOUT, 
+		fakeData.executeCount_WithFilter(service, fakeData, DataField.ABOUT, 
 				StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), !testValidData);		
 	}
 	
 	@Test
 	public void testCount_Filter_ResorceSynopsis_StartsWith() throws Exception {
 		LexEvsFakeData fakeData = new LexEvsFakeData();		
-		LexEvsCodeSystemVersionQueryService service = LexEvsUtils.createService(fakeData, true); 
+		LexEvsCodeSystemVersionQueryService service = this.createService(fakeData, true); 
 		boolean testValidData = true;
-		LexEvsUtils.executeCount_WithFilter(service, fakeData, DataField.RESOURCE_SYNOPSIS, 					
+		fakeData.executeCount_WithFilter(service, fakeData, DataField.RESOURCE_SYNOPSIS, 					
 				StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference(), testValidData);
-		LexEvsUtils.executeCount_WithFilter(service, fakeData, DataField.RESOURCE_SYNOPSIS, 					
+		fakeData.executeCount_WithFilter(service, fakeData, DataField.RESOURCE_SYNOPSIS, 					
 				StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference(), !testValidData);
 	}
 		
 	@Test
 	public void testCount_Filter_ResourceName_ExactMatch() throws Exception {
 		LexEvsFakeData fakeData = new LexEvsFakeData();		
-		LexEvsCodeSystemVersionQueryService service = LexEvsUtils.createService(fakeData, true); 
+		LexEvsCodeSystemVersionQueryService service = this.createService(fakeData, true); 
 		boolean testValidData = true;
-		LexEvsUtils.executeCount_WithFilter(service, fakeData, DataField.RESOURCE_NAME, 
+		fakeData.executeCount_WithFilter(service, fakeData, DataField.RESOURCE_NAME, 
 					StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference(), testValidData);		
-		LexEvsUtils.executeCount_WithFilter(service, fakeData, DataField.RESOURCE_NAME, 
+		fakeData.executeCount_WithFilter(service, fakeData, DataField.RESOURCE_NAME, 
 				StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference(), !testValidData);		
 	}
 		
@@ -100,9 +119,9 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	@Test
 	public void testCount_Filter_AllDefault() throws Exception {
 		LexEvsFakeData fakeData = new LexEvsFakeData();		
-		LexEvsCodeSystemVersionQueryService service = LexEvsUtils.createService(fakeData, true); 
+		LexEvsCodeSystemVersionQueryService service = this.createService(fakeData, true); 
 
-		LexEvsUtils.executeCount_CompareCodeSchemes(service, fakeData, true, true, true);		
+		fakeData.executeCount_CompareCodeSchemes(service, fakeData, true, true, true);		
 	}
 
 	// Count with VALID values with one MISMATCHED
@@ -110,22 +129,22 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	@Test
 	public void testCount_Filter_AllDefault_WrongIndex_About() throws Exception {
 		LexEvsFakeData fakeData = new LexEvsFakeData();		
-		LexEvsCodeSystemVersionQueryService service = LexEvsUtils.createService(fakeData, true); 
-		LexEvsUtils.executeCount_CompareCodeSchemes(service, fakeData, false, true, true);
+		LexEvsCodeSystemVersionQueryService service = this.createService(fakeData, true); 
+		fakeData.executeCount_CompareCodeSchemes(service, fakeData, false, true, true);
 	}
 	
 	@Test
 	public void testCount_Filter_AllDefault_WrongIndex_ResourceSynopsis() throws Exception {
 		LexEvsFakeData fakeData = new LexEvsFakeData();		
-		LexEvsCodeSystemVersionQueryService service = LexEvsUtils.createService(fakeData, true); 
-		LexEvsUtils.executeCount_CompareCodeSchemes(service, fakeData, true, false, true);
+		LexEvsCodeSystemVersionQueryService service = this.createService(fakeData, true); 
+		fakeData.executeCount_CompareCodeSchemes(service, fakeData, true, false, true);
 	}
 
 	@Test
 	public void testCount_Filter_AllDefault_WrongIndex_ResourceName() throws Exception {
 		LexEvsFakeData fakeData = new LexEvsFakeData();		
-		LexEvsCodeSystemVersionQueryService service = LexEvsUtils.createService(fakeData, true); 
-		LexEvsUtils.executeCount_CompareCodeSchemes(service, fakeData, true, true, false);
+		LexEvsCodeSystemVersionQueryService service = this.createService(fakeData, true); 
+		fakeData.executeCount_CompareCodeSchemes(service, fakeData, true, true, false);
 	}
 
 	// --------------------------------------------
@@ -133,40 +152,40 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	public void testGetResourceSummaries_FilterNone_3Summaries_Size50() throws Exception {
 		int schemeCount = 3;
 		LexEvsFakeData fakeData = new LexEvsFakeData(schemeCount);		
-		LexEvsCodeSystemVersionQueryService service = LexEvsUtils.createService(fakeData, true); 
+		LexEvsCodeSystemVersionQueryService service = this.createService(fakeData, true); 
 		
 		Page page = new Page();
-		int lastPage = LexEvsUtils.calculatePagePastLastPage(fakeData.size(), page.getMaxToReturn());
+		int lastPage = fakeData.calculatePagePastLastPage(fakeData.size(), page.getMaxToReturn());
 		
-		LexEvsUtils.executeGetResourceSummaries_MultiplePages(service, fakeData, page, lastPage);		
+		fakeData.executeGetResourceSummaries_MultiplePages(service, fakeData, page, lastPage);		
 	}
 	
 	@Test
 	public void testGetResourceSummaries_FilterNone_20Summaries_Size10() throws Exception {
 		int schemeCount = 20;
 		LexEvsFakeData fakeData = new LexEvsFakeData(schemeCount);		
-		LexEvsCodeSystemVersionQueryService service = LexEvsUtils.createService(fakeData, true); 
+		LexEvsCodeSystemVersionQueryService service = this.createService(fakeData, true); 
 		
 		int firstPage = 0;
 		int pageSize = 10;
-		Page page = LexEvsUtils.createPage(firstPage, pageSize);
-		int lastPage = LexEvsUtils.calculatePagePastLastPage(fakeData.size(), page.getMaxToReturn());
+		Page page = fakeData.createPage(firstPage, pageSize);
+		int lastPage = fakeData.calculatePagePastLastPage(fakeData.size(), page.getMaxToReturn());
 		
-		LexEvsUtils.executeGetResourceSummaries_MultiplePages(service, fakeData, page, lastPage);		
+		fakeData.executeGetResourceSummaries_MultiplePages(service, fakeData, page, lastPage);		
 	}
 
 	@Test
 	public void testGetResourceSummaries_FilterNone_21Summaries_Size10() throws Exception {
 		int schemeCount = 21;		
 		LexEvsFakeData fakeData = new LexEvsFakeData(schemeCount);		
-		LexEvsCodeSystemVersionQueryService service = LexEvsUtils.createService(fakeData, true); 
+		LexEvsCodeSystemVersionQueryService service = this.createService(fakeData, true); 
 		
 		int firstPage = 1;
 		int pageSize = 10;
-		Page page = LexEvsUtils.createPage(firstPage, pageSize);		
-		int lastPage = LexEvsUtils.calculatePagePastLastPage(fakeData.size(), page.getMaxToReturn());
+		Page page = fakeData.createPage(firstPage, pageSize);		
+		int lastPage = fakeData.calculatePagePastLastPage(fakeData.size(), page.getMaxToReturn());
 		
-		LexEvsUtils.executeGetResourceSummaries_MultiplePages(service, fakeData, page, lastPage);		
+		fakeData.executeGetResourceSummaries_MultiplePages(service, fakeData, page, lastPage);		
 	}
 	
 	// -----------------------------------------
@@ -176,33 +195,33 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	public void testGetResourceSummaries_DeepCompare_About_PageSize50() throws Exception {
 		Page page = new Page();		
 		LexEvsFakeData fakeData = new LexEvsFakeData();		
-		LexEvsCodeSystemVersionQueryService service = LexEvsUtils.createService(fakeData, true);
+		LexEvsCodeSystemVersionQueryService service = this.createService(fakeData, true);
 		
 		// Test one page past possible pages to ensure 0 is returned.
-		int lastPage = LexEvsUtils.calculatePagePastLastPage(fakeData.size(), page.getMaxToReturn());
+		int lastPage = fakeData.calculatePagePastLastPage(fakeData.size(), page.getMaxToReturn());
 
-		LexEvsUtils.executeGetResourceSummaries_DeepComparison_MatchingAlgorithms(service, fakeData, page, lastPage, DataField.ABOUT);		
+		fakeData.executeGetResourceSummaries_DeepComparison_MatchingAlgorithms(service, fakeData, page, lastPage, DataField.ABOUT);		
 	}
 
 	@Test
 	public void testGetResourceSummaries_DeepCompare_ResourceSynopsis_PageSize50() throws Exception {
 		Page page = new Page();		
 		LexEvsFakeData fakeData = new LexEvsFakeData();		
-		LexEvsCodeSystemVersionQueryService service = LexEvsUtils.createService(fakeData, true);
+		LexEvsCodeSystemVersionQueryService service = this.createService(fakeData, true);
 		
-		int lastPage = LexEvsUtils.calculatePagePastLastPage(fakeData.size(), page.getMaxToReturn());
+		int lastPage = fakeData.calculatePagePastLastPage(fakeData.size(), page.getMaxToReturn());
 
-		LexEvsUtils.executeGetResourceSummaries_DeepComparison_MatchingAlgorithms(service, fakeData, page, lastPage, DataField.RESOURCE_SYNOPSIS);		
+		fakeData.executeGetResourceSummaries_DeepComparison_MatchingAlgorithms(service, fakeData, page, lastPage, DataField.RESOURCE_SYNOPSIS);		
 	}
 	
 	@Test
 	public void testGetResourceSummaries_DeepCompare_ResourceName_PageSize50() throws Exception {
 		Page page = new Page();		
 		LexEvsFakeData fakeData = new LexEvsFakeData();		
-		LexEvsCodeSystemVersionQueryService service = LexEvsUtils.createService(fakeData, true);
+		LexEvsCodeSystemVersionQueryService service = this.createService(fakeData, true);
 		
-		int lastPage = LexEvsUtils.calculatePagePastLastPage(fakeData.size(), page.getMaxToReturn());
+		int lastPage = fakeData.calculatePagePastLastPage(fakeData.size(), page.getMaxToReturn());
 
-		LexEvsUtils.executeGetResourceSummaries_DeepComparison_MatchingAlgorithms(service, fakeData, page, lastPage, DataField.RESOURCE_NAME);		
+		fakeData.executeGetResourceSummaries_DeepComparison_MatchingAlgorithms(service, fakeData, page, lastPage, DataField.RESOURCE_NAME);		
 	}	
 }
