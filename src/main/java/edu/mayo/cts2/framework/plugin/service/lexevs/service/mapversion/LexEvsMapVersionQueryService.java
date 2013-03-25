@@ -63,6 +63,7 @@ import edu.mayo.cts2.framework.model.service.mapversion.types.MapRole;
 import edu.mayo.cts2.framework.model.service.mapversion.types.MapStatus;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
 import edu.mayo.cts2.framework.service.command.restriction.MapVersionQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
@@ -136,14 +137,14 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 			csrFilteredList = filterByMappingCodeSchemes(csrFilteredList);
 			
 			if (searchCodingSchemeName != null) {
-				csrFilteredList = CommonUtils.filterResourceSummariesByCodingSchemeName(searchCodingSchemeName, csrFilteredList);
+				csrFilteredList = CommonSearchFilterUtils.filterResourceSummariesByCodingSchemeName(searchCodingSchemeName, csrFilteredList);
 			}
 			
 			if ((filters != null) && (csrFilteredList != null) && (csrFilteredList.getCodingSchemeRenderingCount() > 0)) {
 				Iterator<ResolvedFilter> filtersItr = filters.iterator();
 				while (filtersItr.hasNext() && (csrFilteredList.getCodingSchemeRenderingCount() > 0)) {
 						ResolvedFilter resolvedFilter = filtersItr.next();
-						csrFilteredList = CommonUtils.filterResourceSummariesByResolvedFilter(resolvedFilter, 
+						csrFilteredList = CommonSearchFilterUtils.filterResourceSummariesByResolvedFilter(resolvedFilter, 
 								csrFilteredList, nameConverter);
 				}
 			}
