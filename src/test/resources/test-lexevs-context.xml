@@ -9,7 +9,7 @@
 	<import resource="META-INF/spring/lexevs-context.xml" />
 	
 	<context:property-placeholder
-        location="file:target/testconfigdir/webapp-rest/config/lexevs-service.properties"
+        location="classpath:lexevs-service.properties"
         system-properties-mode="OVERRIDE" />
 
 	<bean id="serverContext" class="edu.mayo.cts2.framework.core.config.TestServerContext" />
