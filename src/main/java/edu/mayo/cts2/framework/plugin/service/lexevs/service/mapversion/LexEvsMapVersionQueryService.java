@@ -201,8 +201,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
 		
-		DirectoryResult<MapVersionDirectoryEntry> directoryResult = new DirectoryResult<MapVersionDirectoryEntry>(list, atEnd);
-		return directoryResult;
+		return new DirectoryResult<MapVersionDirectoryEntry>(list, atEnd);
 	}
 
 	/* (non-Javadoc)
@@ -232,8 +231,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
 		
-		DirectoryResult<MapVersion> directoryResult = new DirectoryResult<MapVersion>(list, atEnd);
-		return directoryResult;
+		return new DirectoryResult<MapVersion>(list, atEnd);
 	}
 
 	/* (non-Javadoc)

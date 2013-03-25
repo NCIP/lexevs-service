@@ -12,6 +12,11 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNam
 
 public class CommonUtils {
 
+	// Private constructor - case where every method in class is static
+	private CommonUtils() {
+		super();
+	}
+	
 //	public static <T> DirectoryResult<T> getSublist(List<T> list, Page page){
 //		List<T> sublist = new ArrayList<T>();
 //		boolean atEnd = false;

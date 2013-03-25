@@ -175,8 +175,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
 		
-		DirectoryResult<CodeSystemVersionCatalogEntry> directoryResult = new DirectoryResult<CodeSystemVersionCatalogEntry>(list, atEnd);
-		return directoryResult;
+		return new DirectoryResult<CodeSystemVersionCatalogEntry>(list, atEnd);
 	}
 
 	@Override
@@ -196,8 +195,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
 		
-		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = new DirectoryResult<CodeSystemVersionCatalogEntrySummary>(list, atEnd);
-		return directoryResult;
+		return new DirectoryResult<CodeSystemVersionCatalogEntrySummary>(list, atEnd);
 	}
 
 	@Override
