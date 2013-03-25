@@ -15,12 +15,35 @@ public class MappingToMapEntryTransform {
 		// TODO Auto-generated constructor stub
 	}
 
-	public MapEntry transform(Mapping mapping){
+	public MapEntry transformToMapEntry(ResolvedConceptReference resolvedConceptReference) {
+		MapEntry mapEntry = new MapEntry();
+
+		String code = resolvedConceptReference.getCode();
+		String codeNameSpace = resolvedConceptReference.getCodeNamespace();
+		String codingSchemeName = resolvedConceptReference.getCodingSchemeName();
+		String codingSchemeURI = resolvedConceptReference.getCodingSchemeURI();
+		String codingSchemeVersion = resolvedConceptReference.getCodingSchemeVersion();
+		String entityDescription = resolvedConceptReference.getEntityDescription().getContent();
+		
+		resolvedConceptReference.getConceptCode();
+		
+		//mapEntry.
+
 		throw new UnsupportedOperationException("Transform to MapEntry is under construction");
 	}
 	
 	
 	public MapEntryDirectoryEntry transform(ResolvedConceptReference resolvedConceptReference) {
+		
+		MapEntryDirectoryEntry mapEntryDirectoryEntry = new MapEntryDirectoryEntry();
+		
+		String code = resolvedConceptReference.getCode();
+		String codeNameSpace = resolvedConceptReference.getCodeNamespace();
+		String codingSchemeName = resolvedConceptReference.getCodingSchemeName();
+		String codingSchemeURI = resolvedConceptReference.getCodingSchemeURI();
+		String codingSchemeVersion = resolvedConceptReference.getCodingSchemeVersion();
+		String entityDescription = resolvedConceptReference.getEntityDescription().getContent();
+
 		throw new UnsupportedOperationException("Transform to MapEntryDirectoryEntry is under construction");
 	}
 	
