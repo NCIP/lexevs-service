@@ -1,15 +1,16 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 
 import edu.mayo.cts2.framework.model.command.Page;
-import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 
 public class CommonUtils {
 
+	// Private constructor - case where every method in class is static
+	private CommonUtils() {
+		super();
+	}
+	
 //	public static <T> DirectoryResult<T> getSublist(List<T> list, Page page){
 //		List<T> sublist = new ArrayList<T>();
 //		boolean atEnd = false;
@@ -59,4 +60,5 @@ public class CommonUtils {
 	
 		return csRenderingPage;
 	}
+	
 }

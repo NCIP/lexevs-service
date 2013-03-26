@@ -63,8 +63,8 @@ import edu.mayo.cts2.framework.model.service.mapversion.types.MapRole;
 import edu.mayo.cts2.framework.model.service.mapversion.types.MapStatus;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.service.command.restriction.MapVersionQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
@@ -126,11 +126,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		
 		String searchCodingSchemeName = null;
 		if (codeSystem != null) {
-			if (codeSystem.getUri() != null) {
-				searchCodingSchemeName = codeSystem.getUri();
-			} else {
-				searchCodingSchemeName = codeSystem.getName();
-			}
+			searchCodingSchemeName = (codeSystem.getUri() != null) ? codeSystem.getUri() : codeSystem.getName();
 		}
 		
 		LexBIGService lexBigService = getLexBigService();
@@ -141,24 +137,18 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 			csrFilteredList = filterByMappingCodeSchemes(csrFilteredList);
 			
 			if (searchCodingSchemeName != null) {
-				csrFilteredList = filterResourceSummariesByCodingSchemeName(searchCodingSchemeName, csrFilteredList);
+				csrFilteredList = CommonSearchFilterUtils.filterResourceSummariesByCodingSchemeName(searchCodingSchemeName, csrFilteredList);
 			}
 			
-			if (filters != null)  {
-				// Check csrFilteredList size up front and don't enter filtering legs if list is empty
-				if ((csrFilteredList != null) && (csrFilteredList.getCodingSchemeRenderingCount() > 0)) {
-					Iterator<ResolvedFilter> filtersItr = filters.iterator();
-					while (filtersItr.hasNext()) {
-						if (csrFilteredList.getCodingSchemeRenderingCount() == 0) {
-							break;
-						} else {
-							ResolvedFilter resolvedFilter = filtersItr.next();
-							csrFilteredList = filterResourceSummariesByResolvedFilter(resolvedFilter, csrFilteredList);
-						}						
-					}
+			if ((filters != null) && (csrFilteredList != null) && (csrFilteredList.getCodingSchemeRenderingCount() > 0)) {
+				Iterator<ResolvedFilter> filtersItr = filters.iterator();
+				while (filtersItr.hasNext() && (csrFilteredList.getCodingSchemeRenderingCount() > 0)) {
+						ResolvedFilter resolvedFilter = filtersItr.next();
+						csrFilteredList = CommonSearchFilterUtils.filterResourceSummariesByResolvedFilter(resolvedFilter, 
+								csrFilteredList, nameConverter);
 				}
 			}
-			
+						
 			return csrFilteredList.getCodingSchemeRendering();
 		} catch(Exception e){
 			throw new RuntimeException(e);
@@ -182,91 +172,6 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		return temp;		
 	}
 	
-	private CodingSchemeRenderingList filterResourceSummariesByCodingSchemeName(String searchCodingSchemeName, CodingSchemeRenderingList csrFilteredList) {
-		CodingSchemeRenderingList temp = new CodingSchemeRenderingList();
-		
-		CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
-		for(CodingSchemeRendering render : csRendering) {
-			CodingSchemeSummary codingSchemeSummary = render.getCodingSchemeSummary();
-			if (codingSchemeSummary.getLocalName().equals(searchCodingSchemeName)) {
-				temp.addCodingSchemeRendering(render);
-			}
-		}
-		
-		return temp;
-	}
-	
-	private CodingSchemeRenderingList filterResourceSummariesByResolvedFilter(ResolvedFilter resolvedFilter, CodingSchemeRenderingList csrFilteredList) {
-		
-		boolean caseSensitive = false;
-		CodingSchemeRenderingList temp = new CodingSchemeRenderingList();
-		
-		MatchAlgorithmReference matchAlgorithmReference = resolvedFilter.getMatchAlgorithmReference();
-		String searchType = matchAlgorithmReference.getContent();
-		
-		PropertyReference propertyReference = resolvedFilter.getPropertyReference();
-		String searchAttribute = propertyReference.getReferenceTarget().getName();
-		
-		String matchStr = resolvedFilter.getMatchValue();	
-		String lowerCaseMatchStr = matchStr.toLowerCase(); // Assuming default Locale is ok to use
-		
-		CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
-		for (CodingSchemeRendering render : csRendering) {
-			CodingSchemeSummary codingSchemeSummary = render.getCodingSchemeSummary();
-			if(codingSchemeSummary == null){
-				break;
-			}
-			String retrievedAttrValue = null;
-			if (searchAttribute.equals(Constants.ATTRIBUTE_NAME_ABOUT)) {
-				retrievedAttrValue = codingSchemeSummary.getCodingSchemeURI();
-			} else if (searchAttribute.equals(Constants.ATTRIBUTE_NAME_RESOURCE_SYNOPSIS)) {
-				retrievedAttrValue = codingSchemeSummary.getCodingSchemeDescription().getContent();
-			} else if (searchAttribute.equals(Constants.ATTRIBUTE_NAME_RESOURCE_NAME)) {
-				retrievedAttrValue = 
-					this.nameConverter.toCts2CodeSystemVersionName(
-						codingSchemeSummary.getLocalName(), 
-						codingSchemeSummary.getRepresentsVersion());
-			}
-			if (retrievedAttrValue != null) {
-				if (searchType.equals(Constants.SEARCH_TYPE_EXACT_MATCH)) {
-					if (caseSensitive) {
-						if (retrievedAttrValue.equals(matchStr)) {
-							temp.addCodingSchemeRendering(render);
-						}
-					} else {
-						if (retrievedAttrValue.equalsIgnoreCase(matchStr)) {
-							temp.addCodingSchemeRendering(render);
-						}						
-					}
-				} else if (searchType.equals(Constants.SEARCH_TYPE_CONTAINS)) {
-					if (caseSensitive) {
-						if (retrievedAttrValue.indexOf(matchStr) != -1) {
-							temp.addCodingSchemeRendering(render);
-						}
-					} else {
-						retrievedAttrValue = retrievedAttrValue.toLowerCase(); // Assuming default Locale is ok to use
-						if (retrievedAttrValue.indexOf(lowerCaseMatchStr) != -1) {
-							temp.addCodingSchemeRendering(render);
-						}						
-					}
-				} else if (searchType.equals(Constants.SEARCH_TYPE_STARTS_WITH)) {
-					if (caseSensitive) {
-						if (retrievedAttrValue.startsWith(matchStr)) {
-							temp.addCodingSchemeRendering(render);
-						}
-					} else {
-						retrievedAttrValue = retrievedAttrValue.toLowerCase(); // Assuming default Locale is ok to use
-						if (retrievedAttrValue.startsWith(lowerCaseMatchStr)) {
-							temp.addCodingSchemeRendering(render);
-						}						
-					}
-				}  
-			} // end brace retrievedAttr != null
-		}  // end brace for loop
-		
-		return temp;
-	}
-
 	
 	// -------- Implemented methods ----------------
 	
@@ -297,8 +202,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
 		
-		DirectoryResult<MapVersionDirectoryEntry> directoryResult = new DirectoryResult<MapVersionDirectoryEntry>(list, atEnd);
-		return directoryResult;
+		return new DirectoryResult<MapVersionDirectoryEntry>(list, atEnd);
 	}
 
 	/* (non-Javadoc)
@@ -328,8 +232,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
 		
-		DirectoryResult<MapVersion> directoryResult = new DirectoryResult<MapVersion>(list, atEnd);
-		return directoryResult;
+		return new DirectoryResult<MapVersion>(list, atEnd);
 	}
 
 	/* (non-Javadoc)

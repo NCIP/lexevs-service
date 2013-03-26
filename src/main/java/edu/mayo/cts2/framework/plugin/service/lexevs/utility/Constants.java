@@ -17,14 +17,14 @@ public final class Constants {
 		Constructors.createCodingSchemeVersionOrTagFromTag(CURRENT_LEXEVS_TAG_TEXT);
 	
 	// MatchAlgorithmReference type searches
-	public final static String SEARCH_TYPE_CONTAINS = "contains";
-	public final static String SEARCH_TYPE_EXACT_MATCH = "exactMatch";
-	public final static String SEARCH_TYPE_STARTS_WITH = "startsWith";
+	public static final String SEARCH_TYPE_CONTAINS = "contains";
+	public static final String SEARCH_TYPE_EXACT_MATCH = "exactMatch";
+	public static final String SEARCH_TYPE_STARTS_WITH = "startsWith";
 
 	// PropertyReference search attributes
-	public final static String ATTRIBUTE_NAME_ABOUT = "about";
-	public final static String ATTRIBUTE_NAME_RESOURCE_SYNOPSIS = "resourceSynopsis";
-	public final static String ATTRIBUTE_NAME_RESOURCE_NAME = "resourceName";
+	public static final String ATTRIBUTE_NAME_ABOUT = "about";
+	public static final String ATTRIBUTE_NAME_RESOURCE_SYNOPSIS = "resourceSynopsis";
+	public static final String ATTRIBUTE_NAME_RESOURCE_NAME = "resourceName";
 
 	
 	private Constants(){
