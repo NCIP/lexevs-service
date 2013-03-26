@@ -99,7 +99,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_CodingSchemeExists_andNotEmpty() throws Exception {
-		final NameOrURI name = ModelUtils.nameOrUriFromName("Automobiles");
+		final NameOrURI name = ModelUtils.nameOrUriFromName("Automobiles-1.0");
 		
 		// Configure service to use an anonymous transformer class
 		// -------------------------------------------------------
@@ -135,7 +135,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_CodingSchemeDoesNotExist() throws Exception {
-		final NameOrURI name = ModelUtils.nameOrUriFromName("Automooobiles");
+		final NameOrURI name = ModelUtils.nameOrUriFromName("Automooobiles-1.0");
 		
 		// Configure service to use an anonymous transformer class
 		// -------------------------------------------------------
@@ -179,7 +179,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 				
 		// Create query
 		// ------------
-		EntityDescriptionQuery query = this.createQuery("startsWith", "Jaguar", "Automobiles");	
+		EntityDescriptionQuery query = this.createQuery("startsWith", "Jaguar", "Automobiles-1.0");	
 				
 		// Call getResourceSummaries from service
 		// --------------------------------------
@@ -210,7 +210,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 				
 		// Create query
 		// ------------
-		EntityDescriptionQuery query = this.createQuery("startsWith", "JUGUAR", "Automobiles");	
+		EntityDescriptionQuery query = this.createQuery("startsWith", "JUGUAR", "Automobiles-1.0");	
 				
 		// Call getResourceSummaries from service
 		// --------------------------------------
@@ -242,7 +242,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 				
 		// Create query
 		// ------------
-		EntityDescriptionQuery query = this.createQuery("exactMatch", "Jaguar", "Automobiles");	
+		EntityDescriptionQuery query = this.createQuery("exactMatch", "Jaguar", "Automobiles-1.0");	
 				
 		// Call getResourceSummaries from service
 		// --------------------------------------
@@ -273,7 +273,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 				
 		// Create query
 		// ------------
-		EntityDescriptionQuery query = this.createQuery("exactMatch", "Jagua", "Automobiles");	
+		EntityDescriptionQuery query = this.createQuery("exactMatch", "Jagua", "Automobiles-1.0");	
 				
 		// Call getResourceSummaries from service
 		// --------------------------------------
@@ -307,7 +307,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		
 		// Create query
 		// ------------
-		EntityDescriptionQuery query = this.createQuery("contains", "GE", "Automobiles");	
+		EntityDescriptionQuery query = this.createQuery("contains", "GE", "Automobiles-1.0");	
 				
 		// Call getResourceSummaries from service
 		// --------------------------------------
@@ -338,7 +338,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		
 		// Create query
 		// ------------
-		EntityDescriptionQuery query = this.createQuery("contains", "MOOVIES", "Automobiles");	
+		EntityDescriptionQuery query = this.createQuery("contains", "MOOVIES", "Automobiles-1.0");	
 				
 		// Call getResourceSummaries from service
 		// --------------------------------------
@@ -372,7 +372,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		
 		// Create query
 		// ------------
-		EntityDescriptionQuery query = this.createQuery("contains", "Car", "Automobiles");	
+		EntityDescriptionQuery query = this.createQuery("contains", "Car", "Automobiles-1.0");	
 				
 		// Call getResourceSummaries from service
 		// --------------------------------------
@@ -404,7 +404,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		
 		// Create query - searching for "General Motors" entity
 		// ------------
-		EntityDescriptionQuery query = this.createQuery("LuceneQuery", "*neRal motors", "Automobiles");	
+		EntityDescriptionQuery query = this.createQuery("LuceneQuery", "*neRal motors", "Automobiles-1.0");	
 				
 		// Call getResourceSummaries from service
 		// --------------------------------------
@@ -436,7 +436,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		
 		// Create query
 		// ------------
-		EntityDescriptionQuery query = this.createQuery("LuceneQuery", "* eral", "Automobiles");
+		EntityDescriptionQuery query = this.createQuery("LuceneQuery", "* eral", "Automobiles-1.0");
 				
 		// Call getResourceSummaries from service
 		// --------------------------------------
@@ -467,7 +467,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		
 		// Create query - searching for "General Motors" entity
 		// ------------
-		EntityDescriptionQuery query = this.createQuery("LuceneQuery", "general *", "Automobiles");	
+		EntityDescriptionQuery query = this.createQuery("LuceneQuery", "general *", "Automobiles-1.0");	
 				
 		// Call getResourceSummaries from service
 		// --------------------------------------
@@ -499,7 +499,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		
 		// Create query
 		// ------------
-		EntityDescriptionQuery query = this.createQuery("LuceneQuery", "eneral*", "Automobiles");	
+		EntityDescriptionQuery query = this.createQuery("LuceneQuery", "eneral*", "Automobiles-1.0");	
 				
 		// Call getResourceSummaries from service
 		// --------------------------------------
@@ -531,7 +531,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		
 		// Create query - searching for "General Motors" entity
 		// ------------
-		EntityDescriptionQuery query = this.createQuery("LuceneQuery", "*eneRal *", "Automobiles");	
+		EntityDescriptionQuery query = this.createQuery("LuceneQuery", "*eneRal *", "Automobiles-1.0");	
 				
 		// Call getResourceSummaries from service
 		// --------------------------------------
@@ -563,7 +563,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		
 		// Create query
 		// ------------
-		EntityDescriptionQuery query = this.createQuery("LuceneQuery", "* eneRal*", "Automobiles");	
+		EntityDescriptionQuery query = this.createQuery("LuceneQuery", "* eneRal*", "Automobiles-1.0");	
 				
 		// Call getResourceSummaries from service
 		// --------------------------------------
@@ -597,7 +597,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		
 		// Create query
 		// ------------
-		EntityDescriptionQuery query = this.createQuery("contains", "Car", "Automobiles");	
+		EntityDescriptionQuery query = this.createQuery("contains", "Car", "Automobiles-1.0");	
 				
 		// Call getResourceSummaries from service
 		// --------------------------------------
@@ -641,7 +641,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		
 		// Create query
 		// ------------
-		EntityDescriptionQuery query = this.createQuery("exactMatch", "waz up", "Automobiles");	
+		EntityDescriptionQuery query = this.createQuery("exactMatch", "waz up", "Automobiles-1.0");	
 				
 		// Call getResourceSummaries from service
 		// --------------------------------------

@@ -39,7 +39,6 @@ import org.LexGrid.LexBIG.DataModel.Collections.SortOptionList;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
-import org.LexGrid.LexBIG.DataModel.InterfaceElements.ExtensionDescription;
 import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
 import org.LexGrid.LexBIG.Exceptions.LBParameterException;
@@ -66,7 +65,6 @@ import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURIList;
-import edu.mayo.cts2.framework.model.service.core.Query;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
@@ -83,13 +81,33 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 
 	// Local class defined
 	private class ResolvedConceptReferenceResults{
-		public boolean atEnd;
-		public ResolvedConceptReference [] resolvedConceptReference;
+		private boolean atEnd;
+		private ResolvedConceptReference [] resolvedConceptReference;
 		
-		public ResolvedConceptReferenceResults(ResolvedConceptReference [] references, boolean atEnd){
-			this.resolvedConceptReference = references;
+		public ResolvedConceptReferenceResults(ResolvedConceptReference [] resolvedConceptReference, boolean atEnd){			
+			this.resolvedConceptReference = resolvedConceptReference.clone();
 			this.atEnd = atEnd;
 		}
+
+		public boolean isAtEnd() {
+			return atEnd;
+		}
+
+		@SuppressWarnings("unused")
+		public void setAtEnd(boolean atEnd) {
+			this.atEnd = atEnd;
+		}
+
+		public ResolvedConceptReference[] getResolvedConceptReference() {
+			return resolvedConceptReference;
+		}
+
+		@SuppressWarnings("unused")
+		public void setResolvedConceptReference(
+				ResolvedConceptReference[] resolvedConceptReference) {
+			this.resolvedConceptReference = resolvedConceptReference.clone();
+		}
+		
 	}
 
 	// Local variables
@@ -310,7 +328,7 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		ResolvedConceptReferenceResults resolvedConceptReferenceResults = this.doGetResourceSummaryResults(query, sortCriteria, page);
 		
 		// Transform each reference into a CTS2 entry and add to list
-		ResolvedConceptReference[] resolvedConceptReferences = resolvedConceptReferenceResults.resolvedConceptReference;
+		ResolvedConceptReference[] resolvedConceptReferences = resolvedConceptReferenceResults.getResolvedConceptReference();
 		for(ResolvedConceptReference reference : resolvedConceptReferences){
 			if(printObjects){
 				System.out.println("ResolvedConceptReference:\n" + PrintUtility.resolvedConceptReference_toString(reference, 1));
@@ -319,7 +337,7 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 			list.add(entry);
 		}
 		
-		directoryResult = new DirectoryResult<EntityDescription>(list, resolvedConceptReferenceResults.atEnd);
+		directoryResult = new DirectoryResult<EntityDescription>(list, resolvedConceptReferenceResults.isAtEnd());
 		
 		return directoryResult;
 	}
@@ -333,7 +351,7 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		
 		// Transform each reference into a CTS2 entry and add to list
 		if(resolvedConceptReferenceResults != null){
-			ResolvedConceptReference[] resolvedConceptReferences = resolvedConceptReferenceResults.resolvedConceptReference;
+			ResolvedConceptReference[] resolvedConceptReferences = resolvedConceptReferenceResults.getResolvedConceptReference();
 			for(ResolvedConceptReference reference : resolvedConceptReferences){
 				if(printObjects){
 					System.out.println("ResolvedConceptReference:\n" + PrintUtility.resolvedConceptReference_toString(reference, 1));
@@ -342,7 +360,7 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 				list.add(entry);
 			}
 			
-			directoryResult = new DirectoryResult<EntityDirectoryEntry>(list, resolvedConceptReferenceResults.atEnd);
+			directoryResult = new DirectoryResult<EntityDirectoryEntry>(list, resolvedConceptReferenceResults.isAtEnd());
 		}
 		
 		return directoryResult;
@@ -350,11 +368,11 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 	
 	@Override
 	public Set<? extends MatchAlgorithmReference> getSupportedMatchAlgorithms() {
-		for(ExtensionDescription desc :
-			this.getLexBigService().getFilterExtensions().getExtensionDescription()){
-			
-		}
-		
+//		for(ExtensionDescription desc :
+//			this.getLexBigService().getFilterExtensions().getExtensionDescription()){
+//			
+//		}
+		// TODO
 		return null;
 	}
 	
