@@ -42,7 +42,6 @@ import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.LexEvsUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.LexEvsUtils.CodeSystem;
 import edu.mayo.cts2.framework.service.command.restriction.CodeSystemVersionQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
@@ -196,7 +195,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 
 		// Restrict to given codeSystem
 		CodeSystemVersionQueryServiceRestrictions restrictions = new CodeSystemVersionQueryServiceRestrictions();
-		restrictions.setCodeSystem(ModelUtils.nameOrUriFromName(CodeSystem.AUTOMOBILES.getName()));
+		restrictions.setCodeSystem(ModelUtils.nameOrUriFromName("Automobiles"));
 		
 		// Create query with restriction
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, null, null, restrictions);
@@ -217,7 +216,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 
 		// Restrict to given codeSystem
 		CodeSystemVersionQueryServiceRestrictions restrictions = new CodeSystemVersionQueryServiceRestrictions();
-		restrictions.setCodeSystem(ModelUtils.nameOrUriFromName(CodeSystem.AUTOMOBILES.getName() + "FOO"));
+		restrictions.setCodeSystem(ModelUtils.nameOrUriFromName("Automobiles" + "FOO"));
 		
 		// Create query with restriction
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, null, null, restrictions);
@@ -291,7 +290,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 		assertNotNull(csvCatalogEntrySummary.getResourceSynopsis());
 		assertNotNull(csvCatalogEntrySummary.getResourceSynopsis().getValue());
 		assertNotNull(csvCatalogEntrySummary.getResourceSynopsis().getValue().getContent());
-		assertEquals("Resource Synopsis not transformed - ", CodeSystem.AUTOMOBILES.getName(),csvCatalogEntrySummary.getResourceSynopsis().getValue().getContent());						
+		assertEquals("Resource Synopsis not transformed - ","Automobiles", csvCatalogEntrySummary.getResourceSynopsis().getValue().getContent());						
 	}
 	
 	// ----------------------------------------
@@ -426,7 +425,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 
 		// Restrict to given codeSystem
 		CodeSystemVersionQueryServiceRestrictions restrictions = new CodeSystemVersionQueryServiceRestrictions();
-		restrictions.setCodeSystem(ModelUtils.nameOrUriFromName(CodeSystem.AUTOMOBILES.getName()));
+		restrictions.setCodeSystem(ModelUtils.nameOrUriFromName("Automobiles"));
 		
 		// Create query with restriction
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, null, null, restrictions);
@@ -447,7 +446,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 
 		// Restrict to given codeSystem
 		CodeSystemVersionQueryServiceRestrictions restrictions = new CodeSystemVersionQueryServiceRestrictions();
-		restrictions.setCodeSystem(ModelUtils.nameOrUriFromName(CodeSystem.AUTOMOBILES.getName() + "FOO"));
+		restrictions.setCodeSystem(ModelUtils.nameOrUriFromName("Automobiles" + "FOO"));
 		
 		// Create query with restriction
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, null, null, restrictions);
