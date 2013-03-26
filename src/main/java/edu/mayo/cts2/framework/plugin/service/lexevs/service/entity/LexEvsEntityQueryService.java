@@ -234,11 +234,12 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 					versionOrTag = new CodingSchemeVersionOrTag();
 					codingSchemeName = nameVersionPair.getName();
 					versionOrTag.setTag(nameVersionPair.getVersion());
+					versionOrTag.setVersion(nameVersionPair.getVersion());
 					if(printObjects){
 						System.out.println("CodingSchemeName: " + codingSchemeName);
 						System.out.println("VersionOrTag: " + versionOrTag.getVersion());
 					}
-					if((codingSchemeName != null) && (versionOrTag != null)){
+					if((codingSchemeName != null) && (versionOrTag.getVersion() != null || versionOrTag.getTag() != null)){
 						haveSchemeName = true;
 					}
 				}
