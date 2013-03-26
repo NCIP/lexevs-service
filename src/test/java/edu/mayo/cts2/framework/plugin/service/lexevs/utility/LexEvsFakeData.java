@@ -16,14 +16,14 @@ import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.commonTypes.EntityDescription;
 import org.easymock.EasyMock;
 
-import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntrySummary;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PropertyReference;
+import edu.mayo.cts2.framework.model.core.ResourceVersionDescription;
+import edu.mayo.cts2.framework.model.core.ResourceVersionDescriptionDirectoryEntry;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
-import edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion.CodeSystemVersionQueryImpl;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 import edu.mayo.cts2.framework.service.profile.QueryService;
@@ -86,6 +86,7 @@ public class LexEvsFakeData {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	public LexEvsFakeData() throws IOException{
 		initializeDefaultData();
 		codeSystemList = Arrays.asList(DEFAULT_DATA);
@@ -233,20 +234,19 @@ public class LexEvsFakeData {
 	
 	// Create Mocked Service and generate a codingSchemeRenderingList filled with fake data
 	// ------------------------------------------------------------------------------------
-	public <T extends QueryService> LexBIGService createMockedService_spoofSupportedCodingSchemes(
-			T service, 
-			LexEvsFakeData fakeData, 
+	public <Description extends ResourceVersionDescription, Entry extends ResourceVersionDescriptionDirectoryEntry , Query extends ResourceQuery, Service extends QueryService<Description, Entry, Query>> LexBIGService createMockedService_spoofSupportedCodingSchemes(
+			Service service,
 			boolean withData) throws Exception{
 		LexBIGService lexBigService = EasyMock.createMock(LexBIGService.class);
 		CodingSchemeRenderingList list = new CodingSchemeRenderingList();
 				
-		for(int schemeIndex=0; schemeIndex < fakeData.size(); schemeIndex++){
+		for(int schemeIndex=0; schemeIndex < this.size(); schemeIndex++){
 			CodingSchemeRendering render = new CodingSchemeRendering();
 			CodingSchemeSummary codingSchemeSummary = new CodingSchemeSummary();
 			
 			if(withData){	
 				for(PropertyReference property : service.getSupportedSearchReferences()){
-					fakeData.setProperty(codingSchemeSummary, schemeIndex, property);
+					this.setProperty(codingSchemeSummary, schemeIndex, property);
 				}
 			}
 			
@@ -290,23 +290,32 @@ public class LexEvsFakeData {
 		return ((size / maxToReturn) + 2);
 	}
 
-    public <T extends QueryService> void executeCount(
-    		T service, int expecting, Set<ResolvedFilter> filters) throws Exception {		
-		// Build query using filters
-		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filters, null, null);
-
+//	public <Description extends ResourceVersionDescription, Entry extends ResourceVersionDescriptionDirectoryEntry , Query extends ResourceQuery, Service extends QueryService<Description, Entry, Query>> void executeCount(
+	public <Description extends ResourceVersionDescription, Entry extends ResourceVersionDescriptionDirectoryEntry , Query extends ResourceQuery, Service extends QueryService<?, ?, ?>> void executeCount(
+   		Service service,
+			DirectoryResult<Entry> directoryResult,
+			Query query,
+    		int expecting) throws Exception {	
 		// Test results
-		int actual = service.count(query);
+		QueryService<ResourceVersionDescription, ResourceVersionDescriptionDirectoryEntry, ResourceQuery> genericService = (QueryService<ResourceVersionDescription, ResourceVersionDescriptionDirectoryEntry, ResourceQuery>) service;
+		int actual = genericService.count(query);
+
+//		int actual = service.count(query);
 		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
 	}
 	
-	public <T extends QueryService> void executeCount_CompareCodeSchemes(
-			T service,
-			LexEvsFakeData fakeData, 
-			boolean aboutValid, boolean resourceSynopsisValid, boolean resourceNameValid) throws Exception{
-		int schemeCount = fakeData.size();
+//    public <Description extends ResourceVersionDescription, Entry extends ResourceVersionDescriptionDirectoryEntry , Query extends ResourceQuery, Service extends QueryService<Description, Entry, Query>> void executeCount_CompareCodeSchemes(
+    public <Description extends ResourceVersionDescription, Entry extends ResourceVersionDescriptionDirectoryEntry , Query extends ResourceQuery, Service extends QueryService<?, ?, ?>> void executeCount_CompareCodeSchemes(
+			Service service,
+			DirectoryResult<Entry> directoryResult,
+			Query query,
+	  		boolean aboutValid, 
+			boolean resourceSynopsisValid, 
+			boolean resourceNameValid) throws Exception{
+		int schemeCount = this.size();
 		int expecting;
 		int aboutIndex, synopsisIndex, nameIndex;
+		String aboutValue, synopsisValue, nameValue;
 		
 		Set<ResolvedFilter> filters;
 		for(int schemeIndex=0; schemeIndex < schemeCount; schemeIndex++){
@@ -314,62 +323,76 @@ public class LexEvsFakeData {
 			synopsisIndex = resourceSynopsisValid ? schemeIndex : ((schemeIndex+1) % schemeCount);
 			nameIndex = resourceNameValid ? schemeIndex : ((schemeIndex+1) % schemeCount);
 			
-			filters = LexEvsUtils.createFilterSet(fakeData, aboutIndex, synopsisIndex, nameIndex);
-		
-			expecting = fakeData.getCount(filters);
-			executeCount(service, expecting, filters);
+			aboutValue = this.getScheme_DataField(aboutIndex, StandardModelAttributeReference.ABOUT.getPropertyReference());
+			synopsisValue = this.getScheme_DataField(synopsisIndex, StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference());
+			nameValue = this.getScheme_DataField(nameIndex, StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference());
+					
+			filters = LexEvsUtils.createFilterSet(aboutValue, synopsisValue, nameValue);
+
+			// TODO : enter filters into query
+			expecting = this.getCount(filters);
+			executeCount(service, directoryResult, query, expecting);
 		}
 	}
 
-	public <T extends QueryService> void executeCount_WithFilter(
-			T service, 
-			LexEvsFakeData fakeData, 
+//	public <Description extends ResourceVersionDescription, Entry extends ResourceVersionDescriptionDirectoryEntry , Query extends ResourceQuery, Service extends QueryService<Description, Entry, Query>> void executeCount_WithFilter(
+	public <Description extends ResourceVersionDescription, Entry extends ResourceVersionDescriptionDirectoryEntry , Query extends ResourceQuery, Service extends QueryService<?, ?, ?>> void executeCount_WithFilter(
+			Service service, 
+			DirectoryResult<Entry> directoryResult,
+			Query query,
 			DataField dataField,
 			MatchAlgorithmReference matchAlgorithmReference,
 			boolean breakFilter) throws Exception {
 		
-		for(int schemeIndex=0; schemeIndex < fakeData.size(); schemeIndex++){
-			String testValue = fakeData.getScheme_DataField(schemeIndex,  dataField);
+//		QueryService<ResourceVersionDescription, ResourceVersionDescriptionDirectoryEntry, ResourceQuery> genericService = (QueryService<ResourceVersionDescription, ResourceVersionDescriptionDirectoryEntry, ResourceQuery>) service;
+		for(int schemeIndex=0; schemeIndex < this.size(); schemeIndex++){
+			String testValue = this.getScheme_DataField(schemeIndex,  dataField);
 			if(breakFilter){
 				testValue += "---WRONG DATA---";
 			}
 			Set<ResolvedFilter> filter = LexEvsUtils.createFilterSet(dataField.propertyReference(), matchAlgorithmReference, testValue);
-			int expecting = fakeData.getCount(filter);
-			
-			executeCount(service, expecting, filter);
+			// TODO : enter filters into query
+
+			int expecting = this.getCount(filter);
+			executeCount(service, directoryResult, query, expecting);
 		}
 	}
 
-	public <T extends QueryService> void executeGetResourceSummaries_MultiplePages(
-			T service, 
-			LexEvsFakeData fakeData, 			
+//	public <Description extends ResourceVersionDescription, Entry extends ResourceVersionDescriptionDirectoryEntry , Query extends ResourceQuery, Service extends QueryService<Description, Entry, Query>> void executeGetResourceSummaries_MultiplePages(
+	public <Description extends ResourceVersionDescription, Entry extends ResourceVersionDescriptionDirectoryEntry , Query extends ResourceQuery, Service extends QueryService<?, ?, ?>> void executeGetResourceSummaries_MultiplePages(
+			Service service, 
+			DirectoryResult<Entry> directoryResult,
+			Query query,
 			Page page, int lastPage) throws Exception {
 		for(int pageIndex = page.getPage(); pageIndex <= lastPage; pageIndex++){
 			page.setPage(pageIndex);
-			int expecting = calculateExpecting_WithPage(fakeData.size(), page);
+			int expecting = calculateExpecting_WithPage(this.size(), page);
 			
-			DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = null; 
-			CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, null, null, null);
+//			CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, null, null, null);
 			executeGetResourceSummaries(service, directoryResult, query, page, expecting, null);
 		}		
 	}
 
 	// Test MatchingAlgorithms->Pages->CodingSchemes->Substrings
-	public <T extends QueryService> void executeGetResourceSummaries_DeepComparison_MatchingAlgorithms(
-			T service, 
-			LexEvsFakeData fakeData, 
+//	public <Description extends ResourceVersionDescription, Entry extends ResourceVersionDescriptionDirectoryEntry , Query extends ResourceQuery, Service extends QueryService<Description, Entry, Query>> void executeGetResourceSummaries_DeepComparison_MatchingAlgorithms(
+	public <Description extends ResourceVersionDescription, Entry extends ResourceVersionDescriptionDirectoryEntry , Query extends ResourceQuery, Service extends QueryService<?, ?, ?>> void executeGetResourceSummaries_DeepComparison_MatchingAlgorithms(
+			Service service, 
+			DirectoryResult<Entry> directoryResult,
+			Query query,
 			Page page, int lastPage, DataField dataField) throws Exception {
 		// test all available matching algorithms.
 		for(MatchAlgorithmReference matchAlgorithmReference : service.getSupportedMatchAlgorithms()){
 			// test several pages, which tests all schemes, which tests all substrings....
-			executeGetResourceSummaries_DeepComparison_Pages(service, fakeData, page, lastPage, dataField, matchAlgorithmReference);
+			executeGetResourceSummaries_DeepComparison_Pages(service, directoryResult, query, page, lastPage, dataField, matchAlgorithmReference);
 		}
 	}
 
 	// Test Pages->CodingSchemes->Substrings
-	public <T extends QueryService> void executeGetResourceSummaries_DeepComparison_Pages(
-			T service, 
-			LexEvsFakeData fakeData, 
+//	public <Description extends ResourceVersionDescription, Entry extends ResourceVersionDescriptionDirectoryEntry , Query extends ResourceQuery, Service extends QueryService<Description, Entry, Query>> void executeGetResourceSummaries_DeepComparison_Pages(
+	public <Description extends ResourceVersionDescription, Entry extends ResourceVersionDescriptionDirectoryEntry , Query extends ResourceQuery, Service extends QueryService<?, ?, ?>> void executeGetResourceSummaries_DeepComparison_Pages(
+			Service service, 
+			DirectoryResult<Entry> directoryResult,
+			Query query,
 			Page page, int lastPage, 
 			DataField dataField, 
 			MatchAlgorithmReference matchAlgorithmReference) throws Exception{
@@ -377,30 +400,36 @@ public class LexEvsFakeData {
 		for(int pageIndex = page.getPage(); pageIndex <= lastPage; pageIndex++){
 			page.setPage(pageIndex);
 			// Test across all coding schemes which tests all substrings
-			executeGetResourceSummaries_DeepComparison_CodingSchemes(service, fakeData, page, dataField, matchAlgorithmReference);
+			executeGetResourceSummaries_DeepComparison_CodingSchemes(service, directoryResult, query, page, dataField, matchAlgorithmReference);
 		}
 	}
 	
 	// Test CodingSchemes->Substrings
-	public <T extends QueryService> void executeGetResourceSummaries_DeepComparison_CodingSchemes(
-			T service, 
-			LexEvsFakeData fakeData, 
+//	public <Description extends ResourceVersionDescription, Entry extends ResourceVersionDescriptionDirectoryEntry , Query extends ResourceQuery, Service extends QueryService<Description, Entry, Query>> void executeGetResourceSummaries_DeepComparison_CodingSchemes(
+	public <Description extends ResourceVersionDescription, Entry extends ResourceVersionDescriptionDirectoryEntry , Query extends ResourceQuery, Service extends QueryService<?, ?, ?>> void executeGetResourceSummaries_DeepComparison_CodingSchemes(
+			Service service, 
+			DirectoryResult<Entry> directoryResult,
+			Query query,
 			Page page, 
 			DataField dataField, 
 			MatchAlgorithmReference matchAlgorithmReference) throws Exception{
 		// Continue test into each codingScheme, testing all substrings
-		for(int schemeIndex = 0; schemeIndex < fakeData.size(); schemeIndex++){
-			String testValue = fakeData.getScheme_DataField(schemeIndex, dataField);
-			executeGetResourceSummaries_DeepComparison_Substrings(service, fakeData, testValue, page, dataField, matchAlgorithmReference);				
+		for(int schemeIndex = 0; schemeIndex < this.size(); schemeIndex++){
+			String testValue = this.getScheme_DataField(schemeIndex, dataField);
+			executeGetResourceSummaries_DeepComparison_Substrings(service, directoryResult, query, testValue, page, dataField, matchAlgorithmReference);				
 		}
 	}
 
-	public <T extends QueryService> void executeGetResourceSummaries_DeepComparison_Substrings(
-			T service, 
-			LexEvsFakeData fakeData, 
+//	public <Description extends ResourceVersionDescription, Entry extends ResourceVersionDescriptionDirectoryEntry , Query extends ResourceQuery, Service extends QueryService<Description, Entry, Query>> void executeGetResourceSummaries_DeepComparison_Substrings(
+	public <Description extends ResourceVersionDescription, Entry extends ResourceVersionDescriptionDirectoryEntry , Query extends ResourceQuery, Service extends QueryService<?, ?, ?>> void executeGetResourceSummaries_DeepComparison_Substrings(
+			Service service, 
+			DirectoryResult<Entry> directoryResult,
+			Query query,
 			String testValue, Page page, DataField dataField,
 			MatchAlgorithmReference matchAlgorithmReference)
 			throws Exception {
+				
+//		QueryService<W, U, V> s1 = ((QueryService<W, U, V>) service);
 		
 		// Test all valid substrings
 		for (int start = 0; start < testValue.length(); start++) {
@@ -408,33 +437,34 @@ public class LexEvsFakeData {
 				testValue = testValue.substring(start, end);
 				Set<ResolvedFilter> filter = LexEvsUtils.createFilterSet(dataField.propertyReference(), matchAlgorithmReference, testValue);
 
-				int fakeResults = fakeData.getCount(filter);
+				int fakeResults = this.getCount(filter);
 				int expecting = calculateExpecting_WithPage(fakeResults, page);
 				
-				DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = null; 
-				CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filter, null, null);
+//				CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filter, null, null);
 				executeGetResourceSummaries(service, directoryResult, query, page, expecting, filter);
 			}
 		}
 	}
 	
-	public <T extends QueryService, U, V> void executeGetResourceSummaries(
-			T service, 
-			DirectoryResult<U> directoryResult,
-			ResourceQuery query,
+//	public <Description extends ResourceVersionDescription, Entry extends ResourceVersionDescriptionDirectoryEntry , Query extends ResourceQuery, Service extends QueryService<Description, Entry, Query>> void executeGetResourceSummaries(
+	public <Description extends ResourceVersionDescription, Entry extends ResourceVersionDescriptionDirectoryEntry , Query extends ResourceQuery, Service extends QueryService<?, ?, ?>> void executeGetResourceSummaries(
+			Service service, 
+			DirectoryResult<Entry> directoryResult,
+			Query query,
 			Page page, int expecting, 
 			Set<ResolvedFilter> filters) throws Exception {		
 		SortCriteria sortCriteria = null;		
 		
-		directoryResult = 
-				service.getResourceSummaries(query, sortCriteria, page);
+//		QueryService<W, U, V> s1 = ((QueryService<W, U, V>) service);	
+//		directoryResult = (DirectoryResult<Entry>) s1.getResourceSummaries(query, sortCriteria, page);
 		
+		QueryService<ResourceVersionDescription, ResourceVersionDescriptionDirectoryEntry, ResourceQuery> genericService = (QueryService<ResourceVersionDescription, ResourceVersionDescriptionDirectoryEntry, ResourceQuery>) service;
+		directoryResult = (DirectoryResult<Entry>) genericService.getResourceSummaries(query, sortCriteria, page);
+//		directoryResult = service.getResourceSummaries(query, sortCriteria, page);
 		assertNotNull(directoryResult);
 		
 		int actual = directoryResult.getEntries().size();
 		assertEquals("Expecting " + expecting + " entries but got " + actual, expecting, actual);
 	}
-	
 
-	
 }

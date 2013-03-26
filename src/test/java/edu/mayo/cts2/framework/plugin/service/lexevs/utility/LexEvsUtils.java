@@ -56,35 +56,5 @@ public class LexEvsUtils {
 				Arrays.asList(aboutFilter, synopsisFilter, nameFilter));
 		
 		return filterSet;
-	}
-	
-	public static Set<ResolvedFilter> createFilterSet(LexEvsFakeData fakeData, int aboutIndex, int synopsisIndex,
-			int nameIndex) {
-		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
-		
-		PropertyReference propertyReference = StandardModelAttributeReference.ABOUT.getPropertyReference();
-		MatchAlgorithmReference matchAlgorithmReference = StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference();
-		String matchValue = fakeData.getScheme_DataField(aboutIndex, propertyReference);
-		ResolvedFilter filter1 = LexEvsUtils.createFilter(propertyReference, matchAlgorithmReference, matchValue);
-					
-		filters.add(filter1);
-		
-		propertyReference = StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference();
-		matchAlgorithmReference = StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference();
-		matchValue = fakeData.getScheme_DataField(synopsisIndex, propertyReference);
-		ResolvedFilter filter2 = LexEvsUtils.createFilter(propertyReference, matchAlgorithmReference, matchValue);
-					
-		filters.add(filter2);
-		
-		propertyReference = StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference();
-		matchAlgorithmReference = StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference();
-		matchValue = fakeData.getScheme_DataField(nameIndex, propertyReference);
-		ResolvedFilter filter3 = LexEvsUtils.createFilter(propertyReference, matchAlgorithmReference, matchValue);
-					
-		filters.add(filter3);
-		
-		return filters;
-	}
-	
-	
+	}	
 }
