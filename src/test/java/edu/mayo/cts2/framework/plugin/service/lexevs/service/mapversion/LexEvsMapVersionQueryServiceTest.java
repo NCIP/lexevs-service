@@ -21,7 +21,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion;
+package edu.mayo.cts2.framework.plugin.service.lexevs.service.mapversion;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -44,22 +44,22 @@ import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
  *  @author <a href="mailto:hardie.linda@mayo.edu">Linda Hardie</a>
  *
  */
-public class LexEvsCodeSystemVersionQueryServiceTest {
+public class LexEvsMapVersionQueryServiceTest {
+
 	// Setup mocked environment
 	// -------------------------
-	public LexEvsCodeSystemVersionQueryService createService(
+	public LexEvsMapVersionQueryService createService(
 			FakeLexEvsSystem fakeLexEvs, 
 			boolean withData) throws Exception{
-		LexEvsCodeSystemVersionQueryService service = new LexEvsCodeSystemVersionQueryService();
+		LexEvsMapVersionQueryService service = new LexEvsMapVersionQueryService();
 
 		// Mock LexBIGService, overwrite return value for getSupportedCodingSchemes
 		LexBIGService lexBigService = fakeLexEvs.createMockedService_spoofSupportedCodingSchemes(service, withData);
 		
-		service.setLexBigService(lexBigService);
-
 		// Overwrite objects in service object 
-		service.setCodingSchemeTransformer(new CodingSchemeToCodeSystemTransform(new CodeSystemVersionNameConverter()));
+		service.setLexBigService(lexBigService);
 		service.setCodeSystemVersionNameConverter(new CodeSystemVersionNameConverter());
+		service.setCodingSchemeToMapVersionTransform(new CodingSchemeToMapVersionTransform());
 		
 		return service;
 	}
@@ -77,11 +77,11 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	@Test
 	public void testCount_Filter_About_Contains() throws Exception {
 		FakeLexEvsSystem fakeLexEvs = new FakeLexEvsSystem();
-		LexEvsCodeSystemVersionQueryService service = this.createService(fakeLexEvs, true); 
+		LexEvsMapVersionQueryService service = this.createService(fakeLexEvs, true); 
 		boolean testValidData = true;
 		
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
-		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filters, null, null);
+		MapVersionQueryImpl query = new MapVersionQueryImpl(null, filters, null, null);
 		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = null;
 				
 		fakeLexEvs.executeCount_WithFilter(service, directoryResult, query, DataField.ABOUT, 
@@ -93,11 +93,11 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	@Test
 	public void testCount_Filter_ResorceSynopsis_StartsWith() throws Exception {
 		FakeLexEvsSystem fakeLexEvs = new FakeLexEvsSystem();
-		LexEvsCodeSystemVersionQueryService service = this.createService(fakeLexEvs, true); 
+		LexEvsMapVersionQueryService service = this.createService(fakeLexEvs, true); 
 		boolean testValidData = true;
 		
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
-		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filters, null, null);
+		MapVersionQueryImpl query = new MapVersionQueryImpl(null, filters, null, null);
 		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = null;
 
 		fakeLexEvs.executeCount_WithFilter(service, directoryResult, query, DataField.RESOURCE_SYNOPSIS, 					
@@ -109,11 +109,11 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	@Test
 	public void testCount_Filter_ResourceName_ExactMatch() throws Exception {
 		FakeLexEvsSystem fakeLexEvs = new FakeLexEvsSystem();
-		LexEvsCodeSystemVersionQueryService service = this.createService(fakeLexEvs, true); 
+		LexEvsMapVersionQueryService service = this.createService(fakeLexEvs, true); 
 		boolean testValidData = true;
 		
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
-		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filters, null, null);
+		MapVersionQueryImpl query = new MapVersionQueryImpl(null, filters, null, null);
 		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = null;
 
 		fakeLexEvs.executeCount_WithFilter(service, directoryResult, query, DataField.RESOURCE_NAME, 
@@ -127,11 +127,11 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	@Test
 	public void testCount_FilterDefault_PropertyReferencesValidIndex_AllSchemes() throws Exception {
 		FakeLexEvsSystem fakeLexEvs = new FakeLexEvsSystem();
-		LexEvsCodeSystemVersionQueryService service = this.createService(fakeLexEvs, true); 
+		LexEvsMapVersionQueryService service = this.createService(fakeLexEvs, true); 
 
 		
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
-		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filters, null, null);
+		MapVersionQueryImpl query = new MapVersionQueryImpl(null, filters, null, null);
 		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = null;
 
 		fakeLexEvs.executeCount_CompareCodeSchemes(service, directoryResult, query, true, true, true);		
@@ -142,10 +142,10 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	@Test
 	public void testCount_FilterDefault_PropertyReferencesWrongIndex_AllSchemes() throws Exception {
 		FakeLexEvsSystem fakeLexEvs = new FakeLexEvsSystem();
-		LexEvsCodeSystemVersionQueryService service = this.createService(fakeLexEvs, true); 
+		LexEvsMapVersionQueryService service = this.createService(fakeLexEvs, true); 
 		
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
-		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filters, null, null);
+		MapVersionQueryImpl query = new MapVersionQueryImpl(null, filters, null, null);
 		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = null;
 
 		// About wrong index
@@ -164,9 +164,9 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 		int maxPageSize = 50;
 		
 		FakeLexEvsSystem fakeLexEvs;
-		LexEvsCodeSystemVersionQueryService service;
+		LexEvsMapVersionQueryService service;
 		
-		CodeSystemVersionQueryImpl query;
+		MapVersionQueryImpl query;
 		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult; 
 		
 		Page page = new Page();
@@ -179,7 +179,7 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 				page.setMaxToReturn(pageSize);
 				lastPage = fakeLexEvs.calculatePagePastLastPage(fakeLexEvs.size(), page.getMaxToReturn());
 				
-				query = new CodeSystemVersionQueryImpl(null, null, null, null);
+				query = new MapVersionQueryImpl(null, null, null, null);
 				directoryResult = null; 
 				
 				fakeLexEvs.executeGetResourceSummaries_MultiplePages(service, directoryResult, query, page, lastPage);		
@@ -190,13 +190,13 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	public void testGetResourceSummaries_DeepCompare_PropertyReferences_MatchingAlgorithms_Pages_CodindgSchemes_Substrings() throws Exception {
 		Page page = new Page();		
 		FakeLexEvsSystem fakeLexEvs = new FakeLexEvsSystem();
-		LexEvsCodeSystemVersionQueryService service = this.createService(fakeLexEvs, true);
+		LexEvsMapVersionQueryService service = this.createService(fakeLexEvs, true);
 		
 		// Test one page past possible pages to ensure 0 is returned.
 		int lastPage = fakeLexEvs.calculatePagePastLastPage(fakeLexEvs.size(), page.getMaxToReturn());
 
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
-		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filters, null, null);
+		MapVersionQueryImpl query = new MapVersionQueryImpl(null, filters, null, null);
 		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = null; 
 		
 		fakeLexEvs.executeGetResourceSummaries_DeepComparison_PropertyReferences(service, directoryResult, query, page, lastPage);		
