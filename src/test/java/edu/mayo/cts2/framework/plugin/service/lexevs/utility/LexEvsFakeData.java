@@ -328,9 +328,12 @@ public class LexEvsFakeData {
 			nameValue = this.getScheme_DataField(nameIndex, StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference());
 					
 			filters = LexEvsUtils.createFilterSet(aboutValue, synopsisValue, nameValue);
+			for(ResolvedFilter filter : filters){
+				query.getFilterComponent().add(filter);
+			}
 
 			// TODO : enter filters into query
-			expecting = this.getCount(filters);
+			expecting = this.getCount(query.getFilterComponent());
 			executeCount(service, directoryResult, query, expecting);
 		}
 	}
@@ -350,10 +353,13 @@ public class LexEvsFakeData {
 			if(breakFilter){
 				testValue += "---WRONG DATA---";
 			}
-			Set<ResolvedFilter> filter = LexEvsUtils.createFilterSet(dataField.propertyReference(), matchAlgorithmReference, testValue);
+			Set<ResolvedFilter> filters = LexEvsUtils.createFilterSet(dataField.propertyReference(), matchAlgorithmReference, testValue);
 			// TODO : enter filters into query
+			for(ResolvedFilter filter : filters){
+				query.getFilterComponent().add(filter);
+			}
 
-			int expecting = this.getCount(filter);
+			int expecting = this.getCount(query.getFilterComponent());
 			executeCount(service, directoryResult, query, expecting);
 		}
 	}
@@ -369,7 +375,7 @@ public class LexEvsFakeData {
 			int expecting = calculateExpecting_WithPage(this.size(), page);
 			
 //			CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, null, null, null);
-			executeGetResourceSummaries(service, directoryResult, query, page, expecting, null);
+			executeGetResourceSummaries(service, directoryResult, query, page, expecting);
 		}		
 	}
 
@@ -435,13 +441,16 @@ public class LexEvsFakeData {
 		for (int start = 0; start < testValue.length(); start++) {
 			for (int end = start; end < testValue.length(); end++) {
 				testValue = testValue.substring(start, end);
-				Set<ResolvedFilter> filter = LexEvsUtils.createFilterSet(dataField.propertyReference(), matchAlgorithmReference, testValue);
+				Set<ResolvedFilter> filters = LexEvsUtils.createFilterSet(dataField.propertyReference(), matchAlgorithmReference, testValue);
+				for(ResolvedFilter filter : filters){
+					query.getFilterComponent().add(filter);
+				}
 
-				int fakeResults = this.getCount(filter);
+				int fakeResults = this.getCount(query.getFilterComponent());
 				int expecting = calculateExpecting_WithPage(fakeResults, page);
 				
 //				CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filter, null, null);
-				executeGetResourceSummaries(service, directoryResult, query, page, expecting, filter);
+				executeGetResourceSummaries(service, directoryResult, query, page, expecting);
 			}
 		}
 	}
@@ -451,8 +460,7 @@ public class LexEvsFakeData {
 			Service service, 
 			DirectoryResult<Entry> directoryResult,
 			Query query,
-			Page page, int expecting, 
-			Set<ResolvedFilter> filters) throws Exception {		
+			Page page, int expecting) throws Exception {		
 		SortCriteria sortCriteria = null;		
 		
 //		QueryService<W, U, V> s1 = ((QueryService<W, U, V>) service);	
