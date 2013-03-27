@@ -41,7 +41,7 @@ import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.LexEvsUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonTestUtils;
 import edu.mayo.cts2.framework.service.command.restriction.CodeSystemVersionQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
@@ -75,7 +75,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testCount_FilterSet() throws Exception {
 		// Call local method to create set of all filters
-		Set<ResolvedFilter> filter = LexEvsUtils.createFilterSet(ABOUT_CONTAINS, RESOURCESYNOPSIS_STARTSWITH, RESOURCENAME_EXACTMATCH);
+		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(ABOUT_CONTAINS, RESOURCESYNOPSIS_STARTSWITH, RESOURCENAME_EXACTMATCH);
 		
 		// Build query using filters
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filter, null, null);
@@ -93,7 +93,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	public void testCount_Filter_About_Found() throws Exception {
 
 		// Build query using filters
-		Set<ResolvedFilter> filter = LexEvsUtils.createFilterSet(StandardModelAttributeReference.ABOUT.getPropertyReference(), 
+		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.ABOUT.getPropertyReference(), 
 												  		  StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), 
 												  		  ABOUT_CONTAINS);
 
@@ -110,7 +110,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	public void testCount_Filter_ResorceSynopsis_Found() throws Exception {
 
 		// Build query using filters
-		Set<ResolvedFilter> filter = LexEvsUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference(), 
+		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference(), 
 														  StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference(), 
 														  RESOURCESYNOPSIS_STARTSWITH);
 
@@ -126,7 +126,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	public void testCount_Filter_ResourceName_Found() throws Exception {
 
 		// Build query using filters
-		Set<ResolvedFilter> filter = LexEvsUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
+		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
 												  		  StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference(), 
 												  		  RESOURCENAME_EXACTMATCH);
 
@@ -146,7 +146,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	public void testCount_Filter_About_NotFound() throws Exception {
 
 		// Call local method to create set of all filters, Create error in resource name
-		Set<ResolvedFilter> filter = LexEvsUtils.createFilterSet(ABOUT_CONTAINS + "FOO", RESOURCESYNOPSIS_STARTSWITH, RESOURCENAME_EXACTMATCH);
+		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(ABOUT_CONTAINS + "FOO", RESOURCESYNOPSIS_STARTSWITH, RESOURCENAME_EXACTMATCH);
 	
 		// Build query using filters
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filter, null, null);
@@ -161,7 +161,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	public void testCount_Filter_ResourceName_NotFound() throws Exception {
 
 		// Call local method to create set of all filters, Create error in resource name
-		Set<ResolvedFilter> filter = LexEvsUtils.createFilterSet(ABOUT_CONTAINS, RESOURCESYNOPSIS_STARTSWITH, RESOURCENAME_EXACTMATCH + "FOO");
+		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(ABOUT_CONTAINS, RESOURCESYNOPSIS_STARTSWITH, RESOURCENAME_EXACTMATCH + "FOO");
 		
 		// Build query using filters
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filter, null, null);
@@ -176,7 +176,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	public void testCount_Filter_ResorceSynopsis_NotFound() throws Exception {
 
 		// Call local method to create set of all filters, Create error in resource name
-		Set<ResolvedFilter> filter = LexEvsUtils.createFilterSet(ABOUT_CONTAINS, RESOURCESYNOPSIS_STARTSWITH + "FOO", RESOURCENAME_EXACTMATCH);
+		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(ABOUT_CONTAINS, RESOURCESYNOPSIS_STARTSWITH + "FOO", RESOURCENAME_EXACTMATCH);
 		
 		// Build query using filters
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filter, null, null);
@@ -239,7 +239,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	public void testGetResourceSummaries_FiltersSet() throws Exception {
 
 		// Call local method to create set of all filters
-		Set<ResolvedFilter> filter = LexEvsUtils.createFilterSet(ABOUT_CONTAINS, RESOURCESYNOPSIS_STARTSWITH, RESOURCENAME_EXACTMATCH);
+		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(ABOUT_CONTAINS, RESOURCESYNOPSIS_STARTSWITH, RESOURCENAME_EXACTMATCH);
 		
 		// Build query using filters
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filter, null, null);
@@ -259,7 +259,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	public void testGetResourceSummaries_FilterSet_VerifyTransformation() throws Exception {
 
 		// Call local method to create set of all filters
-		Set<ResolvedFilter> filter = LexEvsUtils.createFilterSet(ABOUT_CONTAINS, RESOURCESYNOPSIS_STARTSWITH, RESOURCENAME_EXACTMATCH);
+		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(ABOUT_CONTAINS, RESOURCESYNOPSIS_STARTSWITH, RESOURCENAME_EXACTMATCH);
 		
 		// Build query using filters
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filter, null, null);
@@ -301,7 +301,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	public void testGetResourceSummaries_Filter_About_Contains_Found() throws Exception {
 
 		// Build query using filters
-		Set<ResolvedFilter> filter = LexEvsUtils.createFilterSet(StandardModelAttributeReference.ABOUT.getPropertyReference(), 
+		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.ABOUT.getPropertyReference(), 
 				   										  StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), 
 				   										  ABOUT_CONTAINS);
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filter, null, null);
@@ -321,7 +321,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	public void testGetResourceSummaries_Filter_ResourceSynopsis_StartsWith_Found() throws Exception {
 
 		// Build query using filters
-		Set<ResolvedFilter> filter = LexEvsUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference(), 
+		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference(), 
 														  StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference(), 
 				   										  RESOURCESYNOPSIS_STARTSWITH);
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filter, null, null);
@@ -341,7 +341,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	public void testGetResourceSummaries_Filter_ResourceName_ExactMatch_Found() throws Exception {
 
 		// Build query using filters
-		Set<ResolvedFilter> filter = LexEvsUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
+		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
 														  StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference(), 
 														  RESOURCENAME_EXACTMATCH);
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filter, null, null);
@@ -361,7 +361,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	public void testGetResourceSummaries_Filter_About_Contains_NotFound() throws Exception {
 
 		// Build query using filters
-		Set<ResolvedFilter> filter = LexEvsUtils.createFilterSet(StandardModelAttributeReference.ABOUT.getPropertyReference(), 
+		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.ABOUT.getPropertyReference(), 
 														  StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), 
 														  ABOUT_CONTAINS + "FOO");
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filter, null, null);
@@ -381,7 +381,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	public void testGetResourceSummaries_Filter_ResourceSynopsis_StartsWith_NotFound() throws Exception {
 
 		// Build query using filters
-		Set<ResolvedFilter> filter = LexEvsUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference(), 
+		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference(), 
 														  StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference(), 
 														  RESOURCESYNOPSIS_STARTSWITH + "FOO");
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filter, null, null);
@@ -401,7 +401,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	public void testGetResourceSummaries_Filter_ResourceName_ExactMatch_NotFound() throws Exception {
 
 		// Build query using filters
-		Set<ResolvedFilter> filter = LexEvsUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
+		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
 														  StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference(), 
 														  RESOURCENAME_EXACTMATCH + "FOO");
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filter, null, null);

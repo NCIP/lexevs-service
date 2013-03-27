@@ -89,6 +89,14 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	private MappingExtension mappingExtension;
 	
 	public static final String MAPPING_EXTENSION = "MappingExtension";	
+	
+	public void setCodeSystemVersionNameConverter(CodeSystemVersionNameConverter converter){
+		this.nameConverter = converter;
+	}
+	public void setCodingSchemeToMapVersionTransform(CodingSchemeToMapVersionTransform transformer){
+			this.codingSchemeToMapVersionTransform = transformer;
+	}
+
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -98,10 +106,15 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	// ------ Local methods ----------------------
 	protected boolean validateMappingCodingScheme(String uri, String version){
 		try {
-			return this.mappingExtension.
-				isMappingCodingScheme(
-						uri, 
-						Constructors.createCodingSchemeVersionOrTagFromVersion(version));
+			if(this.mappingExtension != null){
+				return this.mappingExtension.
+					isMappingCodingScheme(
+							uri, 
+							Constructors.createCodingSchemeVersionOrTagFromVersion(version));
+			}
+			else {
+				return false;
+			}
 		} catch (LBParameterException e) {
 			throw new RuntimeException(e);
 		}
@@ -196,10 +209,14 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 
 		List<MapVersionDirectoryEntry> list = new ArrayList<MapVersionDirectoryEntry>();
 
-		for (CodingSchemeRendering render : csRenderingPage) {
-			list.add(codingSchemeToMapVersionTransform.transform(render));
+		if(csRenderingPage != null){
+			if(csRenderingPage.length > 0){
+				for (CodingSchemeRendering render : csRenderingPage) {
+					list.add(codingSchemeToMapVersionTransform.transform(render));
+				}
+			}
 		}
-
+		
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
 		
 		return new DirectoryResult<MapVersionDirectoryEntry>(list, atEnd);
