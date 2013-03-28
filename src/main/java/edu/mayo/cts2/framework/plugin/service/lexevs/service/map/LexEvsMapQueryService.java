@@ -34,11 +34,15 @@ import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
+import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
+import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Constructors;
+import org.LexGrid.codingSchemes.CodingScheme;
+import org.LexGrid.relations.Relations;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
@@ -57,6 +61,7 @@ import edu.mayo.cts2.framework.model.service.mapversion.types.MapRole;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestrictions.CodeSystemRestriction;
 import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestrictions.ValueSetRestriction;
@@ -116,36 +121,13 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 			filters = query.getFilterComponent();
 		}		
 		
-		// TODO Will probably have different restrictions to retrieve.  Source and/or target codingScheme names.
 		CodeSystemRestriction codeSystemRestriction = null;
-		ValueSetRestriction valueSetRestriction = null;
+		ValueSetRestriction valueSetRestriction = null;  // TODO Do we need to check this restriction type???
 		if (mapQueryServiceRestrictions != null) {
 			codeSystemRestriction = query.getRestrictions().getCodeSystemRestriction();  
 			valueSetRestriction = query.getRestrictions().getValueSetRestriction();
 		}
 		
-		MapRole codeSystemRestrictionMapRole = null;
-		Set<NameOrURI> codeSystemSet = null;
-		if (codeSystemRestriction != null) {
-			codeSystemRestrictionMapRole = codeSystemRestriction.getMapRole();
-			codeSystemSet = codeSystemRestriction.getCodeSystems();
-		}
-		
-		MapRole valueSetRestrictionMapRole = null;
-		Set<NameOrURI> valueSetSet = null;
-		if (valueSetRestriction != null) {
-			valueSetRestrictionMapRole = valueSetRestriction.getMapRole();
-			valueSetSet = valueSetRestriction.getValueSets();
-		}
-		
-		// TODO Question about MapRole value of type String.  Can be "MAP_FROM_ROLE", "MAP_TO_ROLE", or "BOTH_MAP_ROLES".  Does 
-		//    "BOTH_MAP_ROLES" mean an 'or' condition of from or to role or does it mean something else?
-		
-		
-//		String searchCodingSchemeName = null;
-//		if (codeSystem != null) {
-//			searchCodingSchemeName = (codeSystem.getUri() != null) ? codeSystem.getUri() : codeSystem.getName();
-//		}
 		
 		LexBIGService lexBigService = getLexBigService();
 		try {
@@ -154,16 +136,12 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 			// Remove any items in above returned list that are not LexEVS MappingCodeScheme type CodeSchemes 
 			csrFilteredList = filterByMappingCodeSchemes(csrFilteredList);
 			
-			// TODO Will probably need new filtering logic based on source and/or target codingSchemes as noted in the
-			//   relations section of the mapping metadata. Part of queryService restrictions?
+			// Filter items based on the CodingScheme Relations sourceCodingScheme and/or targetCodingScheme string values
 			if (codeSystemRestriction != null) {
 				csrFilteredList = filterByCodeSystemRestriction(csrFilteredList, codeSystemRestriction);
 			}
 			
-//			if (searchCodingSchemeName != null) {
-//				csrFilteredList = CommonSearchFilterUtils.filterResourceSummariesByCodingSchemeName(searchCodingSchemeName, csrFilteredList);
-//			}
-			
+			// TODO *** Need to look into filtering and check if below logic is valid ***
 			if ((filters != null) && (csrFilteredList != null) && (csrFilteredList.getCodingSchemeRenderingCount() > 0)) {
 				Iterator<ResolvedFilter> filtersItr = filters.iterator();
 				while (filtersItr.hasNext() && (csrFilteredList.getCodingSchemeRenderingCount() > 0)) {
@@ -195,19 +173,102 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		if (codeSystemRestrictionMapRole != null) {
 			csrMapRoleValue = codeSystemRestrictionMapRole.value();
 		}
-
-		// Check codeSystemSet not null and size > 0 and csrMapRoleValue not null
+		
 		if (csrMapRoleValue != null && codeSystemSet != null && codeSystemSet.size() > 0) {
 			// Get array of CodingSchemeRendering object and loop checking each item in array
-			// Call 1 of 3 local methods based on csrMapRoleValue passing codeSystemSet - local method for "BOTH_MAP_ROLES" can leverage
-			//    other 2 local methods
-			// Add CodingSchemeRendering object to temp list if csrMapRole method(s) found it
+			CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
+			for (CodingSchemeRendering render : csRendering) {
+				if (isFoundViaCodeSystemRestriction(render, codeSystemSet, csrMapRoleValue)) {
+					temp.addCodingSchemeRendering(render);
+				}
+			}
 		} else {
-			return csrFilteredList;  // No valid restrictions to apply
+			return csrFilteredList;  // No restrictions to apply
 		}
 		
 		return temp;		
 	}
+	
+	protected boolean isFoundViaCodeSystemRestriction(CodingSchemeRendering render, 
+			Set<NameOrURI> codeSystemSet, 
+			String csrMapRoleValue) {
+
+		boolean returnFlag = false;
+		CodingScheme codingScheme = getCodingScheme(render);
+		
+		// Assuming format of Map has only has 1 relations section/1 relations element in xml file
+		if (codingScheme.getRelationsCount() != 1) {
+			throw new RuntimeException("Invalid format for Map. Expecting only one metadata section for Relations.");
+		}
+		Relations relations = codingScheme.getRelations(0);
+		String sourceCodingScheme = relations.getSourceCodingScheme();
+		String targetCodingScheme = relations.getTargetCodingScheme();
+		
+		if (csrMapRoleValue.equals(Constants.MAP_TO_ROLE)) {
+			return isCodingSchemeFound(sourceCodingScheme, codeSystemSet);
+		}
+		
+		if (csrMapRoleValue.equals(Constants.MAP_FROM_ROLE)) { 
+			return isCodingSchemeFound(targetCodingScheme, codeSystemSet);
+		}
+		
+		if (csrMapRoleValue.equals(Constants.BOTH_MAP_ROLES)) {
+			if (isCodingSchemeFound(sourceCodingScheme, targetCodingScheme, codeSystemSet)) {
+				return true;
+			}
+		}
+		
+		return returnFlag;
+	}
+	
+	protected boolean isCodingSchemeFound(String relationCodingScheme, Set<NameOrURI> codeSystemSet) {
+
+		boolean returnFlag = false;
+		Iterator<NameOrURI> iterator = codeSystemSet.iterator();
+		while (iterator.hasNext() && returnFlag == false) {
+			NameOrURI nameOrURI = iterator.next();
+			if (nameOrURI.getName() != null && nameOrURI.getName().equals(relationCodingScheme)) {
+				returnFlag = true;
+			}
+			if (nameOrURI.getUri() != null && nameOrURI.getUri().equals(relationCodingScheme)) {
+				returnFlag = true;
+			}
+		}
+		return returnFlag;
+	}
+	
+	
+	protected boolean isCodingSchemeFound(String srcCodingScheme, String targetCodingScheme, Set<NameOrURI> codeSystemSet) {
+
+		boolean returnFlag = false;
+		Iterator<NameOrURI> iterator = codeSystemSet.iterator();
+		while (iterator.hasNext() && returnFlag == false) {
+			NameOrURI nameOrURI = iterator.next();
+			if (nameOrURI.getName() != null && (nameOrURI.getName().equals(srcCodingScheme) || 
+					nameOrURI.getName().equals(targetCodingScheme))) {
+				returnFlag = true;
+			}
+			if (nameOrURI.getUri() != null && (nameOrURI.getUri().equals(srcCodingScheme) || 
+					nameOrURI.getUri().equals(targetCodingScheme))) {
+				returnFlag = true;
+			}
+		}
+		return returnFlag;
+	}
+	
+	protected CodingScheme getCodingScheme(CodingSchemeRendering render) {
+		String codingSchemeName = render.getCodingSchemeSummary().getCodingSchemeURI();			
+		String version = render.getCodingSchemeSummary().getRepresentsVersion();
+		CodingSchemeVersionOrTag tagOrVersion = Constructors.createCodingSchemeVersionOrTagFromVersion(version);
+		CodingScheme codingScheme;
+		try {
+			codingScheme = this.getLexBigService().resolveCodingScheme(codingSchemeName, tagOrVersion);
+		} catch (LBException e) {
+			throw new RuntimeException(e);
+		}
+		return codingScheme;
+	}
+	
 	
 	// TODO refactor by moving method to utils class - also used in MapVersionQueryService impl
 	private CodingSchemeRenderingList filterByMappingCodeSchemes(CodingSchemeRenderingList csrFilteredList) {
