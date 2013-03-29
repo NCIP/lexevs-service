@@ -7,7 +7,6 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
-import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.codingSchemes.CodingScheme;
@@ -23,6 +22,7 @@ import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsCodeSystemService;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonMapUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.service.profile.mapversion.MapVersionReadService;
 
@@ -56,23 +56,13 @@ public class LexEvsMapVersionReadService
 	 */
 	@Override
 	protected MapVersion transform(CodingScheme codingScheme) {
-		if(! this.validateMappingCodingScheme(
+		if(! CommonMapUtils.validateMappingCodingScheme(
 				codingScheme.getCodingSchemeURI(), 
-				codingScheme.getRepresentsVersion())){
+				codingScheme.getRepresentsVersion(),
+				mappingExtension)){
 			return null;
 		} else {
 			return this.codingSchemeToMapVersionTransform.transform(codingScheme);
-		}
-	}
-	
-	protected boolean validateMappingCodingScheme(String uri, String version){
-		try {
-			return this.mappingExtension.
-				isMappingCodingScheme(
-						uri, 
-						Constructors.createCodingSchemeVersionOrTagFromVersion(version));
-		} catch (LBParameterException e) {
-			throw new RuntimeException(e);
 		}
 	}
 	

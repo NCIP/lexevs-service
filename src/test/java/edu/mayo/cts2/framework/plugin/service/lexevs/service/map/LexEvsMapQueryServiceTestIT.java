@@ -39,6 +39,7 @@ import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.map.MapCatalogEntry;
+import edu.mayo.cts2.framework.model.map.MapCatalogEntrySummary;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.service.mapversion.types.MapRole;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
@@ -72,12 +73,12 @@ public class LexEvsMapQueryServiceTestIT extends AbstractTestITBase {
 
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
-	public void testMapToRoleFound() {
+	public void testGetResourceListMapToRoleFound() {
 		
 		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();
-		NameOrURI validSrc = ModelUtils.nameOrUriFromName("Automobiles");
+		NameOrURI codeSchemeName = ModelUtils.nameOrUriFromName("GermanMadeParts");
 		Set<NameOrURI> codeSystems = new HashSet<NameOrURI>();
-		codeSystems.add(validSrc);
+		codeSystems.add(codeSchemeName);
 		CodeSystemRestriction csr = new CodeSystemRestriction();
 		csr.setCodeSystems(codeSystems);
 		MapRole mapRole = MapRole.fromValue(Constants.MAP_TO_ROLE);
@@ -96,12 +97,68 @@ public class LexEvsMapQueryServiceTestIT extends AbstractTestITBase {
 
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
-	public void testMapToRoleNotFound() {
+	public void testGetResourceSummariesMapToRoleFound() {
 		
 		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();
-		NameOrURI validSrc = ModelUtils.nameOrUriFromName("GermanMadeParts");
+		NameOrURI codeSchemeName = ModelUtils.nameOrUriFromName("GermanMadeParts");
 		Set<NameOrURI> codeSystems = new HashSet<NameOrURI>();
-		codeSystems.add(validSrc);
+		codeSystems.add(codeSchemeName);
+		CodeSystemRestriction csr = new CodeSystemRestriction();
+		csr.setCodeSystems(codeSystems);
+		MapRole mapRole = MapRole.fromValue(Constants.MAP_TO_ROLE);
+		csr.setMapRole(mapRole);
+		restrictions.setCodeSystemRestriction(csr);
+		
+		MapQueryImpl mapQueryImpl = new MapQueryImpl(null,null,null,restrictions);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<MapCatalogEntrySummary> list = this.service.getResourceSummaries(mapQueryImpl, sortCriteria, page);
+		assertNotNull(list);
+		assertEquals(1,list.getEntries().size());
+	}
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
+	public void testMapToRoleFoundForMultipleCodeSchemes() {
+		
+		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();
+		NameOrURI codeSchemeName1 = ModelUtils.nameOrUriFromName("DeutchMadeParts");
+		NameOrURI codeSchemeName2 = ModelUtils.nameOrUriFromName("GermanMadeParts");
+		NameOrURI codeSchemeName3 = ModelUtils.nameOrUriFromName("DEMadeParts");
+		Set<NameOrURI> codeSystems = new HashSet<NameOrURI>();
+		codeSystems.add(codeSchemeName1);
+		codeSystems.add(codeSchemeName2);
+		codeSystems.add(codeSchemeName3);
+		CodeSystemRestriction csr = new CodeSystemRestriction();
+		csr.setCodeSystems(codeSystems);
+		MapRole mapRole = MapRole.fromValue(Constants.MAP_TO_ROLE);
+		csr.setMapRole(mapRole);
+		restrictions.setCodeSystemRestriction(csr);
+		
+		MapQueryImpl mapQueryImpl = new MapQueryImpl(null,null,null,restrictions);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<MapCatalogEntry> resourceList = this.service.getResourceList(mapQueryImpl, sortCriteria, page);
+		assertNotNull(resourceList);
+		assertEquals(1,resourceList.getEntries().size());
+	}
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
+	public void testMapToRoleNotFoundForMultipleCodeSchemes() {
+		
+		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();
+		NameOrURI codeSchemeName1 = ModelUtils.nameOrUriFromName("DeutchMadeParts");
+		NameOrURI codeSchemeName2 = ModelUtils.nameOrUriFromName("Das GermanMadeParts");
+		NameOrURI codeSchemeName3 = ModelUtils.nameOrUriFromName("DEMadeParts");
+		Set<NameOrURI> codeSystems = new HashSet<NameOrURI>();
+		codeSystems.add(codeSchemeName1);
+		codeSystems.add(codeSchemeName2);
+		codeSystems.add(codeSchemeName3);
 		CodeSystemRestriction csr = new CodeSystemRestriction();
 		csr.setCodeSystems(codeSystems);
 		MapRole mapRole = MapRole.fromValue(Constants.MAP_TO_ROLE);
@@ -117,18 +174,224 @@ public class LexEvsMapQueryServiceTestIT extends AbstractTestITBase {
 		assertNotNull(resourceList);
 		assertEquals(0,resourceList.getEntries().size());
 	}
+	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
+	public void testGetResourceListMapToRoleNotFound() {
+		
+		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();
+		NameOrURI codeSchemeName = ModelUtils.nameOrUriFromName("Automobiles");
+		Set<NameOrURI> codeSystems = new HashSet<NameOrURI>();
+		codeSystems.add(codeSchemeName);
+		CodeSystemRestriction csr = new CodeSystemRestriction();
+		csr.setCodeSystems(codeSystems);
+		MapRole mapRole = MapRole.fromValue(Constants.MAP_TO_ROLE);
+		csr.setMapRole(mapRole);
+		restrictions.setCodeSystemRestriction(csr);
+		
+		MapQueryImpl mapQueryImpl = new MapQueryImpl(null,null,null,restrictions);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<MapCatalogEntry> resourceList = this.service.getResourceList(mapQueryImpl, sortCriteria, page);
+		assertNotNull(resourceList);
+		assertEquals(0,resourceList.getEntries().size());
+	}
+	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
+	public void testGetResourceSummariesMapToRoleNotFound() {
+		
+		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();
+		NameOrURI codeSchemeName = ModelUtils.nameOrUriFromName("Automobiles");
+		Set<NameOrURI> codeSystems = new HashSet<NameOrURI>();
+		codeSystems.add(codeSchemeName);
+		CodeSystemRestriction csr = new CodeSystemRestriction();
+		csr.setCodeSystems(codeSystems);
+		MapRole mapRole = MapRole.fromValue(Constants.MAP_TO_ROLE);
+		csr.setMapRole(mapRole);
+		restrictions.setCodeSystemRestriction(csr);
+		
+		MapQueryImpl mapQueryImpl = new MapQueryImpl(null,null,null,restrictions);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<MapCatalogEntrySummary> list = this.service.getResourceSummaries(mapQueryImpl, sortCriteria, page);
+		assertNotNull(list);
+		assertEquals(0,list.getEntries().size());
+	}
 
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 	public void testMapFromRoleFound() {
-		// 
+		
+		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();
+		NameOrURI codeSchemeName = ModelUtils.nameOrUriFromName("Automobiles");
+		Set<NameOrURI> codeSystems = new HashSet<NameOrURI>();
+		codeSystems.add(codeSchemeName);
+		CodeSystemRestriction csr = new CodeSystemRestriction();
+		csr.setCodeSystems(codeSystems);
+		MapRole mapRole = MapRole.fromValue(Constants.MAP_FROM_ROLE);
+		csr.setMapRole(mapRole);
+		restrictions.setCodeSystemRestriction(csr);
+		
+		MapQueryImpl mapQueryImpl = new MapQueryImpl(null,null,null,restrictions);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<MapCatalogEntry> resourceList = this.service.getResourceList(mapQueryImpl, sortCriteria, page);
+		assertNotNull(resourceList);
+		assertEquals(1,resourceList.getEntries().size());
 	}
 
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 	public void testMapFromRoleNotFound() {
-		// 
+		
+		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();
+		NameOrURI codeSchemeName = ModelUtils.nameOrUriFromName("GermanMadeParts");
+		Set<NameOrURI> codeSystems = new HashSet<NameOrURI>();
+		codeSystems.add(codeSchemeName);
+		CodeSystemRestriction csr = new CodeSystemRestriction();
+		csr.setCodeSystems(codeSystems);
+		MapRole mapRole = MapRole.fromValue(Constants.MAP_FROM_ROLE);
+		csr.setMapRole(mapRole);
+		restrictions.setCodeSystemRestriction(csr);
+		
+		MapQueryImpl mapQueryImpl = new MapQueryImpl(null,null,null,restrictions);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<MapCatalogEntry> resourceList = this.service.getResourceList(mapQueryImpl, sortCriteria, page);
+		assertNotNull(resourceList);
+		assertEquals(0,resourceList.getEntries().size());
 	}
 
-	
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
+	public void testBothMapRolesFoundViaMapTo() {
+		
+		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();
+		NameOrURI codeSchemeName1 = ModelUtils.nameOrUriFromName("ItalianMadeParts");
+		NameOrURI codeSchemeName2 = ModelUtils.nameOrUriFromName("GermanMadeParts");
+		NameOrURI codeSchemeName3 = ModelUtils.nameOrUriFromName("FrenchMadeParts");
+		Set<NameOrURI> codeSystems = new HashSet<NameOrURI>();
+		codeSystems.add(codeSchemeName1);
+		codeSystems.add(codeSchemeName2);
+		codeSystems.add(codeSchemeName3);
+		CodeSystemRestriction csr = new CodeSystemRestriction();
+		csr.setCodeSystems(codeSystems);
+		MapRole mapRole = MapRole.fromValue(Constants.BOTH_MAP_ROLES);
+		csr.setMapRole(mapRole);
+		restrictions.setCodeSystemRestriction(csr);
+		
+		MapQueryImpl mapQueryImpl = new MapQueryImpl(null,null,null,restrictions);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<MapCatalogEntry> resourceList = this.service.getResourceList(mapQueryImpl, sortCriteria, page);
+		assertNotNull(resourceList);
+		assertEquals(1,resourceList.getEntries().size());
+	}
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
+	public void testBothMapRolesFoundViaMapFrom() {
+		
+		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();
+		NameOrURI codeSchemeName1 = ModelUtils.nameOrUriFromName("ItalianMadeParts");
+		NameOrURI codeSchemeName2 = ModelUtils.nameOrUriFromName("Automobiles");
+		NameOrURI codeSchemeName3 = ModelUtils.nameOrUriFromName("FrenchMadeParts");
+		Set<NameOrURI> codeSystems = new HashSet<NameOrURI>();
+		codeSystems.add(codeSchemeName1);
+		codeSystems.add(codeSchemeName2);
+		codeSystems.add(codeSchemeName3);
+		CodeSystemRestriction csr = new CodeSystemRestriction();
+		csr.setCodeSystems(codeSystems);
+		MapRole mapRole = MapRole.fromValue(Constants.BOTH_MAP_ROLES);
+		csr.setMapRole(mapRole);
+		restrictions.setCodeSystemRestriction(csr);
+		
+		MapQueryImpl mapQueryImpl = new MapQueryImpl(null,null,null,restrictions);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<MapCatalogEntry> resourceList = this.service.getResourceList(mapQueryImpl, sortCriteria, page);
+		assertNotNull(resourceList);
+		assertEquals(1,resourceList.getEntries().size());
+	}
+
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
+	public void testBothMapRolesNotFound() {
+		
+		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();
+		NameOrURI codeSchemeName1 = ModelUtils.nameOrUriFromName("ItalianMadeParts");
+		NameOrURI codeSchemeName2 = ModelUtils.nameOrUriFromName("AutomobileParts");
+		NameOrURI codeSchemeName3 = ModelUtils.nameOrUriFromName("FrenchMadeParts");
+		Set<NameOrURI> codeSystems = new HashSet<NameOrURI>();
+		codeSystems.add(codeSchemeName1);
+		codeSystems.add(codeSchemeName2);
+		codeSystems.add(codeSchemeName3);
+		CodeSystemRestriction csr = new CodeSystemRestriction();
+		csr.setCodeSystems(codeSystems);
+		MapRole mapRole = MapRole.fromValue(Constants.BOTH_MAP_ROLES);
+		csr.setMapRole(mapRole);
+		restrictions.setCodeSystemRestriction(csr);
+		
+		MapQueryImpl mapQueryImpl = new MapQueryImpl(null,null,null,restrictions);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<MapCatalogEntry> resourceList = this.service.getResourceList(mapQueryImpl, sortCriteria, page);
+		assertNotNull(resourceList);
+		assertEquals(0,resourceList.getEntries().size());
+	}
+
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
+	public void testCountUsingMapFromRoleRestrictionOneFound() {
+		
+		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();
+		NameOrURI codeSchemeName = ModelUtils.nameOrUriFromName("Automobiles");
+		Set<NameOrURI> codeSystems = new HashSet<NameOrURI>();
+		codeSystems.add(codeSchemeName);
+		CodeSystemRestriction csr = new CodeSystemRestriction();
+		csr.setCodeSystems(codeSystems);
+		MapRole mapRole = MapRole.fromValue(Constants.MAP_FROM_ROLE);
+		csr.setMapRole(mapRole);
+		restrictions.setCodeSystemRestriction(csr);
+		
+		MapQueryImpl mapQueryImpl = new MapQueryImpl(null,null,null,restrictions);
+		
+		assertEquals(1,this.service.count(mapQueryImpl));
+	}
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
+	public void testCountUsingNoMapFromRoleRestrictionsOneFound() {
+		
+		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();
+		NameOrURI codeSchemeName = ModelUtils.nameOrUriFromName("GermanMadeParts");
+		Set<NameOrURI> codeSystems = new HashSet<NameOrURI>();
+		codeSystems.add(codeSchemeName);
+		CodeSystemRestriction csr = new CodeSystemRestriction();
+		csr.setCodeSystems(codeSystems);
+		MapRole mapRole = MapRole.fromValue(Constants.MAP_FROM_ROLE);
+		csr.setMapRole(mapRole);
+		restrictions.setCodeSystemRestriction(csr);
+		
+		assertEquals(1,this.service.count(null));
+	}
+
 }

@@ -33,11 +33,9 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
-import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.LexBIG.Exceptions.LBException;
-import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Constructors;
@@ -60,11 +58,11 @@ import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.service.mapversion.types.MapRole;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonMapUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestrictions.CodeSystemRestriction;
-import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestrictions.ValueSetRestriction;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 import edu.mayo.cts2.framework.service.profile.map.MapQuery;
@@ -105,21 +103,6 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 
 
 	// ------ Local methods ----------------------
-	protected boolean validateMappingCodingScheme(String uri, String version){
-		try {
-			if(this.mappingExtension != null){
-				return this.mappingExtension.
-					isMappingCodingScheme(
-							uri, 
-							Constructors.createCodingSchemeVersionOrTagFromVersion(version));
-			}
-			else {
-				return false;
-			}
-		} catch (LBParameterException e) {
-			throw new RuntimeException(e);
-		}
-	}
 
 	protected CodingScheme[] getRenderingPage(CodingScheme[] codingScheme, Page page) {
 		int start = page.getStart();
@@ -145,7 +128,6 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 	
 		return csPage;
 	}
-	
 
 	protected List<CodingScheme> doGetResourceSummaries(
 			MapQuery query, SortCriteria sortCriteria) {
@@ -162,10 +144,10 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		}		
 		
 		CodeSystemRestriction codeSystemRestriction = null;
-		ValueSetRestriction valueSetRestriction = null;  // TODO Do we need to check this restriction type???
+		// ValueSetRestriction valueSetRestriction = null;  // Not in current plan
 		if (mapQueryServiceRestrictions != null) {
 			codeSystemRestriction = query.getRestrictions().getCodeSystemRestriction();  
-			valueSetRestriction = query.getRestrictions().getValueSetRestriction();
+			// valueSetRestriction = query.getRestrictions().getValueSetRestriction();
 		}
 		
 		
@@ -174,9 +156,8 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 			CodingSchemeRenderingList csrFilteredList = lexBigService.getSupportedCodingSchemes();
 			
 			// Remove any items in above returned list that are not LexEVS Mapping CodingScheme type CodingSchemes 
-			csrFilteredList = filterByMappingCodingSchemes(csrFilteredList);
+			csrFilteredList = CommonMapUtils.filterByMappingCodingSchemes(csrFilteredList, mappingExtension);
 			
-			// TODO *** Need to look into filtering and check if below logic is valid ***
 			if ((filters != null) && (csrFilteredList != null) && (csrFilteredList.getCodingSchemeRenderingCount() > 0)) {
 				Iterator<ResolvedFilter> filtersItr = filters.iterator();
 				while (filtersItr.hasNext() && (csrFilteredList.getCodingSchemeRenderingCount() > 0)) {
@@ -188,7 +169,7 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 			
 			// NOTE:  Logic requires the processing of CodeSystemRestrictions to be last in order to save on 
 			//   the resolving to a list of CodingScheme objects.  Filter items based on the CodingScheme Relations 
-			//   sourceCodingScheme and/or targetCodingScheme string values
+			//   sourceCodingScheme and/or targetCodingScheme string values.
 			if (codeSystemRestriction != null) {
 				codingSchemeList = filterByCodeSystemRestriction(csrFilteredList, codeSystemRestriction);
 				resolvedToCodingSchemeFlag = true;
@@ -244,22 +225,22 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		
 		// Assuming format of Map has only has 1 relations section/1 relations element in xml file
 		if (codingScheme.getRelationsCount() != 1) {
-			throw new RuntimeException("Invalid format for Map. Expecting only one metadata section for Relations."); // TODO better msg ???
+			throw new UnsupportedOperationException("Invalid format for Map. Expecting only one metadata section for Relations.");
 		}
 		Relations relations = codingScheme.getRelations(0);
 		String sourceCodingScheme = relations.getSourceCodingScheme();
 		String targetCodingScheme = relations.getTargetCodingScheme();
 		
-		if (csrMapRoleValue.equals(Constants.MAP_TO_ROLE) && isCodingSchemeFound(sourceCodingScheme, codeSystemSet)) {
+		if (csrMapRoleValue.equals(Constants.MAP_TO_ROLE) && isCodingSchemeFound(targetCodingScheme, codeSystemSet)) {
 			return codingScheme;
 		}
 		
-		if (csrMapRoleValue.equals(Constants.MAP_FROM_ROLE) && isCodingSchemeFound(targetCodingScheme, codeSystemSet)) { 
+		if (csrMapRoleValue.equals(Constants.MAP_FROM_ROLE) && isCodingSchemeFound(sourceCodingScheme, codeSystemSet)) { 
 			return codingScheme;
 		}
 		
 		if (csrMapRoleValue.equals(Constants.BOTH_MAP_ROLES) && 
-				isCodingSchemeFound(sourceCodingScheme, targetCodingScheme, codeSystemSet)) {
+				isCodingSchemeFound(targetCodingScheme, sourceCodingScheme, codeSystemSet)) {
 			return codingScheme;
 		}
 		
@@ -284,7 +265,7 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 	}
 	
 	
-	protected boolean isCodingSchemeFound(String srcCodingScheme, String targetCodingScheme, Set<NameOrURI> codeSystemSet) {
+	protected boolean isCodingSchemeFound(String targetCodingScheme, String srcCodingScheme, Set<NameOrURI> codeSystemSet) {
 
 		boolean returnFlag = false;
 		Iterator<NameOrURI> iterator = codeSystemSet.iterator();
@@ -326,26 +307,6 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		}
 		return codingSchemeList;
 	}
-	
-	
-	// TODO refactor by moving method to utils class - also used in MapVersionQueryService impl
-	private CodingSchemeRenderingList filterByMappingCodingSchemes(CodingSchemeRenderingList csrFilteredList) {
-		CodingSchemeRenderingList temp = new CodingSchemeRenderingList();
-		
-		CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
-		for(CodingSchemeRendering render : csRendering) {
-			CodingSchemeSummary codingSchemeSummary = render.getCodingSchemeSummary();
-			
-			String uri = codingSchemeSummary.getCodingSchemeURI();
-			String version = codingSchemeSummary.getRepresentsVersion();
-			
-			if (validateMappingCodingScheme(uri, version)) {
-				temp.addCodingSchemeRendering(render);
-			}
-		}		
-		return temp;		
-	}
-	
 	
 	
 	// -------- Implemented methods ----------------
@@ -431,8 +392,7 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 
 	@Override
 	public int count(MapQuery query) {
-		// TODO Auto-generated method stub
-		return 0;
+		return doGetResourceSummaries(query, null).size();
 	}
 
 }
