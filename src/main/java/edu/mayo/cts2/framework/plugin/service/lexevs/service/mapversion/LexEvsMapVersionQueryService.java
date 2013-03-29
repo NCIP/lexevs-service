@@ -33,11 +33,9 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
-import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.LexBIG.Exceptions.LBException;
-import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Constructors;
@@ -63,6 +61,7 @@ import edu.mayo.cts2.framework.model.service.mapversion.types.MapRole;
 import edu.mayo.cts2.framework.model.service.mapversion.types.MapStatus;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonMapUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
 import edu.mayo.cts2.framework.service.command.restriction.MapVersionQueryServiceRestrictions;
@@ -103,24 +102,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(MAPPING_EXTENSION);
 	}
 		
-	// ------ Local methods ----------------------
-	protected boolean validateMappingCodingScheme(String uri, String version){
-		try {
-			if(this.mappingExtension != null){
-				return this.mappingExtension.
-					isMappingCodingScheme(
-							uri, 
-							Constructors.createCodingSchemeVersionOrTagFromVersion(version));
-			}
-			else {
-				return false;
-			}
-		} catch (LBParameterException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	
+	// ------ Local methods ----------------------	
 	protected CodingSchemeRendering[] doGetResourceSummaries(
 			MapVersionQuery query, SortCriteria sortCriteria) {
 
@@ -147,7 +129,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 			CodingSchemeRenderingList csrFilteredList = lexBigService.getSupportedCodingSchemes();
 			
 			// Remove any items in above returned list that are not LexEVS MappingCodeScheme type CodeSchemes 
-			csrFilteredList = filterByMappingCodeSchemes(csrFilteredList);
+			csrFilteredList = CommonMapUtils.filterByMappingCodingSchemes(csrFilteredList, mappingExtension);
 			
 			if (searchCodingSchemeName != null) {
 				csrFilteredList = CommonSearchFilterUtils.filterResourceSummariesByCodingSchemeName(searchCodingSchemeName, csrFilteredList);
@@ -166,23 +148,6 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		} catch(Exception e){
 			throw new RuntimeException(e);
 		}
-	}
-	
-	private CodingSchemeRenderingList filterByMappingCodeSchemes(CodingSchemeRenderingList csrFilteredList) {
-		CodingSchemeRenderingList temp = new CodingSchemeRenderingList();
-		
-		CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
-		for(CodingSchemeRendering render : csRendering) {
-			CodingSchemeSummary codingSchemeSummary = render.getCodingSchemeSummary();
-			
-			String uri = codingSchemeSummary.getCodingSchemeURI();
-			String version = codingSchemeSummary.getRepresentsVersion();
-			
-			if (validateMappingCodingScheme(uri, version)) {
-				temp.addCodingSchemeRendering(render);
-			}
-		}		
-		return temp;		
 	}
 	
 	
