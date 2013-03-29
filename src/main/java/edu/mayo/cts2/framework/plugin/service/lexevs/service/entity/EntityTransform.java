@@ -27,32 +27,34 @@ import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.concepts.Entity;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
-import edu.mayo.cts2.framework.model.core.EntityReference;
 import edu.mayo.cts2.framework.model.entity.EntityDescription;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.entity.NamedEntityDescription;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.uri.EntityUriHandler;
+import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
 
 /**
  * 
  * CTS2 <-> LexEVS Transform dealing with Entities and EntityDescriptions. 
  *
  */
+@Component
 public class EntityTransform {
 
 	@Resource 
-	private EntityUriHandler entityUriHandler;
-	/**
-	 * LexEVS Entity to CTS2 EntityDescription.
-	 *
-	 * @param entity the entity
-	 * @return the entity description
-	 */
-	public EntityDescription entityToEntityDescription(Entity entity){
+	private UriHandler uriHandler;
+
+	public EntityDescription transformToEntity(ResolvedConceptReference reference) {
+		Assert.isTrue(reference.getEntity() != null, 
+				"The Entity is null. Please resolve the CodedNodeSet with Resolve = true");
+
+		Entity entity = reference.getEntity();
+		
 		NamedEntityDescription namedEntity = new NamedEntityDescription();
-		namedEntity.setAbout(this.entityUriHandler.getUri(entity));
+		namedEntity.setAbout(this.uriHandler.getEntityUri(reference));
 		
 		namedEntity.setEntityID(
 				ModelUtils.createScopedEntityName(
@@ -65,22 +67,11 @@ public class EntityTransform {
 		return ed;
 	}
 
-	public EntityDirectoryEntry transform(ResolvedConceptReference reference) {
+	public EntityDirectoryEntry transformToEntry(ResolvedConceptReference reference) {
 		EntityDirectoryEntry entry = new EntityDirectoryEntry();
-		entry.setAbout(this.entityUriHandler.getUri(reference));
+		entry.setAbout(this.uriHandler.getEntityUri(reference));
 		
 		return entry;
 	}
-	
-	
-	public EntityDescription transform_EntityDescription(ResolvedConceptReference reference) {
-		// TODO need to implement
-		throw new UnsupportedOperationException();
-	}
-	
-	public EntityReference transform_EntityReference(ResolvedConceptReference reference) {
-		// TODO need to implement
-		throw new UnsupportedOperationException();
-	}
-	
+
 }

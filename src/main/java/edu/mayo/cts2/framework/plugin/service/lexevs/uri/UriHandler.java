@@ -23,18 +23,20 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.uri;
 
-import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
-import org.LexGrid.concepts.Entity;
+import org.LexGrid.LexBIG.DataModel.Core.ResolvedCodedNodeReference;
+import org.LexGrid.codingSchemes.CodingScheme;
 
 /**
  * 
- * Responsible for constructing URIs for LexEVS Entities.
+ * Responsible for constructing URIs from LexEVS resources.
  *
  */
-public interface EntityUriHandler {
+public interface UriHandler {
+
+	public String getEntityUri(ResolvedCodedNodeReference reference);
 	
-	public String getUri(Entity entity);
+	public String getCodeSystemUri(CodingScheme codingScheme);
 	
-	public String getUri(ResolvedConceptReference reference);
+	public String getCodeSystemVersionUri(CodingScheme codingScheme);
 
 }

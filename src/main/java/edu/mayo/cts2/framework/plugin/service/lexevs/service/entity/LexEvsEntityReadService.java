@@ -29,11 +29,11 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
-import org.LexGrid.concepts.Entity;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.command.Page;
@@ -64,7 +64,8 @@ import edu.mayo.cts2.framework.service.profile.entitydescription.name.EntityDesc
 public class LexEvsEntityReadService extends AbstractLexEvsService 
 	implements EntityDescriptionReadService {
 
-	private EntityTransform entityTransform = new EntityTransform();
+	@Resource
+	private EntityTransform entityTransform;
 	
 	@Resource
 	private CodeSystemVersionNameConverter codeSystemVersionNameConverter;
@@ -77,11 +78,11 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 			EntityDescriptionReadId identifier,
 			ResolvedReadContext readContext) {
 
-		Entity entity = getLexGridEntityByRead(identifier,	readContext);
+		ResolvedConceptReference entity = getLexGridEntityByRead(identifier, readContext);
 		if(entity == null){
 			return null;
 		} else {
-			return this.entityTransform.entityToEntityDescription(entity);
+			return this.entityTransform.transformToEntity(entity);
 		}
 	}
 
@@ -92,7 +93,7 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 	public boolean exists(EntityDescriptionReadId identifier,
 			ResolvedReadContext readContext) {
 		
-		Entity entity = getLexGridEntityByRead(identifier,	readContext);
+		ResolvedConceptReference entity = getLexGridEntityByRead(identifier,	readContext);
 		if (entity == null) {
 			return false;
 		} else {
@@ -100,7 +101,7 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 		}
 	}
 	
-	protected Entity getLexGridEntityByRead(EntityDescriptionReadId identifier,
+	protected ResolvedConceptReference getLexGridEntityByRead(EntityDescriptionReadId identifier,
 			ResolvedReadContext readContext) {
 
 		String cts2CodeSystemVersionName = identifier.getCodeSystemVersion().getName();
@@ -129,8 +130,7 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 			if(! iterator.hasNext()){
 				return null;
 			} else {
-				Entity entity = iterator.next().getEntity();
-				return entity;
+				return iterator.next();
 			}
 		} catch (LBException e) {
 			throw new RuntimeException();
