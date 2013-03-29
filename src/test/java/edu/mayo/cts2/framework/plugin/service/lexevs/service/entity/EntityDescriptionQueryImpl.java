@@ -1,13 +1,10 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
-import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.service.core.Query;
-import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.service.command.restriction.EntityDescriptionQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntitiesFromAssociationsQuery;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQuery;
@@ -15,7 +12,9 @@ import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescripti
 public class EntityDescriptionQueryImpl implements EntityDescriptionQuery{
 	private Query query;
 	private Set<ResolvedFilter> filterComponent;
+	@SuppressWarnings("unused")
 	private ResolvedReadContext readContext;
+	@SuppressWarnings("unused")
 	private EntitiesFromAssociationsQuery entities;
 	private EntityDescriptionQueryServiceRestrictions restrictions;
 	

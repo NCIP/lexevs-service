@@ -90,6 +90,8 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	
 	public static final String MAPPING_EXTENSION = "MappingExtension";	
 	
+	// ------ Local methods ----------------------
+	// Set methods required to test using FakeLexEvsSystem
 	public void setCodeSystemVersionNameConverter(CodeSystemVersionNameConverter converter){
 		this.nameConverter = converter;
 	}
@@ -97,13 +99,11 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 			this.codingSchemeToMapVersionTransform = transformer;
 	}
 
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(MAPPING_EXTENSION);
+	public void setMappingExtension(MappingExtension extension){
+		this.mappingExtension = extension;
 	}
-		
-	// ------ Local methods ----------------------
+
+	// ------- Helper methods ---------------------
 	protected boolean validateMappingCodingScheme(String uri, String version){
 		try {
 			if(this.mappingExtension != null){
@@ -119,7 +119,6 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 			throw new RuntimeException(e);
 		}
 	}
-
 	
 	protected CodingSchemeRendering[] doGetResourceSummaries(
 			MapVersionQuery query, SortCriteria sortCriteria) {
@@ -188,6 +187,11 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	
 	// -------- Implemented methods ----------------
 	
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(MAPPING_EXTENSION);
+	}
+		
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.service.profile.QueryService#count(edu.mayo.cts2.framework.service.profile.ResourceQuery)
 	 */
