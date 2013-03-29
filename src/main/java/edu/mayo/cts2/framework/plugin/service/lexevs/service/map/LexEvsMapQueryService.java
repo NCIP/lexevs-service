@@ -55,12 +55,14 @@ import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.map.MapCatalogEntry;
 import edu.mayo.cts2.framework.model.map.MapCatalogEntrySummary;
+import edu.mayo.cts2.framework.model.mapversion.MapVersion;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.service.mapversion.types.MapRole;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestrictions.CodeSystemRestriction;
@@ -78,6 +80,8 @@ import edu.mayo.cts2.framework.service.profile.map.MapQueryService;
 public class LexEvsMapQueryService extends AbstractLexEvsService
 		implements MapQueryService, InitializingBean {
 	
+	@Resource
+	CodingSchemeToMapTransform codingSchemeToMapTransform;
 	
 	@Resource
 	private CodeSystemVersionNameConverter nameConverter;
@@ -86,13 +90,22 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 	
 	public static final String MAPPING_EXTENSION = "MappingExtension";	
 
-
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(MAPPING_EXTENSION);
 	}
 
 	
+	public CodingSchemeToMapTransform getCodingSchemeToMapTransform() {
+		return codingSchemeToMapTransform;
+	}
+
+	public void setCodingSchemeToMapTransform(
+			CodingSchemeToMapTransform codingSchemeToMapTransform) {
+		this.codingSchemeToMapTransform = codingSchemeToMapTransform;
+	}
+
+
 	// ------ Local methods ----------------------
 	protected boolean validateMappingCodingScheme(String uri, String version){
 		try {
@@ -110,9 +123,38 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		}
 	}
 
-	protected CodingSchemeRendering[] doGetResourceSummaries(
+	protected CodingScheme[] getRenderingPage(CodingScheme[] codingScheme, Page page) {
+		int start = page.getStart();
+		int end = page.getEnd();
+		CodingScheme [] csPage = null;
+		
+		if(end > codingScheme.length){
+			end = codingScheme.length;
+		}
+		
+		if ((start == 0) && (end == codingScheme.length)) {
+			csPage = codingScheme.clone();
+		} 
+		else if(start < end){
+			
+			int size = end - start;
+			csPage = new CodingScheme [size];
+			
+			for (int i = 0; i < csPage.length; i++) {
+				csPage[i] = codingScheme[start + i];
+			}
+		}
+	
+		return csPage;
+	}
+	
+
+	protected List<CodingScheme> doGetResourceSummaries(
 			MapQuery query, SortCriteria sortCriteria) {
 
+		List<CodingScheme> codingSchemeList = new ArrayList<CodingScheme>();
+		boolean resolvedToCodingSchemeFlag = false;
+		
 		Set<ResolvedFilter> filters = null; 
 		MapQueryServiceRestrictions mapQueryServiceRestrictions = null;
 		
@@ -133,13 +175,8 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		try {
 			CodingSchemeRenderingList csrFilteredList = lexBigService.getSupportedCodingSchemes();
 			
-			// Remove any items in above returned list that are not LexEVS MappingCodeScheme type CodeSchemes 
-			csrFilteredList = filterByMappingCodeSchemes(csrFilteredList);
-			
-			// Filter items based on the CodingScheme Relations sourceCodingScheme and/or targetCodingScheme string values
-			if (codeSystemRestriction != null) {
-				csrFilteredList = filterByCodeSystemRestriction(csrFilteredList, codeSystemRestriction);
-			}
+			// Remove any items in above returned list that are not LexEVS Mapping CodingScheme type CodingSchemes 
+			csrFilteredList = filterByMappingCodingSchemes(csrFilteredList);
 			
 			// TODO *** Need to look into filtering and check if below logic is valid ***
 			if ((filters != null) && (csrFilteredList != null) && (csrFilteredList.getCodingSchemeRenderingCount() > 0)) {
@@ -150,18 +187,30 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 								csrFilteredList, nameConverter);
 				}
 			}
+			
+			// NOTE:  Logic requires the processing of CodeSystemRestrictions to be last in order to save on 
+			//   the resolving to a list of CodingScheme objects.  Filter items based on the CodingScheme Relations 
+			//   sourceCodingScheme and/or targetCodingScheme string values
+			if (codeSystemRestriction != null) {
+				codingSchemeList = filterByCodeSystemRestriction(csrFilteredList, codeSystemRestriction);
+				resolvedToCodingSchemeFlag = true;
+			}
+			
+			if (!resolvedToCodingSchemeFlag) {
+				codingSchemeList = resolveToCodingSchemeList(csrFilteredList.getCodingSchemeRendering());
+			}
 						
-			return csrFilteredList.getCodingSchemeRendering();
+			return codingSchemeList;
 		} catch(Exception e){
 			throw new RuntimeException(e);
 		}
 	}
 	
-	protected CodingSchemeRenderingList filterByCodeSystemRestriction(CodingSchemeRenderingList csrFilteredList, 
+	protected List<CodingScheme> filterByCodeSystemRestriction(CodingSchemeRenderingList csrFilteredList, 
 			CodeSystemRestriction codeSystemRestriction) {
 
-		CodingSchemeRenderingList temp = new CodingSchemeRenderingList();
-		
+		List<CodingScheme> codingSchemeList = new ArrayList<CodingScheme>();
+
 		MapRole codeSystemRestrictionMapRole = null;
 		Set<NameOrURI> codeSystemSet = null;
 		if (codeSystemRestriction != null) {
@@ -178,48 +227,47 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 			// Get array of CodingSchemeRendering object and loop checking each item in array
 			CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
 			for (CodingSchemeRendering render : csRendering) {
-				if (isFoundViaCodeSystemRestriction(render, codeSystemSet, csrMapRoleValue)) {
-					temp.addCodingSchemeRendering(render);
+				CodingScheme codingScheme = getCodingSchemeForCodeSystemRestriction(render, codeSystemSet, csrMapRoleValue); 
+				if (codingScheme != null) {
+					codingSchemeList.add(codingScheme);
 				}
-			}
-		} else {
-			return csrFilteredList;  // No restrictions to apply
-		}
+			}			
+		} 
 		
-		return temp;		
+		return codingSchemeList;		
 	}
 	
-	protected boolean isFoundViaCodeSystemRestriction(CodingSchemeRendering render, 
+	private CodingScheme getCodingSchemeForCodeSystemRestriction(CodingSchemeRendering render, 
 			Set<NameOrURI> codeSystemSet, 
 			String csrMapRoleValue) {
 
-		boolean returnFlag = false;
+		CodingScheme notFoundCodingScheme = null;
 		CodingScheme codingScheme = getCodingScheme(render);
 		
 		// Assuming format of Map has only has 1 relations section/1 relations element in xml file
 		if (codingScheme.getRelationsCount() != 1) {
-			throw new RuntimeException("Invalid format for Map. Expecting only one metadata section for Relations.");
+			throw new RuntimeException("Invalid format for Map. Expecting only one metadata section for Relations."); // TODO better msg ???
 		}
 		Relations relations = codingScheme.getRelations(0);
 		String sourceCodingScheme = relations.getSourceCodingScheme();
 		String targetCodingScheme = relations.getTargetCodingScheme();
 		
-		if (csrMapRoleValue.equals(Constants.MAP_TO_ROLE)) {
-			return isCodingSchemeFound(sourceCodingScheme, codeSystemSet);
+		if (csrMapRoleValue.equals(Constants.MAP_TO_ROLE) && isCodingSchemeFound(sourceCodingScheme, codeSystemSet)) {
+			return codingScheme;
 		}
 		
-		if (csrMapRoleValue.equals(Constants.MAP_FROM_ROLE)) { 
-			return isCodingSchemeFound(targetCodingScheme, codeSystemSet);
+		if (csrMapRoleValue.equals(Constants.MAP_FROM_ROLE) && isCodingSchemeFound(targetCodingScheme, codeSystemSet)) { 
+			return codingScheme;
 		}
 		
-		if (csrMapRoleValue.equals(Constants.BOTH_MAP_ROLES)) {
-			if (isCodingSchemeFound(sourceCodingScheme, targetCodingScheme, codeSystemSet)) {
-				return true;
-			}
+		if (csrMapRoleValue.equals(Constants.BOTH_MAP_ROLES) && 
+				isCodingSchemeFound(sourceCodingScheme, targetCodingScheme, codeSystemSet)) {
+			return codingScheme;
 		}
 		
-		return returnFlag;
+		return notFoundCodingScheme;
 	}
+
 	
 	protected boolean isCodingSchemeFound(String relationCodingScheme, Set<NameOrURI> codeSystemSet) {
 
@@ -269,9 +317,21 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		return codingScheme;
 	}
 	
+	protected List<CodingScheme> resolveToCodingSchemeList(CodingSchemeRendering[] codingSchemeRenderingArray) {
+		List<CodingScheme> codingSchemeList = new ArrayList<CodingScheme>();
+		
+		if (codingSchemeRenderingArray != null && codingSchemeRenderingArray.length > 0) {
+			for (int i=0; i<codingSchemeRenderingArray.length; i++) {
+				CodingScheme codingScheme = getCodingScheme(codingSchemeRenderingArray[i]);
+				codingSchemeList.add(codingScheme);
+			}
+		}
+		return codingSchemeList;
+	}
+	
 	
 	// TODO refactor by moving method to utils class - also used in MapVersionQueryService impl
-	private CodingSchemeRenderingList filterByMappingCodeSchemes(CodingSchemeRenderingList csrFilteredList) {
+	private CodingSchemeRenderingList filterByMappingCodingSchemes(CodingSchemeRenderingList csrFilteredList) {
 		CodingSchemeRenderingList temp = new CodingSchemeRenderingList();
 		
 		CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
@@ -334,16 +394,40 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 	@Override
 	public DirectoryResult<MapCatalogEntrySummary> getResourceSummaries(
 			MapQuery query, SortCriteria sortCriteria, Page page) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		List<CodingScheme> codingSchemeList = this.doGetResourceSummaries(query, sortCriteria);
+		CodingScheme[] codingSchemeArray = codingSchemeList.toArray(new CodingScheme[0]);
+		CodingScheme[] codingSchemePage = getRenderingPage(codingSchemeArray, page);
+		
+		List<MapCatalogEntrySummary> list = new ArrayList<MapCatalogEntrySummary>();
+
+		for (CodingScheme codingScheme : codingSchemePage) {
+			list.add(codingSchemeToMapTransform.transformToMapCatalogEntrySummary(codingScheme));
+		}
+
+		boolean atEnd = (page.getEnd() >= codingSchemeArray.length) ? true : false;
+		
+		return new DirectoryResult<MapCatalogEntrySummary>(list, atEnd);
 	}
 
 
 	@Override
 	public DirectoryResult<MapCatalogEntry> getResourceList(MapQuery query,
 			SortCriteria sortCriteria, Page page) {
-		// TODO Auto-generated method stub
-		return null;
+
+		List<CodingScheme> codingSchemeList = this.doGetResourceSummaries(query, sortCriteria);
+		CodingScheme[] codingSchemeArray = codingSchemeList.toArray(new CodingScheme[0]);
+		CodingScheme[] codingSchemePage = getRenderingPage(codingSchemeArray, page);
+		
+		List<MapCatalogEntry> list = new ArrayList<MapCatalogEntry>();
+
+		for (CodingScheme codingScheme : codingSchemePage) {
+			list.add(codingSchemeToMapTransform.transformToMapCatalogEntry(codingScheme));
+		}
+
+		boolean atEnd = (page.getEnd() >= codingSchemeArray.length) ? true : false;
+		
+		return new DirectoryResult<MapCatalogEntry>(list, atEnd);
 	}
 
 
