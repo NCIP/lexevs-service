@@ -23,15 +23,29 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.map;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.junit.Test;
 
 import edu.mayo.cts2.framework.core.xml.Cts2Marshaller;
-import edu.mayo.cts2.framework.plugin.service.lexevs.service.map.LexEvsMapQueryService;
+import edu.mayo.cts2.framework.model.command.Page;
+import edu.mayo.cts2.framework.model.core.SortCriteria;
+import edu.mayo.cts2.framework.model.directory.DirectoryResult;
+import edu.mayo.cts2.framework.model.map.MapCatalogEntry;
+import edu.mayo.cts2.framework.model.service.core.NameOrURI;
+import edu.mayo.cts2.framework.model.service.mapversion.types.MapRole;
+import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
+import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestrictions;
+import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestrictions.CodeSystemRestriction;
 
 /**
  * @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
@@ -50,5 +64,71 @@ public class LexEvsMapQueryServiceTestIT extends AbstractTestITBase {
 		assertNotNull(this.service);
 	}
 
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
+	public void testLoadMap() {
+		// Just a test to see time involved with the load
+	}
 
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
+	public void testMapToRoleFound() {
+		
+		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();
+		NameOrURI validSrc = ModelUtils.nameOrUriFromName("Automobiles");
+		Set<NameOrURI> codeSystems = new HashSet<NameOrURI>();
+		codeSystems.add(validSrc);
+		CodeSystemRestriction csr = new CodeSystemRestriction();
+		csr.setCodeSystems(codeSystems);
+		MapRole mapRole = MapRole.fromValue(Constants.MAP_TO_ROLE);
+		csr.setMapRole(mapRole);
+		restrictions.setCodeSystemRestriction(csr);
+		
+		MapQueryImpl mapQueryImpl = new MapQueryImpl(null,null,null,restrictions);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<MapCatalogEntry> resourceList = this.service.getResourceList(mapQueryImpl, sortCriteria, page);
+		assertNotNull(resourceList);
+		assertEquals(1,resourceList.getEntries().size());
+	}
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
+	public void testMapToRoleNotFound() {
+		
+		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();
+		NameOrURI validSrc = ModelUtils.nameOrUriFromName("GermanMadeParts");
+		Set<NameOrURI> codeSystems = new HashSet<NameOrURI>();
+		codeSystems.add(validSrc);
+		CodeSystemRestriction csr = new CodeSystemRestriction();
+		csr.setCodeSystems(codeSystems);
+		MapRole mapRole = MapRole.fromValue(Constants.MAP_TO_ROLE);
+		csr.setMapRole(mapRole);
+		restrictions.setCodeSystemRestriction(csr);
+		
+		MapQueryImpl mapQueryImpl = new MapQueryImpl(null,null,null,restrictions);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<MapCatalogEntry> resourceList = this.service.getResourceList(mapQueryImpl, sortCriteria, page);
+		assertNotNull(resourceList);
+		assertEquals(0,resourceList.getEntries().size());
+	}
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
+	public void testMapFromRoleFound() {
+		// 
+	}
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
+	public void testMapFromRoleNotFound() {
+		// 
+	}
+
+	
 }
