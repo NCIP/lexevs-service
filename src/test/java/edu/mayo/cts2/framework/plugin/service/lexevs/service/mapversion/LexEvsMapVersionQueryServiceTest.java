@@ -67,6 +67,8 @@ public class LexEvsMapVersionQueryServiceTest {
 		return service;
 	}
 	
+	final static String CODE_SYSTEM_NAME = null;
+	
 //	QueryService<MapVersion, 
 //	MapVersionDirectoryEntry, 
 //	MapVersionQuery>, Cts2Profile {
@@ -87,9 +89,9 @@ public class LexEvsMapVersionQueryServiceTest {
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
 		MapVersionQueryImpl query = new MapVersionQueryImpl(null, filters, null, null);
 				
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, DataField.ABOUT, 
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, CODE_SYSTEM_NAME, DataField.ABOUT, 
 				StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), testValidData);		
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, DataField.ABOUT, 
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, CODE_SYSTEM_NAME, DataField.ABOUT, 
 				StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), !testValidData);		
 	}
 	
@@ -103,9 +105,9 @@ public class LexEvsMapVersionQueryServiceTest {
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
 		MapVersionQueryImpl query = new MapVersionQueryImpl(null, filters, null, null);
 
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, DataField.RESOURCE_SYNOPSIS, 					
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, CODE_SYSTEM_NAME, DataField.RESOURCE_SYNOPSIS, 					
 				StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference(), testValidData);
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, DataField.RESOURCE_SYNOPSIS, 					
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, CODE_SYSTEM_NAME, DataField.RESOURCE_SYNOPSIS, 					
 				StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference(), !testValidData);
 	}
 		
@@ -119,9 +121,9 @@ public class LexEvsMapVersionQueryServiceTest {
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
 		MapVersionQueryImpl query = new MapVersionQueryImpl(null, filters, null, null);
 
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, DataField.RESOURCE_NAME, 
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, CODE_SYSTEM_NAME, DataField.RESOURCE_NAME, 
 					StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference(), testValidData);		
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, DataField.RESOURCE_NAME, 
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, CODE_SYSTEM_NAME, DataField.RESOURCE_NAME, 
 				StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference(), !testValidData);		
 	}
 		
@@ -137,7 +139,7 @@ public class LexEvsMapVersionQueryServiceTest {
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
 		MapVersionQueryImpl query = new MapVersionQueryImpl(null, filters, null, null);
 
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithDefaultFilterCreated(service, query, true, true, true);		
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithDefaultFilterCreated(service, query, CODE_SYSTEM_NAME, true, true, true);		
 	}
 
 	// Count with VALID values with one MISMATCHED
@@ -152,11 +154,11 @@ public class LexEvsMapVersionQueryServiceTest {
 		MapVersionQueryImpl query = new MapVersionQueryImpl(null, filters, null, null);
 
 		// About wrong index
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithDefaultFilterCreated(service, query, false, true, true);
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithDefaultFilterCreated(service, query, CODE_SYSTEM_NAME, false, true, true);
 		// ResourceSynopsis wrong index
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithDefaultFilterCreated(service, query, true, false, true);
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithDefaultFilterCreated(service, query, CODE_SYSTEM_NAME, true, false, true);
 		// ResourceName wrong index
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithDefaultFilterCreated(service, query, true, true, false);
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithDefaultFilterCreated(service, query, CODE_SYSTEM_NAME, true, true, false);
 	}
 	
 
@@ -186,7 +188,7 @@ public class LexEvsMapVersionQueryServiceTest {
 				query = new MapVersionQueryImpl(null, null, null, null);
 				directoryResult = null; 
 				
-				fakeLexEvs.executeGetResourceSummariesForEachPage(service, directoryResult, query, page, lastPage);		
+				fakeLexEvs.executeGetResourceSummariesForEachPage(service, directoryResult, query, CODE_SYSTEM_NAME, page, lastPage);		
 			}
 		}
 	}
@@ -204,7 +206,7 @@ public class LexEvsMapVersionQueryServiceTest {
 		MapVersionQueryImpl query = new MapVersionQueryImpl(null, filters, null, null);
 		DirectoryResult<MapVersionDirectoryEntry> directoryResult = null; 
 		
-		fakeLexEvs.executeGetResourceSummariesWithDeepComparisonForEachPropertyReference(service, directoryResult, query, page, lastPage);		
+		fakeLexEvs.executeGetResourceSummariesWithDeepComparisonForEachPropertyReference(service, directoryResult, query, CODE_SYSTEM_NAME, page, lastPage);		
 	}
 
 }

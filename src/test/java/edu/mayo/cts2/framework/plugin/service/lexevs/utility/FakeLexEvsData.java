@@ -9,13 +9,12 @@ import java.util.Set;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.commonTypes.EntityDescription;
 
+import scala.actors.threadpool.Arrays;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PropertyReference;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
-
-import scala.actors.threadpool.Arrays;
 
 public class FakeLexEvsData {	
 	final static PropertyReference ABOUT_REF = StandardModelAttributeReference.ABOUT.getPropertyReference();
@@ -26,19 +25,11 @@ public class FakeLexEvsData {
 	final static MatchAlgorithmReference STARTS_WITH_REF = StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference();
 	final static MatchAlgorithmReference EXACT_MATCH_REF = StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference();
 	
-	public enum CodeSystem{
-		AUTOMOBILES ("Automobiles");
-		
-		String name;
-		CodeSystem(String name){
-			this.name = name;
-		}
-		
-		public String getName(){
-			return this.name;
-		}
-	}
+	final static String CONTAINS = CONTAINS_REF.getContent().toLowerCase();
+	final static String STARTS_WITH = STARTS_WITH_REF.getContent().toLowerCase();
+	final static String EXACT_MATCH = EXACT_MATCH_REF.getContent().toLowerCase();
 	
+
 	public enum DataField{
 		ABOUT (0, ABOUT_REF),
 		RESOURCE_SYNOPSIS (1, RESOURCE_SYNOPSIS_REF),
@@ -160,44 +151,46 @@ public class FakeLexEvsData {
 		return index;
 	}
 
-	public int getCount(Set<ResolvedFilter> filters) {
+	public int getCount(Set<ResolvedFilter> filters, String codeSystemName) {
 		int count = 0;
-		String exactMatch = EXACT_MATCH_REF.getContent().toLowerCase();
-		String contains = CONTAINS_REF.getContent().toLowerCase();
-		String startsWith = STARTS_WITH_REF.getContent().toLowerCase();
 		
 		for(int schemeIndex=0; schemeIndex < this.codeSystemCount; schemeIndex++){
-			boolean found = true;
-			Iterator<ResolvedFilter> filterIterator = filters.iterator();
-			while(found && filterIterator.hasNext()){
-				ResolvedFilter filter = filterIterator.next();
-				String matchAlgorithmReferenceName = filter.getMatchAlgorithmReference().getContent().toLowerCase();
-				PropertyReference propertyReference = filter.getPropertyReference();
-				String matchValue = filter.getMatchValue().toLowerCase();
+			// First check if there is a restriction including this scheme
+			if(codeSystemName == null || (codeSystemName.toUpperCase().equals(this.getScheme_DataField(schemeIndex, DataField.RESOURCE_NAME)))){
+				boolean found = true;
+				if(filters != null){
+					Iterator<ResolvedFilter> filterIterator = filters.iterator();
 				
-				String dataValue = this.getScheme_DataField(schemeIndex, propertyReference).toLowerCase();
-				if(matchAlgorithmReferenceName.equals(exactMatch)){
-					if(dataValue.equals(matchValue) == false){
-						found = false;
-					}
-				}
-				else if(matchAlgorithmReferenceName.equals(contains)){
-					if(dataValue.contains(matchValue) == false){
-						found = false;
-					}
-				}
-				else if(matchAlgorithmReferenceName.equals(startsWith)){
-					if(dataValue.startsWith(matchValue) == false){
-						found = false;
-					}
-				}
-				else{
-					found = false;
-				}
+					while(found && filterIterator.hasNext()){
+						ResolvedFilter filter = filterIterator.next();
+						String matchAlgorithmReferenceName = filter.getMatchAlgorithmReference().getContent().toLowerCase();
+						PropertyReference propertyReference = filter.getPropertyReference();
+						String matchValue = filter.getMatchValue().toLowerCase();
 				
-			}
-			if(found){
-				count++;
+						String dataValue = this.getScheme_DataField(schemeIndex, propertyReference).toLowerCase();
+						if(matchAlgorithmReferenceName.equals(EXACT_MATCH)){
+							if(dataValue.equals(matchValue) == false){
+								found = false;
+							}
+						}
+						else if(matchAlgorithmReferenceName.equals(CONTAINS)){
+							if(dataValue.contains(matchValue) == false){
+								found = false;
+							}
+						}
+						else if(matchAlgorithmReferenceName.equals(STARTS_WITH)){
+							if(dataValue.startsWith(matchValue) == false){
+								found = false;
+							}
+						}
+						else{
+							found = false;
+						}
+					}
+				}
+				if(found){
+					count++;
+				}
 			}
 		}
 		return count;
