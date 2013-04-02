@@ -10,11 +10,9 @@ import org.LexGrid.LexBIG.DataModel.Collections.ResolvedConceptReferenceList;
 import org.LexGrid.LexBIG.DataModel.Collections.SortOptionList;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.Core.ConceptReference;
-import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
 import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Exceptions.LBResourceUnavailableException;
-import org.LexGrid.LexBIG.Impl.helpers.ResolvedConceptReferencesIteratorImpl;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
 import org.LexGrid.annotations.LgClientSideSafe;
@@ -172,7 +170,6 @@ public class FakeCodedNodeSetImpl implements org.LexGrid.LexBIG.LexBIGService.Co
      * @see java.lang.Object#clone()
      */
     @Override
-    @SuppressWarnings("unchecked")
     @LgClientSideSafe
     public CodedNodeSet clone() throws CloneNotSupportedException {
         FakeCodedNodeSetImpl cns = (FakeCodedNodeSetImpl) super.clone();

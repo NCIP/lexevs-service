@@ -344,17 +344,22 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		
 		ResolvedConceptReferenceResults resolvedConceptReferenceResults = this.doGetResourceSummaryResults(query, sortCriteria, page);
 		
-		// Transform each reference into a CTS2 entry and add to list
-		ResolvedConceptReference[] resolvedConceptReferences = resolvedConceptReferenceResults.getResolvedConceptReference();
-		for(ResolvedConceptReference reference : resolvedConceptReferences){
-			if(printObjects){
-				System.out.println("ResolvedConceptReference:\n" + PrintUtility.resolvedConceptReference_toString(reference, 1));
+		if(resolvedConceptReferenceResults != null){
+			// Transform each reference into a CTS2 entry and add to list
+			ResolvedConceptReference[] resolvedConceptReferences = resolvedConceptReferenceResults.getResolvedConceptReference();
+			for(ResolvedConceptReference reference : resolvedConceptReferences){
+				if(printObjects){
+					System.out.println("ResolvedConceptReference:\n" + PrintUtility.resolvedConceptReference_toString(reference, 1));
+				}
+				EntityDescription entry = entityTransform.transformToEntity(reference);
+				list.add(entry);
 			}
-			EntityDescription entry = entityTransform.transformToEntity(reference);
-			list.add(entry);
+			
+			directoryResult = new DirectoryResult<EntityDescription>(list, resolvedConceptReferenceResults.isAtEnd());
 		}
-		
-		directoryResult = new DirectoryResult<EntityDescription>(list, resolvedConceptReferenceResults.isAtEnd());
+		else{
+			directoryResult = new DirectoryResult<EntityDescription>(list, true);
+		}
 		
 		return directoryResult;
 	}

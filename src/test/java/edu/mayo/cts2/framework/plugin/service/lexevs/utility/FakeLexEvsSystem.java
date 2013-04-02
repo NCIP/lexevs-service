@@ -7,33 +7,30 @@ import java.util.Set;
 
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.Collections.LocalNameList;
-import org.LexGrid.LexBIG.DataModel.Core.AbsoluteCodingSchemeVersionReference;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.LexBIG.Exceptions.LBException;
-import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
-import org.LexGrid.LexBIG.Utility.ServiceUtility;
 import org.LexGrid.codingSchemes.CodingScheme;
-import org.LexGrid.naming.Mappings;
-import org.apache.commons.lang.StringUtils;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.lexevs.dao.database.utility.DaoUtility;
-import org.lexevs.registry.model.RegistryEntry;
 
+import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntry;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PropertyReference;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
+import edu.mayo.cts2.framework.model.service.core.NameOrURI;
+import edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion.LexEvsCodeSystemVersionReadService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.FakeLexEvsData.DataField;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 import edu.mayo.cts2.framework.service.profile.QueryService;
 import edu.mayo.cts2.framework.service.profile.ResourceQuery;
+import edu.mayo.cts2.framework.service.profile.TagAwareReadService;
 
 //public class FakeLexEvsSystem <DescriptionTemplate extends ResourceVersionDescription, EntryTemplate extends ResourceVersionDescriptionDirectoryEntry, QueryTemplate extends ResourceQuery, Service extends QueryService<?,?,?>> {
 public class FakeLexEvsSystem <DescriptionTemplate, EntryTemplate, QueryTemplate extends ResourceQuery, Service extends QueryService<?,?,?>> {
@@ -123,17 +120,31 @@ public class FakeLexEvsSystem <DescriptionTemplate, EntryTemplate, QueryTemplate
 	// Create Mocked Service and generate a codingSchemeRenderingList filled
 	// with fake data
 	// ------------------------------------------------------------------------------------
-	public LexBIGService createMockedLexBIGServiceWithFakeLexEvsData(
+	public LexBIGService createMockedLexBIGServiceWithFakeLexEvsData (
 			Service service, boolean withData) throws LBException {
 		// Mock LexBigService
 		LexBIGService lexBigService = EasyMock.createMock(LexBIGService.class);
-		createMockedGetSupportedCodingSchemes(service, lexBigService, withData);
-		createMockedGetNodeSetMethod(lexBigService);
+//		createMockedGetSupportedCodingSchemes(service, lexBigService, withData);
+//		createMockedGetNodeSetMethod(lexBigService);
 		createMockedResolveCodingScheme(lexBigService);
 		EasyMock.replay(lexBigService);
 
 		return lexBigService;
 	}
+	
+	public <ReadService extends TagAwareReadService<CodeSystemVersionCatalogEntry, NameOrURI>> LexBIGService createMockedLexBIGServiceWithFakeLexEvsData(
+			ReadService service, boolean withData) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	
+	
+
+	
+	
+	
+	
 	
 	public int size() {
 		return fakeData.size();
@@ -516,7 +527,5 @@ public class FakeLexEvsSystem <DescriptionTemplate, EntryTemplate, QueryTemplate
 		assertEquals("Expecting " + expecting + " entries but got " + actual,
 				expecting, actual);
 	}
-	
-	
-	
+
 }
