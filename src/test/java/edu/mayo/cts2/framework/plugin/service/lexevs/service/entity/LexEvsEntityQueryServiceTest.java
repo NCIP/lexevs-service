@@ -68,6 +68,8 @@ public class LexEvsEntityQueryServiceTest {
 		return service;
 	}
 	
+	
+	final static String RESOURCE_NAME = "Automobiles-1.0";
 
 	// =============
 	// Test methods
@@ -84,13 +86,13 @@ public class LexEvsEntityQueryServiceTest {
 		
 		// Restrict to given codeSystem
 		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
-		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName("Automobiles-1.0"));
+		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName(RESOURCE_NAME));
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
 		EntityDescriptionQuery query = new EntityDescriptionQueryImpl(null, filters, restrictions);
 				
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, DataField.ABOUT, 
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, RESOURCE_NAME, DataField.ABOUT, 
 				StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), testValidData);		
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, DataField.ABOUT, 
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, RESOURCE_NAME, DataField.ABOUT, 
 				StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), !testValidData);		
 	}
 	
@@ -103,13 +105,13 @@ public class LexEvsEntityQueryServiceTest {
 		
 		// Restrict to given codeSystem
 		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
-		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName("Automobiles-1.0"));
+		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName(RESOURCE_NAME));
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
 		EntityDescriptionQuery query = new EntityDescriptionQueryImpl(null, filters, restrictions);
 
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, DataField.RESOURCE_SYNOPSIS, 					
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, RESOURCE_NAME, DataField.RESOURCE_SYNOPSIS, 					
 				StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference(), testValidData);
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, DataField.RESOURCE_SYNOPSIS, 					
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, RESOURCE_NAME, DataField.RESOURCE_SYNOPSIS, 					
 				StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference(), !testValidData);
 	}
 		
@@ -122,13 +124,13 @@ public class LexEvsEntityQueryServiceTest {
 		
 		// Restrict to given codeSystem
 		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
-		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName("Automobiles-1.0"));
+		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName(RESOURCE_NAME));
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
 		EntityDescriptionQuery query = new EntityDescriptionQueryImpl(null, filters, restrictions);
 
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, DataField.RESOURCE_NAME, 
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, RESOURCE_NAME, DataField.RESOURCE_NAME, 
 					StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference(), testValidData);		
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, DataField.RESOURCE_NAME, 
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, RESOURCE_NAME, DataField.RESOURCE_NAME, 
 				StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference(), !testValidData);		
 	}
 		
@@ -143,11 +145,11 @@ public class LexEvsEntityQueryServiceTest {
 		
 		// Restrict to given codeSystem
 		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
-		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName("Automobiles-1.0"));
+		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName(RESOURCE_NAME));
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
 		EntityDescriptionQuery query = new EntityDescriptionQueryImpl(null, filters, restrictions);
 
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithDefaultFilterCreated(service, query, true, true, true);		
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithDefaultFilterCreated(service, query, RESOURCE_NAME, true, true, true);		
 	}
 
 	// Count with VALID values with one MISMATCHED
@@ -160,16 +162,16 @@ public class LexEvsEntityQueryServiceTest {
 		
 		// Restrict to given codeSystem
 		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
-		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName("Automobiles-1.0"));
+		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName(RESOURCE_NAME));
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
 		EntityDescriptionQuery query = new EntityDescriptionQueryImpl(null, filters, restrictions);
 
 		// About wrong index
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithDefaultFilterCreated(service, query, false, true, true);
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithDefaultFilterCreated(service, query, RESOURCE_NAME, false, true, true);
 		// ResourceSynopsis wrong index
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithDefaultFilterCreated(service, query, true, false, true);
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithDefaultFilterCreated(service, query, RESOURCE_NAME, true, false, true);
 		// ResourceName wrong index
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithDefaultFilterCreated(service, query, true, true, false);
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithDefaultFilterCreated(service, query, RESOURCE_NAME, true, true, false);
 	}
 	
 
@@ -183,7 +185,10 @@ public class LexEvsEntityQueryServiceTest {
 		fakeLexEvs = new FakeLexEvsSystem<EntityDescription, EntityDirectoryEntry, EntityDescriptionQuery, LexEvsEntityQueryService>();
 		LexEvsEntityQueryService service;
 		
-		EntityDescriptionQuery query = null;
+		// Restrict to given codeSystem
+		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
+		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName(RESOURCE_NAME));
+		EntityDescriptionQuery query = new EntityDescriptionQueryImpl(null, null, restrictions);
 		DirectoryResult<EntityDirectoryEntry> directoryResult = null;
 		
 		Page page = new Page();
@@ -199,7 +204,7 @@ public class LexEvsEntityQueryServiceTest {
 				query = new EntityDescriptionQueryImpl(null, null, null);
 				directoryResult = null; 
 				
-				fakeLexEvs.executeGetResourceSummariesForEachPage(service, directoryResult, query, page, lastPage);		
+				fakeLexEvs.executeGetResourceSummariesForEachPage(service, directoryResult, query, RESOURCE_NAME, page, lastPage);		
 			}
 		}
 	}
@@ -215,11 +220,11 @@ public class LexEvsEntityQueryServiceTest {
 
 		// Restrict to given codeSystem
 		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
-		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName("Automobiles-1.0"));
+		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName(RESOURCE_NAME));
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
 		EntityDescriptionQuery query = new EntityDescriptionQueryImpl(null, filters, restrictions);
 		DirectoryResult<EntityDirectoryEntry> directoryResult = null;
 		
-		fakeLexEvs.executeGetResourceSummariesWithDeepComparisonForEachPropertyReference(service, directoryResult, query, page, lastPage);		
+		fakeLexEvs.executeGetResourceSummariesWithDeepComparisonForEachPropertyReference(service, directoryResult, query, RESOURCE_NAME, page, lastPage);		
 	}
 }

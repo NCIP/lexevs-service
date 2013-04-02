@@ -85,9 +85,9 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filters, null, null);
 				
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, DataField.ABOUT, 
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, null, DataField.ABOUT, 
 				StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), testValidData);		
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, DataField.ABOUT, 
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, null, DataField.ABOUT, 
 				StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), !testValidData);		
 	}
 	
@@ -101,9 +101,9 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filters, null, null);
 
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, DataField.RESOURCE_SYNOPSIS, 					
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, null,DataField.RESOURCE_SYNOPSIS, 					
 				StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference(), testValidData);
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, DataField.RESOURCE_SYNOPSIS, 					
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, null, DataField.RESOURCE_SYNOPSIS, 					
 				StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference(), !testValidData);
 	}
 		
@@ -117,9 +117,9 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filters, null, null);
 
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, DataField.RESOURCE_NAME, 
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, null, DataField.RESOURCE_NAME, 
 					StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference(), testValidData);		
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, DataField.RESOURCE_NAME, 
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithSuppliedFilter(service, query, null, DataField.RESOURCE_NAME, 
 				StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference(), !testValidData);		
 	}
 		
@@ -135,7 +135,7 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filters, null, null);
 
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithDefaultFilterCreated(service, query, true, true, true);		
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithDefaultFilterCreated(service, query, null, true, true, true);		
 	}
 
 	// Count with VALID values with one MISMATCHED
@@ -150,11 +150,11 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filters, null, null);
 
 		// About wrong index
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithDefaultFilterCreated(service, query, false, true, true);
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithDefaultFilterCreated(service, query, null, false, true, true);
 		// ResourceSynopsis wrong index
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithDefaultFilterCreated(service, query, true, false, true);
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithDefaultFilterCreated(service, query, null, true, false, true);
 		// ResourceName wrong index
-		fakeLexEvs.executeCountForEachExistingCodeSchemeWithDefaultFilterCreated(service, query, true, true, false);
+		fakeLexEvs.executeCountForEachExistingCodeSchemeWithDefaultFilterCreated(service, query, null, true, true, false);
 	}
 	
 
@@ -184,7 +184,7 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 				query = new CodeSystemVersionQueryImpl(null, null, null, null);
 				directoryResult = null; 
 				
-				fakeLexEvs.executeGetResourceSummariesForEachPage(service, directoryResult, query, page, lastPage);		
+				fakeLexEvs.executeGetResourceSummariesForEachPage(service, directoryResult, query, null, page, lastPage);		
 			}
 		}
 	}
@@ -202,6 +202,6 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filters, null, null);
 		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = null; 
 		
-		fakeLexEvs.executeGetResourceSummariesWithDeepComparisonForEachPropertyReference(service, directoryResult, query, page, lastPage);		
+		fakeLexEvs.executeGetResourceSummariesWithDeepComparisonForEachPropertyReference(service, directoryResult, query, null, page, lastPage);		
 	}
 }
