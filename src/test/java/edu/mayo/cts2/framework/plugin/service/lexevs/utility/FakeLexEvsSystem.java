@@ -25,7 +25,6 @@ import edu.mayo.cts2.framework.model.core.PropertyReference;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
-import edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion.LexEvsCodeSystemVersionReadService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.FakeLexEvsData.DataField;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 import edu.mayo.cts2.framework.service.profile.QueryService;
@@ -43,6 +42,23 @@ public class FakeLexEvsSystem <DescriptionTemplate, EntryTemplate, QueryTemplate
 
 	public FakeLexEvsSystem() throws Exception {
 		fakeData = new FakeLexEvsData();
+	}
+	
+	public boolean isMappingCodingScheme(String codingSchemeName,
+			CodingSchemeVersionOrTag codingSchemeVersionOrTag){
+		boolean answer = false;
+		String fakeName, fakeVersion, codeVersion;
+		for(int schemeIndex=0; schemeIndex < fakeData.size(); schemeIndex++){
+			fakeName = fakeData.getScheme_DataField(schemeIndex, DataField.ABOUT).toUpperCase();
+			fakeVersion = fakeData.getScheme_DataField(schemeIndex, DataField.RESOURCE_VERSION).toUpperCase();
+			codeVersion = codingSchemeVersionOrTag.getVersion().toUpperCase();
+			if(fakeName.equals(codingSchemeName.toUpperCase())){
+				if(fakeVersion.equals(codeVersion)){
+					answer = fakeData.isMapping(schemeIndex);					
+				}
+			}
+		}
+		return answer;
 	}
 
 	public CodingSchemeRenderingList createFakeCodingSchemeRenderingList(Service service, boolean withData){
@@ -124,8 +140,8 @@ public class FakeLexEvsSystem <DescriptionTemplate, EntryTemplate, QueryTemplate
 			Service service, boolean withData) throws LBException {
 		// Mock LexBigService
 		LexBIGService lexBigService = EasyMock.createMock(LexBIGService.class);
-//		createMockedGetSupportedCodingSchemes(service, lexBigService, withData);
-//		createMockedGetNodeSetMethod(lexBigService);
+		createMockedGetSupportedCodingSchemes(service, lexBigService, withData);
+		createMockedGetNodeSetMethod(lexBigService);
 		createMockedResolveCodingScheme(lexBigService);
 		EasyMock.replay(lexBigService);
 

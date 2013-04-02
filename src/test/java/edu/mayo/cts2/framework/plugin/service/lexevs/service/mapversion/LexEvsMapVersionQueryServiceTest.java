@@ -61,8 +61,8 @@ public class LexEvsMapVersionQueryServiceTest {
 
 		// Overwrite objects in service object 
 		service.setCodeSystemVersionNameConverter(new CodeSystemVersionNameConverter());
-		service.setCodingSchemeToMapVersionTransform(new CodingSchemeToMapVersionTransform());
-		service.setMappingExtension(new MappingExtensionImpl());
+		service.setCodingSchemeToMapVersionTransform(new CodingSchemeToMapVersionTransform(new CodeSystemVersionNameConverter()));
+		service.setMappingExtension(new MappingExtensionImpl(fakeLexEvs));
 		
 		return service;
 	}
