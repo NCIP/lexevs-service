@@ -26,7 +26,6 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service.mapversion;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -36,7 +35,6 @@ import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.LexBIG.Exceptions.LBException;
-import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Constructors;
@@ -45,7 +43,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.command.Page;
-import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.EntityReferenceList;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
@@ -62,10 +59,9 @@ import edu.mayo.cts2.framework.model.service.mapversion.types.MapRole;
 import edu.mayo.cts2.framework.model.service.mapversion.types.MapStatus;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonMapUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonGetResourceSummaries;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
-import edu.mayo.cts2.framework.service.command.restriction.MapVersionQueryServiceRestrictions;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.QueryData;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQuery;
@@ -95,80 +91,26 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	public void setCodeSystemVersionNameConverter(CodeSystemVersionNameConverter converter){
 		this.nameConverter = converter;
 	}
+	
+	public CodeSystemVersionNameConverter getCodeSystemVersionNameConverter(){
+		return this.nameConverter;
+	}
+	
 	public void setCodingSchemeToMapVersionTransform(CodingSchemeToMapVersionTransform transformer){
 			this.codingSchemeToMapVersionTransform = transformer;
+	}
+	
+	public CodingSchemeToMapVersionTransform getCodingSchemeToMapVersionTransform(){
+		return this.codingSchemeToMapVersionTransform;
 	}
 
 	public void setMappingExtension(MappingExtension extension){
 		this.mappingExtension = extension;
 	}
 
-	// ------- Helper methods ---------------------
-	protected boolean validateMappingCodingScheme(String uri, String version){
-		try {
-			if(this.mappingExtension != null){
-				return this.mappingExtension.
-					isMappingCodingScheme(
-							uri, 
-							Constructors.createCodingSchemeVersionOrTagFromVersion(version));
-			}
-			else {
-				return false;
-			}
-		} catch (LBParameterException e) {
-			throw new RuntimeException(e);
-		}
+	public MappingExtension getMappingExtension(){
+		return this.mappingExtension;
 	}
-	
-		
-	// ------ Local methods ----------------------	
-	protected CodingSchemeRendering[] doGetResourceSummaries(
-			MapVersionQuery query, SortCriteria sortCriteria) {
-
-		Set<ResolvedFilter> filters = null; 
-		MapVersionQueryServiceRestrictions mapVersionQueryServiceRestrictions = null;
-		
-		if (query != null) {
-			mapVersionQueryServiceRestrictions = query.getRestrictions();
-			filters = query.getFilterComponent();
-		}		
-		
-		NameOrURI codeSystem = null;
-		if (mapVersionQueryServiceRestrictions != null) {
-			codeSystem = query.getRestrictions().getMap();  
-		}
-		
-		String searchCodingSchemeName = null;
-		if (codeSystem != null) {
-			searchCodingSchemeName = (codeSystem.getUri() != null) ? codeSystem.getUri() : codeSystem.getName();
-		}
-		
-		LexBIGService lexBigService = getLexBigService();
-		try {
-			CodingSchemeRenderingList csrFilteredList = lexBigService.getSupportedCodingSchemes();
-			
-			// Remove any items in above returned list that are not LexEVS MappingCodeScheme type CodeSchemes 
-			csrFilteredList = CommonMapUtils.filterByMappingCodingSchemes(csrFilteredList, mappingExtension);
-			
-			if (searchCodingSchemeName != null) {
-				csrFilteredList = CommonSearchFilterUtils.filterResourceSummariesByCodingSchemeName(searchCodingSchemeName, csrFilteredList);
-			}
-			
-			if ((filters != null) && (csrFilteredList != null) && (csrFilteredList.getCodingSchemeRenderingCount() > 0)) {
-				Iterator<ResolvedFilter> filtersItr = filters.iterator();
-				while (filtersItr.hasNext() && (csrFilteredList.getCodingSchemeRenderingCount() > 0)) {
-						ResolvedFilter resolvedFilter = filtersItr.next();
-						csrFilteredList = CommonSearchFilterUtils.filterResourceSummariesByResolvedFilter(resolvedFilter, 
-								csrFilteredList, nameConverter);
-				}
-			}
-						
-			return csrFilteredList.getCodingSchemeRendering();
-		} catch(Exception e){
-			throw new RuntimeException(e);
-		}
-	}
-	
 	
 	// -------- Implemented methods ----------------
 	
@@ -182,7 +124,12 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	 */
 	@Override
 	public int count(MapVersionQuery query) {
-		return this.doGetResourceSummaries(query, null).length;
+		LexBIGService lexBigService = this.getLexBigService();
+		QueryData<MapVersionQuery> queryData = new QueryData<MapVersionQuery>(query);
+		
+		CodingSchemeRenderingList csrFilteredList;
+		csrFilteredList = CommonGetResourceSummaries.getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, null);
+		return csrFilteredList.getCodingSchemeRendering().length;
 	}
 
 	
@@ -192,8 +139,14 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	@Override
 	public DirectoryResult<MapVersionDirectoryEntry> getResourceSummaries(
 			MapVersionQuery query, SortCriteria sortCriteria, Page page) {
-
-		CodingSchemeRendering[] csRendering = this.doGetResourceSummaries(query, sortCriteria);
+		LexBIGService lexBigService = this.getLexBigService();
+		CodingSchemeRendering[] csRendering;
+		QueryData<MapVersionQuery> queryData = new QueryData<MapVersionQuery>(query);
+		
+		CodingSchemeRenderingList csrFilteredList;
+		csrFilteredList = CommonGetResourceSummaries.getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, sortCriteria);
+		csRendering = csrFilteredList.getCodingSchemeRendering();
+		
 		CodingSchemeRendering[] csRenderingPage = CommonUtils.getRenderingPage(csRendering, page);
 
 		List<MapVersionDirectoryEntry> list = new ArrayList<MapVersionDirectoryEntry>();
@@ -217,8 +170,14 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	@Override
 	public DirectoryResult<MapVersion> getResourceList(MapVersionQuery query,
 			SortCriteria sortCriteria, Page page) {
-
-		CodingSchemeRendering[] csRendering = this.doGetResourceSummaries(query, sortCriteria);
+		LexBIGService lexBigService = this.getLexBigService();
+		CodingSchemeRendering[] csRendering;
+		QueryData<MapVersionQuery> queryData = new QueryData<MapVersionQuery>(query);
+		
+		CodingSchemeRenderingList csrFilteredList;
+		csrFilteredList = CommonGetResourceSummaries.getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, sortCriteria);
+		csRendering = csrFilteredList.getCodingSchemeRendering();
+		
 		CodingSchemeRendering[] csRenderingPage = CommonUtils.getRenderingPage(csRendering, page);
 		
 		List<MapVersion> list = new ArrayList<MapVersion>();

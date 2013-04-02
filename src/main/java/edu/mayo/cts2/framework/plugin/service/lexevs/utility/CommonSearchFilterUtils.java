@@ -1,13 +1,22 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
+import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.LexGrid.codingSchemes.CodingScheme;
 
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PropertyReference;
+import edu.mayo.cts2.framework.model.service.core.NameOrURI;
+import edu.mayo.cts2.framework.model.service.mapversion.types.MapRole;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestrictions.CodeSystemRestriction;
 
 public class CommonSearchFilterUtils {
 
@@ -140,5 +149,38 @@ public class CommonSearchFilterUtils {
 		}
 		return false;
 	}
+	
+	public static List<CodingScheme> filterByCodeSystemRestriction(LexBIGService lexBigService, CodingSchemeRenderingList csrFilteredList, 
+			CodeSystemRestriction codeSystemRestriction) {
+
+		List<CodingScheme> codingSchemeList = new ArrayList<CodingScheme>();
+
+		MapRole codeSystemRestrictionMapRole = null;
+		Set<NameOrURI> codeSystemSet = null;
+		if (codeSystemRestriction != null) {
+			codeSystemRestrictionMapRole = codeSystemRestriction.getMapRole();
+			codeSystemSet = codeSystemRestriction.getCodeSystems();
+		}
+		
+		String csrMapRoleValue = null;
+		if (codeSystemRestrictionMapRole != null) {
+			csrMapRoleValue = codeSystemRestrictionMapRole.value();
+		}
+		
+		if (csrMapRoleValue != null && codeSystemSet != null && codeSystemSet.size() > 0) {
+			// Get array of CodingSchemeRendering object and loop checking each item in array
+			CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
+			for (CodingSchemeRendering render : csRendering) {
+				CodingScheme codingScheme = CommonUtils.getCodingSchemeForCodeSystemRestriction(lexBigService, render, codeSystemSet, csrMapRoleValue); 
+				if (codingScheme != null) {
+					codingSchemeList.add(codingScheme);
+				}
+			}			
+		} 
+		
+		return codingSchemeList;		
+	}
+	
+
 
 }

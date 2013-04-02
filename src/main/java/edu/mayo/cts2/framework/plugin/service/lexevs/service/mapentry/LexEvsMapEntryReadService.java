@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.LexGrid.LexBIG.DataModel.Collections.ResolvedConceptReferenceList;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension.Mapping;
@@ -61,7 +60,7 @@ public class LexEvsMapEntryReadService extends AbstractLexEvsService implements 
 			mapVersion = nameOrURI.getName() != null ? nameOrURI.getName() : nameOrURI.getUri();
 		}
 				
-		String mappingUri = identifier.getUri(); // Is this the sourceEntity's URI? Not the Map's codingSchemeURI, right?		
+//		String mappingUri = identifier.getUri(); // Is this the sourceEntity's URI? Not the Map's codingSchemeURI, right?		
 		String relationsContainerName = null;   // if left null, the Mapping.resolveMapping() throws NullPointerException
 		
 		Mapping mapping = null;

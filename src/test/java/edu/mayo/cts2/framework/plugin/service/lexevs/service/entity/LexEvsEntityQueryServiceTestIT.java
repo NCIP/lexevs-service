@@ -25,7 +25,6 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
@@ -35,7 +34,6 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
-import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.junit.Test;
 
@@ -62,6 +60,14 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 
 	// local methods
 	// --------------
+	private void setAnonymousTransformer(){
+		service.setEntityTransformer(new EntityTransform(){
+			public EntityDirectoryEntry transformToEntry(ResolvedConceptReference reference){
+				return new EntityDirectoryEntry();
+			}
+		});
+	}
+
 	private EntityDescriptionQuery createQuery(String matchAlgorithmReference, String matchValue, String codeSystemVersion){
 		// Create filters for query
 		// ------------------------
@@ -101,13 +107,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	public void testGetResourceSummaries_CodingSchemeExists_andNotEmpty() throws Exception {
 		final NameOrURI name = ModelUtils.nameOrUriFromName("Automobiles-1.0");
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 		
 		// Create restriction for query
 		// ----------------------------
@@ -137,13 +137,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	public void testGetResourceSummaries_CodingSchemeDoesNotExist() throws Exception {
 		final NameOrURI name = ModelUtils.nameOrUriFromName("Automooobiles-1.0");
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 		
 		// Create restriction for query
 		// ----------------------------
@@ -170,13 +164,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_startsWith() throws Exception {
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 				
 		// Create query
 		// ------------
@@ -201,13 +189,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_startsWith_Empty() throws Exception {
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 				
 		// Create query
 		// ------------
@@ -233,13 +215,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_exactMatch() throws Exception {
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 				
 		// Create query
 		// ------------
@@ -264,13 +240,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_exactMatch_Empty() throws Exception {
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 				
 		// Create query
 		// ------------
@@ -298,13 +268,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		// NOTE:  The CTS2 "word starts with" filtered query maps to the LexEVS "contains" registered
 		//   filter extension
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 		
 		// Create query
 		// ------------
@@ -329,13 +293,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_contains_Empty() throws Exception {
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 		
 		// Create query
 		// ------------
@@ -363,13 +321,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		// NOTE:  The CTS2 "word starts with" filtered query maps to the LexEVS "contains" registered
 		//   filter extension
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 		
 		// Create query
 		// ------------
@@ -395,13 +347,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_Leading_Wildcard() throws Exception {
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 		
 		// Create query - searching for "General Motors" entity
 		// ------------
@@ -427,13 +373,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_Leading_Wildcard_Empty() throws Exception {
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 		
 		// Create query
 		// ------------
@@ -458,13 +398,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_Lagging_Wildcard() throws Exception {
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 		
 		// Create query - searching for "General Motors" entity
 		// ------------
@@ -490,13 +424,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_Lagging_Wildcard_Empty() throws Exception {
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 		
 		// Create query
 		// ------------
@@ -522,13 +450,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_LeadingAndLagging_Wildcard() throws Exception {
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 		
 		// Create query - searching for "General Motors" entity
 		// ------------
@@ -554,13 +476,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_LeadingAndLagging_Wildcard_Empty() throws Exception {
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 		
 		// Create query
 		// ------------
@@ -588,13 +504,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		// NOTE:  The CTS2 "word starts with" filtered query maps to the LexEVS "contains" registered
 		//   filter extension
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 		
 		// Create query
 		// ------------
@@ -624,7 +534,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		assertTrue("Expected to be at the end of the pages ", directoryResult.isAtEnd());
 
 	}	
-
+	
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_Paging_Empty() throws Exception {
@@ -632,13 +542,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		// NOTE:  The CTS2 "word starts with" filtered query maps to the LexEVS "contains" registered
 		//   filter extension
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 		
 		// Create query
 		// ------------
