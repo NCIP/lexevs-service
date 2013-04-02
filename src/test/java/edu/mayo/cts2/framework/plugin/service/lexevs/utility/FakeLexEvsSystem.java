@@ -7,14 +7,22 @@ import java.util.Set;
 
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.Collections.LocalNameList;
+import org.LexGrid.LexBIG.DataModel.Core.AbsoluteCodingSchemeVersionReference;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.LexBIG.Exceptions.LBException;
+import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.LexGrid.LexBIG.Utility.ServiceUtility;
+import org.LexGrid.codingSchemes.CodingScheme;
+import org.LexGrid.naming.Mappings;
+import org.apache.commons.lang.StringUtils;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
+import org.lexevs.dao.database.utility.DaoUtility;
+import org.lexevs.registry.model.RegistryEntry;
 
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
@@ -63,25 +71,11 @@ public class FakeLexEvsSystem <DescriptionTemplate, EntryTemplate, QueryTemplate
 	}
 	
 	public void createMockedGetNodeSetMethod(LexBIGService lexBigService) throws LBException{
-//		final Capture<String> captureCodingScheme = new Capture<String>();
-//		final Capture<CodingSchemeVersionOrTag> captureVersion = new Capture<CodingSchemeVersionOrTag>();
-//		final Capture<LocalNameList> captureNameList = new Capture<LocalNameList>();
-		
-//		EasyMock.expect(lexBigService.getNodeSet(EasyMock.capture(captureCodingScheme), 
-//				EasyMock.capture(captureVersion), 
-//				EasyMock.capture(captureNameList))).andAnswer(
-//		EasyMock.expect(lexBigService.getNodeSet(EasyMock.anyObject(), EasyMock.anyObject(), EasyMock.anyObject())).andAnswer(
 		EasyMock.expect(lexBigService.getNodeSet((String) EasyMock.anyObject(), (CodingSchemeVersionOrTag) EasyMock.anyObject(), (LocalNameList) EasyMock.anyObject())).andAnswer(
 		    new IAnswer<CodedNodeSet>() {
 		        @Override
-		        public CodedNodeSet answer() throws Throwable {
-		        	// Mock CodedNodeSet
-//		        	CodedNodeSet codedNodeSet = EasyMock.createMock(CodedNodeSetImpl.class);
-//		        	createMockedRestrictToMatchingDesignation(codedNodeSet);
-		        	
+		        public CodedNodeSet answer() throws Throwable {		        	
 		        	FakeCodedNodeSetImpl codedNodeSet = new FakeCodedNodeSetImpl();
-//		        	String codingScheme = captureCodingScheme.getValue(); // (String) EasyMock.getCurrentArguments()[0];
-//		        	CodingSchemeVersionOrTag version = captureVersion.getValue(); // (CodingSchemeVersionOrTag) EasyMock.getCurrentArguments()[1];
 		        	String codingScheme =  (String) EasyMock.getCurrentArguments()[0];
 		        	CodingSchemeVersionOrTag version = (CodingSchemeVersionOrTag) EasyMock.getCurrentArguments()[1];
 
@@ -92,57 +86,34 @@ public class FakeLexEvsSystem <DescriptionTemplate, EntryTemplate, QueryTemplate
 		        		}
 		        	}
 		        	
-//		        	codedNodeSet.restrictToMatchingDesignations(codingScheme, SearchDesignationOption.ALL, null, null);
-//        			codedNodeSet.restrictToMatchingDesignations(version.getVersion(), SearchDesignationOption.ALL, null, null);
-		        	
 		        	return codedNodeSet;
 		        }
 		    }
 		).anyTimes();
 	}
-	
-//	public void createMockedRestrictToMatchingDesignation(CodedNodeSet codedNodeSet) throws LBInvocationException, LBParameterException{
-//		final Capture<String> matchText = new Capture<String>();
-//		final Capture<SearchDesignationOption> option = new Capture<SearchDesignationOption>();
-//		final Capture<String> matchAlgorithm = new Capture<String>();
-//		final Capture<String> language = new Capture<String>();
-//		
-//		EasyMock.expect(codedNodeSet.restrictToMatchingDesignations(EasyMock.capture(matchText), 
-//				EasyMock.capture(option), 
-//				EasyMock.capture(matchAlgorithm), 
-//				EasyMock.capture(language))).andAnswer(
-//			new IAnswer<CodedNodeSet>(){
-//
-//				@Override
-//				public CodedNodeSet answer() throws Throwable {
-//	
-//	ConceptReferenceList codeList = new ConceptReferenceList();
-//	for(int i=0; i < fakeData.size(); i++){
-//		if(fakeData.getScheme_DataField(i, DataField.ABOUT).toUpperCase().equals(codingScheme.toUpperCase()) &&
-//		(fakeData.getScheme_DataField(i, DataField.RESOURCE_VERSION).toUpperCase().equals(version.getVersion().toUpperCase()))){
-//    		ConceptReference ref = new ConceptReference();
-//    		ref.setCodingSchemeName(codingScheme);
-//    	// TODO: set version???
-//    	
-//	codedNodeSet.restrictToCodes(codeList );
-	//		}
-//	}
-//
-//					this.toNodeListCodes = null;
-//					FakeRestrictToMatchingDesignations op = new FakeRestrictToMatchingDesignations(matchText.getValue(), option.getValue(), matchAlgorithm.getValue(), language.getValue());
-//					
-//					if(!this.pendingOperations_.contains(op)) {
-//						this.pendingOperations_.add(op);
-//					}
-//					return null;
-//				}
-//			}
-//						
-//		);
-//		
-//	}
-//
-	
+
+
+	private void createMockedResolveCodingScheme(LexBIGService lexBigService) throws LBException{
+		EasyMock.expect(lexBigService.resolveCodingScheme((String) EasyMock.anyObject(), (CodingSchemeVersionOrTag) EasyMock.anyObject())).andAnswer(
+			    new IAnswer<CodingScheme>() {
+			        @Override
+			        public CodingScheme answer() throws Throwable {		        	
+			        	String codingSchemeName =  (String) EasyMock.getCurrentArguments()[0];
+			        	CodingSchemeVersionOrTag tagOrVersion = (CodingSchemeVersionOrTag) EasyMock.getCurrentArguments()[1];
+			        	CodingScheme codingScheme = new CodingScheme();
+			        	
+			        	//TODO: Need to set the values with correct data
+			        	codingScheme.setCodingSchemeName(codingSchemeName);
+			        	codingScheme.setRepresentsVersion(tagOrVersion.getVersion());
+			        	codingScheme.setCodingSchemeURI("");
+			        	codingScheme.setFormalName("");
+			        	codingScheme.setLocalName(new String[0]);
+			        	return codingScheme;
+			        }
+			    }
+			).anyTimes();
+	}
+
 	public void createMockedGetSupportedCodingSchemes(Service service, LexBIGService lexBigService, boolean withData) throws LBException{
 		// Mock LexBigService.getSupportedCodingSchemes method
 		CodingSchemeRenderingList list = createFakeCodingSchemeRenderingList(service, withData);
@@ -158,11 +129,12 @@ public class FakeLexEvsSystem <DescriptionTemplate, EntryTemplate, QueryTemplate
 		LexBIGService lexBigService = EasyMock.createMock(LexBIGService.class);
 		createMockedGetSupportedCodingSchemes(service, lexBigService, withData);
 		createMockedGetNodeSetMethod(lexBigService);
+		createMockedResolveCodingScheme(lexBigService);
 		EasyMock.replay(lexBigService);
 
 		return lexBigService;
 	}
-
+	
 	public int size() {
 		return fakeData.size();
 	}
@@ -193,6 +165,9 @@ public class FakeLexEvsSystem <DescriptionTemplate, EntryTemplate, QueryTemplate
 		return ((size / maxToReturn) + 2);
 	}
 
+	// -------------------------
+	// --- Methods for getCount
+	// -------------------------
 	@SuppressWarnings("unchecked")
 	public void executeCount(Service service,
 			QueryTemplate query, 
@@ -278,6 +253,9 @@ public class FakeLexEvsSystem <DescriptionTemplate, EntryTemplate, QueryTemplate
 		}
 	}
 
+	// -------------------------------------
+	// --- Methods for getResourceSummaries
+	// -------------------------------------
 	public void executeGetResourceSummariesForEachPage(
 			Service service, DirectoryResult<EntryTemplate> directoryResult,
 			QueryTemplate query, 
@@ -406,4 +384,139 @@ public class FakeLexEvsSystem <DescriptionTemplate, EntryTemplate, QueryTemplate
 		assertEquals("Expecting " + expecting + " entries but got " + actual,
 				expecting, actual);
 	}
+
+	// -------------------------------------
+	// --- Methods for getResourceList
+	// -------------------------------------
+	public void executeGetResourceListForEachPage(
+			Service service, DirectoryResult<DescriptionTemplate> directoryResult,
+			QueryTemplate query, 
+			String codeSystemRestriction,
+			Page page, int lastPage) throws Exception {
+		for (int pageIndex = page.getPage(); pageIndex <= lastPage; pageIndex++) {
+			page.setPage(pageIndex);
+			
+			int tempCount = fakeData.getCount(null, codeSystemRestriction);
+			int expecting = calculateExpectingValueForSpecificPage(tempCount, page);
+
+			executeGetResourceList(service, directoryResult, query, page, expecting);
+		}
+	}
+
+	public void executeGetResourceListWithDeepComparisonForEachPropertyReference(
+			Service service, DirectoryResult<DescriptionTemplate> directoryResult,
+			QueryTemplate query, 
+			String codeSystemRestriction,
+			Page page, int lastPage) throws Exception {
+		this.executeGetResourceListWithDeepComparisonForEachMatchingAlgorithm(
+				service, directoryResult, query, codeSystemRestriction, page, lastPage,
+				DataField.ABOUT);
+		this.executeGetResourceListWithDeepComparisonForEachMatchingAlgorithm(
+				service, directoryResult, query, codeSystemRestriction, page, lastPage,
+				DataField.RESOURCE_SYNOPSIS);
+		this.executeGetResourceListWithDeepComparisonForEachMatchingAlgorithm(
+				service, directoryResult, query, codeSystemRestriction, page, lastPage,
+				DataField.RESOURCE_NAME);
+
+	}
+
+	// Test MatchingAlgorithms->Pages->CodingSchemes->Substrings
+	public void executeGetResourceListWithDeepComparisonForEachMatchingAlgorithm(
+			Service service, DirectoryResult<DescriptionTemplate> directoryResult,
+			QueryTemplate query, 
+			String codeSystemRestriction,
+			Page page, int lastPage, DataField dataField)
+			throws Exception {
+		// test all available matching algorithms.
+		for (MatchAlgorithmReference matchAlgorithmReference : service
+				.getSupportedMatchAlgorithms()) {
+			// test several pages, which tests all schemes, which tests all
+			// substrings....
+			executeGetResourceListWithDeepComparisonForEachPage(service,
+					directoryResult, query, codeSystemRestriction, page, lastPage, dataField,
+					matchAlgorithmReference);
+		}
+	}
+
+	// Test Pages->CodingSchemes->Substrings
+	public void executeGetResourceListWithDeepComparisonForEachPage(
+			Service service, DirectoryResult<DescriptionTemplate> directoryResult,
+			QueryTemplate query, 
+			String codeSystemRestriction,
+			Page page, int lastPage, DataField dataField,
+			MatchAlgorithmReference matchAlgorithmReference) throws Exception {
+		// Test multiple pages
+		for (int pageIndex = page.getPage(); pageIndex <= lastPage; pageIndex++) {
+			page.setPage(pageIndex);
+			// Test across all coding schemes which tests all substrings
+			executeGetResourceListWithDeepComparisonForEachCodingScheme(service,
+					directoryResult, query, codeSystemRestriction, page, dataField,
+					matchAlgorithmReference);
+		}
+	}
+
+	// Test CodingSchemes->Substrings
+	public void executeGetResourceListWithDeepComparisonForEachCodingScheme(
+			Service service, DirectoryResult<DescriptionTemplate> directoryResult,
+			QueryTemplate query, 
+			String codeSystemRestriction,
+			Page page, DataField dataField,
+			MatchAlgorithmReference matchAlgorithmReference) throws Exception {
+		// Continue test into each codingScheme, testing all substrings
+		for (int schemeIndex = 0; schemeIndex < fakeData.size(); schemeIndex++) {
+			String testValue = fakeData.getScheme_DataField(schemeIndex,
+					dataField);
+			executeGetResourceListForEachSubstring(service,
+					directoryResult, query, codeSystemRestriction, testValue, page, dataField,
+					matchAlgorithmReference);
+		}
+	}
+
+	public void executeGetResourceListForEachSubstring(
+			Service service, DirectoryResult<DescriptionTemplate> directoryResult,
+			QueryTemplate query, 
+			String codeSystemRestriction,
+			String testValue, Page page, DataField dataField,
+			MatchAlgorithmReference matchAlgorithmReference) throws Exception {
+
+		// Test all valid substrings
+		for (int start = 0; start < testValue.length(); start++) {
+			for (int end = start; end < testValue.length(); end++) {
+				testValue = testValue.substring(start, end);
+				Set<ResolvedFilter> filters = CommonTestUtils.createFilterSet(
+						dataField.propertyReference(), matchAlgorithmReference,
+						testValue);
+				for (ResolvedFilter filter : filters) {
+					query.getFilterComponent().add(filter);
+				}
+
+				int fakeResults = fakeData.getCount(query.getFilterComponent(), codeSystemRestriction);
+				int expecting = calculateExpectingValueForSpecificPage(fakeResults, page);
+
+				executeGetResourceList(service, directoryResult, query, page, expecting);
+			}
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public void executeGetResourceList(
+			Service service, DirectoryResult<DescriptionTemplate> directoryResult,
+			QueryTemplate query, Page page, int expecting) throws Exception {
+		SortCriteria sortCriteria = null;
+
+		QueryService<DescriptionTemplate, EntryTemplate, QueryTemplate> genericService;
+		genericService = (QueryService<DescriptionTemplate, EntryTemplate, QueryTemplate>) service;
+		
+		directoryResult = (DirectoryResult<DescriptionTemplate>) genericService
+				.getResourceList(query, sortCriteria, page);
+		
+		assertNotNull(directoryResult);
+
+		int actual = directoryResult.getEntries().size();
+		assertEquals("Expecting " + expecting + " entries but got " + actual,
+				expecting, actual);
+	}
+	
+	
+	
 }

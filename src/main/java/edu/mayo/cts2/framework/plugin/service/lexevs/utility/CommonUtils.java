@@ -39,26 +39,27 @@ public class CommonUtils {
 	public static CodingSchemeRendering[] getRenderingPage(CodingSchemeRendering[] csRendering, Page page) {
 		int start = page.getStart();
 		int end = page.getEnd();
-		CodingSchemeRendering [] csRenderingPage = null;
+		CodingSchemeRendering [] csRenderingPage = new CodingSchemeRendering[0];
 		
-		if(end > csRendering.length){
-			end = csRendering.length;
-		}
-		
-		if ((start == 0) && (end == csRendering.length)) {
-			csRenderingPage = csRendering;
-		} 
-		else if(start < end){
+		if(csRendering != null){
+			if(end > csRendering.length){
+				end = csRendering.length;
+			}
 			
-			int size = end - start;
-			csRenderingPage = new CodingSchemeRendering [size];
-			
-			for (int i = 0; i < csRenderingPage.length; i++) {
-				csRenderingPage[i] = csRendering[start + i];
+			if ((start == 0) && (end == csRendering.length)) {
+				csRenderingPage = csRendering;
+			} 
+			else if(start < end){
+				
+				int size = end - start;
+				csRenderingPage = new CodingSchemeRendering [size];
+				
+				for (int i = 0; i < csRenderingPage.length; i++) {
+					csRenderingPage[i] = csRendering[start + i];
+				}
 			}
 		}
-	
+		
 		return csRenderingPage;
 	}
-	
 }
