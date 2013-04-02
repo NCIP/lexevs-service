@@ -28,6 +28,7 @@ import static org.junit.Assert.assertNotNull;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
+import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContents;
 import org.junit.Test;
 
 import edu.mayo.cts2.framework.core.xml.Cts2Marshaller;
@@ -57,7 +58,13 @@ public class LexEvsMapEntryReadServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
+	@LoadContents(
+		{
+			@LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml"),
+			@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
+			@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
+		}
+	)
 	public void testRead() {
 		
 		String sourceEntityCode = "A0001";

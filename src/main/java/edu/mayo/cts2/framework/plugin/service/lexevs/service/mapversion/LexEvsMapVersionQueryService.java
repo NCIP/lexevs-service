@@ -36,6 +36,7 @@ import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.LexBIG.Exceptions.LBException;
+import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Constructors;
@@ -89,6 +90,8 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	
 	public static final String MAPPING_EXTENSION = "MappingExtension";	
 	
+	// ------ Local methods ----------------------
+	// Set methods required to test using FakeLexEvsSystem
 	public void setCodeSystemVersionNameConverter(CodeSystemVersionNameConverter converter){
 		this.nameConverter = converter;
 	}
@@ -96,11 +99,27 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 			this.codingSchemeToMapVersionTransform = transformer;
 	}
 
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(MAPPING_EXTENSION);
+	public void setMappingExtension(MappingExtension extension){
+		this.mappingExtension = extension;
 	}
+
+	// ------- Helper methods ---------------------
+	protected boolean validateMappingCodingScheme(String uri, String version){
+		try {
+			if(this.mappingExtension != null){
+				return this.mappingExtension.
+					isMappingCodingScheme(
+							uri, 
+							Constructors.createCodingSchemeVersionOrTagFromVersion(version));
+			}
+			else {
+				return false;
+			}
+		} catch (LBParameterException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 		
 	// ------ Local methods ----------------------	
 	protected CodingSchemeRendering[] doGetResourceSummaries(
@@ -153,6 +172,11 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	
 	// -------- Implemented methods ----------------
 	
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(MAPPING_EXTENSION);
+	}
+		
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.service.profile.QueryService#count(edu.mayo.cts2.framework.service.profile.ResourceQuery)
 	 */

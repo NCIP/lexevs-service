@@ -50,6 +50,10 @@ import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
 import org.springframework.stereotype.Component;
 
+import edu.mayo.cts2.framework.filter.match.ContainsMatcher;
+import edu.mayo.cts2.framework.filter.match.ExactMatcher;
+import edu.mayo.cts2.framework.filter.match.ResolvableMatchAlgorithmReference;
+import edu.mayo.cts2.framework.filter.match.StartsWithMatcher;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
@@ -71,6 +75,7 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsServi
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.PrintUtility;
 import edu.mayo.cts2.framework.service.command.restriction.EntityDescriptionQueryServiceRestrictions;
+import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQuery;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQueryService;
@@ -79,13 +84,23 @@ import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescripti
 public class LexEvsEntityQueryService extends AbstractLexEvsService 
 		implements EntityDescriptionQueryService {
 
+	@Resource
+	private CodeSystemVersionNameConverter codeSystemVersionNameConverter;
+	
+	// Local variables
+	private EntityTransform entityTransform = new EntityTransform();
+	private boolean printObjects = false;
+	
 	// Local class defined
 	private class ResolvedConceptReferenceResults{
 		private boolean atEnd;
 		private ResolvedConceptReference [] resolvedConceptReference;
 		
-		public ResolvedConceptReferenceResults(ResolvedConceptReference [] resolvedConceptReference, boolean atEnd){			
-			this.resolvedConceptReference = resolvedConceptReference.clone();
+		public ResolvedConceptReferenceResults(ResolvedConceptReference [] resolvedConceptReference, boolean atEnd){	
+			this.resolvedConceptReference = null;
+			if(resolvedConceptReference != null){
+				this.resolvedConceptReference = resolvedConceptReference.clone();
+			}
 			this.atEnd = atEnd;
 		}
 
@@ -109,14 +124,6 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		}
 		
 	}
-
-	// Local variables
-	private EntityTransform entityTransform = new EntityTransform();
-	private boolean printObjects = false;
-
-	@Resource
-	private CodeSystemVersionNameConverter codeSystemVersionNameConverter;
-	
 	
 	// ------ Local methods ----------------------
 	public CodeSystemVersionNameConverter getCodeSystemVersionNameConverter() {
@@ -166,23 +173,25 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		try {
 			iterator = this.getResolvedConceptReferencesIterator(codedNodeSet, sortCriteria);
 			
-			// Get on requested "page" of entities.  
-			// In this case we can get the "page" from the iterator, unlike in LexEvsCodeSystemVersionQueryService.
-			start = page.getStart();
-			end = page.getEnd();
-			if(end > iterator.numberRemaining()){
-				end = iterator.numberRemaining();
-				atEnd = true;				
-			}
-			resolvedConceptReferenceList = iterator.get(start, end);
-			// Get array of resolved concept references
-			
-			if(resolvedConceptReferenceList != null){
-				resolvedConceptReferences = resolvedConceptReferenceList.getResolvedConceptReference();
-				if(printObjects){
-					System.out.println("resolvedConceptReferences: " + resolvedConceptReferences.length);
+			if(iterator != null){
+				// Get on requested "page" of entities.  
+				// In this case we can get the "page" from the iterator, unlike in LexEvsCodeSystemVersionQueryService.
+				start = page.getStart();
+				end = page.getEnd();
+				if(end > iterator.numberRemaining()){
+					end = iterator.numberRemaining();
+					atEnd = true;				
 				}
-			}	
+				resolvedConceptReferenceList = iterator.get(start, end);
+				// Get array of resolved concept references
+				
+				if(resolvedConceptReferenceList != null){
+					resolvedConceptReferences = resolvedConceptReferenceList.getResolvedConceptReference();
+					if(printObjects){
+						System.out.println("resolvedConceptReferences: " + resolvedConceptReferences.length);
+					}
+				}	
+			}
 		} catch (LBInvocationException e) {
 			throw new RuntimeException(e);
 		} catch (LBParameterException e) {
@@ -196,22 +205,24 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 	
 	protected ResolvedConceptReferencesIterator getResolvedConceptReferencesIterator(CodedNodeSet codedNodeSet, SortCriteria sortCriteria){
 		ResolvedConceptReferencesIterator iterator = null;
-		try {
-			// With all null arguments the iterator will access the entire codeNodeSet
-			// This call will execute the set of filters determined in loop above
-			SortOptionList sortOptions = null;
-			LocalNameList propertyNames = null;
-			PropertyType [] propertyTypes = null; 
-			
-			iterator = codedNodeSet.resolve(sortOptions, propertyNames, propertyTypes);
-		} catch (LBInvocationException e) {
-			throw new RuntimeException(e);
-		} catch (LBParameterException e) {
-			throw new RuntimeException(e);
-		}
-		
+		if(codedNodeSet != null){
+			try {
+				// With all null arguments the iterator will access the entire codeNodeSet
+				// This call will execute the set of filters determined in loop above
+				SortOptionList sortOptions = null;
+				LocalNameList propertyNames = null;
+				PropertyType [] propertyTypes = null; 
+				
+				iterator = codedNodeSet.resolve(sortOptions, propertyNames, propertyTypes);
+			} catch (LBInvocationException e) {
+				throw new RuntimeException(e);
+			} catch (LBParameterException e) {
+				throw new RuntimeException(e);
+			}
+		}		
 		return iterator;
 	}
+	
 	
 	protected CodedNodeSet getCodedNodeSet(EntityDescriptionQuery query, SortCriteria sortCriteria){
 		CodedNodeSet codedNodeSet = null;
@@ -262,8 +273,8 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 						System.out.println("CodingSchemeRendering: ");
 						System.out.println(PrintUtility.codingSchemeSummary(codingSchemeSummary, 1));
 					}
-					
-					if(codingSchemeSummary.getLocalName().equals(codingSchemeName)){
+					// TODO: not certain this is correct
+					if(codingSchemeSummary.getLocalName().equals(codingSchemeName) && codingSchemeSummary.getRepresentsVersion().equals(versionOrTag.getVersion())){
 						found = true;
 					}
 				}
@@ -307,17 +318,22 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 	// -------- Implemented methods ----------------
 	@Override
 	public int count(EntityDescriptionQuery query) {
+		int count = 0;
+		
 		CodedNodeSet codedNodeSet = this.getCodedNodeSet(query, null);
-		ResolvedConceptReferencesIterator iterator = this.getResolvedConceptReferencesIterator(codedNodeSet, null);
-		if(iterator == null){
-			return 0;
+		
+		if(codedNodeSet != null){
+			ResolvedConceptReferencesIterator iterator = this.getResolvedConceptReferencesIterator(codedNodeSet, null);
+			if(iterator != null){
+				try {
+					return iterator.numberRemaining();
+				} catch (LBResourceUnavailableException e) {
+					throw new RuntimeException(e);
+				}
+			}
 		}
 		
-		try {
-			return iterator.numberRemaining();
-		} catch (LBResourceUnavailableException e) {
-			throw new RuntimeException(e);
-		}
+		return count;
 	}
 
 	@Override
@@ -345,22 +361,23 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 
 	@Override
 	public DirectoryResult<EntityDirectoryEntry> getResourceSummaries(EntityDescriptionQuery query, SortCriteria sortCriteria, Page page) {	
-		DirectoryResult<EntityDirectoryEntry> directoryResult = null;
 		List<EntityDirectoryEntry> list = new ArrayList<EntityDirectoryEntry>();
+		DirectoryResult<EntityDirectoryEntry> directoryResult = new DirectoryResult<EntityDirectoryEntry>(list, true);
 		
 		ResolvedConceptReferenceResults resolvedConceptReferenceResults = this.doGetResourceSummaryResults(query, sortCriteria, page);
 		
 		// Transform each reference into a CTS2 entry and add to list
 		if(resolvedConceptReferenceResults != null){
 			ResolvedConceptReference[] resolvedConceptReferences = resolvedConceptReferenceResults.getResolvedConceptReference();
-			for(ResolvedConceptReference reference : resolvedConceptReferences){
-				if(printObjects){
-					System.out.println("ResolvedConceptReference:\n" + PrintUtility.resolvedConceptReference_toString(reference, 1));
+			if(resolvedConceptReferences != null){
+				for(ResolvedConceptReference reference : resolvedConceptReferences){
+					if(printObjects){
+						System.out.println("ResolvedConceptReference:\n" + PrintUtility.resolvedConceptReference_toString(reference, 1));
+					}
+					EntityDirectoryEntry entry = entityTransform.transformToEntry(reference);
+					list.add(entry);
 				}
-				EntityDirectoryEntry entry = entityTransform.transformToEntry(reference);
-				list.add(entry);
-			}
-			
+			}			
 			directoryResult = new DirectoryResult<EntityDirectoryEntry>(list, resolvedConceptReferenceResults.isAtEnd());
 		}
 		
@@ -369,20 +386,43 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 	
 	@Override
 	public Set<? extends MatchAlgorithmReference> getSupportedMatchAlgorithms() {
-//		for(ExtensionDescription desc :
-//			this.getLexBigService().getFilterExtensions().getExtensionDescription()){
-//			
-//		}
-		// TODO
-		return null;
+
+		Set<MatchAlgorithmReference> returnSet = new HashSet<MatchAlgorithmReference>();
+
+		MatchAlgorithmReference exactMatch = StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference();
+
+		returnSet.add(ResolvableMatchAlgorithmReference
+				.toResolvableMatchAlgorithmReference(exactMatch,
+						new ExactMatcher()));
+
+		MatchAlgorithmReference contains = StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference();
+
+		returnSet.add(ResolvableMatchAlgorithmReference
+				.toResolvableMatchAlgorithmReference(contains,
+						new ContainsMatcher()));
+
+		MatchAlgorithmReference startsWith = StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference();
+
+		returnSet.add(ResolvableMatchAlgorithmReference
+				.toResolvableMatchAlgorithmReference(startsWith,
+						new StartsWithMatcher()));
+
+		return returnSet;
 	}
 	
 	@Override
 	public Set<? extends PropertyReference> getSupportedSearchReferences() {
-		PropertyReference ref = StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference();
-		// presentation
-		// resource_name - code (restricted code method)
-		return new HashSet<PropertyReference>(Arrays.asList(ref)); 
+		PropertyReference
+			name = StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference();
+		
+		PropertyReference
+			about = StandardModelAttributeReference.ABOUT.getPropertyReference();
+		
+		PropertyReference
+			description = StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference();
+		
+		return new HashSet<PropertyReference>(Arrays.asList(name,about,description));
+		
 	}
 
 	@Override

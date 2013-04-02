@@ -63,7 +63,6 @@ public class LexEvsMapEntryReadService extends AbstractLexEvsService implements 
 				
 		String mappingUri = identifier.getUri(); // Is this the sourceEntity's URI? Not the Map's codingSchemeURI, right?		
 		String relationsContainerName = null;   // if left null, the Mapping.resolveMapping() throws NullPointerException
-		relationsContainerName = "AutoToGMPMappings"; 
 		
 		Mapping mapping = null;
 		ResolvedConceptReferencesIterator resolvedConceptReferencesIterator;

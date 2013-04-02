@@ -57,8 +57,8 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	@Resource
 	private LexEvsEntityQueryService service;
 	
-	@Resource
-	private LexBIGService lbs;
+//	@Resource
+//	private LexBIGService lbs;
 
 	// local methods
 	// --------------
@@ -93,7 +93,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	@Test
 	public void testSetUp() {
 		assertNotNull(this.service);
-		assertNotNull(this.lbs);
+	//	assertNotNull(this.lbs);
 	}
 	
 	@Test
