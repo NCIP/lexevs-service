@@ -350,7 +350,7 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 			if(printObjects){
 				System.out.println("ResolvedConceptReference:\n" + PrintUtility.resolvedConceptReference_toString(reference, 1));
 			}
-			EntityDescription entry = entityTransform.transform_EntityDescription(reference);
+			EntityDescription entry = entityTransform.transformToEntity(reference);
 			list.add(entry);
 		}
 		
@@ -374,7 +374,7 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 					if(printObjects){
 						System.out.println("ResolvedConceptReference:\n" + PrintUtility.resolvedConceptReference_toString(reference, 1));
 					}
-					EntityDirectoryEntry entry = entityTransform.transform(reference);
+					EntityDirectoryEntry entry = entityTransform.transformToEntry(reference);
 					list.add(entry);
 				}
 			}			
