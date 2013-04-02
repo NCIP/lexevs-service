@@ -162,7 +162,8 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		
 		// Test results
 		// ------------
-		assertNull(directoryResult);		
+		assertNotNull(directoryResult);		
+		assertTrue(directoryResult.getEntries().size() == 0);		
 	}
 	
 	@Test
