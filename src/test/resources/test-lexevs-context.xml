@@ -28,8 +28,8 @@
 	<bean id="configInitializer"
 		class="edu.mayo.cts2.framework.core.config.TestConfigInitializerSpringFactory" />
 		
-	<bean name="lexBigServiceFactory" class="edu.mayo.cts2.framework.plugins.service.LocalClasspathLexBigServiceFactory" />
+	<bean id="lexBigServiceFactory" class="edu.mayo.cts2.framework.plugins.service.LocalClasspathLexBigServiceFactory" />
 	
-	<bean name="lexEvsOsgiClassLoader" class="edu.mayo.cts2.framework.plugins.service.LocalClasspathLexEvsOsgiClassLoader" />
+	<bean id="lexEvsOsgiClassLoader" class="edu.mayo.cts2.framework.plugins.service.LocalClasspathLexEvsOsgiClassLoader" />
 
 </beans>

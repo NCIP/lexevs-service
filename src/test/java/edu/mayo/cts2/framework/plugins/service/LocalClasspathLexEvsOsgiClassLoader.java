@@ -9,4 +9,11 @@ public class LocalClasspathLexEvsOsgiClassLoader extends LexEvsOsgiClassLoader {
 		//
 	}
 
+	public Class<?> loadClass(String clazz) throws ClassNotFoundException {
+		return Thread.currentThread().getContextClassLoader().loadClass(clazz);
+	}
+	
+	protected Object getServiceClass(String clazz, boolean forceFromJar) throws Exception {
+		return this.loadClass(clazz).newInstance();
+	}
 }
