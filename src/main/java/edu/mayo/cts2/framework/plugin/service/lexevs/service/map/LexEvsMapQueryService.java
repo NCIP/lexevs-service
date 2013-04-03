@@ -147,7 +147,7 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		QueryData<MapQuery> queryData = new QueryData<MapQuery>(query);
 		codingSchemeList = CommonGetResourceSummaries.getCodingSchemeList(lexBigService, this.getCodeSystemVersionNameConverter(), mappingExtension, queryData, sortCriteria);
 		CodingScheme[] codingSchemeArray = codingSchemeList.toArray(new CodingScheme[0]);
-		CodingScheme[] codingSchemePage = CommonUtils.getRenderingPage(codingSchemeArray, page);
+		CodingScheme[] codingSchemePage = (CodingScheme[]) CommonUtils.getRenderingPage(codingSchemeArray, page);
 		
 		List<MapCatalogEntrySummary> list = new ArrayList<MapCatalogEntrySummary>();
 
@@ -170,7 +170,7 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		QueryData<MapQuery> queryData = new QueryData<MapQuery>(query);
 		codingSchemeList = CommonGetResourceSummaries.getCodingSchemeList(lexBigService, this.getCodeSystemVersionNameConverter(), mappingExtension, queryData, sortCriteria);
 		CodingScheme[] codingSchemeArray = codingSchemeList.toArray(new CodingScheme[0]);
-		CodingScheme[] codingSchemePage = CommonUtils.getRenderingPage(codingSchemeArray, page);
+		CodingScheme[] codingSchemePage = (CodingScheme[]) CommonUtils.getRenderingPage(codingSchemeArray, page);
 		
 		List<MapCatalogEntry> list = new ArrayList<MapCatalogEntry>();
 

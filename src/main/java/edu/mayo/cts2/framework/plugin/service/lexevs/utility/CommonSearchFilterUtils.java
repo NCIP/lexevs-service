@@ -7,7 +7,12 @@ import java.util.Set;
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
+import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
+import org.LexGrid.LexBIG.Exceptions.LBParameterException;
+import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
+import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet.SearchDesignationOption;
 import org.LexGrid.codingSchemes.CodingScheme;
 
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
@@ -100,55 +105,39 @@ public class CommonSearchFilterUtils {
 		String searchType = matchAlgorithmReference.getContent();
 		
 		if (searchType.equals(Constants.SEARCH_TYPE_EXACT_MATCH)) {
-			return searchExactMatch(sourceValue, searchValue, caseSensitive);
+			return CommonStringUtils.searchExactMatch(sourceValue, searchValue, caseSensitive);
 		} else if (searchType.equals(Constants.SEARCH_TYPE_CONTAINS)) {
-			return searchContains(sourceValue, searchValue, caseSensitive);
+			return CommonStringUtils.searchContains(sourceValue, searchValue, caseSensitive);
 		} else if (searchType.equals(Constants.SEARCH_TYPE_STARTS_WITH)) {
-			return searchStartsWith(sourceValue, searchValue, caseSensitive);
+			return CommonStringUtils.searchStartsWith(sourceValue, searchValue, caseSensitive);
 		}  
 		
 		return false;
 	}
+
+	public static void filterCodedNodeSetByResolvedFilter(ResolvedFilter filter, CodedNodeSet codedNodeSet){
+		if(codedNodeSet != null){
+			try {
+				String matchText = null;
+				String matchAlgorithm = null;
+			
+				if(filter != null){
+					matchText = filter.getMatchValue();										// Value to search with 
+					matchAlgorithm = filter.getMatchAlgorithmReference().getContent();		// Extract from filter the match algorithm to use
+				}	
+				SearchDesignationOption option = SearchDesignationOption.ALL;					// Other options: PREFERRED_ONLY, NON_PREFERRED_ONLY, ALL 
+				String language = null;															// This field is not really used, uses default "en"
+				
+				codedNodeSet.restrictToMatchingDesignations(matchText, option, matchAlgorithm, language);
+			} catch (LBInvocationException e) {
+				throw new RuntimeException(e);
+			} catch (LBParameterException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
 	
-	public static boolean searchContains(String sourceValue, String searchValue, boolean caseSensitive) {
-		if (caseSensitive) {
-			if (sourceValue.indexOf(searchValue) != -1) {
-				return true;
-			}
-		} else {
-			if (sourceValue.toLowerCase().indexOf(searchValue.toLowerCase()) != -1) {
-				return true;
-			}						
-		}
-		return false;
-	}
 
-	public static boolean searchExactMatch(String sourceValue, String searchValue, boolean caseSensitive) {
-		if (caseSensitive) {
-			if (sourceValue.equals(searchValue)) {
-				return true;
-			}
-		} else {
-			if (sourceValue.equalsIgnoreCase(searchValue)) {
-				return true;
-			}						
-		}
-		return false;
-	}
-
-
-	public static boolean searchStartsWith(String sourceValue, String searchValue, boolean caseSensitive) {
-		if (caseSensitive) {
-			if (sourceValue.startsWith(searchValue)) {
-				return true;
-			}
-		} else {
-			if (sourceValue.toLowerCase().startsWith(searchValue.toLowerCase())) {
-				return true;
-			}						
-		}
-		return false;
-	}
 	
 	public static List<CodingScheme> filterByCodeSystemRestriction(LexBIGService lexBigService, CodingSchemeRenderingList csrFilteredList, 
 			CodeSystemRestriction codeSystemRestriction) {
@@ -180,6 +169,26 @@ public class CommonSearchFilterUtils {
 		
 		return codingSchemeList;		
 	}
+	
+	public static CodingSchemeRenderingList filterByMappingCodingSchemes(CodingSchemeRenderingList csrFilteredList, 
+			MappingExtension mappingExtension) {
+		CodingSchemeRenderingList temp = new CodingSchemeRenderingList();
+		
+		CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
+		for(CodingSchemeRendering render : csRendering) {
+			CodingSchemeSummary codingSchemeSummary = render.getCodingSchemeSummary();
+			
+			String uri = codingSchemeSummary.getCodingSchemeURI();
+			String version = codingSchemeSummary.getRepresentsVersion();
+			
+			if (CommonMapUtils.validateMappingCodingScheme(uri, version, mappingExtension)) {
+				temp.addCodingSchemeRendering(render);
+			}
+		}		
+		return temp;		
+	}
+
+
 	
 
 

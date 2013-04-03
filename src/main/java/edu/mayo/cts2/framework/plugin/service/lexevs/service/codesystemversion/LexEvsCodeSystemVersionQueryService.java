@@ -120,24 +120,25 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		csrFilteredList = CommonGetResourceSummaries.getCodingSchemeRenderingList(lexBigService, nameConverter, null, queryData, sortCriteria);
 		CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
 
-		CodingSchemeRendering[] csRenderingPage = CommonUtils.getRenderingPage(csRendering, page);
+		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonUtils.getRenderingPage(csRendering, page);
 		
 		List<CodeSystemVersionCatalogEntry> list = new ArrayList<CodeSystemVersionCatalogEntry>();
-
-		for (CodingSchemeRendering render : csRenderingPage) {
-			String codingSchemeName = render.getCodingSchemeSummary().getCodingSchemeURI();			
-			String version = render.getCodingSchemeSummary().getRepresentsVersion();
-			CodingSchemeVersionOrTag tagOrVersion = Constructors.createCodingSchemeVersionOrTagFromVersion(version);
-			CodingScheme codingScheme;
-			try {
-				codingScheme = this.getLexBigService().resolveCodingScheme(codingSchemeName, tagOrVersion);
-				list.add(codingSchemeTransformer.transform(codingScheme));
-			} catch (LBException e) {
-				throw new RuntimeException(e);
+		boolean atEnd = true;
+		if(csRenderingPage != null){
+			for (CodingSchemeRendering render : csRenderingPage) {
+				String codingSchemeName = render.getCodingSchemeSummary().getCodingSchemeURI();			
+				String version = render.getCodingSchemeSummary().getRepresentsVersion();
+				CodingSchemeVersionOrTag tagOrVersion = Constructors.createCodingSchemeVersionOrTagFromVersion(version);
+				CodingScheme codingScheme;
+				try {
+					codingScheme = this.getLexBigService().resolveCodingScheme(codingSchemeName, tagOrVersion);
+					list.add(codingSchemeTransformer.transform(codingScheme));
+				} catch (LBException e) {
+					throw new RuntimeException(e);
+				}
 			}
+			atEnd = (page.getEnd() >= csRendering.length) ? true : false;
 		}
-
-		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
 		
 		return new DirectoryResult<CodeSystemVersionCatalogEntry>(list, atEnd);
 	}
@@ -153,7 +154,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		csrFilteredList = CommonGetResourceSummaries.getCodingSchemeRenderingList(lexBigService, nameConverter, null, queryData, sortCriteria);
 		CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
 
-		CodingSchemeRendering[] csRenderingPage = CommonUtils.getRenderingPage(csRendering, page);
+		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonUtils.getRenderingPage(csRendering, page);
 
 		List<CodeSystemVersionCatalogEntrySummary> list = new ArrayList<CodeSystemVersionCatalogEntrySummary>();
 
