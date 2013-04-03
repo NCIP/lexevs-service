@@ -16,9 +16,9 @@
 
 	<bean class="edu.mayo.cts2.framework.util.spring.UrlConstructorSpringFactory" />
 	
-	<bean name="lexBigServiceFactory" class="edu.mayo.cts2.framework.plugin.service.lexevs.LexBigServiceFactory" />
+	<bean id="lexBigServiceFactory" class="edu.mayo.cts2.framework.plugin.service.lexevs.LexBigServiceFactory" />
 
-	<bean name="lexEvsOsgiClassLoader" class="edu.mayo.cts2.framework.plugin.service.lexevs.LexEvsOsgiClassLoader" />
+	<bean id="lexEvsOsgiClassLoader" class="edu.mayo.cts2.framework.plugin.service.lexevs.LexEvsOsgiClassLoader" />
 	
 	<util:properties id="buildProperties" location="classpath:build-info.properties" />
 
