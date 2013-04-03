@@ -30,37 +30,15 @@ public class CommonSearchFilterUtils {
 	}
 	
 	/**
-	 * Common filter routine needed for specialized CodingScheme name filtering that cannot leverage existing LexEVS filter extensions.
-	 * 
-	 * @param searchCodingSchemeName
-	 * @param csrFilteredList
-	 * @return
-	 */
-	public static CodingSchemeRenderingList filterResourceSummariesByCodingSchemeName(String searchCodingSchemeName, CodingSchemeRenderingList csrFilteredList) {
-		CodingSchemeRenderingList temp = new CodingSchemeRenderingList();
-		
-		CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
-		for(CodingSchemeRendering render : csRendering) {
-			CodingSchemeSummary codingSchemeSummary = render.getCodingSchemeSummary();
-			if (codingSchemeSummary.getLocalName().equals(searchCodingSchemeName)) {
-				temp.addCodingSchemeRendering(render);
-			}
-		}
-		
-		return temp;
-	}
-	
-	
-	/**
 	 * Common filter routine needed for specialized filtering that cannot leverage existing LexEVS filter extensions.
 	 * 
 	 * @param resolvedFilter
-	 * @param csrFilteredList
+	 * @param renderingList
 	 * @param nameConverter
 	 * @return
 	 */
-	public static CodingSchemeRenderingList filterResourceSummariesByResolvedFilter(ResolvedFilter resolvedFilter, 
-			CodingSchemeRenderingList csrFilteredList,
+	public static CodingSchemeRenderingList filterRenderingListByResolvedFilter(ResolvedFilter resolvedFilter, 
+			CodingSchemeRenderingList renderingList,
 			CodeSystemVersionNameConverter nameConverter) {
 		
 		boolean caseSensitive = false;
@@ -73,7 +51,7 @@ public class CommonSearchFilterUtils {
 		
 		String matchStr = resolvedFilter.getMatchValue();	
 		
-		CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
+		CodingSchemeRendering[] csRendering = renderingList.getCodingSchemeRendering();
 		for (CodingSchemeRendering render : csRendering) {
 			CodingSchemeSummary codingSchemeSummary = render.getCodingSchemeSummary();
 			if(codingSchemeSummary == null){
@@ -91,7 +69,7 @@ public class CommonSearchFilterUtils {
 						codingSchemeSummary.getRepresentsVersion());
 			}
 			if ((retrievedAttrValue != null) && (matchStr != null) && 
-				(isFoundForSearchUsingSearchType(retrievedAttrValue, matchStr, matchAlgorithmReference, caseSensitive))) {
+				(CommonStringUtils.executeMatchAlgorithm(retrievedAttrValue, matchStr, matchAlgorithmReference, caseSensitive))) {
 					temp.addCodingSchemeRendering(render);
 			} 
 		}  
@@ -99,22 +77,6 @@ public class CommonSearchFilterUtils {
 		return temp;
 	}
 	
-	public static boolean isFoundForSearchUsingSearchType(String sourceValue, String searchValue, 
-			MatchAlgorithmReference matchAlgorithmReference, boolean caseSensitive) {
-		
-		String searchType = matchAlgorithmReference.getContent();
-		
-		if (searchType.equals(Constants.SEARCH_TYPE_EXACT_MATCH)) {
-			return CommonStringUtils.searchExactMatch(sourceValue, searchValue, caseSensitive);
-		} else if (searchType.equals(Constants.SEARCH_TYPE_CONTAINS)) {
-			return CommonStringUtils.searchContains(sourceValue, searchValue, caseSensitive);
-		} else if (searchType.equals(Constants.SEARCH_TYPE_STARTS_WITH)) {
-			return CommonStringUtils.searchStartsWith(sourceValue, searchValue, caseSensitive);
-		}  
-		
-		return false;
-	}
-
 	public static void filterCodedNodeSetByResolvedFilter(ResolvedFilter filter, CodedNodeSet codedNodeSet){
 		if(codedNodeSet != null){
 			try {
@@ -139,48 +101,91 @@ public class CommonSearchFilterUtils {
 	
 
 	
-	public static List<CodingScheme> filterByCodeSystemRestriction(LexBIGService lexBigService, CodingSchemeRenderingList csrFilteredList, 
-			CodeSystemRestriction codeSystemRestriction) {
+	public static List<CodingScheme> filterByRenderingListAndMappingExtension(
+			LexBIGService lexBigService, 
+			CodingSchemeRenderingList renderingList, 
+			CodeSystemRestriction mappingRestriction) {
 
 		List<CodingScheme> codingSchemeList = new ArrayList<CodingScheme>();
 
-		MapRole codeSystemRestrictionMapRole = null;
 		Set<NameOrURI> codeSystemSet = null;
-		if (codeSystemRestriction != null) {
-			codeSystemRestrictionMapRole = codeSystemRestriction.getMapRole();
-			codeSystemSet = codeSystemRestriction.getCodeSystems();
-		}
+		MapRole mapRole = null;
+		CodingScheme codingScheme;
 		
-		String csrMapRoleValue = null;
-		if (codeSystemRestrictionMapRole != null) {
-			csrMapRoleValue = codeSystemRestrictionMapRole.value();
+		if (mappingRestriction != null) {
+			codeSystemSet = mappingRestriction.getCodeSystems();
+			if(haveMapRoleAndCodeSystems(mappingRestriction, codeSystemSet)){
+				mapRole = mappingRestriction.getMapRole();
+				// Get array of CodingSchemeRendering object and loop checking each item in array
+				CodingSchemeRendering[] csRendering = renderingList.getCodingSchemeRendering();
+				for (CodingSchemeRendering render : csRendering) {
+					codingScheme = CommonCodingSchemeUtils.getMappedCodingSchemeForCodeSystemRestriction(lexBigService, render, codeSystemSet, mapRole.value()); 
+					if (codingScheme != null) {
+						codingSchemeList.add(codingScheme);
+					}			
+				} 
+			}
 		}
-		
-		if (csrMapRoleValue != null && codeSystemSet != null && codeSystemSet.size() > 0) {
-			// Get array of CodingSchemeRendering object and loop checking each item in array
-			CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
-			for (CodingSchemeRendering render : csRendering) {
-				CodingScheme codingScheme = CommonCodingSchemeUtils.getMappedCodingSchemeForCodeSystemRestriction(lexBigService, render, codeSystemSet, csrMapRoleValue); 
-				if (codingScheme != null) {
-					codingSchemeList.add(codingScheme);
-				}
-			}			
-		} 
 		
 		return codingSchemeList;		
 	}
 	
-	public static CodingSchemeRenderingList filterByMappingCodingSchemes(CodingSchemeRenderingList csrFilteredList, 
-			MappingExtension mappingExtension) {
+	public static boolean haveMapRoleAndCodeSystems(CodeSystemRestriction mappingRestriction, Set<NameOrURI> codeSystemSet){
+		boolean answer = false;
+		String mapRoleValue = null;
+		MapRole mapRole = mappingRestriction.getMapRole();
+		if (mapRole != null) {
+			mapRoleValue = mapRole.value();
+			if (mapRoleValue != null && codeSystemSet != null && codeSystemSet.size() > 0) {
+				answer = true;
+			}
+		}
+		return answer;
+	}
+	
+	/**
+	 * Common filter routine needed for specialized CodingScheme name filtering that cannot leverage existing LexEVS filter extensions.
+	 * 
+	 * @param codingSchemeName
+	 * @param renderingList
+	 * @return
+	 */
+	public static CodingSchemeRenderingList filterIfCodingSchemeNameValid(String codingSchemeName, CodingSchemeRenderingList renderingList) {
+		if(codingSchemeName == null || renderingList == null){
+			return renderingList;
+		}
+		
 		CodingSchemeRenderingList temp = new CodingSchemeRenderingList();
 		
-		CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
+		CodingSchemeRendering[] csRendering = renderingList.getCodingSchemeRendering();
 		for(CodingSchemeRendering render : csRendering) {
 			CodingSchemeSummary codingSchemeSummary = render.getCodingSchemeSummary();
 			
+			// Add if names match
+			if (codingSchemeSummary.getLocalName().equals(codingSchemeName)) {
+				temp.addCodingSchemeRendering(render);
+			}
+		}
+		
+		return temp;
+	}
+	
+	public static CodingSchemeRenderingList filterIfMappingExtensionValid(
+			MappingExtension mappingExtension,
+			CodingSchemeRenderingList renderingList) {
+		if(mappingExtension == null || renderingList == null){
+			return renderingList;
+		}
+		
+		CodingSchemeRenderingList temp = new CodingSchemeRenderingList();
+		
+		CodingSchemeRendering[] csRendering = renderingList.getCodingSchemeRendering();
+		for(CodingSchemeRendering render : csRendering) {
+			CodingSchemeSummary codingSchemeSummary = render.getCodingSchemeSummary();
+			
+			// Add if valid Mapping Coding Scheme
 			String uri = codingSchemeSummary.getCodingSchemeURI();
 			String version = codingSchemeSummary.getRepresentsVersion();
-			
 			if (CommonMapUtils.validateMappingCodingScheme(uri, version, mappingExtension)) {
 				temp.addCodingSchemeRendering(render);
 			}
