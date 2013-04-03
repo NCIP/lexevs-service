@@ -59,7 +59,7 @@ import edu.mayo.cts2.framework.model.service.mapversion.types.MapRole;
 import edu.mayo.cts2.framework.model.service.mapversion.types.MapStatus;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonGetResourceSummaries;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceSummaryUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.QueryData;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
@@ -128,7 +128,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		QueryData<MapVersionQuery> queryData = new QueryData<MapVersionQuery>(query);
 		
 		CodingSchemeRenderingList csrFilteredList;
-		csrFilteredList = CommonGetResourceSummaries.getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, null);
+		csrFilteredList = CommonResourceSummaryUtils.getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, null);
 		return csrFilteredList.getCodingSchemeRendering().length;
 	}
 
@@ -144,7 +144,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		QueryData<MapVersionQuery> queryData = new QueryData<MapVersionQuery>(query);
 		
 		CodingSchemeRenderingList csrFilteredList;
-		csrFilteredList = CommonGetResourceSummaries.getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, sortCriteria);
+		csrFilteredList = CommonResourceSummaryUtils.getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, sortCriteria);
 		csRendering = csrFilteredList.getCodingSchemeRendering();
 		
 		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonUtils.getRenderingPage(csRendering, page);
@@ -175,7 +175,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		QueryData<MapVersionQuery> queryData = new QueryData<MapVersionQuery>(query);
 		
 		CodingSchemeRenderingList csrFilteredList;
-		csrFilteredList = CommonGetResourceSummaries.getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, sortCriteria);
+		csrFilteredList = CommonResourceSummaryUtils.getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, sortCriteria);
 		csRendering = csrFilteredList.getCodingSchemeRendering();
 		
 		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonUtils.getRenderingPage(csRendering, page);

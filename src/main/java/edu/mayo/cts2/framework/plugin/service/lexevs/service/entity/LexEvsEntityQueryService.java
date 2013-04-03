@@ -59,10 +59,11 @@ import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURIList;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonGetResourceSummaries;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceSummaryUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.PrintUtility;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.QueryData;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.ResolvedConceptReferenceResults;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
@@ -110,7 +111,10 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		int count = 0;
 		
 		LexBIGService lexBigService = this.getLexBigService();
-		CodedNodeSet codedNodeSet = CommonGetResourceSummaries.getCodedNodeSet(lexBigService, this.getCodeSystemVersionNameConverter(), query, null);
+		QueryData<EntityDescriptionQuery> queryData = new QueryData<EntityDescriptionQuery>(query);
+		queryData.setVersionOrTag(codeSystemVersionNameConverter);
+		CodedNodeSet codedNodeSet;
+		codedNodeSet = CommonResourceSummaryUtils.getCodedNodeSet(lexBigService, queryData, null);
 		
 		if(codedNodeSet != null){
 			ResolvedConceptReferencesIterator iterator = CommonUtils.getResolvedConceptReferencesIterator(codedNodeSet, null);
@@ -133,7 +137,10 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		List<EntityDescription> list = new ArrayList<EntityDescription>();
 		
 		LexBIGService lexBigService = this.getLexBigService();
-		ResolvedConceptReferenceResults resolvedConceptReferenceResults = CommonGetResourceSummaries.getResolvedConceptReferenceResults(lexBigService, this.getCodeSystemVersionNameConverter(), query, sortCriteria, page);
+		QueryData<EntityDescriptionQuery> queryData = new QueryData<EntityDescriptionQuery>(query);
+		queryData.setVersionOrTag(codeSystemVersionNameConverter);
+		ResolvedConceptReferenceResults resolvedConceptReferenceResults;
+		resolvedConceptReferenceResults = CommonResourceSummaryUtils.getResolvedConceptReferenceResults(lexBigService, queryData, sortCriteria, page);
 		
 		if(resolvedConceptReferenceResults != null){
 			// Transform each reference into a CTS2 entry and add to list
@@ -161,7 +168,10 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		DirectoryResult<EntityDirectoryEntry> directoryResult = new DirectoryResult<EntityDirectoryEntry>(list, true);
 		
 		LexBIGService lexBigService = this.getLexBigService();
-		ResolvedConceptReferenceResults resolvedConceptReferenceResults = CommonGetResourceSummaries.getResolvedConceptReferenceResults(lexBigService, this.getCodeSystemVersionNameConverter(), query, sortCriteria, page);
+		QueryData<EntityDescriptionQuery> queryData = new QueryData<EntityDescriptionQuery>(query);
+		queryData.setVersionOrTag(codeSystemVersionNameConverter);
+		ResolvedConceptReferenceResults resolvedConceptReferenceResults;
+		resolvedConceptReferenceResults = CommonResourceSummaryUtils.getResolvedConceptReferenceResults(lexBigService, queryData, sortCriteria, page);
 		
 		// Transform each reference into a CTS2 entry and add to list
 		if(resolvedConceptReferenceResults != null){
@@ -307,9 +317,5 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-
-
-
 }
 

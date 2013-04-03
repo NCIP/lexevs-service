@@ -160,7 +160,7 @@ public class CommonSearchFilterUtils {
 			// Get array of CodingSchemeRendering object and loop checking each item in array
 			CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
 			for (CodingSchemeRendering render : csRendering) {
-				CodingScheme codingScheme = CommonUtils.getCodingSchemeForCodeSystemRestriction(lexBigService, render, codeSystemSet, csrMapRoleValue); 
+				CodingScheme codingScheme = CommonCodingSchemeUtils.getMappedCodingSchemeForCodeSystemRestriction(lexBigService, render, codeSystemSet, csrMapRoleValue); 
 				if (codingScheme != null) {
 					codingSchemeList.add(codingScheme);
 				}

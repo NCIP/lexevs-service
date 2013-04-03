@@ -9,7 +9,6 @@ import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.Collections.LocalNameList;
 import org.LexGrid.LexBIG.DataModel.Collections.ResolvedConceptReferenceList;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
-import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
@@ -25,14 +24,11 @@ import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
-import edu.mayo.cts2.framework.service.command.restriction.EntityDescriptionQueryServiceRestrictions;
-import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQuery;
+import edu.mayo.cts2.framework.service.profile.ResourceQuery;
 
-public class CommonGetResourceSummaries {
+public class CommonResourceSummaryUtils{
 	
-	@SuppressWarnings("rawtypes")
-	public static boolean hasCodingSchemeRenderings(QueryData queryData, CodingSchemeRenderingList csrFilteredList){
+	public static <T extends ResourceQuery> boolean hasCodingSchemeRenderings(QueryData<T> queryData, CodingSchemeRenderingList csrFilteredList){
 		boolean answer = false;
 		if((queryData.getFilters() != null) && (csrFilteredList != null) && (csrFilteredList.getCodingSchemeRenderingCount() > 0)){
 			answer = true;
@@ -40,17 +36,18 @@ public class CommonGetResourceSummaries {
 		return answer;
 	}
 
-	public static ResolvedConceptReferenceResults getResolvedConceptReferenceResults(LexBIGService lexBigService, CodeSystemVersionNameConverter codeSystemVersionNameConverter, EntityDescriptionQuery query, SortCriteria sortCriteria, Page page){
+	public static <T extends ResourceQuery> ResolvedConceptReferenceResults getResolvedConceptReferenceResults(
+			LexBIGService lexBigService, 
+			QueryData<T> queryData,
+			SortCriteria sortCriteria, 
+			Page page){
 		ResolvedConceptReferenceResults results = null;
 		
-		// * if codingSchemeName exists within the query, get CodedNodeSet
-		// * for each filter existing within the query, execute restrictToMatchingDesignations on the codedNodeSet
-		CodedNodeSet codedNodeSet = CommonGetResourceSummaries.getCodedNodeSet(lexBigService, codeSystemVersionNameConverter, query, sortCriteria);
+		CodedNodeSet codedNodeSet;
+		codedNodeSet = CommonResourceSummaryUtils.getCodedNodeSet(lexBigService, queryData, sortCriteria);
 		
 		if(codedNodeSet != null){
-			// Using filtered codeNodeSet get ResolvedConceptReferenceResults
-			// -- contains an array of ResolvedConceptReference and a boolean indicating if at end of resultSet
-			results = CommonGetResourceSummaries.getResolvedConceptReferenceResults(codedNodeSet, sortCriteria, page);
+			results = CommonResourceSummaryUtils.getResolvedConceptReferenceResults(codedNodeSet, sortCriteria, page);
 		}
 		
 		return results;
@@ -100,45 +97,13 @@ public class CommonGetResourceSummaries {
 	
 	
 	
-	public static CodedNodeSet getCodedNodeSet(
+	public static <T extends ResourceQuery> CodedNodeSet getCodedNodeSet(
 			LexBIGService lexBigService, 
-			CodeSystemVersionNameConverter codeSystemVersionNameConverter, 
-			EntityDescriptionQuery query, 
+			QueryData<T> queryData,
 			SortCriteria sortCriteria){
 		CodedNodeSet codedNodeSet = null;
-		Set<ResolvedFilter> filters = null; 		
-		String codeSystem = null;
-		EntityDescriptionQueryServiceRestrictions entityDescriptionQueryServiceRestrictions = null;
-		String codingSchemeName = null;
-		CodingSchemeVersionOrTag versionOrTag = null;
-		boolean haveSchemeName = false;
 		
-		if (query != null) {
-			entityDescriptionQueryServiceRestrictions = query.getRestrictions();
-			filters = query.getFilterComponent();
-			if (entityDescriptionQueryServiceRestrictions != null) {
-				codeSystem = entityDescriptionQueryServiceRestrictions.getCodeSystemVersion().getName();
-				
-				if(codeSystem != null){
-					NameVersionPair nameVersionPair =
-							codeSystemVersionNameConverter.fromCts2CodeSystemVersionName(codeSystem);					
-					versionOrTag = new CodingSchemeVersionOrTag();
-					codingSchemeName = nameVersionPair.getName();
-					versionOrTag.setTag(nameVersionPair.getVersion());
-					versionOrTag.setVersion(nameVersionPair.getVersion());
-//					if(printObjects){
-//						System.out.println("CodingSchemeName: " + codingSchemeName);
-//						System.out.println("VersionOrTag: " + versionOrTag.getVersion());
-//					}
-					if((codingSchemeName != null) && (versionOrTag.getVersion() != null || versionOrTag.getTag() != null)){
-						haveSchemeName = true;
-					}
-				}
-			}
-		}		
-				
-
-		if(haveSchemeName){
+		if(queryData.hasNameAndVersion()){
 			boolean found = false;
 			
 			try {
@@ -153,19 +118,23 @@ public class CommonGetResourceSummaries {
 //						System.out.println(PrintUtility.codingSchemeSummary(codingSchemeSummary, 1));
 //					}
 					// TODO: not certain this is correct
-					if(codingSchemeSummary.getLocalName().equals(codingSchemeName) && codingSchemeSummary.getRepresentsVersion().equals(versionOrTag.getVersion())){
+					String codingSchemeSummaryName = codingSchemeSummary.getLocalName();
+					String codingSchemeSummaryVersion = codingSchemeSummary.getRepresentsVersion();
+					if(codingSchemeSummaryName.equals(queryData.getCodingSchemeName()) && 
+							codingSchemeSummaryVersion.equals(queryData.getVersionOrTag().getVersion())){
 						found = true;
 					}
 				}
 				
 				
 				if(found){
-					codedNodeSet = lexBigService.getNodeSet(codingSchemeName, versionOrTag , entityTypes);
+					codedNodeSet = lexBigService.getNodeSet(queryData.getCodingSchemeName(), queryData.getVersionOrTag() , entityTypes);
 				}
 			} catch (LBException e) {
 				throw new RuntimeException(e);
 			}
 				
+			Set<ResolvedFilter> filters = queryData.getFilters();
 			if(found && (filters != null)){
 				for(ResolvedFilter filter : filters){
 					CommonSearchFilterUtils.filterCodedNodeSetByResolvedFilter(filter, codedNodeSet);
@@ -176,16 +145,12 @@ public class CommonGetResourceSummaries {
 		
 		return codedNodeSet;
 	}
-	
-	
-
-	
-	@SuppressWarnings("rawtypes")
-	public static List<CodingScheme> getCodingSchemeList(
+		
+	public static <T extends ResourceQuery> List<CodingScheme> getCodingSchemeList(
 			LexBIGService lexBigService, 
 			CodeSystemVersionNameConverter nameConverter,
 			MappingExtension mappingExtension,
-			QueryData queryData,
+			QueryData<T> queryData,
 			SortCriteria sortCriteria) {
 
 		List<CodingScheme> codingSchemeList = new ArrayList<CodingScheme>();
@@ -204,18 +169,17 @@ public class CommonGetResourceSummaries {
 		}
 		
 		if (!resolvedToCodingSchemeFlag) {
-			codingSchemeList = CommonUtils.resolveToCodingSchemeList(lexBigService, csrFilteredList.getCodingSchemeRendering());
+			codingSchemeList = CommonCodingSchemeUtils.getCodingSchemeListFromCodingSchemeRenderings(lexBigService, csrFilteredList.getCodingSchemeRendering());
 		}
 					
 		return codingSchemeList;
 	}
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static CodingSchemeRenderingList getCodingSchemeRenderingList(
+	public static <T extends ResourceQuery> CodingSchemeRenderingList getCodingSchemeRenderingList(
 			LexBIGService lexBigService, 
 			CodeSystemVersionNameConverter nameConverter,
 			MappingExtension mappingExtension,
-			QueryData queryData,
+			QueryData<T> queryData,
 			SortCriteria sortCriteria) {
 		try {
 			CodingSchemeRenderingList csrFilteredList = lexBigService.getSupportedCodingSchemes();
@@ -229,7 +193,7 @@ public class CommonGetResourceSummaries {
 				csrFilteredList = CommonSearchFilterUtils.filterResourceSummariesByCodingSchemeName(queryData.getCodingSchemeName(), csrFilteredList);
 			}
 			
-			if (CommonGetResourceSummaries.hasCodingSchemeRenderings(queryData, csrFilteredList)){ 
+			if (CommonResourceSummaryUtils.hasCodingSchemeRenderings(queryData, csrFilteredList)){ 
 				Iterator<ResolvedFilter> filtersItr = queryData.getFilters().iterator();
 				while (filtersItr.hasNext() && (csrFilteredList.getCodingSchemeRenderingCount() > 0)) {
 						ResolvedFilter resolvedFilter = filtersItr.next();

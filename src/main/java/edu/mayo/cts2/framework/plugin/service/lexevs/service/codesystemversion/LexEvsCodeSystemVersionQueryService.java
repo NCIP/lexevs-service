@@ -56,7 +56,7 @@ import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonGetResourceSummaries;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceSummaryUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.QueryData;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
@@ -105,7 +105,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		QueryData<CodeSystemVersionQuery> queryData = new QueryData<CodeSystemVersionQuery>(query);
 		
 		CodingSchemeRenderingList csrFilteredList;
-		csrFilteredList = CommonGetResourceSummaries.getCodingSchemeRenderingList(lexBigService, nameConverter, null, queryData, null);
+		csrFilteredList = CommonResourceSummaryUtils.getCodingSchemeRenderingList(lexBigService, nameConverter, null, queryData, null);
 		return csrFilteredList.getCodingSchemeRendering().length;
 	}
 
@@ -117,7 +117,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		QueryData<CodeSystemVersionQuery> queryData = new QueryData<CodeSystemVersionQuery>(query);
 		
 		CodingSchemeRenderingList csrFilteredList;
-		csrFilteredList = CommonGetResourceSummaries.getCodingSchemeRenderingList(lexBigService, nameConverter, null, queryData, sortCriteria);
+		csrFilteredList = CommonResourceSummaryUtils.getCodingSchemeRenderingList(lexBigService, nameConverter, null, queryData, sortCriteria);
 		CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
 
 		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonUtils.getRenderingPage(csRendering, page);
@@ -151,7 +151,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		QueryData<CodeSystemVersionQuery> queryData = new QueryData<CodeSystemVersionQuery>(query);
 		
 		CodingSchemeRenderingList csrFilteredList;
-		csrFilteredList = CommonGetResourceSummaries.getCodingSchemeRenderingList(lexBigService, nameConverter, null, queryData, sortCriteria);
+		csrFilteredList = CommonResourceSummaryUtils.getCodingSchemeRenderingList(lexBigService, nameConverter, null, queryData, sortCriteria);
 		CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
 
 		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonUtils.getRenderingPage(csRendering, page);
