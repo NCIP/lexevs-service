@@ -41,7 +41,8 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
 import edu.mayo.cts2.framework.service.profile.mapentry.name.MapEntryReadId;
 
 /**
- * @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
+ *  @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
+ *  @author <a href="mailto:hardie.linda@mayo.edu">Linda Hardie</a>
  *
  */
 public class LexEvsMapEntryReadServiceTestIT extends AbstractTestITBase {

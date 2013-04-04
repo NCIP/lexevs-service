@@ -69,9 +69,10 @@ import edu.mayo.cts2.framework.service.profile.mapversion.MapVersionQuery;
 import edu.mayo.cts2.framework.service.profile.mapversion.MapVersionQueryService;
 
 /**
- * @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
+ *  @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
+ *  @author <a href="mailto:hardie.linda@mayo.edu">Linda Hardie</a>
  *
- */
+*/
 @Component
 public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		implements MapVersionQueryService, InitializingBean {
@@ -92,26 +93,14 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		this.nameConverter = converter;
 	}
 	
-	public CodeSystemVersionNameConverter getCodeSystemVersionNameConverter(){
-		return this.nameConverter;
-	}
-	
 	public void setCodingSchemeToMapVersionTransform(CodingSchemeToMapVersionTransform transformer){
 			this.codingSchemeToMapVersionTransform = transformer;
 	}
 	
-	public CodingSchemeToMapVersionTransform getCodingSchemeToMapVersionTransform(){
-		return this.codingSchemeToMapVersionTransform;
-	}
-
 	public void setMappingExtension(MappingExtension extension){
 		this.mappingExtension = extension;
 	}
 
-	public MappingExtension getMappingExtension(){
-		return this.mappingExtension;
-	}
-	
 	// -------- Implemented methods ----------------
 	
 	@Override

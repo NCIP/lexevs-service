@@ -57,37 +57,12 @@ public abstract class AbstractLexEvsService implements BaseService {
 	@Resource
 	private LexBIGService lexBigService;
 
-	public LexBIGService getLexBigService() {
-		return lexBigService;
-	}
-
-	public void setLexBigService(LexBIGService lexBigService) {
-		this.lexBigService = lexBigService;
-	}
-	
-	@Resource
+	//TODO: Create factories for this
 	private LexEVSResolvedValueSetService lexEVSResolvedService;
-	@Resource
+	
+	//TODO: Create factories for this
 	private LexEVSValueSetDefinitionServices lexEVSValueSetDefinitionServices;
-
-	public LexEVSResolvedValueSetService getLexEVSResolvedService() {
-		return lexEVSResolvedService;
-	}
-
-	public void setLexEVSResolvedService(
-			LexEVSResolvedValueSetService lexEVSResolvedService) {
-		this.lexEVSResolvedService = lexEVSResolvedService;
-	}
-
-	public LexEVSValueSetDefinitionServices getLexEVSValueSetDefinitionServices() {
-		return lexEVSValueSetDefinitionServices;
-	}
-
-	public void setLexEVSValueSetDefinitionServices(
-			LexEVSValueSetDefinitionServices lexEVSValueSetDefinitionServices) {
-		this.lexEVSValueSetDefinitionServices = lexEVSValueSetDefinitionServices;
-	}
-
+	
 	@Override
 	public String getServiceName() {
 		return this.buildName;
@@ -108,4 +83,29 @@ public abstract class AbstractLexEvsService implements BaseService {
 		return new SourceReference("Mayo Clinic");
 	}
 
+	public LexBIGService getLexBigService() {
+		return lexBigService;
+	}
+
+	public void setLexBigService(LexBIGService lexBigService) {
+		this.lexBigService = lexBigService;
+	}
+
+	public LexEVSResolvedValueSetService getLexEVSResolvedService() {
+		return lexEVSResolvedService;
+	}
+
+	public void setLexEVSResolvedService(
+			LexEVSResolvedValueSetService lexEVSResolvedService) {
+		this.lexEVSResolvedService = lexEVSResolvedService;
+	}
+
+	public LexEVSValueSetDefinitionServices getLexEVSValueSetDefinitionServices() {
+		return lexEVSValueSetDefinitionServices;
+	}
+
+	public void setLexEVSValueSetDefinitionServices(
+			LexEVSValueSetDefinitionServices lexEVSValueSetDefinitionServices) {
+		this.lexEVSValueSetDefinitionServices = lexEVSValueSetDefinitionServices;
+	}
 }
