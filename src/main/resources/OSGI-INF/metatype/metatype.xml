@@ -3,6 +3,8 @@
 	<OCD description="LexEVS Plugin" name="LexEVS Plugin" id="edu.mayo.cts2.framework.plugin.service.lexevs">
 		<AD name="LexEVS Runtime Jar" id="LG_RUNTIME_JAR" required="true" type="String" />
 		<AD name="LexEVS Patch Jar" id="LG_PATCH_JAR" required="true" type="String" />
+		<AD name="UriResolutionService URL" id="uriResolutionServiceUrl" required="true" type="String" 
+			default="https://informatics.mayo.edu/cts2/services/uriresolver/" />
 	</OCD>
 	<Designate pid="edu.mayo.cts2.framework.plugin.service.lexevs">
         <Object ocdref="edu.mayo.cts2.framework.plugin.service.lexevs"/>
