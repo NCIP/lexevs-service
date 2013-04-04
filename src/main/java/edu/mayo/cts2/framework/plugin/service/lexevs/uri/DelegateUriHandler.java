@@ -23,38 +23,15 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.uri;
 
-import org.LexGrid.LexBIG.DataModel.Core.ResolvedCodedNodeReference;
-import org.LexGrid.codingSchemes.CodingScheme;
+import org.springframework.core.Ordered;
 
 /**
- * Responsible for constructing URIs from LexEVS resources.
+ * Like {@link UriHandler} but with ordering -- used as Delegates.
  *
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
-public interface UriHandler {
+public interface DelegateUriHandler extends UriHandler, Ordered {
 
-	/**
-	 * Gets the entity uri.
-	 *
-	 * @param reference the reference
-	 * @return the entity uri
-	 */
-	public String getEntityUri(ResolvedCodedNodeReference reference);
+	//
 	
-	/**
-	 * Gets the code system uri.
-	 *
-	 * @param codingScheme the coding scheme
-	 * @return the code system uri
-	 */
-	public String getCodeSystemUri(CodingScheme codingScheme);
-	
-	/**
-	 * Gets the code system version uri.
-	 *
-	 * @param codingScheme the coding scheme
-	 * @return the code system version uri
-	 */
-	public String getCodeSystemVersionUri(CodingScheme codingScheme);
-
 }

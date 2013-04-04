@@ -23,10 +23,9 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 
-import javax.annotation.Resource;
-
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.concepts.Entity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -44,7 +43,7 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
 @Component
 public class EntityTransform {
 
-	@Resource 
+	@Autowired
 	private UriHandler uriHandler;
 
 	public EntityDescription transformToEntity(ResolvedConceptReference reference) {

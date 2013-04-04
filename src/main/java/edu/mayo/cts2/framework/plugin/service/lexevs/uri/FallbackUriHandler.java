@@ -23,38 +23,56 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.uri;
 
+import javax.annotation.Resource;
+
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedCodedNodeReference;
+import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.codingSchemes.CodingScheme;
+import org.springframework.stereotype.Component;
 
 /**
- * Responsible for constructing URIs from LexEVS resources.
+ * Last resort. This returns back a URI no matter what, even if we
+ * have to make something up.
  *
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
-public interface UriHandler {
+@Component
+public class FallbackUriHandler implements DelegateUriHandler {
 
-	/**
-	 * Gets the entity uri.
-	 *
-	 * @param reference the reference
-	 * @return the entity uri
+	@Resource
+	private LexBIGService lexBigService;
+
+	/* (non-Javadoc)
+	 * @see edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler#getEntityUri(org.LexGrid.LexBIG.DataModel.Core.ResolvedCodedNodeReference)
 	 */
-	public String getEntityUri(ResolvedCodedNodeReference reference);
+	@Override
+	public String getEntityUri(ResolvedCodedNodeReference reference) {
+		String codingSchemeUri = reference.getCodingSchemeURI();
 	
-	/**
-	 * Gets the code system uri.
-	 *
-	 * @param codingScheme the coding scheme
-	 * @return the code system uri
-	 */
-	public String getCodeSystemUri(CodingScheme codingScheme);
+		String name = reference.getCode();
+		
+		return codingSchemeUri + "/" + name;
+	}
 	
-	/**
-	 * Gets the code system version uri.
-	 *
-	 * @param codingScheme the coding scheme
-	 * @return the code system version uri
+	/* (non-Javadoc)
+	 * @see edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler#getCodeSystemUri(org.LexGrid.codingSchemes.CodingScheme)
 	 */
-	public String getCodeSystemVersionUri(CodingScheme codingScheme);
+	@Override
+	public String getCodeSystemUri(CodingScheme codingScheme) {
+		return codingScheme.getCodingSchemeURI();
+	}
+
+	/* (non-Javadoc)
+	 * @see edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler#getCodeSystemVersionUri(org.LexGrid.codingSchemes.CodingScheme)
+	 */
+	@Override
+	public String getCodeSystemVersionUri(CodingScheme codingScheme) {
+		return codingScheme.getCodingSchemeURI() + "#" + codingScheme.getRepresentsVersion();
+	}
+
+	@Override
+	public int getOrder() {
+		return 2;
+	}
 
 }
