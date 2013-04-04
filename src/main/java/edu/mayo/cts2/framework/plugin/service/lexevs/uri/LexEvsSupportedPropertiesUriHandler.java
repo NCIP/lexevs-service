@@ -8,14 +8,25 @@ import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.codingSchemes.CodingScheme;
 import org.LexGrid.naming.SupportedNamespace;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LexEvsSupportedPropertiesUriHandler implements UriHandler {
+public class LexEvsSupportedPropertiesUriHandler implements UriHandler, InitializingBean {
 
 	@Resource
 	private LexBIGService lexBigService;
 
+	@Value("${uriResolutionServiceUrl}")
+	private String uriResolutionServiceUrl;
+	  
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	/* 
 	 * This constructs an Entity URI based on the SupportedNamespace
 	 * of LexEVS.

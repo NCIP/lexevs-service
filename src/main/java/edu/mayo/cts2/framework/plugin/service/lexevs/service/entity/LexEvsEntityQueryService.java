@@ -75,8 +75,9 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 	@Resource
 	private CodeSystemVersionNameConverter codeSystemVersionNameConverter;
 	
-	// Local variables
-	private EntityTransform entityTransform = new EntityTransform();
+	@Resource
+	private EntityTransform entityTransform;
+	
 	private boolean printObjects = false;
 	
 	// ------ Local methods ----------------------
