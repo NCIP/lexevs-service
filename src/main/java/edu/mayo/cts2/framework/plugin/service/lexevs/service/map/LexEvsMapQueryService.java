@@ -57,15 +57,16 @@ import edu.mayo.cts2.framework.service.profile.map.MapQuery;
 import edu.mayo.cts2.framework.service.profile.map.MapQueryService;
 
 /**
- * @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
+ *  @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
+ *  @author <a href="mailto:hardie.linda@mayo.edu">Linda Hardie</a>
  *
- */
+*/
 @Component
 public class LexEvsMapQueryService extends AbstractLexEvsService
 		implements MapQueryService, InitializingBean {
 	
 	@Resource
-	CodingSchemeToMapTransform codingSchemeToMapTransform;
+	CodingSchemeToMapTransform transformer;
 	
 	@Resource
 	private CodeSystemVersionNameConverter nameConverter;
@@ -75,25 +76,16 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 	public static final String MAPPING_EXTENSION = "MappingExtension";	
 
 	// ------ Local methods ----------------------
-	public CodingSchemeToMapTransform getCodingSchemeToMapTransform() {
-		return codingSchemeToMapTransform;
-	}
-
 	public void setCodingSchemeToMapTransform(
 			CodingSchemeToMapTransform codingSchemeToMapTransform) {
-		this.codingSchemeToMapTransform = codingSchemeToMapTransform;
+		this.transformer = codingSchemeToMapTransform;
 	}
 
-	public CodeSystemVersionNameConverter getCodeSystemVersionNameConverter(){
-		return this.nameConverter;
-	}
-	
 	public void setCodeSystemVersionNameConverter(CodeSystemVersionNameConverter converter){
 		this.nameConverter = converter;
 	}
 
-	// -------- Implemented methods ----------------
-	
+	// -------- Implemented methods ----------------	
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(MAPPING_EXTENSION);
@@ -145,14 +137,14 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		LexBIGService lexBigService = this.getLexBigService();
 		List<CodingScheme> codingSchemeList;
 		QueryData<MapQuery> queryData = new QueryData<MapQuery>(query);
-		codingSchemeList = CommonResourceSummaryUtils.getCodingSchemeList(lexBigService, this.getCodeSystemVersionNameConverter(), mappingExtension, queryData, sortCriteria);
+		codingSchemeList = CommonResourceSummaryUtils.getCodingSchemeList(lexBigService, this.nameConverter, mappingExtension, queryData, sortCriteria);
 		CodingScheme[] codingSchemeArray = codingSchemeList.toArray(new CodingScheme[0]);
 		CodingScheme[] codingSchemePage = (CodingScheme[]) CommonUtils.getRenderingPage(codingSchemeArray, page);
 		
 		List<MapCatalogEntrySummary> list = new ArrayList<MapCatalogEntrySummary>();
 
 		for (CodingScheme codingScheme : codingSchemePage) {
-			list.add(codingSchemeToMapTransform.transformToMapCatalogEntrySummary(codingScheme));
+			list.add(transformer.transformToMapCatalogEntrySummary(codingScheme));
 		}
 
 		boolean atEnd = (page.getEnd() >= codingSchemeArray.length) ? true : false;
@@ -168,14 +160,14 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		LexBIGService lexBigService = this.getLexBigService();
 		List<CodingScheme> codingSchemeList;
 		QueryData<MapQuery> queryData = new QueryData<MapQuery>(query);
-		codingSchemeList = CommonResourceSummaryUtils.getCodingSchemeList(lexBigService, this.getCodeSystemVersionNameConverter(), mappingExtension, queryData, sortCriteria);
+		codingSchemeList = CommonResourceSummaryUtils.getCodingSchemeList(lexBigService, this.nameConverter, mappingExtension, queryData, sortCriteria);
 		CodingScheme[] codingSchemeArray = codingSchemeList.toArray(new CodingScheme[0]);
 		CodingScheme[] codingSchemePage = (CodingScheme[]) CommonUtils.getRenderingPage(codingSchemeArray, page);
 		
 		List<MapCatalogEntry> list = new ArrayList<MapCatalogEntry>();
 
 		for (CodingScheme codingScheme : codingSchemePage) {
-			list.add(codingSchemeToMapTransform.transformToMapCatalogEntry(codingScheme));
+			list.add(transformer.transformToMapCatalogEntry(codingScheme));
 		}
 
 		boolean atEnd = (page.getEnd() >= codingSchemeArray.length) ? true : false;
@@ -189,7 +181,7 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		LexBIGService lexBigService = this.getLexBigService();
 		List<CodingScheme> codingSchemeList;
 		QueryData<MapQuery> queryData = new QueryData<MapQuery>(query);
-		codingSchemeList = CommonResourceSummaryUtils.getCodingSchemeList(lexBigService, this.getCodeSystemVersionNameConverter(), mappingExtension, queryData, null);
+		codingSchemeList = CommonResourceSummaryUtils.getCodingSchemeList(lexBigService, this.nameConverter, mappingExtension, queryData, null);
 		return codingSchemeList.size();
 	}
 
