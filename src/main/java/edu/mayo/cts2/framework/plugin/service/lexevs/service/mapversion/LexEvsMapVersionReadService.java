@@ -77,13 +77,6 @@ public class LexEvsMapVersionReadService
 		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(MAPPING_EXTENSION);
 	}
 
-	/*
-	 * As part of the transfrom service, validate if it is in fact a valid
-	 * LexEVS Mapping CodingScheme. If not, return null.
-	 * 
-	 * (non-Javadoc)
-	 * @see edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsCodeSystemService#transform(org.LexGrid.codingSchemes.CodingScheme)
-	 */
 	@Override
 	protected MapVersion transform(CodingScheme codingScheme) {
 		if(! CommonMapUtils.validateMappingCodingScheme(

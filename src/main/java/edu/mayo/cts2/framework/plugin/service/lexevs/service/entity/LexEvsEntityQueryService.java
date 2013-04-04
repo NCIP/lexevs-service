@@ -77,9 +77,7 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 	
 	@Resource
 	private EntityTransform transformer;
-	
-	private boolean printObjects = false;
-	
+		
 	// ------ Local methods ----------------------
 	public void setCodeSystemVersionNameConverter(
 			CodeSystemVersionNameConverter codeSystemVersionNameConverter) {
@@ -91,10 +89,6 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		this.transformer = entityTransform;
 	}
 	
-	public void setPrintObject(boolean print){
-		this.printObjects = print;
-	}
-
 
 	// -------- Implemented methods ----------------
 	@Override
@@ -180,48 +174,6 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		return new ArrayList<DocumentedNamespaceReference>();
 	}
 
-//	@Override
-//	public boolean isEntityInSet(EntityNameOrURI entity,
-//			EntityDescriptionQuery restrictions, ResolvedReadContext readContext) {
-//		boolean answer = false;
-//		CodedNodeSet codedNodeSet = this.getCodedNodeSet(restrictions, null);
-//		
-//		ConceptReference code = new ConceptReference();
-//		code.setCode(entity.getEntityName().getName());
-//		code.setCodeNamespace(entity.getEntityName().getNamespace());
-//	
-//		try {
-//			answer = codedNodeSet.isCodeInSet(code);
-//		} catch (LBInvocationException e) {
-//			throw new UnsupportedOperationException();
-//		} catch (LBParameterException e) {
-//			throw new UnsupportedOperationException();
-//		}
-//		
-//		return answer;
-//	}
-
-//	@Override
-//	public EntityReferenceList resolveAsEntityReferenceList(
-//			EntityDescriptionQuery restrictions, ResolvedReadContext readContext) {
-//		
-//		EntityReferenceList entityReferenceList = new EntityReferenceList();		
-//		
-//		ResolvedConceptReferenceResults resolvedConceptReferenceResults = this.doGetResourceSummaryResults(restrictions, null, null);
-//		
-//		// Transform each reference into a CTS2 entry and add to list
-//		ResolvedConceptReference[] resolvedConceptReferences = resolvedConceptReferenceResults.resolvedConceptReference;
-//		for(ResolvedConceptReference reference : resolvedConceptReferences){
-//			if(printObjects){
-//				System.out.println("ResolvedConceptReference:\n" + PrintUtility.resolvedConceptReference_toString(reference, 1));
-//			}
-//			EntityReference entry = entityTransform.transform_EntityReference(reference);
-//			entityReferenceList.addEntry(entry);
-//		}
-//		
-//		return entityReferenceList;
-//	}
-//
 	@Override
 	public EntityNameOrURIList intersectEntityList(
 			Set<EntityNameOrURI> entities,
@@ -230,7 +182,6 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException();
 	}
-
 
 	@Override
 	public Set<VersionTagReference> getSupportedTags() {

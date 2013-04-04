@@ -32,13 +32,9 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
-import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
-import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
-import org.LexGrid.LexBIG.Utility.Constructors;
-import org.LexGrid.codingSchemes.CodingScheme;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
@@ -88,7 +84,6 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	public static final String MAPPING_EXTENSION = "MappingExtension";	
 	
 	// ------ Local methods ----------------------
-	// Set methods required to test using FakeLexEvsSystem
 	public void setCodeSystemVersionNameConverter(CodeSystemVersionNameConverter converter){
 		this.nameConverter = converter;
 	}
@@ -108,9 +103,6 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(MAPPING_EXTENSION);
 	}
 		
-	/* (non-Javadoc)
-	 * @see edu.mayo.cts2.framework.service.profile.QueryService#count(edu.mayo.cts2.framework.service.profile.ResourceQuery)
-	 */
 	@Override
 	public int count(MapVersionQuery query) {
 		LexBIGService lexBigService = this.getLexBigService();
@@ -120,78 +112,28 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		csrFilteredList = CommonResourceSummaryUtils.getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, null);
 		return csrFilteredList.getCodingSchemeRendering().length;
 	}
-
 	
-	/* (non-Javadoc)
-	 * @see edu.mayo.cts2.framework.service.profile.QueryService#getResourceSummaries(edu.mayo.cts2.framework.service.profile.ResourceQuery, edu.mayo.cts2.framework.model.core.SortCriteria, edu.mayo.cts2.framework.model.command.Page)
-	 */
 	@Override
 	public DirectoryResult<MapVersionDirectoryEntry> getResourceSummaries(
 			MapVersionQuery query, SortCriteria sortCriteria, Page page) {
 		LexBIGService lexBigService = this.getLexBigService();
-		CodingSchemeRendering[] csRendering;
-		QueryData<MapVersionQuery> queryData = new QueryData<MapVersionQuery>(query);
-		
-		CodingSchemeRenderingList csrFilteredList;
-		csrFilteredList = CommonResourceSummaryUtils.getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, sortCriteria);
-		csRendering = csrFilteredList.getCodingSchemeRendering();
-		
+		CodingSchemeRendering[] csRendering = CommonResourceSummaryUtils.getCodingSchemeRendering(lexBigService, nameConverter, query, null, sortCriteria);
 		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonUtils.getPageFromArray(csRendering, page);
-
-		List<MapVersionDirectoryEntry> list = new ArrayList<MapVersionDirectoryEntry>();
-
-		if(csRenderingPage != null){
-			if(csRenderingPage.length > 0){
-				for (CodingSchemeRendering render : csRenderingPage) {
-					list.add(codingSchemeToMapVersionTransform.transform(render));
-				}
-			}
-		}
-		
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
-		
-		return new DirectoryResult<MapVersionDirectoryEntry>(list, atEnd);
+		return CommonResourceSummaryUtils.createDirectoryResultWithEntrySummaryData(lexBigService, this.codingSchemeToMapVersionTransform, csRenderingPage, atEnd);
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.mayo.cts2.framework.service.profile.QueryService#getResourceList(edu.mayo.cts2.framework.service.profile.ResourceQuery, edu.mayo.cts2.framework.model.core.SortCriteria, edu.mayo.cts2.framework.model.command.Page)
-	 */
 	@Override
 	public DirectoryResult<MapVersion> getResourceList(MapVersionQuery query,
 			SortCriteria sortCriteria, Page page) {
+
 		LexBIGService lexBigService = this.getLexBigService();
-		CodingSchemeRendering[] csRendering;
-		QueryData<MapVersionQuery> queryData = new QueryData<MapVersionQuery>(query);
-		
-		CodingSchemeRenderingList csrFilteredList;
-		csrFilteredList = CommonResourceSummaryUtils.getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, sortCriteria);
-		csRendering = csrFilteredList.getCodingSchemeRendering();
-		
+		CodingSchemeRendering[] csRendering = CommonResourceSummaryUtils.getCodingSchemeRendering(lexBigService, nameConverter, query, null, sortCriteria);
 		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonUtils.getPageFromArray(csRendering, page);
-		
-		List<MapVersion> list = new ArrayList<MapVersion>();
-
-		for (CodingSchemeRendering render : csRenderingPage) {
-			String codingSchemeName = render.getCodingSchemeSummary().getCodingSchemeURI();			
-			String version = render.getCodingSchemeSummary().getRepresentsVersion();
-			CodingSchemeVersionOrTag tagOrVersion = Constructors.createCodingSchemeVersionOrTagFromVersion(version);
-			CodingScheme codingScheme;
-			try {
-				codingScheme = this.getLexBigService().resolveCodingScheme(codingSchemeName, tagOrVersion);
-				list.add(codingSchemeToMapVersionTransform.transform(codingScheme));
-			} catch (LBException e) {
-				throw new RuntimeException(e);
-			}
-		}
-
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
-		
-		return new DirectoryResult<MapVersion>(list, atEnd);
+		return CommonResourceSummaryUtils.createDirectoryResultWithEntryData(lexBigService, this.codingSchemeToMapVersionTransform, csRenderingPage, atEnd);
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.mayo.cts2.framework.service.profile.BaseQueryService#getSupportedMatchAlgorithms()
-	 */
 	@Override
 	public Set<? extends MatchAlgorithmReference> getSupportedMatchAlgorithms() {
 
@@ -202,9 +144,6 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		return new HashSet<MatchAlgorithmReference>(Arrays.asList(exactMatch,contains,startsWith));
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.mayo.cts2.framework.service.profile.BaseQueryService#getSupportedSearchReferences()
-	 */
 	@Override
 	public Set<? extends PropertyReference> getSupportedSearchReferences() {
 		
@@ -215,33 +154,21 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		return new HashSet<PropertyReference>(Arrays.asList(name,about,description));
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.mayo.cts2.framework.service.profile.BaseQueryService#getSupportedSortReferences()
-	 */
 	@Override
 	public Set<? extends PropertyReference> getSupportedSortReferences() {
 		return new HashSet<PropertyReference>();
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.mayo.cts2.framework.service.profile.BaseQueryService#getKnownProperties()
-	 */
 	@Override
 	public Set<PredicateReference> getKnownProperties() {
 		return new HashSet<PredicateReference>();
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.mayo.cts2.framework.service.profile.BaseService#getKnownNamespaceList()
-	 */
 	@Override
 	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
 		return new ArrayList<DocumentedNamespaceReference>();
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.mayo.cts2.framework.service.profile.mapversion.MapVersionQueryService#mapVersionEntities(edu.mayo.cts2.framework.model.service.core.NameOrURI, edu.mayo.cts2.framework.model.service.mapversion.types.MapRole, edu.mayo.cts2.framework.model.service.mapversion.types.MapStatus, edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQuery, edu.mayo.cts2.framework.model.core.SortCriteria, edu.mayo.cts2.framework.model.command.Page)
-	 */
 	@Override
 	public DirectoryResult<EntityDirectoryEntry> mapVersionEntities(
 			NameOrURI mapVersion, MapRole mapRole, MapStatus mapStatus,
@@ -250,9 +177,6 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.mayo.cts2.framework.service.profile.mapversion.MapVersionQueryService#mapVersionEntityList(edu.mayo.cts2.framework.model.service.core.NameOrURI, edu.mayo.cts2.framework.model.service.mapversion.types.MapRole, edu.mayo.cts2.framework.model.service.mapversion.types.MapStatus, edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQuery, edu.mayo.cts2.framework.model.core.SortCriteria, edu.mayo.cts2.framework.model.command.Page)
-	 */
 	@Override
 	public DirectoryResult<EntityDescription> mapVersionEntityList(
 			NameOrURI mapVersion, MapRole mapRole, MapStatus mapStatus,
@@ -261,9 +185,6 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.mayo.cts2.framework.service.profile.mapversion.MapVersionQueryService#mapVersionEntityReferences(edu.mayo.cts2.framework.model.service.core.NameOrURI, edu.mayo.cts2.framework.model.service.mapversion.types.MapRole, edu.mayo.cts2.framework.model.service.mapversion.types.MapStatus, edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQuery, edu.mayo.cts2.framework.model.core.SortCriteria, edu.mayo.cts2.framework.model.command.Page)
-	 */
 	@Override
 	public EntityReferenceList mapVersionEntityReferences(NameOrURI mapVersion,
 			MapRole mapRole, MapStatus mapStatus, EntityDescriptionQuery query,

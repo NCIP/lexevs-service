@@ -96,9 +96,15 @@ public class LexEvsCodeSystemVersionReadService extends
 	@Override
 	public CodeSystemVersionCatalogEntry read(NameOrURI identifier,
 			ResolvedReadContext readContext) {
+		NameOrURI name = new NameOrURI();
+		CodingSchemeVersionOrTag versionOrTag = new CodingSchemeVersionOrTag();
+		
 		NameVersionPair namePair = CommonUtils.getNamePair(nameConverter, identifier, readContext);
-		NameOrURI name = ModelUtils.nameOrUriFromName(namePair.getName());
-		CodingSchemeVersionOrTag versionOrTag = Constructors.createCodingSchemeVersionOrTagFromVersion(namePair.getVersion());
+		if(namePair != null){
+			name = ModelUtils.nameOrUriFromName(namePair.getName());
+			versionOrTag = Constructors.createCodingSchemeVersionOrTagFromVersion(namePair.getVersion());
+		}
+		
 		return this.getByVersionIdOrTag(name, versionOrTag);
 	}
 
@@ -125,7 +131,7 @@ public class LexEvsCodeSystemVersionReadService extends
 
 		CodingSchemeVersionOrTag versionOrTag = Constructors.createCodingSchemeVersionOrTagFromVersion(officialResourceVersionId);
 		CodeSystemVersionCatalogEntry entry = this.getByVersionIdOrTag(codeSystem, versionOrTag);
-		return entry;
+        return entry;
 	}
 
 	@Override

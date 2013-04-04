@@ -62,15 +62,30 @@ public class LexEvsCodeSystemVersionReadServiceTestIT extends AbstractTestITBase
 	@Test
 	public void testSetUp() {
 		assertNotNull(this.service);
+		assertNotNull(this.marshaller);
 	}
 	
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testReadByOfficialVersionId() throws Exception {
-		NameOrURI name = ModelUtils.nameOrUriFromName("Automobiles");
-		
-		assertNotNull(this.service.getCodeSystemByVersionId(name, "1.0", null));
+		NameOrURI nameOrUri = new NameOrURI();
+		nameOrUri.setName("Automobiles");
+		CodeSystemVersionCatalogEntry results = this.service.getCodeSystemByVersionId(nameOrUri, "1.0", null);
+		assertNotNull("Expected data in results but it was null", results);
 	}
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testReadByOfficialVersionId2() throws Exception {
+		//NameOrURI name = ModelUtils.nameOrUriFromName("Automobiles");
+		NameOrURI nameOrUri = new NameOrURI();
+		nameOrUri.setName("Automobiles");
+		
+		CodeSystemVersionCatalogEntry results = this.service.getCodeSystemByVersionId(nameOrUri, "1.0", null);
+		assertNotNull("Expected data in results but it was null", results);
+	}
+
+	
 	
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")

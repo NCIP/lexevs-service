@@ -167,21 +167,22 @@ public class CommonUtils {
 			NameOrURI identifier,
 			ResolvedReadContext readContext) {
 		String name;
+		NameVersionPair namePair;
+		
 		if (identifier.getName() != null) {
 			name = identifier.getName();
 			if (!nameConverter.isValidCodeSystemVersionName(name)) {
-				return null;
+				namePair = null;
+			}
+			else{
+				namePair = nameConverter.fromCts2CodeSystemVersionName(name);		
 			}
 		} else {
 			throw new UnsupportedOperationException(
 					"Cannot resolve by DocumentURI yet.");
 		}
 
-		NameVersionPair namePair = nameConverter
-				.fromCts2CodeSystemVersionName(name);
-		
 		return namePair;
-
 	}
 		
 }

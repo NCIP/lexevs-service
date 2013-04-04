@@ -28,10 +28,13 @@ import edu.mayo.cts2.framework.model.entity.EntityDescription;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.map.MapCatalogEntry;
 import edu.mayo.cts2.framework.model.map.MapCatalogEntrySummary;
+import edu.mayo.cts2.framework.model.mapversion.MapVersion;
+import edu.mayo.cts2.framework.model.mapversion.MapVersionDirectoryEntry;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion.CodingSchemeToCodeSystemTransform;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.entity.EntityTransform;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.map.CodingSchemeToMapTransform;
+import edu.mayo.cts2.framework.plugin.service.lexevs.service.mapversion.CodingSchemeToMapVersionTransform;
 import edu.mayo.cts2.framework.service.profile.ResourceQuery;
 
 public class CommonResourceSummaryUtils{
@@ -59,6 +62,22 @@ public class CommonResourceSummaryUtils{
 		return new DirectoryResult<MapCatalogEntry>(list, atEnd);
 	}
 
+	
+	public static DirectoryResult<CodeSystemVersionCatalogEntrySummary> createDirectoryResultWithEntrySummaryData(
+			LexBIGService lexBigService,
+			CodingSchemeToCodeSystemTransform transformer,
+			CodingSchemeRendering[] csRendering, boolean atEnd) {
+		List<CodeSystemVersionCatalogEntrySummary> list = new ArrayList<CodeSystemVersionCatalogEntrySummary>();
+
+		if(csRendering != null){
+			for (CodingSchemeRendering render : csRendering) {
+				list.add(transformer.transform(render));
+			}
+		}
+		
+		return new DirectoryResult<CodeSystemVersionCatalogEntrySummary>(list, atEnd);
+	}
+
 	public static DirectoryResult<MapCatalogEntrySummary> createDirectoryResultWithEntrySummaryData(
 			LexBIGService lexBigService,
 			CodingSchemeToMapTransform transformer,
@@ -75,12 +94,36 @@ public class CommonResourceSummaryUtils{
 	}
 	
 	
-	
-	public static DirectoryResult<CodeSystemVersionCatalogEntrySummary> createDirectoryResultWithEntrySummaryData(
+	public static DirectoryResult<MapVersion> createDirectoryResultWithEntryData(
 			LexBIGService lexBigService,
-			CodingSchemeToCodeSystemTransform transformer,
+			CodingSchemeToMapVersionTransform transformer,
 			CodingSchemeRendering[] csRendering, boolean atEnd) {
-		List<CodeSystemVersionCatalogEntrySummary> list = new ArrayList<CodeSystemVersionCatalogEntrySummary>();
+		List<MapVersion> list = new ArrayList<MapVersion>();
+
+		if(csRendering != null){
+			for (CodingSchemeRendering render : csRendering) {
+				String codingSchemeName = render.getCodingSchemeSummary().getCodingSchemeURI();			
+				String version = render.getCodingSchemeSummary().getRepresentsVersion();
+				CodingSchemeVersionOrTag tagOrVersion = Constructors.createCodingSchemeVersionOrTagFromVersion(version);
+				CodingScheme codingScheme;
+				try {
+					codingScheme = lexBigService.resolveCodingScheme(codingSchemeName, tagOrVersion);
+					list.add(transformer.transform(codingScheme));
+				} catch (LBException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
+		
+		return new DirectoryResult<MapVersion>(list, atEnd);
+	}
+
+	public static DirectoryResult<MapVersionDirectoryEntry> createDirectoryResultWithEntrySummaryData(
+			LexBIGService lexBigService,
+			CodingSchemeToMapVersionTransform transformer,
+			CodingSchemeRendering[] csRendering, boolean atEnd) {
+		
+		List<MapVersionDirectoryEntry> list = new ArrayList<MapVersionDirectoryEntry>();
 
 		if(csRendering != null){
 			for (CodingSchemeRendering render : csRendering) {
@@ -88,7 +131,7 @@ public class CommonResourceSummaryUtils{
 			}
 		}
 		
-		return new DirectoryResult<CodeSystemVersionCatalogEntrySummary>(list, atEnd);
+		return new DirectoryResult<MapVersionDirectoryEntry>(list, atEnd);
 	}
 
 

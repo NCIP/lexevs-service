@@ -29,6 +29,7 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
+import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension.Mapping;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension.Mapping.SearchContext;
@@ -67,6 +68,32 @@ public class LexEvsMapEntryReadService extends AbstractLexEvsService implements 
 	public static final String MAPPING_EXTENSION = "MappingExtension";
 	
 	// ------ Local methods ----------------------
+	private String extractMapVersion(MapEntryReadId identifier) {		
+		String mapVersion = null;
+		NameOrURI nameOrURI = identifier.getMapVersion();
+		if (nameOrURI != null) {
+			mapVersion = nameOrURI.getName() != null ? nameOrURI.getName() : nameOrURI.getUri();
+		}
+				
+		return mapVersion;
+	}
+
+	private ResolvedConceptReferencesIterator getInteratorFromMapping(
+			MappingExtension mappingExtension, 
+			String mapVersion,
+			String sourceEntityCode, 
+			String relationsContainerName) throws LBException {
+		/*			mapping = mappingExtension.getMapping(
+		mappingUri, 
+		Constructors.createCodingSchemeVersionOrTagFromVersion(mapVersion), 
+		relationsContainerName);
+		 */			
+		Mapping mapping = mappingExtension.getMapping(mapVersion, Constants.CURRENT_LEXEVS_TAG,	relationsContainerName);
+		mapping = mapping.restrictToCodes(Constructors.createConceptReferenceList(sourceEntityCode), SearchContext.SOURCE_CODES);
+		//Mapping mapping2 = mapping.restrictToCodes(Constructors.createConceptReferenceList(sourceEntityCode), SearchContext.SOURCE_OR_TARGET_CODES);
+		return mapping.resolveMapping();
+	}
+
 
 	// -------- Implemented methods ----------------	
 	@Override
@@ -80,37 +107,17 @@ public class LexEvsMapEntryReadService extends AbstractLexEvsService implements 
 			MapEntryReadId identifier,
 			ResolvedReadContext readContext) {
 		
-		// Parse identifier into pieces to create a LexEVS Mapping object
 		ScopedEntityName scopedEntityName = identifier.getEntityName();
 		String sourceEntityCode = scopedEntityName.getName();
+		String mapVersion = extractMapVersion(identifier);
 		
-		String mapVersion = null;
-		NameOrURI nameOrURI = identifier.getMapVersion();
-		if (nameOrURI != null) {
-			mapVersion = nameOrURI.getName() != null ? nameOrURI.getName() : nameOrURI.getUri();
-		}
-				
 //		String mappingUri = identifier.getUri(); // Is this the sourceEntity's URI? Not the Map's codingSchemeURI, right?		
 		String relationsContainerName = null;   // if left null, the Mapping.resolveMapping() throws NullPointerException
 		
-		Mapping mapping = null;
 		ResolvedConceptReferencesIterator resolvedConceptReferencesIterator;
 		ResolvedConceptReference resolvedConceptReference = null;
 		try {
-/*			mapping = mappingExtension.getMapping(
-					mappingUri, 
-					Constructors.createCodingSchemeVersionOrTagFromVersion(mapVersion), 
-					relationsContainerName);
-*/			
-			mapping = mappingExtension.getMapping(
-					mapVersion, 
-					Constants.CURRENT_LEXEVS_TAG, 
-					relationsContainerName);
-
-			mapping = mapping.restrictToCodes(Constructors.createConceptReferenceList(sourceEntityCode), SearchContext.SOURCE_CODES);
-//			Mapping mapping2 = mapping.restrictToCodes(Constructors.createConceptReferenceList(sourceEntityCode), SearchContext.SOURCE_OR_TARGET_CODES);
-			
-			resolvedConceptReferencesIterator = mapping.resolveMapping();
+			resolvedConceptReferencesIterator = getInteratorFromMapping(mappingExtension, mapVersion, sourceEntityCode, relationsContainerName); 
 			
 			if (resolvedConceptReferencesIterator.hasNext()) {
 				resolvedConceptReference = resolvedConceptReferencesIterator.next();				
@@ -157,6 +164,8 @@ public class LexEvsMapEntryReadService extends AbstractLexEvsService implements 
 			return new MapEntry();
 		}
 	}
+
+
 
 	@Override
 	public boolean exists(
