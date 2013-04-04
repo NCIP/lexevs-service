@@ -85,6 +85,14 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		this.nameConverter = converter;
 	}
 
+	public MappingExtension getMappingExtension() {
+		return mappingExtension;
+	}
+
+	public void setMappingExtension(MappingExtension mappingExtension) {
+		this.mappingExtension = mappingExtension;
+	}
+
 	// -------- Implemented methods ----------------	
 	@Override
 	public void afterPropertiesSet() throws Exception {
