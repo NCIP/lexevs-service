@@ -9,15 +9,32 @@ import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
 
+import edu.mayo.cts2.framework.model.mapversion.MapVersion;
+import edu.mayo.cts2.framework.model.mapversion.MapVersionDirectoryEntry;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.FakeLexEvsSystem;
+import edu.mayo.cts2.framework.service.profile.mapversion.MapVersionQuery;
+
 public class MappingExtensionImpl implements MappingExtension{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6171317228717285533L;
 	String name;
 	String description;
 	String provider;
 	String version;
 	
+	FakeLexEvsSystem<MapVersion, MapVersionDirectoryEntry, MapVersionQuery, LexEvsMapVersionQueryService> fakeLexEvsSystem;
+	
+	
 	public MappingExtensionImpl(){
 		super();
 	}
+	
+	public MappingExtensionImpl(FakeLexEvsSystem<MapVersion, MapVersionDirectoryEntry, MapVersionQuery, LexEvsMapVersionQueryService> fakeLexEvsSystem){
+		this.fakeLexEvsSystem = fakeLexEvsSystem;
+	}
+	
 	
 	public MappingExtensionImpl(String name, String description, String provider, String version){
 		super();
@@ -25,6 +42,10 @@ public class MappingExtensionImpl implements MappingExtension{
 		this.description = description;
 		this.provider = provider;
 		this.version = version;
+	}
+	
+	public void setFakeSystem(FakeLexEvsSystem<MapVersion, MapVersionDirectoryEntry, MapVersionQuery, LexEvsMapVersionQueryService> fakeLexEvsSystem){
+		this.fakeLexEvsSystem = fakeLexEvsSystem;
 	}
 	
 	public void setName(String name){
@@ -64,11 +85,13 @@ public class MappingExtensionImpl implements MappingExtension{
 	}
 
 	@Override
-	public boolean isMappingCodingScheme(String codingScheme,
+	public boolean isMappingCodingScheme(String codingSchemeName,
 			CodingSchemeVersionOrTag codingSchemeVersionOrTag)
 			throws LBParameterException {
-		// TODO Auto-generated method stub
-		return false;
+		boolean answer = false;
+		
+		answer = fakeLexEvsSystem.isMappingCodingScheme(codingSchemeName, codingSchemeVersionOrTag);
+		return answer;
 	}
 
 	@Override

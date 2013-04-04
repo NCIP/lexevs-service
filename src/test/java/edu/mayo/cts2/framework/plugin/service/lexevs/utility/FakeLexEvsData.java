@@ -35,7 +35,11 @@ public class FakeLexEvsData {
 		RESOURCE_SYNOPSIS (1, RESOURCE_SYNOPSIS_REF),
 		RESOURCE_LOCALNAME (2, null),
 		RESOURCE_VERSION (3, null),
-		RESOURCE_NAME (4, RESOURCE_NAME_REF);
+		RESOURCE_NAME (4, RESOURCE_NAME_REF),
+		URI(5, null),
+		CONTAINS_ENTITIES (6, null),
+		IS_MAPPING(7, null);
+		
 		
 		private int index;
 		private PropertyReference propertyReference;
@@ -52,14 +56,15 @@ public class FakeLexEvsData {
 			return this.propertyReference;
 		}
 	}
-	
+
+//	private List<FakeLexEvsCodingSchemeData> DEFAULT_DATA = null;
 	private final static String [][] DEFAULT_DATA = {
-		{"11.11.0.1", "Auto", "Automobiles", "1.0", ""},
-		{"9.0.0.1", "Car", "Vehicles", "1.0", ""},
-		{"13.11.0.2", "Auto3", "Automobiles", "1.1", ""},
-		{"1.2.3.4", "2Auto", "automobiles", "1.0", ""},
-		{"5.6.7.8", "auto", "vehicles", "1.0", ""},
-		{"7.6.5.4", "utoA", "hicle", "1.0", ""}
+		{"11.11.0.1", "Auto", "Automobiles", "1.0", "", "1.2.3.4", "true", "true"},
+		{"9.0.0.1", "Car", "Vehicles", "1.0", "", "2.3.4.5", "true", "false"},
+		{"13.11.0.2", "Auto3", "Automobiles", "1.1", "", "3.4.5.6", "true", "false"},
+		{"1.2.3.4", "2Auto", "automobiles", "1.0", "", "4.5.6.7", "true", "false"},
+		{"5.6.7.8", "auto", "vehicles", "1.0", "", "5.6.7.8", "true", "false"},
+		{"7.6.5.4", "utoA", "hicle", "1.0", "", "6.7.8.9", "true", "false"}
 	};
 	
 	private final static int CODESYSTEM_FIELDCOUNT = DataField.values().length;
@@ -136,6 +141,18 @@ public class FakeLexEvsData {
 		return results;
 	}
 
+	public boolean isMapping(int schemeIndex){
+		boolean answer = false;
+		
+		if(schemeIndex < this.codeSystemCount){
+			String[] codeSystem = this.codeSystemList.get(schemeIndex);
+			if(codeSystem[DataField.IS_MAPPING.index()].equals("true")){
+				answer = true;
+			}
+		}
+		
+		return answer;
+	}
 	
 	private int getPropertyReferenceIndex(PropertyReference propertyReference) {
 		int index = 0;

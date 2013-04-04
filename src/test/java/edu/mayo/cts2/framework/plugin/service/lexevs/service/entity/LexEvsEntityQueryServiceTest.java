@@ -227,4 +227,61 @@ public class LexEvsEntityQueryServiceTest {
 		
 		fakeLexEvs.executeGetResourceSummariesWithDeepComparisonForEachPropertyReference(service, directoryResult, query, RESOURCE_NAME, page, lastPage);		
 	}
+	
+	// -----------  Test getResourceList
+	@Test
+	public void testGetResourceList_NoFilter_SchemeCountsFrom1to21_PageSizesFrom1to50_Pages() throws Exception {
+		int maxSchemeCount = 21;
+		int maxPageSize = 50;
+		
+		FakeLexEvsSystem<EntityDescription, EntityDirectoryEntry, EntityDescriptionQuery, LexEvsEntityQueryService> fakeLexEvs;
+		fakeLexEvs = new FakeLexEvsSystem<EntityDescription, EntityDirectoryEntry, EntityDescriptionQuery, LexEvsEntityQueryService>();
+		LexEvsEntityQueryService service;
+		
+		// Restrict to given codeSystem
+		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
+		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName(RESOURCE_NAME));
+		
+		EntityDescriptionQuery query;
+		DirectoryResult<EntityDescription> directoryResult; 
+		
+		Page page = new Page();
+		int lastPage;
+		
+		for(int schemeCount=1; schemeCount <= maxSchemeCount; schemeCount++){
+			fakeLexEvs = new FakeLexEvsSystem<EntityDescription, EntityDirectoryEntry, EntityDescriptionQuery, LexEvsEntityQueryService>(schemeCount);		
+			service = this.createService(fakeLexEvs, true); 
+			for(int pageSize=1; pageSize <= maxPageSize; pageSize++){
+				page.setMaxToReturn(pageSize);
+				lastPage = fakeLexEvs.calculatePagePastLastPage(fakeLexEvs.size(), page.getMaxToReturn());
+				
+				query = new EntityDescriptionQueryImpl(null, null, restrictions);
+				directoryResult = null; 
+				
+				fakeLexEvs.executeGetResourceListForEachPage(service, directoryResult, query, RESOURCE_NAME, page, lastPage);		
+			}
+		}
+	}
+	
+	@Test
+	public void testGetResourceList_DeepCompare_PropertyReferences_MatchingAlgorithms_Pages_CodindgSchemes_Substrings() throws Exception {
+		Page page = new Page();		
+		FakeLexEvsSystem<EntityDescription, EntityDirectoryEntry, EntityDescriptionQuery, LexEvsEntityQueryService> fakeLexEvs;
+		fakeLexEvs = new FakeLexEvsSystem<EntityDescription, EntityDirectoryEntry, EntityDescriptionQuery, LexEvsEntityQueryService>();
+		LexEvsEntityQueryService service = this.createService(fakeLexEvs, true);
+		
+		// Test one page past possible pages to ensure 0 is returned.
+		int lastPage = fakeLexEvs.calculatePagePastLastPage(fakeLexEvs.size(), page.getMaxToReturn());
+
+		// Restrict to given codeSystem
+		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
+		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName(RESOURCE_NAME));
+		
+		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
+		EntityDescriptionQuery query = new EntityDescriptionQueryImpl(null, filters, restrictions);
+		DirectoryResult<EntityDescription> directoryResult = null; 
+		
+		fakeLexEvs.executeGetResourceListWithDeepComparisonForEachPropertyReference(service, directoryResult, query, RESOURCE_NAME, page, lastPage);		
+	}
+	
 }

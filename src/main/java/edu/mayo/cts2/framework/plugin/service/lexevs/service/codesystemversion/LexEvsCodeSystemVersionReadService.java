@@ -61,6 +61,17 @@ public class LexEvsCodeSystemVersionReadService
 	@Resource
 	private CodeSystemVersionNameConverter nameConverter;
 	
+	
+	public void setCodingSchemeToCodeSystemTransform(
+			CodingSchemeToCodeSystemTransform transformer) {
+		this.transformer = transformer;
+	}
+	
+	public void setCodeSystemVersionNameConverter(CodeSystemVersionNameConverter nameConverter){
+		this.nameConverter = nameConverter;
+	}
+	
+	
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.service.profile.TagAwareReadService#readByTag(edu.mayo.cts2.framework.model.service.core.NameOrURI, edu.mayo.cts2.framework.model.core.VersionTagReference, edu.mayo.cts2.framework.model.command.ResolvedReadContext)
 	 */
@@ -162,4 +173,5 @@ public class LexEvsCodeSystemVersionReadService
 	protected CodeSystemVersionCatalogEntry transform(CodingScheme codingScheme) {
 		return this.transformer.transform(codingScheme);
 	}
+
 }

@@ -70,37 +70,23 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 	@Resource
 	private CodeSystemVersionNameConverter codeSystemVersionNameConverter;
 
-	/* (non-Javadoc)
-	 * @see edu.mayo.cts2.framework.service.profile.ReadService#read(java.lang.Object, edu.mayo.cts2.framework.model.command.ResolvedReadContext)
-	 */
-	@Override
-	public EntityDescription read(
-			EntityDescriptionReadId identifier,
-			ResolvedReadContext readContext) {
-
-		ResolvedConceptReference entity = getLexGridEntityByRead(identifier, readContext);
-		if(entity == null){
-			return null;
-		} else {
-			return this.entityTransform.transformToEntity(entity);
-		}
+	public CodeSystemVersionNameConverter getCodeSystemVersionNameConverter() {
+		return codeSystemVersionNameConverter;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.mayo.cts2.framework.service.profile.ReadService#exists(java.lang.Object, edu.mayo.cts2.framework.model.command.ResolvedReadContext)
-	 */
-	@Override
-	public boolean exists(EntityDescriptionReadId identifier,
-			ResolvedReadContext readContext) {
-		
-		ResolvedConceptReference entity = getLexGridEntityByRead(identifier,	readContext);
-		if (entity == null) {
-			return false;
-		} else {
-			return true;
-		}
+	public void setCodeSystemVersionNameConverter(
+			CodeSystemVersionNameConverter codeSystemVersionNameConverter) {
+		this.codeSystemVersionNameConverter = codeSystemVersionNameConverter;
 	}
-	
+
+	public EntityTransform getEntityTransform() {
+		return entityTransform;
+	}
+
+	public void setEntityTransform(EntityTransform entityTransform) {
+		this.entityTransform = entityTransform;
+	}
+
 	protected ResolvedConceptReference getLexGridEntityByRead(EntityDescriptionReadId identifier,
 			ResolvedReadContext readContext) {
 
@@ -138,6 +124,37 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.mayo.cts2.framework.service.profile.ReadService#read(java.lang.Object, edu.mayo.cts2.framework.model.command.ResolvedReadContext)
+	 */
+	@Override
+	public EntityDescription read(
+			EntityDescriptionReadId identifier,
+			ResolvedReadContext readContext) {
+
+		ResolvedConceptReference entity = getLexGridEntityByRead(identifier, readContext);
+		if(entity == null){
+			return null;
+		} else {
+			return this.entityTransform.transformToEntity(entity);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see edu.mayo.cts2.framework.service.profile.ReadService#exists(java.lang.Object, edu.mayo.cts2.framework.model.command.ResolvedReadContext)
+	 */
+	@Override
+	public boolean exists(EntityDescriptionReadId identifier,
+			ResolvedReadContext readContext) {
+		
+		ResolvedConceptReference entity = getLexGridEntityByRead(identifier,	readContext);
+		if (entity == null) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
 	@Override
 	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
 		return new ArrayList<DocumentedNamespaceReference>();
@@ -188,23 +205,5 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 	@Override
 	public List<VersionTagReference> getSupportedVersionTags() {
 		return Arrays.asList(Constants.CURRENT_TAG);
-	}
-	
-	public CodeSystemVersionNameConverter getCodeSystemVersionNameConverter() {
-		return codeSystemVersionNameConverter;
-	}
-
-	public void setCodeSystemVersionNameConverter(
-			CodeSystemVersionNameConverter codeSystemVersionNameConverter) {
-		this.codeSystemVersionNameConverter = codeSystemVersionNameConverter;
-	}
-
-	public EntityTransform getEntityTransform() {
-		return entityTransform;
-	}
-
-	public void setEntityTransform(EntityTransform entityTransform) {
-		this.entityTransform = entityTransform;
-	}
-
+	}	
 }

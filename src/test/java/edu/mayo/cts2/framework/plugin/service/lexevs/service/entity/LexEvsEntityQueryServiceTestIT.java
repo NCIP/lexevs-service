@@ -25,7 +25,6 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
@@ -35,7 +34,6 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
-import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.junit.Test;
 
@@ -62,6 +60,14 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 
 	// local methods
 	// --------------
+	private void setAnonymousTransformer(){
+		service.setEntityTransformer(new EntityTransform(){
+			public EntityDirectoryEntry transformToEntry(ResolvedConceptReference reference){
+				return new EntityDirectoryEntry();
+			}
+		});
+	}
+
 	private EntityDescriptionQuery createQuery(String matchAlgorithmReference, String matchValue, String codeSystemVersion){
 		// Create filters for query
 		// ------------------------
@@ -93,7 +99,6 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	@Test
 	public void testSetUp() {
 		assertNotNull(this.service);
-	//	assertNotNull(this.lbs);
 	}
 	
 	@Test
@@ -101,13 +106,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	public void testGetResourceSummaries_CodingSchemeExists_andNotEmpty() throws Exception {
 		final NameOrURI name = ModelUtils.nameOrUriFromName("Automobiles-1.0");
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 		
 		// Create restriction for query
 		// ----------------------------
@@ -123,13 +122,14 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();		
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();
-		assertNotNull(list);
-		assertTrue(list.size() > 0);		
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() > 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() > 0);		
 	}
 
 	@Test
@@ -137,13 +137,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	public void testGetResourceSummaries_CodingSchemeDoesNotExist() throws Exception {
 		final NameOrURI name = ModelUtils.nameOrUriFromName("Automooobiles-1.0");
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 		
 		// Create restriction for query
 		// ----------------------------
@@ -162,21 +156,16 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		
 		// Test results
 		// ------------
-		assertNotNull(directoryResult);		
-		assertTrue(directoryResult.getEntries().size() == 0);		
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
+		String msg = "Expecting directoryResult.getEntries().size() == 0, instead directoryResult.getEntries().size() == " + directoryResult.getEntries().size();
+		assertTrue(msg, directoryResult.getEntries().size() == 0);		
 	}
 	
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_startsWith() throws Exception {
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 				
 		// Create query
 		// ------------
@@ -187,27 +176,22 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() > 0);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() > 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() > 0);		
 	}	
 
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_startsWith_Empty() throws Exception {
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 				
 		// Create query
 		// ------------
@@ -218,14 +202,15 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() == 0);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() == 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() == 0);		
 	}	
 
 	
@@ -233,13 +218,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_exactMatch() throws Exception {
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 				
 		// Create query
 		// ------------
@@ -250,27 +229,22 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() > 0);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() > 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() > 0);		
 	}	
 
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_exactMatch_Empty() throws Exception {
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 				
 		// Create query
 		// ------------
@@ -281,14 +255,15 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() == 0);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() == 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() == 0);		
 	}	
 
 	@Test
@@ -298,13 +273,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		// NOTE:  The CTS2 "word starts with" filtered query maps to the LexEVS "contains" registered
 		//   filter extension
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 		
 		// Create query
 		// ------------
@@ -315,27 +284,22 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 		
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() > 0);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() > 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() > 0);		
 	}	
 	
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_contains_Empty() throws Exception {
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 		
 		// Create query
 		// ------------
@@ -346,14 +310,15 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 		
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() == 0);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() == 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() == 0);		
 	}	
 
 	@Test
@@ -363,13 +328,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		// NOTE:  The CTS2 "word starts with" filtered query maps to the LexEVS "contains" registered
 		//   filter extension
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 		
 		// Create query
 		// ------------
@@ -380,14 +339,15 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 		
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() == 4);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() == 4, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() == 4);		
 	}	
 	
 
@@ -395,13 +355,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_Leading_Wildcard() throws Exception {
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 		
 		// Create query - searching for "General Motors" entity
 		// ------------
@@ -412,14 +366,15 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 		
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() > 0);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() > 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() > 0);		
 	}	
 	
 	
@@ -427,13 +382,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_Leading_Wildcard_Empty() throws Exception {
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 		
 		// Create query
 		// ------------
@@ -444,27 +393,22 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 		
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() == 0);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() == 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() == 0);		
 	}	
 	
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_Lagging_Wildcard() throws Exception {
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 		
 		// Create query - searching for "General Motors" entity
 		// ------------
@@ -475,14 +419,15 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 		
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() > 0);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() > 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() > 0);		
 	}	
 	
 	
@@ -490,13 +435,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_Lagging_Wildcard_Empty() throws Exception {
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 		
 		// Create query
 		// ------------
@@ -507,14 +446,15 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 		
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() == 0);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() == 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() == 0);		
 	}	
 	
 	
@@ -522,13 +462,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_LeadingAndLagging_Wildcard() throws Exception {
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 		
 		// Create query - searching for "General Motors" entity
 		// ------------
@@ -539,14 +473,15 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 		
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() > 0);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() > 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() > 0);		
 	}	
 	
 	
@@ -554,13 +489,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_LeadingAndLagging_Wildcard_Empty() throws Exception {
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 		
 		// Create query
 		// ------------
@@ -571,14 +500,15 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 		
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() == 0);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() == 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() == 0);		
 	}	
 	
 	@Test
@@ -588,13 +518,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		// NOTE:  The CTS2 "word starts with" filtered query maps to the LexEVS "contains" registered
 		//   filter extension
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 		
 		// Create query
 		// ------------
@@ -606,25 +530,26 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		Page page = new Page();
 		page.setMaxToReturn(3);
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 				
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
+		assertNotNull("Expecting data returned but list is null", list);
 		assertTrue("Expected first 1 of 2 pages returned ",list.size() == 3);
 		assertFalse("Expected not to be at the end of the pages ", directoryResult.isAtEnd());
 		
 		page.setPage(1);
 		directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 		list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue("Expected 1 page being the last page returned ", list.size() == 1);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() == 1, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() == 1);		
 		assertTrue("Expected to be at the end of the pages ", directoryResult.isAtEnd());
 
 	}	
-
+	
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_Paging_Empty() throws Exception {
@@ -632,13 +557,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		// NOTE:  The CTS2 "word starts with" filtered query maps to the LexEVS "contains" registered
 		//   filter extension
 		
-		// Configure service to use an anonymous transformer class
-		// -------------------------------------------------------
-		service.setEntityTransformer(new EntityTransform(){
-			public EntityDirectoryEntry transform(ResolvedConceptReference reference){
-				return new EntityDirectoryEntry();
-			}
-		});
+		this.setAnonymousTransformer();
 		
 		// Create query
 		// ------------
@@ -649,13 +568,14 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 				
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() == 0);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() == 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() == 0);		
 		assertTrue("Expected to be at the end of the pages ", directoryResult.isAtEnd());
 	}	
 

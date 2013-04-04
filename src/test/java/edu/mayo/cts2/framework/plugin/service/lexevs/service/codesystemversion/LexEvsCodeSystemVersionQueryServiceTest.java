@@ -158,7 +158,7 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	}
 	
 
-	// --------------------------------------------
+	// -----------  Test getResourceSummaries
 	@Test
 	public void testGetResourceSummaries_NoFilter_SchemeCountsFrom1to21_PageSizesFrom1to50_Pages() throws Exception {
 		int maxSchemeCount = 21;
@@ -203,5 +203,53 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = null; 
 		
 		fakeLexEvs.executeGetResourceSummariesWithDeepComparisonForEachPropertyReference(service, directoryResult, query, null, page, lastPage);		
+	}
+	
+	// -----------  Test getResourceList
+	@Test
+	public void testGetResourceList_NoFilter_SchemeCountsFrom1to21_PageSizesFrom1to50_Pages() throws Exception {
+		int maxSchemeCount = 21;
+		int maxPageSize = 50;
+		
+		FakeLexEvsSystem<CodeSystemVersionCatalogEntry, CodeSystemVersionCatalogEntrySummary, CodeSystemVersionQueryImpl, LexEvsCodeSystemVersionQueryService> fakeLexEvs;
+		fakeLexEvs = new FakeLexEvsSystem<CodeSystemVersionCatalogEntry, CodeSystemVersionCatalogEntrySummary, CodeSystemVersionQueryImpl, LexEvsCodeSystemVersionQueryService>();
+		LexEvsCodeSystemVersionQueryService service;
+		
+		CodeSystemVersionQueryImpl query;
+		DirectoryResult<CodeSystemVersionCatalogEntry> directoryResult; 
+		
+		Page page = new Page();
+		int lastPage;
+		
+		for(int schemeCount=1; schemeCount <= maxSchemeCount; schemeCount++){
+			fakeLexEvs = new FakeLexEvsSystem<CodeSystemVersionCatalogEntry, CodeSystemVersionCatalogEntrySummary, CodeSystemVersionQueryImpl, LexEvsCodeSystemVersionQueryService>(schemeCount);		
+			service = this.createService(fakeLexEvs, true); 
+			for(int pageSize=1; pageSize <= maxPageSize; pageSize++){
+				page.setMaxToReturn(pageSize);
+				lastPage = fakeLexEvs.calculatePagePastLastPage(fakeLexEvs.size(), page.getMaxToReturn());
+				
+				query = new CodeSystemVersionQueryImpl(null, null, null, null);
+				directoryResult = null; 
+				
+				fakeLexEvs.executeGetResourceListForEachPage(service, directoryResult, query, null, page, lastPage);		
+			}
+		}
+	}
+	
+	@Test
+	public void testGetResourceList_DeepCompare_PropertyReferences_MatchingAlgorithms_Pages_CodindgSchemes_Substrings() throws Exception {
+		Page page = new Page();		
+		FakeLexEvsSystem<CodeSystemVersionCatalogEntry, CodeSystemVersionCatalogEntrySummary, CodeSystemVersionQueryImpl, LexEvsCodeSystemVersionQueryService> fakeLexEvs;
+		fakeLexEvs = new FakeLexEvsSystem<CodeSystemVersionCatalogEntry, CodeSystemVersionCatalogEntrySummary, CodeSystemVersionQueryImpl, LexEvsCodeSystemVersionQueryService>();
+		LexEvsCodeSystemVersionQueryService service = this.createService(fakeLexEvs, true);
+		
+		// Test one page past possible pages to ensure 0 is returned.
+		int lastPage = fakeLexEvs.calculatePagePastLastPage(fakeLexEvs.size(), page.getMaxToReturn());
+
+		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
+		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filters, null, null);
+		DirectoryResult<CodeSystemVersionCatalogEntry> directoryResult = null; 
+		
+		fakeLexEvs.executeGetResourceListWithDeepComparisonForEachPropertyReference(service, directoryResult, query, null, page, lastPage);		
 	}
 }
