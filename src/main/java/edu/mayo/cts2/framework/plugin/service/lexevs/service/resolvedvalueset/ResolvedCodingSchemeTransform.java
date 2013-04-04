@@ -23,6 +23,17 @@ public class ResolvedCodingSchemeTransform {
 	@Resource 
 	private UriHandler uriHandler;
 
+	
+	List<ResolvedValueSetDirectoryEntry> transform(List<CodingScheme> listcs) {
+		List<ResolvedValueSetDirectoryEntry> rvsde_list = new ArrayList<ResolvedValueSetDirectoryEntry>();
+		for (CodingScheme cs: listcs) {
+			ResolvedValueSetDirectoryEntry rvsde = transform(cs);
+			rvsde_list.add(rvsde);
+	     }
+		return rvsde_list;
+	}
+	
+	
 	ResolvedValueSetDirectoryEntry transform(CodingScheme cs) {
 		ResolvedValueSetDirectoryEntry entry= new ResolvedValueSetDirectoryEntry();
 		entry.setResolvedValueSetURI(cs.getCodingSchemeURI());
