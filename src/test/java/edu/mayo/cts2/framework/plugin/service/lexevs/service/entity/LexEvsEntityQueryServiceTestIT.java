@@ -99,7 +99,6 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	@Test
 	public void testSetUp() {
 		assertNotNull(this.service);
-	//	assertNotNull(this.lbs);
 	}
 	
 	@Test
@@ -123,13 +122,14 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();		
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();
-		assertNotNull(list);
-		assertTrue(list.size() > 0);		
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() > 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() > 0);		
 	}
 
 	@Test
@@ -156,8 +156,9 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		
 		// Test results
 		// ------------
-		assertNotNull(directoryResult);		
-		assertTrue(directoryResult.getEntries().size() == 0);		
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
+		String msg = "Expecting directoryResult.getEntries().size() == 0, instead directoryResult.getEntries().size() == " + directoryResult.getEntries().size();
+		assertTrue(msg, directoryResult.getEntries().size() == 0);		
 	}
 	
 	@Test
@@ -175,14 +176,15 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() > 0);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() > 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() > 0);		
 	}	
 
 	@Test
@@ -200,14 +202,15 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() == 0);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() == 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() == 0);		
 	}	
 
 	
@@ -226,14 +229,15 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() > 0);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() > 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() > 0);		
 	}	
 
 	@Test
@@ -251,14 +255,15 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() == 0);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() == 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() == 0);		
 	}	
 
 	@Test
@@ -279,14 +284,15 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 		
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() > 0);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() > 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() > 0);		
 	}	
 	
 	@Test
@@ -304,14 +310,15 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 		
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() == 0);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() == 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() == 0);		
 	}	
 
 	@Test
@@ -332,14 +339,15 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 		
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() == 4);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() == 4, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() == 4);		
 	}	
 	
 
@@ -358,14 +366,15 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 		
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() > 0);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() > 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() > 0);		
 	}	
 	
 	
@@ -384,14 +393,15 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 		
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() == 0);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() == 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() == 0);		
 	}	
 	
 	@Test
@@ -409,14 +419,15 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 		
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() > 0);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() > 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() > 0);		
 	}	
 	
 	
@@ -435,14 +446,15 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 		
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() == 0);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() == 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() == 0);		
 	}	
 	
 	
@@ -461,14 +473,15 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 		
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() > 0);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() > 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() > 0);		
 	}	
 	
 	
@@ -487,14 +500,15 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 		
 		
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() == 0);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() == 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() == 0);		
 	}	
 	
 	@Test
@@ -516,21 +530,22 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		Page page = new Page();
 		page.setMaxToReturn(3);
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 				
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
+		assertNotNull("Expecting data returned but list is null", list);
 		assertTrue("Expected first 1 of 2 pages returned ",list.size() == 3);
 		assertFalse("Expected not to be at the end of the pages ", directoryResult.isAtEnd());
 		
 		page.setPage(1);
 		directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 		list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue("Expected 1 page being the last page returned ", list.size() == 1);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() == 1, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() == 1);		
 		assertTrue("Expected to be at the end of the pages ", directoryResult.isAtEnd());
 
 	}	
@@ -553,13 +568,14 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
-		assertNotNull(directoryResult);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
 				
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
-		assertNotNull(list);
-		assertTrue(list.size() == 0);
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() == 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() == 0);		
 		assertTrue("Expected to be at the end of the pages ", directoryResult.isAtEnd());
 	}	
 

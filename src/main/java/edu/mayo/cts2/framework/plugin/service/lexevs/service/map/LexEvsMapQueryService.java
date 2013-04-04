@@ -48,7 +48,7 @@ import edu.mayo.cts2.framework.model.map.MapCatalogEntrySummary;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonGetResourceSummaries;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceSummaryUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.QueryData;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
@@ -145,9 +145,9 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		LexBIGService lexBigService = this.getLexBigService();
 		List<CodingScheme> codingSchemeList;
 		QueryData<MapQuery> queryData = new QueryData<MapQuery>(query);
-		codingSchemeList = CommonGetResourceSummaries.getCodingSchemeList(lexBigService, this.getCodeSystemVersionNameConverter(), mappingExtension, queryData, sortCriteria);
+		codingSchemeList = CommonResourceSummaryUtils.getCodingSchemeList(lexBigService, this.getCodeSystemVersionNameConverter(), mappingExtension, queryData, sortCriteria);
 		CodingScheme[] codingSchemeArray = codingSchemeList.toArray(new CodingScheme[0]);
-		CodingScheme[] codingSchemePage = CommonUtils.getRenderingPage(codingSchemeArray, page);
+		CodingScheme[] codingSchemePage = (CodingScheme[]) CommonUtils.getRenderingPage(codingSchemeArray, page);
 		
 		List<MapCatalogEntrySummary> list = new ArrayList<MapCatalogEntrySummary>();
 
@@ -168,9 +168,9 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		LexBIGService lexBigService = this.getLexBigService();
 		List<CodingScheme> codingSchemeList;
 		QueryData<MapQuery> queryData = new QueryData<MapQuery>(query);
-		codingSchemeList = CommonGetResourceSummaries.getCodingSchemeList(lexBigService, this.getCodeSystemVersionNameConverter(), mappingExtension, queryData, sortCriteria);
+		codingSchemeList = CommonResourceSummaryUtils.getCodingSchemeList(lexBigService, this.getCodeSystemVersionNameConverter(), mappingExtension, queryData, sortCriteria);
 		CodingScheme[] codingSchemeArray = codingSchemeList.toArray(new CodingScheme[0]);
-		CodingScheme[] codingSchemePage = CommonUtils.getRenderingPage(codingSchemeArray, page);
+		CodingScheme[] codingSchemePage = (CodingScheme[]) CommonUtils.getRenderingPage(codingSchemeArray, page);
 		
 		List<MapCatalogEntry> list = new ArrayList<MapCatalogEntry>();
 
@@ -189,7 +189,7 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		LexBIGService lexBigService = this.getLexBigService();
 		List<CodingScheme> codingSchemeList;
 		QueryData<MapQuery> queryData = new QueryData<MapQuery>(query);
-		codingSchemeList = CommonGetResourceSummaries.getCodingSchemeList(lexBigService, this.getCodeSystemVersionNameConverter(), mappingExtension, queryData, null);
+		codingSchemeList = CommonResourceSummaryUtils.getCodingSchemeList(lexBigService, this.getCodeSystemVersionNameConverter(), mappingExtension, queryData, null);
 		return codingSchemeList.size();
 	}
 
