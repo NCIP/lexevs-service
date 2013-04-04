@@ -1,3 +1,4 @@
+; Client code to connect to an external URI Resolver Service.
 (ns cts2.uri
   (:require [clj-http.client :as client])
   (:import [java.net URLEncoder]))

@@ -150,6 +150,7 @@ public class CommonResourceSummaryUtils{
 		return csRendering;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static <Entry extends edu.mayo.cts2.framework.model.core.ResourceDescription> DirectoryResult<Entry> createDirectoryResultWithEntryData(
 			LexBIGService lexBigService, 
 			CodingSchemeToCodeSystemTransform transformer, 
