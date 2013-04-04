@@ -41,6 +41,7 @@ import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsCodeSystemService;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
 import edu.mayo.cts2.framework.service.profile.map.MapReadService;
 
 /**
@@ -80,25 +81,10 @@ public class LexEvsMapReadService
 	@Override
 	public MapCatalogEntry read(NameOrURI identifier,
 			ResolvedReadContext readContext) {
-		
-		String name;
-		if(identifier.getName() != null){
-			name = identifier.getName();
-			if(!this.nameConverter.isValidCodeSystemVersionName(name)){
-				return null;
-			}
-		} else {
-			throw new UnsupportedOperationException("Cannot resolve by DocumentURI yet.");
-		}
-		
-		NameVersionPair namePair = this.nameConverter.fromCts2CodeSystemVersionName(name);
-		CodingSchemeVersionOrTag version = 
-			Constructors.createCodingSchemeVersionOrTagFromVersion(namePair.getVersion());
-		
-		return this.getByVersionIdOrTag
-				(ModelUtils.nameOrUriFromName(
-						namePair.getName()), 
-						version);
+		NameVersionPair namePair = CommonUtils.getNamePair(nameConverter, identifier, readContext);
+		NameOrURI name = ModelUtils.nameOrUriFromName(namePair.getName());
+		CodingSchemeVersionOrTag versionOrTag = Constructors.createCodingSchemeVersionOrTagFromVersion(namePair.getVersion());
+		return this.getByVersionIdOrTag(name, versionOrTag);
 	}
 
 	@Override

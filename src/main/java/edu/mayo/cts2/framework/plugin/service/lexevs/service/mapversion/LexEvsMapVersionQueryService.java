@@ -136,7 +136,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		csrFilteredList = CommonResourceSummaryUtils.getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, sortCriteria);
 		csRendering = csrFilteredList.getCodingSchemeRendering();
 		
-		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonUtils.getRenderingPage(csRendering, page);
+		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonUtils.getPageFromArray(csRendering, page);
 
 		List<MapVersionDirectoryEntry> list = new ArrayList<MapVersionDirectoryEntry>();
 
@@ -167,7 +167,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		csrFilteredList = CommonResourceSummaryUtils.getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, sortCriteria);
 		csRendering = csrFilteredList.getCodingSchemeRendering();
 		
-		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonUtils.getRenderingPage(csRendering, page);
+		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonUtils.getPageFromArray(csRendering, page);
 		
 		List<MapVersion> list = new ArrayList<MapVersion>();
 

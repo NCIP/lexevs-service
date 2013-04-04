@@ -8,16 +8,30 @@ import java.util.Set;
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.Collections.LocalNameList;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
+import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
+import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
+import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.LexGrid.LexBIG.Utility.Constructors;
+import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
 import org.LexGrid.codingSchemes.CodingScheme;
 
+import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntrySummary;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
+import edu.mayo.cts2.framework.model.directory.DirectoryResult;
+import edu.mayo.cts2.framework.model.entity.EntityDescription;
+import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
+import edu.mayo.cts2.framework.model.map.MapCatalogEntry;
+import edu.mayo.cts2.framework.model.map.MapCatalogEntrySummary;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion.CodingSchemeToCodeSystemTransform;
+import edu.mayo.cts2.framework.plugin.service.lexevs.service.entity.EntityTransform;
+import edu.mayo.cts2.framework.plugin.service.lexevs.service.map.CodingSchemeToMapTransform;
 import edu.mayo.cts2.framework.service.profile.ResourceQuery;
 
 public class CommonResourceSummaryUtils{
@@ -29,18 +43,111 @@ public class CommonResourceSummaryUtils{
 		}
 		return answer;
 	}
+	
+	public static DirectoryResult<MapCatalogEntry> createDirectoryResultWithEntryData(
+			LexBIGService lexBigService,
+			CodingSchemeToMapTransform transformer,
+			CodingScheme[] codingSchemes, boolean atEnd) {
+		List<MapCatalogEntry> list = new ArrayList<MapCatalogEntry>();
 
-	public static <T extends ResourceQuery> ResolvedConceptReferenceResults getResolvedConceptReferenceResults(
+		if(codingSchemes != null){
+			for (CodingScheme codingScheme : codingSchemes) {
+				list.add(transformer.transformToMapCatalogEntry(codingScheme));
+			}
+		}
+		
+		return new DirectoryResult<MapCatalogEntry>(list, atEnd);
+	}
+
+	public static DirectoryResult<MapCatalogEntrySummary> createDirectoryResultWithEntrySummaryData(
+			LexBIGService lexBigService,
+			CodingSchemeToMapTransform transformer,
+			CodingScheme[] codingSchemes, boolean atEnd) {
+		List<MapCatalogEntrySummary> list = new ArrayList<MapCatalogEntrySummary>();
+
+		if(codingSchemes != null){
+			for (CodingScheme codingScheme : codingSchemes) {
+				list.add(transformer.transformToMapCatalogEntrySummary(codingScheme));
+			}
+		}
+		
+		return new DirectoryResult<MapCatalogEntrySummary>(list, atEnd);
+	}
+	
+	
+	
+	public static DirectoryResult<CodeSystemVersionCatalogEntrySummary> createDirectoryResultWithEntrySummaryData(
+			LexBIGService lexBigService,
+			CodingSchemeToCodeSystemTransform transformer,
+			CodingSchemeRendering[] csRendering, boolean atEnd) {
+		List<CodeSystemVersionCatalogEntrySummary> list = new ArrayList<CodeSystemVersionCatalogEntrySummary>();
+
+		if(csRendering != null){
+			for (CodingSchemeRendering render : csRendering) {
+				list.add(transformer.transform(render));
+			}
+		}
+		
+		return new DirectoryResult<CodeSystemVersionCatalogEntrySummary>(list, atEnd);
+	}
+
+
+	public static <Query extends ResourceQuery> CodingSchemeRendering[] getCodingSchemeRendering(
+			LexBIGService lexBigService, 
+			CodeSystemVersionNameConverter nameConverter, 
+			Query query, 
+			MappingExtension mappingExtension,
+			SortCriteria sortCriteria){
+		
+		QueryData<Query> queryData = new QueryData<Query>(query);
+		CodingSchemeRenderingList csrFilteredList;
+		csrFilteredList = CommonResourceSummaryUtils.getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, sortCriteria);
+		CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
+
+		return csRendering;
+	}
+	
+	public static <Entry extends edu.mayo.cts2.framework.model.core.ResourceDescription> DirectoryResult<Entry> createDirectoryResultWithEntryData(
+			LexBIGService lexBigService, 
+			CodingSchemeToCodeSystemTransform transformer, 
+			CodingSchemeRendering[] csRendering, boolean atEnd2){
+		
+		
+//		List<CodeSystemVersionCatalogEntry> list = new ArrayList<CodeSystemVersionCatalogEntry>();
+		List<Entry> list = new ArrayList<Entry>();
+		boolean atEnd = true;
+		if(csRendering != null){
+			for (CodingSchemeRendering render : csRendering) {
+				String codingSchemeName = render.getCodingSchemeSummary().getCodingSchemeURI();			
+				String version = render.getCodingSchemeSummary().getRepresentsVersion();
+				CodingSchemeVersionOrTag tagOrVersion = Constructors.createCodingSchemeVersionOrTagFromVersion(version);
+				CodingScheme codingScheme;
+				try {
+					codingScheme = lexBigService.resolveCodingScheme(codingSchemeName, tagOrVersion);
+					list.add((Entry) transformer.transform(codingScheme));
+				} catch (LBException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
+		
+		return new DirectoryResult<Entry>(list, atEnd);
+	}
+
+	
+	public static <T extends ResourceQuery> ResolvedConceptReferenceResults getResolvedConceptReferenceResultsPage(
 			LexBIGService lexBigService, 
 			QueryData<T> queryData,
 			SortCriteria sortCriteria, 
 			Page page){
 		ResolvedConceptReferenceResults results = null;
+		ResolvedConceptReferencesIterator iterator;
 		CodedNodeSet codedNodeSet;
 		
 		codedNodeSet = CommonResourceSummaryUtils.getCodedNodeSet(lexBigService, queryData, sortCriteria);
 		if(codedNodeSet != null){
-			results = CommonUtils.getReferenceResultPage(codedNodeSet, sortCriteria, page);
+			iterator = CommonUtils.getResolvedConceptReferencesIterator(codedNodeSet, sortCriteria);
+			results = CommonUtils.getPageFromIterator(iterator, page);
 		}
 		
 		return results;
@@ -84,10 +191,6 @@ public class CommonResourceSummaryUtils{
 		for(int index=0; index < count; index++){
 			CodingSchemeSummary codingSchemeSummary;
 			codingSchemeSummary = codingSchemeRenderingList.getCodingSchemeRendering(index).getCodingSchemeSummary();
-//				if(printObjects){
-//					System.out.println("CodingSchemeRendering: ");
-//					System.out.println(PrintUtility.codingSchemeSummary(codingSchemeSummary, 1));
-//				}
 			localName = codingSchemeSummary.getLocalName();
 			version = codingSchemeSummary.getRepresentsVersion();
 			if(localName.equals(queryData.getCodingSchemeName()) && 
@@ -137,13 +240,9 @@ public class CommonResourceSummaryUtils{
 		List<CodingScheme> codingSchemeList = new ArrayList<CodingScheme>();
 		boolean resolvedToCodingSchemeFlag = false;
 		
-//		QueryData<MapQuery> queryData = new QueryData<MapQuery>(query);
 		CodingSchemeRenderingList csrFilteredList;
 		csrFilteredList = getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, sortCriteria);
 
-		// NOTE:  Logic requires the processing of CodeSystemRestrictions to be last in order to save on 
-		//   the resolving to a list of CodingScheme objects.  Filter items based on the CodingScheme Relations 
-		//   sourceCodingScheme and/or targetCodingScheme string values.
 		if (queryData.getCodeSystemRestriction() != null) {
 			codingSchemeList = CommonSearchFilterUtils.filterByRenderingListAndMappingExtension(lexBigService, csrFilteredList, queryData.getCodeSystemRestriction());
 			resolvedToCodingSchemeFlag = true;
@@ -154,5 +253,47 @@ public class CommonResourceSummaryUtils{
 		}
 					
 		return codingSchemeList;
+	}
+
+	public static DirectoryResult<EntityDirectoryEntry> createDirectoryResultWithEntryData(
+			LexBIGService lexBigService, EntityTransform transformer,
+			ResolvedConceptReferenceResults resolvedConceptReferenceResults) {
+		
+		List<EntityDirectoryEntry> list = new ArrayList<EntityDirectoryEntry>();
+		DirectoryResult<EntityDirectoryEntry> directoryResult = new DirectoryResult<EntityDirectoryEntry>(list, true);
+		
+		if(resolvedConceptReferenceResults != null){
+			ResolvedConceptReference[] resolvedConceptReferences = resolvedConceptReferenceResults.getResolvedConceptReference();
+			if(resolvedConceptReferences != null){
+				for(ResolvedConceptReference reference : resolvedConceptReferences){
+					EntityDirectoryEntry entry = transformer.transformToEntry(reference);
+					list.add(entry);
+				}
+			}			
+			directoryResult = new DirectoryResult<EntityDirectoryEntry>(list, resolvedConceptReferenceResults.isAtEnd());
+		}
+
+		return directoryResult;
+	}	
+
+	public static DirectoryResult<EntityDescription> createDirectoryResultWithEntrySummaryData(
+			LexBIGService lexBigService, EntityTransform transformer,
+			ResolvedConceptReferenceResults resolvedConceptReferenceResults) {
+		
+		List<EntityDescription> list = new ArrayList<EntityDescription>();
+		DirectoryResult<EntityDescription> directoryResult = new DirectoryResult<EntityDescription>(list, true);
+		
+		if(resolvedConceptReferenceResults != null){
+			ResolvedConceptReference[] resolvedConceptReferences = resolvedConceptReferenceResults.getResolvedConceptReference();
+			if(resolvedConceptReferences != null){
+				for(ResolvedConceptReference reference : resolvedConceptReferences){
+					EntityDescription entry = transformer.transformToEntity(reference);
+					list.add(entry);
+				}
+			}			
+			directoryResult = new DirectoryResult<EntityDescription>(list, resolvedConceptReferenceResults.isAtEnd());
+		}
+
+		return directoryResult;
 	}	
 }

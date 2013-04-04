@@ -30,10 +30,7 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
-import org.LexGrid.LexBIG.Exceptions.LBException;
-import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
-import org.LexGrid.LexBIG.Utility.Constructors;
-import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
+import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.command.Page;
@@ -41,7 +38,6 @@ import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.core.CodeSystemReference;
 import edu.mayo.cts2.framework.model.core.CodeSystemVersionReference;
 import edu.mayo.cts2.framework.model.core.EntityReference;
-import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
@@ -51,8 +47,8 @@ import edu.mayo.cts2.framework.model.entity.EntityListEntry;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionReadService;
 import edu.mayo.cts2.framework.service.profile.entitydescription.name.EntityDescriptionReadId;
@@ -84,53 +80,14 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 		this.transformer = entityTransform;
 	}
 
-	protected ResolvedConceptReference getLexGridEntityByRead(EntityDescriptionReadId identifier,
-			ResolvedReadContext readContext) {
-
-		String cts2CodeSystemVersionName = identifier.getCodeSystemVersion().getName();
-		
-		NameVersionPair codingSchemeName =
-			this.nameConverter.fromCts2CodeSystemVersionName(cts2CodeSystemVersionName);
-		
-		ScopedEntityName entityName = identifier.getEntityName();
-		
-		try {
-			CodedNodeSet cns = this.getLexBigService().
-				getNodeSet(
-					codingSchemeName.getName(), 
-					Constructors.createCodingSchemeVersionOrTagFromVersion(codingSchemeName.getVersion()), 
-					null);
-			
-			cns = cns.restrictToCodes(
-				Constructors.createConceptReferenceList(
-						entityName.getName(), 
-						entityName.getNamespace(),
-						codingSchemeName.getName()));
-			
-			ResolvedConceptReferencesIterator iterator = 
-				cns.resolve(null, null, null);
-			
-			if(! iterator.hasNext()){
-				return null;
-			} else {
-				return iterator.next();
-			}
-		} catch (LBException e) {
-			throw new RuntimeException();
-		}
-		
-	}
-
 	// -------- Implemented methods ----------------
-	/* (non-Javadoc)
-	 * @see edu.mayo.cts2.framework.service.profile.ReadService#read(java.lang.Object, edu.mayo.cts2.framework.model.command.ResolvedReadContext)
-	 */
 	@Override
 	public EntityDescription read(
 			EntityDescriptionReadId identifier,
 			ResolvedReadContext readContext) {
-
-		ResolvedConceptReference entity = getLexGridEntityByRead(identifier, readContext);
+		LexBIGService lexBigService = this.getLexBigService();
+		ResolvedConceptReference entity = CommonUtils.getResolvedConceptReference(lexBigService, nameConverter, identifier, readContext);
+		
 		if(entity == null){
 			return null;
 		} else {
@@ -138,19 +95,13 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.mayo.cts2.framework.service.profile.ReadService#exists(java.lang.Object, edu.mayo.cts2.framework.model.command.ResolvedReadContext)
-	 */
 	@Override
 	public boolean exists(EntityDescriptionReadId identifier,
 			ResolvedReadContext readContext) {
+		LexBIGService lexBigService = this.getLexBigService();
 		
-		ResolvedConceptReference entity = getLexGridEntityByRead(identifier,	readContext);
-		if (entity == null) {
-			return false;
-		} else {
-			return true;
-		}
+		ResolvedConceptReference entity = CommonUtils.getResolvedConceptReference(lexBigService, nameConverter, identifier,	readContext);
+		return (entity == null) ? false : true;
 	}
 	
 	@Override
@@ -158,9 +109,6 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 		return new ArrayList<DocumentedNamespaceReference>();
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionReadService#readEntityDescriptions(edu.mayo.cts2.framework.model.service.core.EntityNameOrURI, edu.mayo.cts2.framework.model.core.SortCriteria, edu.mayo.cts2.framework.model.command.ResolvedReadContext, edu.mayo.cts2.framework.model.command.Page)
-	 */
 	@Override
 	public DirectoryResult<EntityListEntry> readEntityDescriptions(
 			EntityNameOrURI entityId, SortCriteria sortCriteria,
@@ -170,9 +118,6 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 		throw new UnsupportedOperationException();
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionReadService#availableDescriptions(edu.mayo.cts2.framework.model.service.core.EntityNameOrURI, edu.mayo.cts2.framework.model.command.ResolvedReadContext)
-	 */
 	@Override
 	public EntityReference availableDescriptions(EntityNameOrURI entityId,
 			ResolvedReadContext readContext) {
@@ -180,9 +125,6 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 		throw new UnsupportedOperationException();
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionReadService#readEntityDescriptions(edu.mayo.cts2.framework.model.service.core.EntityNameOrURI, edu.mayo.cts2.framework.model.command.ResolvedReadContext)
-	 */
 	@Override
 	public EntityList readEntityDescriptions(EntityNameOrURI entityId,
 			ResolvedReadContext readContext) {

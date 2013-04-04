@@ -25,7 +25,6 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,18 +32,10 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
-import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
-import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
-import org.LexGrid.LexBIG.Utility.Constructors;
-import org.LexGrid.codingSchemes.CodingScheme;
 import org.springframework.stereotype.Component;
 
-import edu.mayo.cts2.framework.filter.match.ContainsMatcher;
-import edu.mayo.cts2.framework.filter.match.ExactMatcher;
-import edu.mayo.cts2.framework.filter.match.ResolvableMatchAlgorithmReference;
-import edu.mayo.cts2.framework.filter.match.StartsWithMatcher;
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntry;
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntrySummary;
 import edu.mayo.cts2.framework.model.command.Page;
@@ -57,10 +48,9 @@ import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceSummaryUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.QueryData;
-import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
-import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersionQuery;
 import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersionQueryService;
 
@@ -105,34 +95,11 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 	public DirectoryResult<CodeSystemVersionCatalogEntry> getResourceList(
 			CodeSystemVersionQuery query, SortCriteria sortCriteria, Page page) {
 
-		LexBIGService lexBigService = this.getLexBigService();
-		QueryData<CodeSystemVersionQuery> queryData = new QueryData<CodeSystemVersionQuery>(query);
-		
-		CodingSchemeRenderingList csrFilteredList;
-		csrFilteredList = CommonResourceSummaryUtils.getCodingSchemeRenderingList(lexBigService, nameConverter, null, queryData, sortCriteria);
-		CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
-
-		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonUtils.getRenderingPage(csRendering, page);
-		
-		List<CodeSystemVersionCatalogEntry> list = new ArrayList<CodeSystemVersionCatalogEntry>();
-		boolean atEnd = true;
-		if(csRenderingPage != null){
-			for (CodingSchemeRendering render : csRenderingPage) {
-				String codingSchemeName = render.getCodingSchemeSummary().getCodingSchemeURI();			
-				String version = render.getCodingSchemeSummary().getRepresentsVersion();
-				CodingSchemeVersionOrTag tagOrVersion = Constructors.createCodingSchemeVersionOrTagFromVersion(version);
-				CodingScheme codingScheme;
-				try {
-					codingScheme = this.getLexBigService().resolveCodingScheme(codingSchemeName, tagOrVersion);
-					list.add(transformer.transform(codingScheme));
-				} catch (LBException e) {
-					throw new RuntimeException(e);
-				}
-			}
-			atEnd = (page.getEnd() >= csRendering.length) ? true : false;
-		}
-		
-		return new DirectoryResult<CodeSystemVersionCatalogEntry>(list, atEnd);
+		LexBIGService lexBigService = this.getLexBigService();		
+		CodingSchemeRendering[] csRendering = CommonResourceSummaryUtils.getCodingSchemeRendering(lexBigService, nameConverter, query, null, sortCriteria);
+		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonUtils.getPageFromArray(csRendering, page);
+		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
+		return CommonResourceSummaryUtils.createDirectoryResultWithEntryData(lexBigService, this.transformer, csRenderingPage, atEnd);
 	}
 
 	@Override
@@ -140,25 +107,10 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 			CodeSystemVersionQuery query, SortCriteria sortCriteria, Page page) {
 
 		LexBIGService lexBigService = this.getLexBigService();
-		QueryData<CodeSystemVersionQuery> queryData = new QueryData<CodeSystemVersionQuery>(query);
-		
-		CodingSchemeRenderingList csrFilteredList;
-		csrFilteredList = CommonResourceSummaryUtils.getCodingSchemeRenderingList(lexBigService, nameConverter, null, queryData, sortCriteria);
-		CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
-
-		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonUtils.getRenderingPage(csRendering, page);
-
-		List<CodeSystemVersionCatalogEntrySummary> list = new ArrayList<CodeSystemVersionCatalogEntrySummary>();
-
-		if(csRenderingPage != null){
-			for (CodingSchemeRendering render : csRenderingPage) {
-				list.add(transformer.transform(render));
-			}
-		}
-		
+		CodingSchemeRendering[] csRendering = CommonResourceSummaryUtils.getCodingSchemeRendering(lexBigService, nameConverter, query, null, sortCriteria);
+		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonUtils.getPageFromArray(csRendering, page);
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
-		
-		return new DirectoryResult<CodeSystemVersionCatalogEntrySummary>(list, atEnd);
+		return CommonResourceSummaryUtils.createDirectoryResultWithEntrySummaryData(lexBigService, this.transformer, csRenderingPage, atEnd);
 	}
 
 	@Override
@@ -173,43 +125,12 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 
 	@Override
 	public Set<? extends MatchAlgorithmReference> getSupportedMatchAlgorithms() {
-
-		Set<MatchAlgorithmReference> returnSet = new HashSet<MatchAlgorithmReference>();
-
-		MatchAlgorithmReference exactMatch = StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference();
-
-		returnSet.add(ResolvableMatchAlgorithmReference
-				.toResolvableMatchAlgorithmReference(exactMatch,
-						new ExactMatcher()));
-
-		MatchAlgorithmReference contains = StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference();
-
-		returnSet.add(ResolvableMatchAlgorithmReference
-				.toResolvableMatchAlgorithmReference(contains,
-						new ContainsMatcher()));
-
-		MatchAlgorithmReference startsWith = StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference();
-
-		returnSet.add(ResolvableMatchAlgorithmReference
-				.toResolvableMatchAlgorithmReference(startsWith,
-						new StartsWithMatcher()));
-
-		return returnSet;
+		return CommonSearchFilterUtils.createSupportedMatchAlgorithms();
 	}
 
 	@Override
 	public Set<? extends PropertyReference> getSupportedSearchReferences() {
-		
-		PropertyReference
-			name = StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference();
-		
-		PropertyReference
-			about = StandardModelAttributeReference.ABOUT.getPropertyReference();
-		
-		PropertyReference
-			description = StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference();
-		
-		return new HashSet<PropertyReference>(Arrays.asList(name,about,description));
+		return CommonSearchFilterUtils.createSupportedSearchReferences();
 	}
 
 	@Override

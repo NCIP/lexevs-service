@@ -24,7 +24,6 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.map;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -49,10 +48,9 @@ import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceSummaryUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.QueryData;
-import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
-import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 import edu.mayo.cts2.framework.service.profile.map.MapQuery;
 import edu.mayo.cts2.framework.service.profile.map.MapQueryService;
 
@@ -101,22 +99,12 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 
 	@Override
 	public Set<? extends MatchAlgorithmReference> getSupportedMatchAlgorithms() {
-
-		MatchAlgorithmReference exactMatch = StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference();
-		MatchAlgorithmReference contains = StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference();
-		MatchAlgorithmReference startsWith = StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference();
-
-		return new HashSet<MatchAlgorithmReference>(Arrays.asList(exactMatch,contains,startsWith));
+		return CommonSearchFilterUtils.createSupportedMatchAlgorithms();
 	}
 
 	@Override
 	public Set<? extends PropertyReference> getSupportedSearchReferences() {
-		
-		PropertyReference name = StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference();		
-		PropertyReference about = StandardModelAttributeReference.ABOUT.getPropertyReference();	
-		PropertyReference description = StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference();
-		
-		return new HashSet<PropertyReference>(Arrays.asList(name,about,description));
+		return CommonSearchFilterUtils.createSupportedSearchReferences();
 	}
 
 	@Override
@@ -135,21 +123,15 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 			MapQuery query, SortCriteria sortCriteria, Page page) {
 		
 		LexBIGService lexBigService = this.getLexBigService();
-		List<CodingScheme> codingSchemeList;
 		QueryData<MapQuery> queryData = new QueryData<MapQuery>(query);
+		List<CodingScheme> codingSchemeList;
+		
 		codingSchemeList = CommonResourceSummaryUtils.getCodingSchemeList(lexBigService, this.nameConverter, mappingExtension, queryData, sortCriteria);
-		CodingScheme[] codingSchemeArray = codingSchemeList.toArray(new CodingScheme[0]);
-		CodingScheme[] codingSchemePage = (CodingScheme[]) CommonUtils.getRenderingPage(codingSchemeArray, page);
+		CodingScheme[] codingSchemePage = (CodingScheme[]) CommonUtils.getRenderingPage(codingSchemeList, page);
 		
-		List<MapCatalogEntrySummary> list = new ArrayList<MapCatalogEntrySummary>();
-
-		for (CodingScheme codingScheme : codingSchemePage) {
-			list.add(transformer.transformToMapCatalogEntrySummary(codingScheme));
-		}
-
-		boolean atEnd = (page.getEnd() >= codingSchemeArray.length) ? true : false;
-		
-		return new DirectoryResult<MapCatalogEntrySummary>(list, atEnd);
+		boolean atEnd = (page.getEnd() >= codingSchemeList.size()) ? true : false;
+			
+		return CommonResourceSummaryUtils.createDirectoryResultWithEntrySummaryData(lexBigService, transformer, codingSchemePage, atEnd);		
 	}
 
 
@@ -159,20 +141,14 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 
 		LexBIGService lexBigService = this.getLexBigService();
 		List<CodingScheme> codingSchemeList;
+		
 		QueryData<MapQuery> queryData = new QueryData<MapQuery>(query);
-		codingSchemeList = CommonResourceSummaryUtils.getCodingSchemeList(lexBigService, this.nameConverter, mappingExtension, queryData, sortCriteria);
-		CodingScheme[] codingSchemeArray = codingSchemeList.toArray(new CodingScheme[0]);
-		CodingScheme[] codingSchemePage = (CodingScheme[]) CommonUtils.getRenderingPage(codingSchemeArray, page);
+		codingSchemeList = CommonResourceSummaryUtils.getCodingSchemeList(lexBigService, this.nameConverter, mappingExtension, queryData, sortCriteria);		
+		CodingScheme[] codingSchemePage = (CodingScheme[]) CommonUtils.getRenderingPage(codingSchemeList, page);
 		
-		List<MapCatalogEntry> list = new ArrayList<MapCatalogEntry>();
-
-		for (CodingScheme codingScheme : codingSchemePage) {
-			list.add(transformer.transformToMapCatalogEntry(codingScheme));
-		}
-
-		boolean atEnd = (page.getEnd() >= codingSchemeArray.length) ? true : false;
+		boolean atEnd = (page.getEnd() >= codingSchemeList.size()) ? true : false;
 		
-		return new DirectoryResult<MapCatalogEntry>(list, atEnd);
+		return CommonResourceSummaryUtils.createDirectoryResultWithEntryData(lexBigService, transformer, codingSchemePage, atEnd);
 	}
 
 
