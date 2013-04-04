@@ -70,35 +70,32 @@ import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQuery;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQueryService;
 
+/**
+ *  @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
+ *  @author <a href="mailto:hardie.linda@mayo.edu">Linda Hardie</a>
+ *
+*/
 @Component
 public class LexEvsEntityQueryService extends AbstractLexEvsService 
 		implements EntityDescriptionQueryService {
 
 	@Resource
-	private CodeSystemVersionNameConverter codeSystemVersionNameConverter;
+	private CodeSystemVersionNameConverter nameConverter;
 	
 	@Resource
-	private EntityTransform entityTransform;
+	private EntityTransform transformer;
 	
 	private boolean printObjects = false;
 	
 	// ------ Local methods ----------------------
-	public CodeSystemVersionNameConverter getCodeSystemVersionNameConverter() {
-		return codeSystemVersionNameConverter;
-	}
-
 	public void setCodeSystemVersionNameConverter(
 			CodeSystemVersionNameConverter codeSystemVersionNameConverter) {
-		this.codeSystemVersionNameConverter = codeSystemVersionNameConverter;
+		this.nameConverter = codeSystemVersionNameConverter;
 	}
 	
-	public EntityTransform getEntityTransformer() {
-		return entityTransform;
-	}
-
 	public void setEntityTransformer(
 			EntityTransform entityTransform) {
-		this.entityTransform = entityTransform;
+		this.transformer = entityTransform;
 	}
 	
 	public void setPrintObject(boolean print){
@@ -113,7 +110,7 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		
 		LexBIGService lexBigService = this.getLexBigService();
 		QueryData<EntityDescriptionQuery> queryData = new QueryData<EntityDescriptionQuery>(query);
-		queryData.setVersionOrTag(codeSystemVersionNameConverter);
+		queryData.setVersionOrTag(nameConverter);
 		CodedNodeSet codedNodeSet;
 		codedNodeSet = CommonResourceSummaryUtils.getCodedNodeSet(lexBigService, queryData, null);
 		
@@ -139,7 +136,7 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		
 		LexBIGService lexBigService = this.getLexBigService();
 		QueryData<EntityDescriptionQuery> queryData = new QueryData<EntityDescriptionQuery>(query);
-		queryData.setVersionOrTag(codeSystemVersionNameConverter);
+		queryData.setVersionOrTag(nameConverter);
 		ResolvedConceptReferenceResults resolvedConceptReferenceResults;
 		resolvedConceptReferenceResults = CommonResourceSummaryUtils.getResolvedConceptReferenceResults(lexBigService, queryData, sortCriteria, page);
 		
@@ -150,7 +147,7 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 				if(printObjects){
 					System.out.println("ResolvedConceptReference:\n" + PrintUtility.resolvedConceptReference_toString(reference, 1));
 				}
-				EntityDescription entry = entityTransform.transformToEntity(reference);
+				EntityDescription entry = transformer.transformToEntity(reference);
 				list.add(entry);
 			}
 			
@@ -170,7 +167,7 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		
 		LexBIGService lexBigService = this.getLexBigService();
 		QueryData<EntityDescriptionQuery> queryData = new QueryData<EntityDescriptionQuery>(query);
-		queryData.setVersionOrTag(codeSystemVersionNameConverter);
+		queryData.setVersionOrTag(nameConverter);
 		ResolvedConceptReferenceResults resolvedConceptReferenceResults;
 		resolvedConceptReferenceResults = CommonResourceSummaryUtils.getResolvedConceptReferenceResults(lexBigService, queryData, sortCriteria, page);
 		
@@ -182,7 +179,7 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 					if(printObjects){
 						System.out.println("ResolvedConceptReference:\n" + PrintUtility.resolvedConceptReference_toString(reference, 1));
 					}
-					EntityDirectoryEntry entry = entityTransform.transformToEntry(reference);
+					EntityDirectoryEntry entry = transformer.transformToEntry(reference);
 					list.add(entry);
 				}
 			}			

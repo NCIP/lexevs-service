@@ -42,13 +42,18 @@ import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryQuery;
 import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryQueryService;
 
 /**
- * @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
+ *  @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
+ *  @author <a href="mailto:hardie.linda@mayo.edu">Linda Hardie</a>
  *
- */
+*/
 @Component
 public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 		MapEntryQueryService {
 
+	// ------ Local methods ----------------------
+	
+	
+	// -------- Implemented methods ----------------	
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.service.profile.QueryService#getResourceSummaries(edu.mayo.cts2.framework.service.profile.ResourceQuery, edu.mayo.cts2.framework.model.core.SortCriteria, edu.mayo.cts2.framework.model.command.Page)
 	 */

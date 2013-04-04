@@ -59,32 +59,29 @@ import edu.mayo.cts2.framework.service.profile.entitydescription.name.EntityDesc
 
 /**
  * LexEVS CodedNodeSet implementation of EntityDescriptionReadService.
- */
+ * 
+ *  @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
+ *  @author <a href="mailto:hardie.linda@mayo.edu">Linda Hardie</a>
+ *
+*/
 @Component
 public class LexEvsEntityReadService extends AbstractLexEvsService 
 	implements EntityDescriptionReadService {
 
 	@Resource
-	private EntityTransform entityTransform;
+	private EntityTransform transformer;
 	
 	@Resource
-	private CodeSystemVersionNameConverter codeSystemVersionNameConverter;
+	private CodeSystemVersionNameConverter nameConverter;
 
-	public CodeSystemVersionNameConverter getCodeSystemVersionNameConverter() {
-		return codeSystemVersionNameConverter;
-	}
-
+	// ------ Local methods ----------------------
 	public void setCodeSystemVersionNameConverter(
 			CodeSystemVersionNameConverter codeSystemVersionNameConverter) {
-		this.codeSystemVersionNameConverter = codeSystemVersionNameConverter;
-	}
-
-	public EntityTransform getEntityTransform() {
-		return entityTransform;
+		this.nameConverter = codeSystemVersionNameConverter;
 	}
 
 	public void setEntityTransform(EntityTransform entityTransform) {
-		this.entityTransform = entityTransform;
+		this.transformer = entityTransform;
 	}
 
 	protected ResolvedConceptReference getLexGridEntityByRead(EntityDescriptionReadId identifier,
@@ -93,7 +90,7 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 		String cts2CodeSystemVersionName = identifier.getCodeSystemVersion().getName();
 		
 		NameVersionPair codingSchemeName =
-			this.codeSystemVersionNameConverter.fromCts2CodeSystemVersionName(cts2CodeSystemVersionName);
+			this.nameConverter.fromCts2CodeSystemVersionName(cts2CodeSystemVersionName);
 		
 		ScopedEntityName entityName = identifier.getEntityName();
 		
@@ -124,6 +121,7 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 		
 	}
 
+	// -------- Implemented methods ----------------
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.service.profile.ReadService#read(java.lang.Object, edu.mayo.cts2.framework.model.command.ResolvedReadContext)
 	 */
@@ -136,7 +134,7 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 		if(entity == null){
 			return null;
 		} else {
-			return this.entityTransform.transformToEntity(entity);
+			return this.transformer.transformToEntity(entity);
 		}
 	}
 

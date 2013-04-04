@@ -74,26 +74,18 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		implements CodeSystemVersionQueryService {
 
 	@Resource
-	private CodingSchemeToCodeSystemTransform codingSchemeTransformer;
+	private CodingSchemeToCodeSystemTransform transformer;
 
 	@Resource
 	private CodeSystemVersionNameConverter nameConverter;
 	
 
 	// ------ Local methods ----------------------
-	public CodingSchemeToCodeSystemTransform getCodingSchemeTransformer() {
-		return codingSchemeTransformer;
-	}
-
 	public void setCodingSchemeTransformer(
 			CodingSchemeToCodeSystemTransform codingSchemeTransformer) {
-		this.codingSchemeTransformer = codingSchemeTransformer;
+		this.transformer = codingSchemeTransformer;
 	}
 	
-	public CodeSystemVersionNameConverter getCodeSystemVersionNameConverter(){
-		return nameConverter;
-	}
-
 	public void setCodeSystemVersionNameConverter(CodeSystemVersionNameConverter converter){
 		this.nameConverter = converter;
 	}
@@ -132,7 +124,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 				CodingScheme codingScheme;
 				try {
 					codingScheme = this.getLexBigService().resolveCodingScheme(codingSchemeName, tagOrVersion);
-					list.add(codingSchemeTransformer.transform(codingScheme));
+					list.add(transformer.transform(codingScheme));
 				} catch (LBException e) {
 					throw new RuntimeException(e);
 				}
@@ -160,7 +152,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 
 		if(csRenderingPage != null){
 			for (CodingSchemeRendering render : csRenderingPage) {
-				list.add(codingSchemeTransformer.transform(render));
+				list.add(transformer.transform(render));
 			}
 		}
 		
