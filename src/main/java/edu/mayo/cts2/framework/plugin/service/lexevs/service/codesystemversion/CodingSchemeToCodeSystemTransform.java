@@ -49,7 +49,7 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.utility.LexEvsToCTS2Transfo
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
 @Component
-public class CodingSchemeToCodeSystemTransform implements LexEvsToCTS2Transformer<CodeSystemVersionCatalogEntrySummary, CodingSchemeRendering, CodeSystemVersionCatalogEntry, CodingScheme>{
+public class CodingSchemeToCodeSystemTransform implements LexEvsToCTS2Transformer<CodeSystemVersionCatalogEntry, CodingScheme, CodeSystemVersionCatalogEntrySummary, CodingSchemeRendering>{
 	//DescriptionDataType, DescriptionDataIN, DirectoryEntryDataType, DirecotoryEntryDataIN> 
 	@Resource
 	private CodeSystemVersionNameConverter codeSystemVersionNameConverter;
@@ -73,7 +73,7 @@ public class CodingSchemeToCodeSystemTransform implements LexEvsToCTS2Transforme
 	 * @return the code system version catalog entry
 	 */
 	@Override
-	public CodeSystemVersionCatalogEntry transformDirectoryEntry(CodingScheme codingScheme){
+	public CodeSystemVersionCatalogEntry transformDescription(CodingScheme codingScheme){
 		CodeSystemVersionCatalogEntry codeSystemVersion = new CodeSystemVersionCatalogEntry();
 
 		codeSystemVersion.setAbout(codingScheme.getCodingSchemeURI());
@@ -115,7 +115,7 @@ public class CodingSchemeToCodeSystemTransform implements LexEvsToCTS2Transforme
 	}
 	
 	@Override
-	public CodeSystemVersionCatalogEntrySummary transformDescription(CodingSchemeRendering codingSchemeRendering){
+	public CodeSystemVersionCatalogEntrySummary transformDirectoryEntry(CodingSchemeRendering codingSchemeRendering){
 		CodeSystemVersionCatalogEntrySummary summary = new CodeSystemVersionCatalogEntrySummary();
 		
 		CodingSchemeSummary codingSchemeSummary = codingSchemeRendering.getCodingSchemeSummary();

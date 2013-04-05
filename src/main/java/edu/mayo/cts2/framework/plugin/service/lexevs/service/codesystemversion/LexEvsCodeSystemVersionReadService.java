@@ -136,7 +136,7 @@ public class LexEvsCodeSystemVersionReadService extends
 
 	@Override
 	protected CodeSystemVersionCatalogEntry transform(CodingScheme codingScheme) {
-		return this.transformer.transformDirectoryEntry(codingScheme);
+		return this.transformer.transformDescription(codingScheme);
 	}
 
 }

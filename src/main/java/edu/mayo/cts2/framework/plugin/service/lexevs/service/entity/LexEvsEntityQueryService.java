@@ -54,6 +54,7 @@ import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURIList;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonPageUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceSummaryUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
@@ -124,10 +125,10 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		queryData.setVersionOrTag(nameConverter);
 		
 		ResolvedConceptReferenceResults resolvedConceptReferenceResultsPage;
-		resolvedConceptReferenceResultsPage = CommonResourceSummaryUtils.getResolvedConceptReferenceResultsPage(lexBigService, queryData, sortCriteria, page);
+		resolvedConceptReferenceResultsPage = CommonPageUtils.getResolvedConceptReferenceResultsPage(lexBigService, queryData, sortCriteria, page);
 
 		DirectoryResult<EntityDescription> directoryResult;
-		directoryResult = CommonResourceSummaryUtils.createDirectoryResultWithEntrySummaryData(lexBigService, this.transformer, resolvedConceptReferenceResultsPage);
+		directoryResult = CommonResourceSummaryUtils.createDirectoryResultWithResolvedEntrySummaryData(lexBigService, this.transformer, resolvedConceptReferenceResultsPage);
 
 		return directoryResult;
 	}
@@ -141,10 +142,10 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		queryData.setVersionOrTag(nameConverter);
 		
 		ResolvedConceptReferenceResults resolvedConceptReferenceResults;
-		resolvedConceptReferenceResults = CommonResourceSummaryUtils.getResolvedConceptReferenceResultsPage(lexBigService, queryData, sortCriteria, page);
+		resolvedConceptReferenceResults = CommonPageUtils.getResolvedConceptReferenceResultsPage(lexBigService, queryData, sortCriteria, page);
 		
 		DirectoryResult<EntityDirectoryEntry> directoryResult;
-		directoryResult = CommonResourceSummaryUtils.createDirectoryResultWithEntryData(lexBigService, transformer, resolvedConceptReferenceResults);
+		directoryResult = CommonResourceSummaryUtils.createDirectoryResultWithResolvedEntryData(lexBigService, transformer, resolvedConceptReferenceResults);
 			
 		return directoryResult;
 	}

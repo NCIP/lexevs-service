@@ -71,6 +71,9 @@ public class LexEvsMapReadService
 		this.nameConverter = converter;
 	}
 	
+	public void setMappingExtension(MappingExtension mappingExtension){
+		this.mappingExtension = mappingExtension;
+	}
 	
 	// -------- Implemented methods ----------------	
 	@Override

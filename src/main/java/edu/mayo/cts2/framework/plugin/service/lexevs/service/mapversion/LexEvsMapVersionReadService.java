@@ -63,7 +63,7 @@ public class LexEvsMapVersionReadService
 	private CodeSystemVersionNameConverter nameConverter;
 	
 	@Resource
-	private CodingSchemeToMapVersionTransform codingSchemeToMapVersionTransform;
+	private CodingSchemeToMapVersionTransform transformer;
 	
 	private MappingExtension mappingExtension;
 	
@@ -85,7 +85,7 @@ public class LexEvsMapVersionReadService
 				mappingExtension)){
 			return null;
 		} else {
-			return this.codingSchemeToMapVersionTransform.transform(codingScheme);
+			return this.transformer.transformDescription(codingScheme);
 		}
 	}
 	

@@ -47,9 +47,9 @@ import edu.mayo.cts2.framework.model.map.MapCatalogEntrySummary;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonPageUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceSummaryUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.QueryData;
 import edu.mayo.cts2.framework.service.profile.map.MapQuery;
 import edu.mayo.cts2.framework.service.profile.map.MapQueryService;
@@ -135,7 +135,7 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		List<CodingScheme> codingSchemeList;
 		
 		codingSchemeList = CommonResourceSummaryUtils.getCodingSchemeList(lexBigService, this.nameConverter, mappingExtension, queryData, sortCriteria);
-		CodingScheme[] codingSchemePage = (CodingScheme[]) CommonUtils.getRenderingPage(codingSchemeList, page);
+		CodingScheme[] codingSchemePage = (CodingScheme[]) CommonPageUtils.getRenderingPage(codingSchemeList, page);
 		
 		boolean atEnd = (page.getEnd() >= codingSchemeList.size()) ? true : false;
 			
@@ -152,7 +152,7 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		
 		QueryData<MapQuery> queryData = new QueryData<MapQuery>(query);
 		codingSchemeList = CommonResourceSummaryUtils.getCodingSchemeList(lexBigService, this.nameConverter, mappingExtension, queryData, sortCriteria);		
-		CodingScheme[] codingSchemePage = (CodingScheme[]) CommonUtils.getRenderingPage(codingSchemeList, page);
+		CodingScheme[] codingSchemePage = (CodingScheme[]) CommonPageUtils.getRenderingPage(codingSchemeList, page);
 		
 		boolean atEnd = (page.getEnd() >= codingSchemeList.size()) ? true : false;
 		

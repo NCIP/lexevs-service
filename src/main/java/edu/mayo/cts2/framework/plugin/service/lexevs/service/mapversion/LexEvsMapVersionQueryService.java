@@ -55,8 +55,8 @@ import edu.mayo.cts2.framework.model.service.mapversion.types.MapRole;
 import edu.mayo.cts2.framework.model.service.mapversion.types.MapStatus;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonPageUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceSummaryUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.QueryData;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
@@ -118,7 +118,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 			MapVersionQuery query, SortCriteria sortCriteria, Page page) {
 		LexBIGService lexBigService = this.getLexBigService();
 		CodingSchemeRendering[] csRendering = CommonResourceSummaryUtils.getCodingSchemeRendering(lexBigService, nameConverter, query, null, sortCriteria);
-		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonUtils.getPageFromArray(csRendering, page);
+		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPageFromArray(csRendering, page);
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
 		return CommonResourceSummaryUtils.createDirectoryResultWithEntrySummaryData(lexBigService, this.codingSchemeToMapVersionTransform, csRenderingPage, atEnd);
 	}
@@ -129,9 +129,9 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 
 		LexBIGService lexBigService = this.getLexBigService();
 		CodingSchemeRendering[] csRendering = CommonResourceSummaryUtils.getCodingSchemeRendering(lexBigService, nameConverter, query, null, sortCriteria);
-		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonUtils.getPageFromArray(csRendering, page);
+		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPageFromArray(csRendering, page);
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
-		return CommonResourceSummaryUtils.createDirectoryResultWithEntryData(lexBigService, this.codingSchemeToMapVersionTransform, csRenderingPage, atEnd);
+		return CommonResourceSummaryUtils.createDirectoryResultWithRenderedEntryData(lexBigService, this.codingSchemeToMapVersionTransform, csRenderingPage, atEnd);
 	}
 
 	@Override

@@ -25,7 +25,6 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service.valuesetdefinition
 
 import static org.junit.Assert.assertNotNull;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -63,7 +62,7 @@ public class LexEvsValueSetDefinitionQueryServiceTestIT extends
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/VSDOnlyTest.xml")
 	public void testResourceSummaries() throws Exception {
-		String uri = "SRITEST:AUTO:PropertyRefTest1-VSDONLY";
+//		String uri = "SRITEST:AUTO:PropertyRefTest1-VSDONLY";
 		String name = "Automobiles";
 		//NameOrURI uriName = ModelUtils.nameOrUriFromUri(uri);
 		NameOrURI codeSystemName = ModelUtils.nameOrUriFromName(name);

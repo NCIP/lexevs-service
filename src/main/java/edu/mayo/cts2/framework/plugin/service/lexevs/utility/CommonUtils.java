@@ -1,31 +1,28 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
 
-import java.util.List;
-
+import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.Collections.ConceptReferenceList;
 import org.LexGrid.LexBIG.DataModel.Collections.LocalNameList;
-import org.LexGrid.LexBIG.DataModel.Collections.ResolvedConceptReferenceList;
 import org.LexGrid.LexBIG.DataModel.Collections.SortOptionList;
+import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
 import org.LexGrid.LexBIG.Exceptions.LBParameterException;
-import org.LexGrid.LexBIG.Exceptions.LBResourceUnavailableException;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet.PropertyType;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
-import org.LexGrid.codingSchemes.CodingScheme;
 
-import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
+import edu.mayo.cts2.framework.service.profile.ResourceQuery;
 import edu.mayo.cts2.framework.service.profile.entitydescription.name.EntityDescriptionReadId;
 
 public class CommonUtils {
@@ -34,7 +31,36 @@ public class CommonUtils {
 	private CommonUtils() {
 		super();
 	}
+
+	public static <T extends ResourceQuery> boolean hasCodingSchemeRenderings(QueryData<T> queryData, CodingSchemeRenderingList csrFilteredList){
+		boolean answer = false;
+		if((queryData.getFilters() != null) && (csrFilteredList != null) && (csrFilteredList.getCodingSchemeRenderingCount() > 0)){
+			answer = true;
+		}
+		return answer;
+	}
 	
+	public static <T extends ResourceQuery> boolean queryReturnsData(
+			QueryData<T> queryData,
+			CodingSchemeRenderingList codingSchemeRenderingList){
+		boolean found = false;
+		String localName, version;
+		int count = codingSchemeRenderingList.getCodingSchemeRenderingCount();
+		for(int index=0; index < count; index++){
+			CodingSchemeSummary codingSchemeSummary;
+			codingSchemeSummary = codingSchemeRenderingList.getCodingSchemeRendering(index).getCodingSchemeSummary();
+			localName = codingSchemeSummary.getLocalName();
+			version = codingSchemeSummary.getRepresentsVersion();
+			if(localName.equals(queryData.getCodingSchemeName()) && 
+				version.equals(queryData.getVersionOrTag().getVersion())){
+				found = true;
+			}
+		}		
+			
+		return found;
+	}
+
+
 	public static ResolvedConceptReference getResolvedConceptReference(
 			LexBIGService lexBigService, 
 			CodeSystemVersionNameConverter nameConverter, 
@@ -74,72 +100,7 @@ public class CommonUtils {
 
 
 	
-	public static <T> Object[] getRenderingPage(List<T> list, Page page){
-		Object [] renderedArray = list.toArray(new CodingScheme[0]);
-		Object [] renderedPage = CommonUtils.getPageFromArray(renderedArray, page);		
-		return renderedPage;
-	}
 	
-	public static <T> Object[] getPageFromArray(T[] data, Page page) {
-		int start = page.getStart();
-		int end = page.getEnd();
-		Object [] csPage = null;
-		
-		if(end > data.length){
-			end = data.length;
-		}
-		
-		if ((start == 0) && (end == data.length)) {
-			csPage = data.clone();
-		} 
-		else if(start < end){
-			
-			int size = end - start;
-			csPage = new Object [size];
-			
-			for (int i = 0; i < csPage.length; i++) {
-				csPage[i] = data[start + i];
-			}
-		}
-	
-		return csPage;
-	}
-	
-	public static ResolvedConceptReferenceResults getPageFromIterator(ResolvedConceptReferencesIterator iterator,
-			Page page) {
-		boolean atEnd = false;
-		ResolvedConceptReference[] resolvedConceptReferences = null;
-		ResolvedConceptReferenceList resolvedConceptReferenceList = null;
-		int start = 0, end = 0;
-		try {
-			if(iterator != null){
-				start = page.getStart();
-				end = page.getEnd();
-				if(end > iterator.numberRemaining()){
-					end = iterator.numberRemaining();
-					atEnd = true;				
-				}
-				resolvedConceptReferenceList = iterator.get(start, end);
-				// Get array of resolved concept references
-				
-				if(resolvedConceptReferenceList != null){
-					resolvedConceptReferences = resolvedConceptReferenceList.getResolvedConceptReference();
-				}	
-			}
-		} catch (LBInvocationException e) {
-			throw new RuntimeException(e);
-		} catch (LBParameterException e) {
-			throw new RuntimeException(e);
-		} catch (LBResourceUnavailableException e) {
-			throw new RuntimeException(e);
-		}
-		
-		return new ResolvedConceptReferenceResults(resolvedConceptReferences, atEnd);
-	}
-	
-	
-	
-
 
 	public static ResolvedConceptReferencesIterator getResolvedConceptReferencesIterator(CodedNodeSet codedNodeSet, SortCriteria sortCriteria){
 		ResolvedConceptReferencesIterator iterator = null;

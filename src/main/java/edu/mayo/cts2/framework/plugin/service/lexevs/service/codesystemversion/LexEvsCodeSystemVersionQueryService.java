@@ -47,9 +47,9 @@ import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonPageUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceSummaryUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.QueryData;
 import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersionQuery;
 import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersionQueryService;
@@ -97,9 +97,9 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 
 		LexBIGService lexBigService = this.getLexBigService();		
 		CodingSchemeRendering[] csRendering = CommonResourceSummaryUtils.getCodingSchemeRendering(lexBigService, nameConverter, query, null, sortCriteria);
-		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonUtils.getPageFromArray(csRendering, page);
+		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPageFromArray(csRendering, page);
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
-		return CommonResourceSummaryUtils.createDirectoryResultWithEntryData(lexBigService, this.transformer, csRenderingPage, atEnd);
+		return CommonResourceSummaryUtils.createDirectoryResultWithRenderedEntryData(lexBigService, this.transformer, csRenderingPage, atEnd);
 	}
 
 	@Override
@@ -108,7 +108,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 
 		LexBIGService lexBigService = this.getLexBigService();
 		CodingSchemeRendering[] csRendering = CommonResourceSummaryUtils.getCodingSchemeRendering(lexBigService, nameConverter, query, null, sortCriteria);
-		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonUtils.getPageFromArray(csRendering, page);
+		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPageFromArray(csRendering, page);
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
 		return CommonResourceSummaryUtils.createDirectoryResultWithEntrySummaryData(lexBigService, this.transformer, csRenderingPage, atEnd);
 	}

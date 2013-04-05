@@ -34,7 +34,6 @@ import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGServiceManager;
 import org.LexGrid.LexBIG.Utility.LBConstants;
 import org.junit.Test;
-import org.lexgrid.valuesets.LexEVSPickListDefinitionServices;
 import org.lexgrid.valuesets.LexEVSValueSetDefinitionServices;
 import org.lexgrid.valuesets.impl.LexEVSValueSetDefinitionServicesImpl;
 
@@ -49,7 +48,7 @@ import edu.mayo.cts2.framework.plugins.service.LocalClasspathLexBigServiceFactor
  */
 public class LoadTestDataTest extends AbstractTestITBase {
 	private LexEVSValueSetDefinitionServices vds_;
-	private LexEVSPickListDefinitionServices pls_;
+//	private LexEVSPickListDefinitionServices pls_;
 	
 //	public LoadTestDataTest(String serverName) {
 //		super(serverName);

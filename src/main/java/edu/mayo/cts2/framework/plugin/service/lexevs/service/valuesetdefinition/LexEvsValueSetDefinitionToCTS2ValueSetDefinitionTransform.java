@@ -23,12 +23,13 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.valuesetdefinition;
 
+import org.LexGrid.codingSchemes.CodingScheme;
 import org.lexgrid.valuesets.dto.ResolvedValueSetCodedNodeSet;
 
 import edu.mayo.cts2.framework.model.core.ValueSetReference;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinition;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinitionDirectoryEntry;
-import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinitionEntry;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.LexEvsToCTS2Transformer;
 
 /**
  * Transforms a LexEVS ValueSetDefinition object into a CTS2 ValueSetDefinition object.
@@ -36,7 +37,7 @@ import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinitionEntry;
  * @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
  *
  */
-public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform {
+public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform implements LexEvsToCTS2Transformer <ValueSetDefinition, CodingScheme, ValueSetDefinitionDirectoryEntry, ResolvedValueSetCodedNodeSet> {
 
 	public ValueSetDefinition transformToValueSetDefinition(org.LexGrid.valueSets.ValueSetDefinition lexEvsVSD) {
 		
@@ -49,7 +50,7 @@ public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform {
 		cts2VSD.setFormalName(lexEvsVSD.getValueSetDefinitionURI());  // TODO Ok mapping???
 		
 		// TODO Need to transform LexEVS Definition Entry objects into CTS2 ValueSetDefinitionEntry objects ???
-		ValueSetDefinitionEntry[] vEntryList;
+//		ValueSetDefinitionEntry[] vEntryList;
 //		cts2VSD.setEntry(vEntryList);
 		
 		ValueSetReference vsReference = new ValueSetReference();
@@ -75,11 +76,21 @@ public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform {
 	}
 	
 	// TODO Not sure if method is needed/useful. May be better to transform directly in LexValueSetDefinitionQueryService
-	public ValueSetDefinitionDirectoryEntry transformToValueSetDefinitionDirectoryEntry(ResolvedValueSetCodedNodeSet resolvedValueSetCodedNodeSet) {
-		ValueSetDefinitionDirectoryEntry vsdDirEntry = new ValueSetDefinitionDirectoryEntry();
+	@Override
+	public ValueSetDefinitionDirectoryEntry transformDirectoryEntry(ResolvedValueSetCodedNodeSet resolvedValueSetCodedNodeSet) {
+//		ValueSetDefinitionDirectoryEntry vsdDirEntry = new ValueSetDefinitionDirectoryEntry();
 		
 		//return vsdDirEntry;
 		throw new UnsupportedOperationException("Transform of LexEVS ValueSetDefinition into CTS2 ValueSetDefinitionDirectoryEntry is under construction");		
+	}
+
+	/* (non-Javadoc)
+	 * @see edu.mayo.cts2.framework.plugin.service.lexevs.utility.LexEvsToCTS2Transformer#transformDescription(java.lang.Object)
+	 */
+	@Override
+	public ValueSetDefinition transformDescription(CodingScheme data) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

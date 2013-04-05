@@ -23,6 +23,11 @@ import org.LexGrid.LexBIG.LexBIGService.LexBIGServiceMetadata;
 import org.LexGrid.codingSchemes.CodingScheme;
 
 public class LexBigServiceStub implements LexBIGService{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public LexBigServiceStub(){
 		
 	}

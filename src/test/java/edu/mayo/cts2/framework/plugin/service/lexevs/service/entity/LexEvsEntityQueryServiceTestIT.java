@@ -65,6 +65,7 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	// --------------
 	private void setAnonymousTransformer(){
 		service.setEntityTransformer(new EntityTransform(){
+			@SuppressWarnings("unused")
 			public EntityDirectoryEntry transformToEntry(ResolvedConceptReference reference){
 				return new EntityDirectoryEntry();
 			}

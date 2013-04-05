@@ -35,6 +35,6 @@ public class CodingSchemeToCodeSystemTransformTest {
 		CodingSchemeToCodeSystemTransform transform = 
 				new CodingSchemeToCodeSystemTransform(new CodeSystemVersionNameConverter());
 		
-		transform.transform(new CodingScheme());
+		transform.transformDescription(new CodingScheme());
 	}
 }
