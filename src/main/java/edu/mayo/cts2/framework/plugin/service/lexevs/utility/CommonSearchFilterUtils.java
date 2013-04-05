@@ -1,6 +1,8 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -11,8 +13,8 @@ import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
 import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
-import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet.SearchDesignationOption;
+import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.codingSchemes.CodingScheme;
 
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
@@ -22,6 +24,8 @@ import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.service.mapversion.types.MapRole;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestrictions.CodeSystemRestriction;
+import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
+import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 
 public class CommonSearchFilterUtils {
 
@@ -29,6 +33,28 @@ public class CommonSearchFilterUtils {
 		super();
 	}
 	
+
+	/**
+	 * @return
+	 */
+	public static Set<? extends MatchAlgorithmReference> createSupportedMatchAlgorithms() {
+
+		MatchAlgorithmReference exactMatch = StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference();
+		MatchAlgorithmReference contains = StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference();
+		MatchAlgorithmReference startsWith = StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference();
+
+		return new HashSet<MatchAlgorithmReference>(Arrays.asList(exactMatch,contains,startsWith));
+	}
+
+	public static Set<? extends PropertyReference> createSupportedSearchReferences() {
+		
+		PropertyReference name = StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference();		
+		PropertyReference about = StandardModelAttributeReference.ABOUT.getPropertyReference();	
+		PropertyReference description = StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference();
+		
+		return new HashSet<PropertyReference>(Arrays.asList(name,about,description));
+	}
+
 	/**
 	 * Common filter routine needed for specialized filtering that cannot leverage existing LexEVS filter extensions.
 	 * 

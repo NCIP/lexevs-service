@@ -21,39 +21,17 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package edu.mayo.cts2.framework.plugin.service.lexevs;
+package edu.mayo.cts2.framework.plugin.service.lexevs.uri;
 
-import javax.annotation.Resource;
-
-import org.lexgrid.valuesets.LexEVSValueSetDefinitionServices;
-import org.springframework.beans.factory.FactoryBean;
-import org.springframework.stereotype.Component;
+import org.springframework.core.Ordered;
 
 /**
- * @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
+ * Like {@link UriHandler} but with ordering -- used as Delegates.
  *
+ * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
-@Component
-public class LexEVSValueSetDefinitionServicesFactory implements
-		FactoryBean<LexEVSValueSetDefinitionServices> {
+public interface DelegateUriHandler extends UriHandler, Ordered {
+
+	//
 	
-	@Resource
-	private LexEvsOsgiClassLoader lexEvsOsgiClassLoader;
-
-	@Override
-	public LexEVSValueSetDefinitionServices getObject() throws Exception {
-		return (LexEVSValueSetDefinitionServices) this.lexEvsOsgiClassLoader.
-			getServiceClass("org.lexgrid.valuesets.impl.LexEVSValueSetDefinitionServicesImpl", true);
-	}
-
-	@Override
-	public Class<?> getObjectType() {
-		return LexEVSValueSetDefinitionServices.class;
-	}
-
-	@Override
-	public boolean isSingleton() {
-		return false;
-	}
-
 }

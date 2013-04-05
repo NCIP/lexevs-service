@@ -7,45 +7,152 @@ import java.util.Set;
 
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.Collections.LocalNameList;
-import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
+import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
+import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
+import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.codingSchemes.CodingScheme;
 
-import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
+import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.service.profile.ResourceQuery;
 
 public class CommonResourceSummaryUtils{
 	
-	public static <T extends ResourceQuery> boolean hasCodingSchemeRenderings(QueryData<T> queryData, CodingSchemeRenderingList csrFilteredList){
-		boolean answer = false;
-		if((queryData.getFilters() != null) && (csrFilteredList != null) && (csrFilteredList.getCodingSchemeRenderingCount() > 0)){
-			answer = true;
-		}
-		return answer;
-	}
+	/// create DirectoryResults with EntrySummaryData
+	// ---------------------------------------
 
-	public static <T extends ResourceQuery> ResolvedConceptReferenceResults getResolvedConceptReferenceResults(
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static <SummaryType, DataType> DirectoryResult<SummaryType> createDirectoryResultWithResolvedEntrySummaryData(
 			LexBIGService lexBigService, 
-			QueryData<T> queryData,
-			SortCriteria sortCriteria, 
-			Page page){
-		ResolvedConceptReferenceResults results = null;
-		CodedNodeSet codedNodeSet;
+			LexEvsToCTS2Transformer transformer,
+			ResolvedConceptReferenceResults resolvedConceptReferenceResults) {
 		
-		codedNodeSet = CommonResourceSummaryUtils.getCodedNodeSet(lexBigService, queryData, sortCriteria);
-		if(codedNodeSet != null){
-			results = CommonUtils.getReferenceResultPage(codedNodeSet, sortCriteria, page);
+		List<SummaryType> list = new ArrayList<SummaryType>();
+		DirectoryResult<SummaryType> directoryResult = new DirectoryResult<SummaryType>(list, true);
+		
+		if(resolvedConceptReferenceResults != null){
+			ResolvedConceptReference[] resolvedConceptReferences = resolvedConceptReferenceResults.getResolvedConceptReference();
+			if(resolvedConceptReferences != null){
+				for(ResolvedConceptReference reference : resolvedConceptReferences){
+					SummaryType entry = (SummaryType) transformer.transformDescription(reference);
+					list.add(entry);
+				}
+			}			
+			directoryResult = new DirectoryResult<SummaryType>(list, resolvedConceptReferenceResults.isAtEnd());
+		}
+
+		return directoryResult;
+	}	
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static <SummaryType, DataType> DirectoryResult<SummaryType> createDirectoryResultWithEntrySummaryData(
+			LexBIGService lexBigService,
+			LexEvsToCTS2Transformer transformer,
+			DataType[] dataCollection, boolean atEnd) {
+		List<SummaryType> list = new ArrayList<SummaryType>();
+
+		if(dataCollection != null){
+			for (DataType data : dataCollection) {
+				list.add((SummaryType) transformer.transformDirectoryEntry(data));
+			}
 		}
 		
-		return results;
+		return new DirectoryResult<SummaryType>(list, atEnd);
+	}
+	
+	
+	/// create DirectoryResults with EntryData
+	// ---------------------------------------
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static <EntryType> DirectoryResult<EntryType> createDirectoryResultWithEntryData(
+			LexBIGService lexBigService,
+			LexEvsToCTS2Transformer transformer,
+			CodingScheme[] codingSchemes, boolean atEnd) {
+		List<EntryType> list = new ArrayList<EntryType>();
+
+		if(codingSchemes != null){
+			for (CodingScheme codingScheme : codingSchemes) {
+				list.add((EntryType) transformer.transformDescription(codingScheme));
+			}
+		}
+		
+		return new DirectoryResult<EntryType>(list, atEnd);
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static <EntryType> DirectoryResult<EntryType> createDirectoryResultWithResolvedEntryData(
+			LexBIGService lexBigService, 
+			LexEvsToCTS2Transformer transformer,
+			ResolvedConceptReferenceResults resolvedConceptReferenceResults) {
+		
+		List<EntryType> list = new ArrayList<EntryType>();
+		DirectoryResult<EntryType> directoryResult = new DirectoryResult<EntryType>(list, true);
+		
+		if(resolvedConceptReferenceResults != null){
+			ResolvedConceptReference[] resolvedConceptReferences = resolvedConceptReferenceResults.getResolvedConceptReference();
+			if(resolvedConceptReferences != null){
+				for(ResolvedConceptReference reference : resolvedConceptReferences){
+					EntryType entry = (EntryType) transformer.transformDirectoryEntry(reference);
+					list.add(entry);
+				}
+			}			
+			directoryResult = new DirectoryResult<EntryType>(list, resolvedConceptReferenceResults.isAtEnd());
+		}
+
+		return directoryResult;
+	}	
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static <EntryType> DirectoryResult<EntryType> createDirectoryResultWithRenderedEntryData(
+			LexBIGService lexBigService, 
+			LexEvsToCTS2Transformer transformer, 
+			CodingSchemeRendering[] csRendering, boolean atEnd2){
+		
+		List<EntryType> list = new ArrayList<EntryType>();
+		boolean atEnd = true;
+		if(csRendering != null){
+			for (CodingSchemeRendering render : csRendering) {
+				String codingSchemeName = render.getCodingSchemeSummary().getCodingSchemeURI();			
+				String version = render.getCodingSchemeSummary().getRepresentsVersion();
+				CodingSchemeVersionOrTag tagOrVersion = Constructors.createCodingSchemeVersionOrTagFromVersion(version);
+				CodingScheme codingScheme;
+				try {
+					codingScheme = lexBigService.resolveCodingScheme(codingSchemeName, tagOrVersion);
+					list.add((EntryType) transformer.transformDescription(codingScheme));
+				} catch (LBException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
+		
+		return new DirectoryResult<EntryType>(list, atEnd);
 	}
 
+	
+	// --------------------------------------------
+	public static <Query extends ResourceQuery> CodingSchemeRendering[] getCodingSchemeRendering(
+			LexBIGService lexBigService, 
+			CodeSystemVersionNameConverter nameConverter, 
+			Query query, 
+			MappingExtension mappingExtension,
+			SortCriteria sortCriteria){
+		
+		QueryData<Query> queryData = new QueryData<Query>(query);
+		CodingSchemeRenderingList csrFilteredList;
+		csrFilteredList = CommonResourceSummaryUtils.getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, sortCriteria);
+		CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
+
+		return csRendering;
+	}
+	
 	public static <T extends ResourceQuery> CodedNodeSet getCodedNodeSet(
 			LexBIGService lexBigService, 
 			QueryData<T> queryData,
@@ -57,7 +164,7 @@ public class CommonResourceSummaryUtils{
 				// Get Code Node Set from LexBIG service for given coding scheme
 				LocalNameList entityTypes = new LocalNameList();
 				CodingSchemeRenderingList codingSchemeRenderingList = lexBigService.getSupportedCodingSchemes();
-				containsData = queryReturnsData(queryData, codingSchemeRenderingList);			
+				containsData = CommonUtils.queryReturnsData(queryData, codingSchemeRenderingList);			
 				if(containsData){
 					codedNodeSet = lexBigService.getNodeSet(queryData.getCodingSchemeName(), queryData.getVersionOrTag() , entityTypes);
 				}
@@ -75,30 +182,6 @@ public class CommonResourceSummaryUtils{
 		return codedNodeSet;
 	}
 	
-	private static <T extends ResourceQuery> boolean queryReturnsData(
-			QueryData<T> queryData,
-			CodingSchemeRenderingList codingSchemeRenderingList){
-		boolean found = false;
-		String localName, version;
-		int count = codingSchemeRenderingList.getCodingSchemeRenderingCount();
-		for(int index=0; index < count; index++){
-			CodingSchemeSummary codingSchemeSummary;
-			codingSchemeSummary = codingSchemeRenderingList.getCodingSchemeRendering(index).getCodingSchemeSummary();
-//				if(printObjects){
-//					System.out.println("CodingSchemeRendering: ");
-//					System.out.println(PrintUtility.codingSchemeSummary(codingSchemeSummary, 1));
-//				}
-			localName = codingSchemeSummary.getLocalName();
-			version = codingSchemeSummary.getRepresentsVersion();
-			if(localName.equals(queryData.getCodingSchemeName()) && 
-				version.equals(queryData.getVersionOrTag().getVersion())){
-				found = true;
-			}
-		}		
-			
-		return found;
-	}
-
 	public static <T extends ResourceQuery> CodingSchemeRenderingList getCodingSchemeRenderingList(
 			LexBIGService lexBigService, 
 			CodeSystemVersionNameConverter nameConverter,
@@ -111,7 +194,7 @@ public class CommonResourceSummaryUtils{
 			renderingList = CommonSearchFilterUtils.filterIfMappingExtensionValid(mappingExtension, renderingList);
 			renderingList = CommonSearchFilterUtils.filterIfCodingSchemeNameValid(queryData.getCodingSchemeName(), renderingList);
 			
-			if (CommonResourceSummaryUtils.hasCodingSchemeRenderings(queryData, renderingList)){ 
+			if (CommonUtils.hasCodingSchemeRenderings(queryData, renderingList)){ 
 				Iterator<ResolvedFilter> filtersItr = queryData.getFilters().iterator();
 				while (filtersItr.hasNext() && (renderingList.getCodingSchemeRenderingCount() > 0)) {
 						ResolvedFilter resolvedFilter = filtersItr.next();
@@ -137,13 +220,9 @@ public class CommonResourceSummaryUtils{
 		List<CodingScheme> codingSchemeList = new ArrayList<CodingScheme>();
 		boolean resolvedToCodingSchemeFlag = false;
 		
-//		QueryData<MapQuery> queryData = new QueryData<MapQuery>(query);
 		CodingSchemeRenderingList csrFilteredList;
 		csrFilteredList = getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, sortCriteria);
 
-		// NOTE:  Logic requires the processing of CodeSystemRestrictions to be last in order to save on 
-		//   the resolving to a list of CodingScheme objects.  Filter items based on the CodingScheme Relations 
-		//   sourceCodingScheme and/or targetCodingScheme string values.
 		if (queryData.getCodeSystemRestriction() != null) {
 			codingSchemeList = CommonSearchFilterUtils.filterByRenderingListAndMappingExtension(lexBigService, csrFilteredList, queryData.getCodeSystemRestriction());
 			resolvedToCodingSchemeFlag = true;
@@ -154,5 +233,6 @@ public class CommonResourceSummaryUtils{
 		}
 					
 		return codingSchemeList;
-	}	
+	}
+
 }

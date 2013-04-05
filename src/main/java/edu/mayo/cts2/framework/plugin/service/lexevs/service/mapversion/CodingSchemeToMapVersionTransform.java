@@ -41,6 +41,7 @@ import edu.mayo.cts2.framework.model.mapversion.MapVersion;
 import edu.mayo.cts2.framework.model.mapversion.MapVersionDirectoryEntry;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.LexEvsToCTS2Transformer;
 
 /**
  * Transforms a LexGrid CodingScheme into a CTS2 MayVersion.
@@ -48,7 +49,7 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNam
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
 @Component
-public class CodingSchemeToMapVersionTransform {
+public class CodingSchemeToMapVersionTransform implements LexEvsToCTS2Transformer <MapVersion, CodingScheme, MapVersionDirectoryEntry, CodingSchemeRendering> {
 	
 	@Resource
 	private CodeSystemVersionNameConverter codeSystemVersionNameConverter;
@@ -62,13 +63,9 @@ public class CodingSchemeToMapVersionTransform {
 		super();
 		this.codeSystemVersionNameConverter = codeSystemVersionNameConverter;
 	}
-	/**
-	 * Transform.
-	 *
-	 * @param codingScheme the coding scheme
-	 * @return the code system version catalog entry
-	 */
-	public MapVersion transform(CodingScheme codingScheme){
+
+	@Override
+	public MapVersion transformDescription(CodingScheme codingScheme){
 		MapVersion mapVersion = new MapVersion();
 
 		mapVersion.setAbout(codingScheme.getCodingSchemeURI());
@@ -109,7 +106,8 @@ public class CodingSchemeToMapVersionTransform {
 		return mapVersion;
 	}
 	
-	public MapVersionDirectoryEntry transform(CodingSchemeRendering codingSchemeRendering){
+	@Override
+	public MapVersionDirectoryEntry transformDirectoryEntry(CodingSchemeRendering codingSchemeRendering){
 		MapVersionDirectoryEntry summary = new MapVersionDirectoryEntry();
 		
 		CodingSchemeSummary codingSchemeSummary = codingSchemeRendering.getCodingSchemeSummary();

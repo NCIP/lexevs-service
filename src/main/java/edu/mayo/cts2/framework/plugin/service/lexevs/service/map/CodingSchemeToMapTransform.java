@@ -28,28 +28,31 @@ import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.map.MapCatalogEntry;
 import edu.mayo.cts2.framework.model.map.MapCatalogEntrySummary;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.LexEvsToCTS2Transformer;
 
 /**
  * @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
  *
  */
 @Component
-public class CodingSchemeToMapTransform {
+public class CodingSchemeToMapTransform  implements LexEvsToCTS2Transformer <MapCatalogEntry, CodingScheme, MapCatalogEntrySummary, CodingScheme> {
 
 	public CodingSchemeToMapTransform() {
 		super();
 	}
 
-	public MapCatalogEntry transformToMapCatalogEntry(CodingScheme codingScheme) {
+	@Override
+	public MapCatalogEntry transformDescription(CodingScheme codingScheme) {
 		MapCatalogEntry mapCatalogEntry = new MapCatalogEntry();
 		// TODO do transformation
 		return mapCatalogEntry;
 	}
 	
-	public MapCatalogEntrySummary transformToMapCatalogEntrySummary(CodingScheme codingScheme) {
+	@Override
+	public MapCatalogEntrySummary transformDirectoryEntry(CodingScheme codingScheme) {
 		MapCatalogEntrySummary mapCatalogEntrySummary = new MapCatalogEntrySummary();
 		// TODO do transformation
 		return mapCatalogEntrySummary;
 	}
-		
+
 }

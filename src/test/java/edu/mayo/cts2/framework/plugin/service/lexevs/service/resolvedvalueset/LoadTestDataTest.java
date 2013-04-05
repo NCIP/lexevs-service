@@ -55,7 +55,7 @@ import edu.mayo.cts2.framework.plugins.service.LocalClasspathLexBigServiceFactor
  */
 public class LoadTestDataTest extends AbstractTestITBase {
 	private LexEVSValueSetDefinitionServices vds_;
-	private LexEVSPickListDefinitionServices pls_;
+//	private LexEVSPickListDefinitionServices pls_;
 	
 	@BeforeClass
     public static void oneTimeSetUp() throws Exception {

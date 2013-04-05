@@ -23,73 +23,48 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.uri;
 
-import javax.annotation.Resource;
+import java.util.Collections;
+import java.util.List;
 
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedCodedNodeReference;
-import org.LexGrid.LexBIG.Exceptions.LBException;
-import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
-import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.codingSchemes.CodingScheme;
-import org.LexGrid.naming.SupportedNamespace;
-import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
+import org.springframework.core.OrderComparator;
 import org.springframework.stereotype.Component;
 
 /**
- * Returns a URI based on the LexEVS SupportedProperties, if it can find it.
+ * The Class DelegatingUriHandler.
  *
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
 @Component
-public class LexEvsSupportedPropertiesUriHandler implements DelegateUriHandler {
+@Primary
+public class DelegatingUriHandler implements UriHandler, InitializingBean {
 
-	@Resource
-	private LexBIGService lexBigService;
+	private List<DelegateUriHandler> delegateUriHandlers;
 	
-	/* 
-	 * This constructs an Entity URI based on the SupportedNamespace
-	 * of LexEVS.
-	 * 
-	 * (non-Javadoc)
+	/* (non-Javadoc)
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 */
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		Collections.sort(this.delegateUriHandlers, OrderComparator.INSTANCE);
+	}
+
+	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler#getEntityUri(org.LexGrid.LexBIG.DataModel.Core.ResolvedCodedNodeReference)
 	 */
 	@Override
 	public String getEntityUri(ResolvedCodedNodeReference reference) {
-		String codingSchemeName = reference.getCodingSchemeName();
-		String version = reference.getCodingSchemeVersion();
-		
+		String codingSchemeUri = reference.getCodingSchemeURI();
+	
 		String name = reference.getCode();
-		String namespace = reference.getCodeNamespace();
-
-		CodingScheme codingScheme;
-		try {
-			codingScheme = this.lexBigService.resolveCodingScheme(
-					codingSchemeName, 
-					Constructors.createCodingSchemeVersionOrTagFromVersion(version));
-		} catch (LBException e) {
-			throw new RuntimeException(e);
-		}
 		
-		SupportedNamespace sns = 
-			this.findSupportedNamespace(
-				namespace,
-				codingScheme.getMappings().getSupportedNamespace());
-		
-		if(sns != null && StringUtils.isNotEmpty(sns.getUri())){
-			return sns.getUri() + name;
-		} else {
-			return null;
-		}
+		return codingSchemeUri + "/" + name;
 	}
 	
-	private SupportedNamespace findSupportedNamespace(String namespace, SupportedNamespace[] namespaces){
-		for(SupportedNamespace sns : namespaces){
-			if(sns.getLocalId().equals(namespace)){
-				return sns;
-			}
-		}
-		return null;
-	}
-
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler#getCodeSystemUri(org.LexGrid.codingSchemes.CodingScheme)
 	 */
@@ -106,9 +81,13 @@ public class LexEvsSupportedPropertiesUriHandler implements DelegateUriHandler {
 		return codingScheme.getCodingSchemeURI() + "#" + codingScheme.getRepresentsVersion();
 	}
 
-	@Override
-	public int getOrder() {
-		return 1;
+	public List<DelegateUriHandler> getDelegateUriHandlers() {
+		return delegateUriHandlers;
+	}
+
+	@Autowired
+	public void setDelegateUriHandlers(List<DelegateUriHandler> delegateUriHandlers) {
+		this.delegateUriHandlers = delegateUriHandlers;
 	}
 
 }

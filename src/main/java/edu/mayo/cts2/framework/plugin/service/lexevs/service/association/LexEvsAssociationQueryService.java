@@ -16,7 +16,6 @@ import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.springframework.stereotype.Component;
 
-import edu.mayo.cts2.framework.filter.directory.AbstractStateBuildingDirectoryBuilder.Callback;
 import edu.mayo.cts2.framework.model.association.Association;
 import edu.mayo.cts2.framework.model.association.AssociationDirectoryEntry;
 import edu.mayo.cts2.framework.model.association.GraphNode;
@@ -39,26 +38,26 @@ import edu.mayo.cts2.framework.service.profile.entitydescription.name.EntityDesc
 @Component
 public class LexEvsAssociationQueryService extends AbstractLexEvsService implements AssociationQueryService {
 
-	private static class CodedNodeGraphCallback 
-		implements Callback<CodedNodeGraph,AssociationDirectoryEntry> {
-
-		@Override
-		public DirectoryResult<AssociationDirectoryEntry> 
-			execute(
-				CodedNodeGraph state, 
-				int start, 
-				int maxResults) {
-			
-			return null;
-		}
-
-		@Override
-		public int executeCount(CodedNodeGraph state) {
-			return 0;
-		}
-		
-	}
-	
+//	private static class CodedNodeGraphCallback 
+//		implements Callback<CodedNodeGraph,AssociationDirectoryEntry> {
+//
+//		@Override
+//		public DirectoryResult<AssociationDirectoryEntry> 
+//			execute(
+//				CodedNodeGraph state, 
+//				int start, 
+//				int maxResults) {
+//			
+//			return null;
+//		}
+//
+//		@Override
+//		public int executeCount(CodedNodeGraph state) {
+//			return 0;
+//		}
+//		
+//	}
+//	
 	
 	@Override
 	public DirectoryResult<AssociationDirectoryEntry> getResourceSummaries(

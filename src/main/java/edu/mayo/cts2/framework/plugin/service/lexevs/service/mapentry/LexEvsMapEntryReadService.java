@@ -29,6 +29,7 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
+import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension.Mapping;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension.Mapping.SearchContext;
@@ -67,80 +68,44 @@ public class LexEvsMapEntryReadService extends AbstractLexEvsService implements 
 	public static final String MAPPING_EXTENSION = "MappingExtension";
 	
 	// ------ Local methods ----------------------
-
-	// -------- Implemented methods ----------------	
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(MAPPING_EXTENSION);
-	}
-
-	
-	@Override
-	public MapEntry read(
-			MapEntryReadId identifier,
-			ResolvedReadContext readContext) {
-		
-		// Parse identifier into pieces to create a LexEVS Mapping object
-		ScopedEntityName scopedEntityName = identifier.getEntityName();
-		String sourceEntityCode = scopedEntityName.getName();
-		
+	private String extractMapVersion(MapEntryReadId identifier) {		
 		String mapVersion = null;
 		NameOrURI nameOrURI = identifier.getMapVersion();
 		if (nameOrURI != null) {
 			mapVersion = nameOrURI.getName() != null ? nameOrURI.getName() : nameOrURI.getUri();
 		}
 				
-//		String mappingUri = identifier.getUri(); // Is this the sourceEntity's URI? Not the Map's codingSchemeURI, right?		
-		String relationsContainerName = null;   // if left null, the Mapping.resolveMapping() throws NullPointerException
+		return mapVersion;
+	}
+
+	private ResolvedConceptReferencesIterator getInteratorFromMapping(
+			MappingExtension mappingExtension, 
+			String mapVersion,
+			String sourceEntityCode, 
+			String relationsContainerName) throws LBException {
+
+		Mapping mapping = mappingExtension.getMapping(mapVersion, Constants.CURRENT_LEXEVS_TAG,	relationsContainerName);
+		mapping = mapping.restrictToCodes(Constructors.createConceptReferenceList(sourceEntityCode), SearchContext.SOURCE_CODES);
+		return mapping.resolveMapping();
+	}
+	
+	private ResolvedConceptReference getResolvedConceptReference(MapEntryReadId identifier,
+			ResolvedReadContext readContext) {
+
+		ScopedEntityName scopedEntityName = identifier.getEntityName();
+		String sourceEntityCode = scopedEntityName.getName();
+		String mapVersion = extractMapVersion(identifier);
 		
-		Mapping mapping = null;
+		String relationsContainerName = null;   
+		
 		ResolvedConceptReferencesIterator resolvedConceptReferencesIterator;
 		ResolvedConceptReference resolvedConceptReference = null;
 		try {
-/*			mapping = mappingExtension.getMapping(
-					mappingUri, 
-					Constructors.createCodingSchemeVersionOrTagFromVersion(mapVersion), 
-					relationsContainerName);
-*/			
-			mapping = mappingExtension.getMapping(
-					mapVersion, 
-					Constants.CURRENT_LEXEVS_TAG, 
-					relationsContainerName);
-
-			mapping = mapping.restrictToCodes(Constructors.createConceptReferenceList(sourceEntityCode), SearchContext.SOURCE_CODES);
-//			Mapping mapping2 = mapping.restrictToCodes(Constructors.createConceptReferenceList(sourceEntityCode), SearchContext.SOURCE_OR_TARGET_CODES);
-			
-			resolvedConceptReferencesIterator = mapping.resolveMapping();
+			resolvedConceptReferencesIterator = getInteratorFromMapping(mappingExtension, mapVersion, sourceEntityCode, relationsContainerName); 
 			
 			if (resolvedConceptReferencesIterator.hasNext()) {
 				resolvedConceptReference = resolvedConceptReferencesIterator.next();				
 			}
-//			ResolvedConceptReferencesIterator itr = mapping2.resolveMapping();
-			
-			// if relationsContainerName is null, below method throws NullPointerException
-			ResolvedConceptReferencesIterator itr = mappingExtension.resolveMapping(
-					mapVersion, 
-					Constants.CURRENT_LEXEVS_TAG, 
-					relationsContainerName, 
-					null);
-
-//			ResolvedConceptReferenceList rcrList = itr.get(0,5);  // Unsupported Operation
-//			ResolvedConceptReferenceList rcrList = itr.getNext(); // Unsupported Operation
-			
-			// hasNext will fail - Bad SQL Grammar error - ibatis 
-			while (itr.hasNext())  {
-				@SuppressWarnings("unused")
-				ResolvedConceptReference next = itr.next();
-				//System.out.println();
-			}
-			
-			// null relation container name throws NullPointerException
-//			ResolvedConceptReferencesIterator itr2 = mappingExtension.resolveMapping(
-//					mapVersion, 
-//					Constants.CURRENT_LEXEVS_TAG, 
-//					null, 
-//					null);
-
 			
 			if (resolvedConceptReferencesIterator != null && resolvedConceptReferencesIterator.numberRemaining() == 1) {
 				resolvedConceptReference = resolvedConceptReferencesIterator.next();
@@ -148,21 +113,34 @@ public class LexEvsMapEntryReadService extends AbstractLexEvsService implements 
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+
+		return resolvedConceptReference;
+	}
+
+
+	// -------- Implemented methods ----------------	
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(MAPPING_EXTENSION);
+	}
+	
+	@Override
+	public MapEntry read(
+			MapEntryReadId identifier,
+			ResolvedReadContext readContext) {
+		
+		ResolvedConceptReference resolvedConceptReference = getResolvedConceptReference(identifier, readContext);
 		
 		if (resolvedConceptReference != null) {
-			//resolvedConceptReference.
-			return new MapEntry();
-			//return this.mappingToMapEntryTransform.transform(resolvedConceptReference);
+			return this.mappingToMapEntryTransform.transformDescription(resolvedConceptReference);
 		} else {
 			return new MapEntry();
 		}
 	}
 
 	@Override
-	public boolean exists(
-			MapEntryReadId identifier,
-			ResolvedReadContext readContext) {
-		throw new UnsupportedOperationException();
+	public boolean exists(MapEntryReadId identifier, ResolvedReadContext readContext) {	
+		return getResolvedConceptReference(identifier, readContext) != null;
 	}
 
 	@Override

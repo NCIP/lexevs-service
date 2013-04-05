@@ -28,47 +28,48 @@ import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.mapversion.MapEntry;
 import edu.mayo.cts2.framework.model.mapversion.MapEntryDirectoryEntry;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.LexEvsToCTS2Transformer;
 
 @Component
-public class MappingToMapEntryTransform {
+public class MappingToMapEntryTransform implements LexEvsToCTS2Transformer <MapEntry, ResolvedConceptReference, MapEntryDirectoryEntry, ResolvedConceptReference>  {
 
 	public MappingToMapEntryTransform() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public MapEntry transformToMapEntry(ResolvedConceptReference resolvedConceptReference) {
-		MapEntry mapEntry = new MapEntry();
-
-		String code = resolvedConceptReference.getCode();
-		String codeNameSpace = resolvedConceptReference.getCodeNamespace();
-		String codingSchemeName = resolvedConceptReference.getCodingSchemeName();
-		String codingSchemeURI = resolvedConceptReference.getCodingSchemeURI();
-		String codingSchemeVersion = resolvedConceptReference.getCodingSchemeVersion();
-		String entityDescription = resolvedConceptReference.getEntityDescription().getContent();
-		
-		resolvedConceptReference.getConceptCode();
-		
+	@Override
+	public MapEntry transformDescription(ResolvedConceptReference resolvedConceptReference) {
+//		MapEntry mapEntry = new MapEntry();
+//
+//		String code = resolvedConceptReference.getCode();
+//		String codeNameSpace = resolvedConceptReference.getCodeNamespace();
+//		String codingSchemeName = resolvedConceptReference.getCodingSchemeName();
+//		String codingSchemeURI = resolvedConceptReference.getCodingSchemeURI();
+//		String codingSchemeVersion = resolvedConceptReference.getCodingSchemeVersion();
+//		String entityDescription = resolvedConceptReference.getEntityDescription().getContent();
+//		
+//		resolvedConceptReference.getConceptCode();
+//		
 		//mapEntry.
 
 		throw new UnsupportedOperationException("Transform to MapEntry is under construction");
 	}
 	
 	
-	public MapEntryDirectoryEntry transform(ResolvedConceptReference resolvedConceptReference) {
+	@Override
+	public MapEntryDirectoryEntry transformDirectoryEntry(ResolvedConceptReference resolvedConceptReference) {
 		
-		MapEntryDirectoryEntry mapEntryDirectoryEntry = new MapEntryDirectoryEntry();
-		
-		String code = resolvedConceptReference.getCode();
-		String codeNameSpace = resolvedConceptReference.getCodeNamespace();
-		String codingSchemeName = resolvedConceptReference.getCodingSchemeName();
-		String codingSchemeURI = resolvedConceptReference.getCodingSchemeURI();
-		String codingSchemeVersion = resolvedConceptReference.getCodingSchemeVersion();
-		String entityDescription = resolvedConceptReference.getEntityDescription().getContent();
+//		MapEntryDirectoryEntry mapEntryDirectoryEntry = new MapEntryDirectoryEntry();
+//		
+//		String code = resolvedConceptReference.getCode();
+//		String codeNameSpace = resolvedConceptReference.getCodeNamespace();
+//		String codingSchemeName = resolvedConceptReference.getCodingSchemeName();
+//		String codingSchemeURI = resolvedConceptReference.getCodingSchemeURI();
+//		String codingSchemeVersion = resolvedConceptReference.getCodingSchemeVersion();
+//		String entityDescription = resolvedConceptReference.getEntityDescription().getContent();
 
 		throw new UnsupportedOperationException("Transform to MapEntryDirectoryEntry is under construction");
 	}
-	
-	
-	
+
 }

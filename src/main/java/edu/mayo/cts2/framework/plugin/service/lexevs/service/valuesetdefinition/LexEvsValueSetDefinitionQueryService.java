@@ -49,7 +49,7 @@ import edu.mayo.cts2.framework.service.profile.valuesetdefinition.ValueSetDefini
 public class LexEvsValueSetDefinitionQueryService extends AbstractLexEvsService
 		implements ValueSetDefinitionQueryService {
 
-	private LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform vsdTransformer = new LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform();
+	private LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform transformer = new LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform();
 
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.service.profile.QueryService#getResourceSummaries(edu.mayo.cts2.framework.service.profile.ResourceQuery, edu.mayo.cts2.framework.model.core.SortCriteria, edu.mayo.cts2.framework.model.command.Page)

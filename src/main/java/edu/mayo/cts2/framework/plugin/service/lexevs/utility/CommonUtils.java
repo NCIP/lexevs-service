@@ -1,18 +1,29 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
 
+import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
+import org.LexGrid.LexBIG.DataModel.Collections.ConceptReferenceList;
 import org.LexGrid.LexBIG.DataModel.Collections.LocalNameList;
-import org.LexGrid.LexBIG.DataModel.Collections.ResolvedConceptReferenceList;
 import org.LexGrid.LexBIG.DataModel.Collections.SortOptionList;
+import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
+import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
+import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
 import org.LexGrid.LexBIG.Exceptions.LBParameterException;
-import org.LexGrid.LexBIG.Exceptions.LBResourceUnavailableException;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet.PropertyType;
+import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
 
-import edu.mayo.cts2.framework.model.command.Page;
+import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
+import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
+import edu.mayo.cts2.framework.model.service.core.NameOrURI;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
+import edu.mayo.cts2.framework.service.profile.ResourceQuery;
+import edu.mayo.cts2.framework.service.profile.entitydescription.name.EntityDescriptionReadId;
 
 public class CommonUtils {
 
@@ -20,75 +31,76 @@ public class CommonUtils {
 	private CommonUtils() {
 		super();
 	}
-	
-	public static <T> Object[] getRenderingPage(T[] codingScheme, Page page) {
-		int start = page.getStart();
-		int end = page.getEnd();
-		Object [] csPage = null;
-		
-		if(end > codingScheme.length){
-			end = codingScheme.length;
-		}
-		
-		if ((start == 0) && (end == codingScheme.length)) {
-			csPage = codingScheme.clone();
-		} 
-		else if(start < end){
-			
-			int size = end - start;
-			csPage = new Object [size];
-			
-			for (int i = 0; i < csPage.length; i++) {
-				csPage[i] = codingScheme[start + i];
-			}
-		}
-	
-		return csPage;
-	}
-	
-	public static ResolvedConceptReferenceResults getReferenceResultPage(
-			CodedNodeSet codedNodeSet, 
-			SortCriteria sortCriteria, 
-			Page page){
-		boolean atEnd = false;
-		ResolvedConceptReference[] resolvedConceptReferences = null;
-		ResolvedConceptReferencesIterator iterator;
-		ResolvedConceptReferenceList resolvedConceptReferenceList = null;
-		int start = 0, end = 0;
-		try {
-			iterator = CommonUtils.getResolvedConceptReferencesIterator(codedNodeSet, sortCriteria);
-			
-			if(iterator != null){
-				start = page.getStart();
-				end = page.getEnd();
-				if(end > iterator.numberRemaining()){
-					end = iterator.numberRemaining();
-					atEnd = true;				
-				}
-				resolvedConceptReferenceList = iterator.get(start, end);
-				// Get array of resolved concept references
-				
-				if(resolvedConceptReferenceList != null){
-					resolvedConceptReferences = resolvedConceptReferenceList.getResolvedConceptReference();
-//					if(printObjects){
-//						System.out.println("resolvedConceptReferences: " + resolvedConceptReferences.length);
-//					}
-				}	
-			}
-		} catch (LBInvocationException e) {
-			throw new RuntimeException(e);
-		} catch (LBParameterException e) {
-			throw new RuntimeException(e);
-		} catch (LBResourceUnavailableException e) {
-			throw new RuntimeException(e);
-		}
-		
-		return new ResolvedConceptReferenceResults(resolvedConceptReferences, atEnd);
-	}
-	
-	
-	
 
+	public static <T extends ResourceQuery> boolean hasCodingSchemeRenderings(QueryData<T> queryData, CodingSchemeRenderingList csrFilteredList){
+		boolean answer = false;
+		if((queryData.getFilters() != null) && (csrFilteredList != null) && (csrFilteredList.getCodingSchemeRenderingCount() > 0)){
+			answer = true;
+		}
+		return answer;
+	}
+	
+	public static <T extends ResourceQuery> boolean queryReturnsData(
+			QueryData<T> queryData,
+			CodingSchemeRenderingList codingSchemeRenderingList){
+		boolean found = false;
+		String localName, version;
+		int count = codingSchemeRenderingList.getCodingSchemeRenderingCount();
+		for(int index=0; index < count; index++){
+			CodingSchemeSummary codingSchemeSummary;
+			codingSchemeSummary = codingSchemeRenderingList.getCodingSchemeRendering(index).getCodingSchemeSummary();
+			localName = codingSchemeSummary.getLocalName();
+			version = codingSchemeSummary.getRepresentsVersion();
+			if(localName.equals(queryData.getCodingSchemeName()) && 
+				version.equals(queryData.getVersionOrTag().getVersion())){
+				found = true;
+			}
+		}		
+			
+		return found;
+	}
+
+
+	public static ResolvedConceptReference getResolvedConceptReference(
+			LexBIGService lexBigService, 
+			CodeSystemVersionNameConverter nameConverter, 
+			EntityDescriptionReadId identifier,
+			ResolvedReadContext readContext) {
+
+		NameVersionPair codingSchemeName;
+		CodingSchemeVersionOrTag versionOrTag;
+		ConceptReferenceList referenceList;
+		CodedNodeSet codedNodeSet;
+		String versionName;
+		
+		versionName = identifier.getCodeSystemVersion().getName();
+		
+		codingSchemeName = nameConverter.fromCts2CodeSystemVersionName(versionName);
+		
+		ScopedEntityName entityName = identifier.getEntityName();
+		versionOrTag = Constructors.createCodingSchemeVersionOrTagFromVersion(codingSchemeName.getVersion());
+		referenceList = Constructors.createConceptReferenceList(entityName.getName(), entityName.getNamespace(), codingSchemeName.getName());
+		
+		try {
+			codedNodeSet = lexBigService.getNodeSet(codingSchemeName.getName(), versionOrTag, null);
+			codedNodeSet = codedNodeSet.restrictToCodes(referenceList);
+			
+			ResolvedConceptReferencesIterator iterator = codedNodeSet.resolve(null, null, null);
+			
+			if(! iterator.hasNext()){
+				return null;
+			} else {
+				return iterator.next();
+			}
+		} catch (LBException e) {
+			throw new RuntimeException();
+		}
+		
+	}
+
+
+	
+	
 
 	public static ResolvedConceptReferencesIterator getResolvedConceptReferencesIterator(CodedNodeSet codedNodeSet, SortCriteria sortCriteria){
 		ResolvedConceptReferencesIterator iterator = null;
@@ -108,6 +120,30 @@ public class CommonUtils {
 			}
 		}		
 		return iterator;
+	}
+
+
+	public static NameVersionPair getNamePair(
+			CodeSystemVersionNameConverter nameConverter, 
+			NameOrURI identifier,
+			ResolvedReadContext readContext) {
+		String name;
+		NameVersionPair namePair;
+		
+		if (identifier.getName() != null) {
+			name = identifier.getName();
+			if (!nameConverter.isValidCodeSystemVersionName(name)) {
+				namePair = null;
+			}
+			else{
+				namePair = nameConverter.fromCts2CodeSystemVersionName(name);		
+			}
+		} else {
+			throw new UnsupportedOperationException(
+					"Cannot resolve by DocumentURI yet.");
+		}
+
+		return namePair;
 	}
 		
 }
