@@ -45,6 +45,7 @@ public class LexEvsMapQueryServiceTest {
 
 	// Setup mocked environment
 	// -------------------------
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public LexEvsMapQueryService createService(
 			FakeLexEvsSystem<MapCatalogEntry, MapCatalogEntrySummary, MapQuery, LexEvsMapQueryService> fakeLexEvs, 
 			boolean withData) throws Exception{
@@ -65,9 +66,6 @@ public class LexEvsMapQueryServiceTest {
 	
 	final static String CODE_SYSTEM_NAME = null;
 	
-//	QueryService<MapVersion, 
-//	MapVersionDirectoryEntry, 
-//	MapVersionQuery>, Cts2Profile {
 
 	// =============
 	// Test methods
@@ -159,7 +157,6 @@ public class LexEvsMapQueryServiceTest {
 	
 
 	// --------------------------------------------
-	/*
 	@Test
 	public void testGetResourceSummaries_NoFilter_SchemeCountsFrom1to21_PageSizesFrom1to50_Pages() throws Exception {
 		int maxSchemeCount = 21;
@@ -189,6 +186,7 @@ public class LexEvsMapQueryServiceTest {
 			}
 		}
 	}
+	
 	@Test
 	public void testGetResourceSummaries_DeepCompare_PropertyReferences_MatchingAlgorithms_Pages_CodindgSchemes_Substrings() throws Exception {
 		Page page = new Page();		
@@ -205,5 +203,4 @@ public class LexEvsMapQueryServiceTest {
 		
 		fakeLexEvs.executeGetResourceSummariesWithDeepComparisonForEachPropertyReference(service, directoryResult, query, CODE_SYSTEM_NAME, page, lastPage);		
 	}
-*/
 }
