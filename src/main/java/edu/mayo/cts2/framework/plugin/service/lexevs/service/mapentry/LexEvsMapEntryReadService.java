@@ -139,13 +139,8 @@ public class LexEvsMapEntryReadService extends AbstractLexEvsService implements 
 	}
 
 	@Override
-	public boolean exists(MapEntryReadId identifier, ResolvedReadContext readContext) {
-		
-		ResolvedConceptReference resolvedConceptReference = getResolvedConceptReference(identifier, readContext);
-		if (resolvedConceptReference != null) {
-			return true;
-		}
-		return false;
+	public boolean exists(MapEntryReadId identifier, ResolvedReadContext readContext) {	
+		return getResolvedConceptReference(identifier, readContext) != null;
 	}
 
 	@Override
