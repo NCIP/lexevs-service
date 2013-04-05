@@ -55,7 +55,7 @@ public class CommonResourceSummaryUtils{
 
 		if(codingSchemes != null){
 			for (CodingScheme codingScheme : codingSchemes) {
-				list.add(transformer.transformToMapCatalogEntry(codingScheme));
+				list.add(transformer.transformDescription(codingScheme));
 			}
 		}
 		
@@ -71,7 +71,7 @@ public class CommonResourceSummaryUtils{
 
 		if(csRendering != null){
 			for (CodingSchemeRendering render : csRendering) {
-				list.add(transformer.transform(render));
+				list.add(transformer.transformDescription(render));
 			}
 		}
 		
@@ -86,7 +86,7 @@ public class CommonResourceSummaryUtils{
 
 		if(codingSchemes != null){
 			for (CodingScheme codingScheme : codingSchemes) {
-				list.add(transformer.transformToMapCatalogEntrySummary(codingScheme));
+				list.add(transformer.transformDirectoryEntry(codingScheme));
 			}
 		}
 		
@@ -134,6 +134,24 @@ public class CommonResourceSummaryUtils{
 		return new DirectoryResult<MapVersionDirectoryEntry>(list, atEnd);
 	}
 
+	public static <T extends ResourceQuery> ResolvedConceptReferenceResults getResolvedConceptReferenceResultsPage(
+			LexBIGService lexBigService, 
+			QueryData<T> queryData,
+			SortCriteria sortCriteria, 
+			Page page){
+		ResolvedConceptReferenceResults results = null;
+		ResolvedConceptReferencesIterator iterator;
+		CodedNodeSet codedNodeSet;
+		
+		codedNodeSet = CommonResourceSummaryUtils.getCodedNodeSet(lexBigService, queryData, sortCriteria);
+		if(codedNodeSet != null){
+			iterator = CommonUtils.getResolvedConceptReferencesIterator(codedNodeSet, sortCriteria);
+			results = CommonUtils.getPageFromIterator(iterator, page);
+		}
+		
+		return results;
+	}
+
 
 	public static <Query extends ResourceQuery> CodingSchemeRendering[] getCodingSchemeRendering(
 			LexBIGService lexBigService, 
@@ -168,7 +186,7 @@ public class CommonResourceSummaryUtils{
 				CodingScheme codingScheme;
 				try {
 					codingScheme = lexBigService.resolveCodingScheme(codingSchemeName, tagOrVersion);
-					list.add((Entry) transformer.transform(codingScheme));
+					list.add((Entry) transformer.transformDirectoryEntry(codingScheme));
 				} catch (LBException e) {
 					throw new RuntimeException(e);
 				}
@@ -179,24 +197,6 @@ public class CommonResourceSummaryUtils{
 	}
 
 	
-	public static <T extends ResourceQuery> ResolvedConceptReferenceResults getResolvedConceptReferenceResultsPage(
-			LexBIGService lexBigService, 
-			QueryData<T> queryData,
-			SortCriteria sortCriteria, 
-			Page page){
-		ResolvedConceptReferenceResults results = null;
-		ResolvedConceptReferencesIterator iterator;
-		CodedNodeSet codedNodeSet;
-		
-		codedNodeSet = CommonResourceSummaryUtils.getCodedNodeSet(lexBigService, queryData, sortCriteria);
-		if(codedNodeSet != null){
-			iterator = CommonUtils.getResolvedConceptReferencesIterator(codedNodeSet, sortCriteria);
-			results = CommonUtils.getPageFromIterator(iterator, page);
-		}
-		
-		return results;
-	}
-
 	public static <T extends ResourceQuery> CodedNodeSet getCodedNodeSet(
 			LexBIGService lexBigService, 
 			QueryData<T> queryData,
@@ -310,7 +310,7 @@ public class CommonResourceSummaryUtils{
 			ResolvedConceptReference[] resolvedConceptReferences = resolvedConceptReferenceResults.getResolvedConceptReference();
 			if(resolvedConceptReferences != null){
 				for(ResolvedConceptReference reference : resolvedConceptReferences){
-					EntityDirectoryEntry entry = transformer.transformToEntry(reference);
+					EntityDirectoryEntry entry = transformer.transformDirectoryEntry(reference);
 					list.add(entry);
 				}
 			}			
@@ -331,7 +331,7 @@ public class CommonResourceSummaryUtils{
 			ResolvedConceptReference[] resolvedConceptReferences = resolvedConceptReferenceResults.getResolvedConceptReference();
 			if(resolvedConceptReferences != null){
 				for(ResolvedConceptReference reference : resolvedConceptReferences){
-					EntityDescription entry = transformer.transformToEntity(reference);
+					EntityDescription entry = transformer.transformDescription(reference);
 					list.add(entry);
 				}
 			}			

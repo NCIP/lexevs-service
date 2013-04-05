@@ -75,7 +75,7 @@ public class LexEvsMapReadService
 	// -------- Implemented methods ----------------	
 	@Override
 	protected MapCatalogEntry transform(CodingScheme codingScheme) {
-		return this.transformer.transformToMapCatalogEntry(codingScheme);
+		return this.transformer.transformDescription(codingScheme);
 	}
 
 	@Override

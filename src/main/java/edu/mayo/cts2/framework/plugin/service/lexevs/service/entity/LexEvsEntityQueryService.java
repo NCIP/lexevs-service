@@ -123,11 +123,11 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		QueryData<EntityDescriptionQuery> queryData = new QueryData<EntityDescriptionQuery>(query);
 		queryData.setVersionOrTag(nameConverter);
 		
-		ResolvedConceptReferenceResults resolvedConceptReferenceResults;
-		resolvedConceptReferenceResults = CommonResourceSummaryUtils.getResolvedConceptReferenceResultsPage(lexBigService, queryData, sortCriteria, page);
+		ResolvedConceptReferenceResults resolvedConceptReferenceResultsPage;
+		resolvedConceptReferenceResultsPage = CommonResourceSummaryUtils.getResolvedConceptReferenceResultsPage(lexBigService, queryData, sortCriteria, page);
 
 		DirectoryResult<EntityDescription> directoryResult;
-		directoryResult = CommonResourceSummaryUtils.createDirectoryResultWithEntrySummaryData(lexBigService, transformer, resolvedConceptReferenceResults);
+		directoryResult = CommonResourceSummaryUtils.createDirectoryResultWithEntrySummaryData(lexBigService, this.transformer, resolvedConceptReferenceResultsPage);
 
 		return directoryResult;
 	}

@@ -34,6 +34,7 @@ import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.entity.NamedEntityDescription;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.LexEvsToCTS2Transformer;
 
 /**
  * 
@@ -41,12 +42,13 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
  *
  */
 @Component
-public class EntityTransform {
+public class EntityTransform implements LexEvsToCTS2Transformer <EntityDescription, ResolvedConceptReference, EntityDirectoryEntry, ResolvedConceptReference> {
 
 	@Autowired
 	private UriHandler uriHandler;
 
-	public EntityDescription transformToEntity(ResolvedConceptReference reference) {
+	@Override
+	public EntityDescription transformDescription(ResolvedConceptReference reference) {
 		Assert.isTrue(reference.getEntity() != null, 
 				"The Entity is null. Please resolve the CodedNodeSet with Resolve = true");
 
@@ -66,7 +68,8 @@ public class EntityTransform {
 		return ed;
 	}
 
-	public EntityDirectoryEntry transformToEntry(ResolvedConceptReference reference) {
+	@Override
+	public EntityDirectoryEntry transformDirectoryEntry(ResolvedConceptReference reference) {
 		EntityDirectoryEntry entry = new EntityDirectoryEntry();
 		entry.setAbout(this.uriHandler.getEntityUri(reference));
 		

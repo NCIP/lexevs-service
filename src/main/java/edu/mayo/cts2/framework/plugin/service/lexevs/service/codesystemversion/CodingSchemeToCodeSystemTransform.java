@@ -41,6 +41,7 @@ import edu.mayo.cts2.framework.model.core.SourceAndNotation;
 import edu.mayo.cts2.framework.model.core.StatementTarget;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.LexEvsToCTS2Transformer;
 
 /**
  * Transforms a LexGrid CodingScheme into a CTS2 CodeSystemVersion CatalogEntry.
@@ -48,8 +49,8 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNam
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
 @Component
-public class CodingSchemeToCodeSystemTransform {
-	
+public class CodingSchemeToCodeSystemTransform implements LexEvsToCTS2Transformer<CodeSystemVersionCatalogEntrySummary, CodingSchemeRendering, CodeSystemVersionCatalogEntry, CodingScheme>{
+	//DescriptionDataType, DescriptionDataIN, DirectoryEntryDataType, DirecotoryEntryDataIN> 
 	@Resource
 	private CodeSystemVersionNameConverter codeSystemVersionNameConverter;
 	
@@ -62,13 +63,17 @@ public class CodingSchemeToCodeSystemTransform {
 		super();
 		this.codeSystemVersionNameConverter = codeSystemVersionNameConverter;
 	}
+	
+	
+	
 	/**
 	 * Transform.
 	 *
 	 * @param codingScheme the coding scheme
 	 * @return the code system version catalog entry
 	 */
-	public CodeSystemVersionCatalogEntry transform(CodingScheme codingScheme){
+	@Override
+	public CodeSystemVersionCatalogEntry transformDirectoryEntry(CodingScheme codingScheme){
 		CodeSystemVersionCatalogEntry codeSystemVersion = new CodeSystemVersionCatalogEntry();
 
 		codeSystemVersion.setAbout(codingScheme.getCodingSchemeURI());
@@ -109,7 +114,8 @@ public class CodingSchemeToCodeSystemTransform {
 		return codeSystemVersion;
 	}
 	
-	public CodeSystemVersionCatalogEntrySummary transform(CodingSchemeRendering codingSchemeRendering){
+	@Override
+	public CodeSystemVersionCatalogEntrySummary transformDescription(CodingSchemeRendering codingSchemeRendering){
 		CodeSystemVersionCatalogEntrySummary summary = new CodeSystemVersionCatalogEntrySummary();
 		
 		CodingSchemeSummary codingSchemeSummary = codingSchemeRendering.getCodingSchemeSummary();
@@ -165,5 +171,5 @@ public class CodingSchemeToCodeSystemTransform {
 		return this.codeSystemVersionNameConverter.
 				toCts2CodeSystemVersionName(name, version);
 	}
-	
+
 }
