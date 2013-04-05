@@ -83,36 +83,20 @@ public class LexEvsMapEntryReadService extends AbstractLexEvsService implements 
 			String mapVersion,
 			String sourceEntityCode, 
 			String relationsContainerName) throws LBException {
-		/*			mapping = mappingExtension.getMapping(
-		mappingUri, 
-		Constructors.createCodingSchemeVersionOrTagFromVersion(mapVersion), 
-		relationsContainerName);
-		 */			
+
 		Mapping mapping = mappingExtension.getMapping(mapVersion, Constants.CURRENT_LEXEVS_TAG,	relationsContainerName);
 		mapping = mapping.restrictToCodes(Constructors.createConceptReferenceList(sourceEntityCode), SearchContext.SOURCE_CODES);
-		//Mapping mapping2 = mapping.restrictToCodes(Constructors.createConceptReferenceList(sourceEntityCode), SearchContext.SOURCE_OR_TARGET_CODES);
 		return mapping.resolveMapping();
 	}
-
-
-	// -------- Implemented methods ----------------	
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(MAPPING_EXTENSION);
-	}
-
 	
-	@Override
-	public MapEntry read(
-			MapEntryReadId identifier,
+	private ResolvedConceptReference getResolvedConceptReference(MapEntryReadId identifier,
 			ResolvedReadContext readContext) {
-		
+
 		ScopedEntityName scopedEntityName = identifier.getEntityName();
 		String sourceEntityCode = scopedEntityName.getName();
 		String mapVersion = extractMapVersion(identifier);
 		
-//		String mappingUri = identifier.getUri(); // Is this the sourceEntity's URI? Not the Map's codingSchemeURI, right?		
-		String relationsContainerName = null;   // if left null, the Mapping.resolveMapping() throws NullPointerException
+		String relationsContainerName = null;   
 		
 		ResolvedConceptReferencesIterator resolvedConceptReferencesIterator;
 		ResolvedConceptReference resolvedConceptReference = null;
@@ -122,32 +106,6 @@ public class LexEvsMapEntryReadService extends AbstractLexEvsService implements 
 			if (resolvedConceptReferencesIterator.hasNext()) {
 				resolvedConceptReference = resolvedConceptReferencesIterator.next();				
 			}
-//			ResolvedConceptReferencesIterator itr = mapping2.resolveMapping();
-			
-			// if relationsContainerName is null, below method throws NullPointerException
-			ResolvedConceptReferencesIterator itr = mappingExtension.resolveMapping(
-					mapVersion, 
-					Constants.CURRENT_LEXEVS_TAG, 
-					relationsContainerName, 
-					null);
-
-//			ResolvedConceptReferenceList rcrList = itr.get(0,5);  // Unsupported Operation
-//			ResolvedConceptReferenceList rcrList = itr.getNext(); // Unsupported Operation
-			
-			// hasNext will fail - Bad SQL Grammar error - ibatis 
-			while (itr.hasNext())  {
-				@SuppressWarnings("unused")
-				ResolvedConceptReference next = itr.next();
-				//System.out.println();
-			}
-			
-			// null relation container name throws NullPointerException
-//			ResolvedConceptReferencesIterator itr2 = mappingExtension.resolveMapping(
-//					mapVersion, 
-//					Constants.CURRENT_LEXEVS_TAG, 
-//					null, 
-//					null);
-
 			
 			if (resolvedConceptReferencesIterator != null && resolvedConceptReferencesIterator.numberRemaining() == 1) {
 				resolvedConceptReference = resolvedConceptReferencesIterator.next();
@@ -155,23 +113,39 @@ public class LexEvsMapEntryReadService extends AbstractLexEvsService implements 
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+
+		return resolvedConceptReference;
+	}
+
+
+	// -------- Implemented methods ----------------	
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(MAPPING_EXTENSION);
+	}
+	
+	@Override
+	public MapEntry read(
+			MapEntryReadId identifier,
+			ResolvedReadContext readContext) {
+		
+		ResolvedConceptReference resolvedConceptReference = getResolvedConceptReference(identifier, readContext);
 		
 		if (resolvedConceptReference != null) {
-			//resolvedConceptReference.
-			return new MapEntry();
-			//return this.mappingToMapEntryTransform.transform(resolvedConceptReference);
+			return this.mappingToMapEntryTransform.transformDescription(resolvedConceptReference);
 		} else {
 			return new MapEntry();
 		}
 	}
 
-
-
 	@Override
-	public boolean exists(
-			MapEntryReadId identifier,
-			ResolvedReadContext readContext) {
-		throw new UnsupportedOperationException();
+	public boolean exists(MapEntryReadId identifier, ResolvedReadContext readContext) {
+		
+		ResolvedConceptReference resolvedConceptReference = getResolvedConceptReference(identifier, readContext);
+		if (resolvedConceptReference != null) {
+			return true;
+		}
+		return false;
 	}
 
 	@Override

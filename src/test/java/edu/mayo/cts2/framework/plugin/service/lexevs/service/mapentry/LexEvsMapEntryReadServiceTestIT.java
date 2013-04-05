@@ -23,7 +23,9 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.mapentry;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import javax.annotation.Resource;
 
@@ -69,14 +71,10 @@ public class LexEvsMapEntryReadServiceTestIT extends AbstractTestITBase {
 	public void testRead() {
 		
 		String sourceEntityCode = "A0001";
-//		String sourceEntityCode = "Ford";
-//		String sourceEntityCodeNamespace = "Automobiles";
 		ScopedEntityName mapFromName = new ScopedEntityName();
 		mapFromName.setName(sourceEntityCode);
-//		mapFromName.setNamespace(sourceEntityCodeNamespace);
 
 		String mapCodingSchemeURI = "urn:oid:mapping:sample";
-//		String mapRepresentsVersion = "1.0";
 		NameOrURI mapVersion = ModelUtils.nameOrUriFromUri(mapCodingSchemeURI);
 		MapEntryReadId identifier = new MapEntryReadId(mapFromName, mapVersion);
 		
@@ -88,16 +86,47 @@ public class LexEvsMapEntryReadServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
-	public void testReadNotFound() {
+	@LoadContents(
+			{
+				@LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml"),
+				@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
+				@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
+			}
+	)
+	public void testExistsFound() {
+		String sourceEntityCode = "Ford";
+		ScopedEntityName mapFromName = new ScopedEntityName();
+		mapFromName.setName(sourceEntityCode);
+
+		String mapCodingSchemeURI = "urn:oid:mapping:sample";
+		NameOrURI mapVersion = ModelUtils.nameOrUriFromUri(mapCodingSchemeURI);
+		MapEntryReadId identifier = new MapEntryReadId(mapFromName, mapVersion);
 		
+		ResolvedReadContext readContext = null;
+		
+		assertTrue(this.service.exists(identifier, readContext));		
 	}
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
-	public void testReadManyFound() {
-		// Won't be possible given a single loaded mapping - consider fake data? LexEVS may surface exception/error for case
-		//   when a mapping is restricted to a entitycode, search is for source only and multiple mappings exist for source entity.
+	@LoadContents(
+			{
+				@LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml"),
+				@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
+				@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
+			}
+	)
+	public void testExistsNotFound() {
+		String sourceEntityCode = "Fjord";
+		ScopedEntityName mapFromName = new ScopedEntityName();
+		mapFromName.setName(sourceEntityCode);
+
+		String mapCodingSchemeURI = "urn:oid:mapping:sample";
+		NameOrURI mapVersion = ModelUtils.nameOrUriFromUri(mapCodingSchemeURI);
+		MapEntryReadId identifier = new MapEntryReadId(mapFromName, mapVersion);
+		
+		ResolvedReadContext readContext = null;
+		
+		assertFalse(this.service.exists(identifier, readContext));				
 	}
-	
+
 }
