@@ -208,7 +208,11 @@
 			<artifactId>lexbig-impl</artifactId>
 			<version>${lexevs.version}</version>
 		</dependency>
-
+        <dependency>
+			<groupId>lexevs</groupId>
+			<artifactId>lexgrid-converter</artifactId>
+			<version>${lexevs.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>lexevs</groupId>
 			<artifactId>lexbig-interfaces</artifactId>
@@ -260,6 +264,8 @@
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
+		
+		
 
 		<dependency>
 			<groupId>org.codehaus.castor</groupId>

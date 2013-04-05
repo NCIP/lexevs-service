@@ -18,22 +18,28 @@
  */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.resolvedvalueset;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.types.ProcessState;
 import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Extensions.Load.OBO_Loader;
+import org.LexGrid.LexBIG.Extensions.Load.ResolvedValueSetDefinitionLoader;
 import org.LexGrid.LexBIG.Impl.loaders.LexGridMultiLoaderImpl;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGServiceManager;
 import org.LexGrid.LexBIG.Utility.LBConstants;
+import org.LexGrid.codingSchemes.CodingScheme;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.lexgrid.resolvedvalueset.LexEVSResolvedValueSetService;
+import org.lexgrid.resolvedvalueset.impl.LexEVSResolvedValueSetServiceImpl;
 import org.lexgrid.valuesets.LexEVSPickListDefinitionServices;
 import org.lexgrid.valuesets.LexEVSValueSetDefinitionServices;
 import org.lexgrid.valuesets.impl.LexEVSValueSetDefinitionServicesImpl;
@@ -51,21 +57,31 @@ public class LoadTestDataTest extends AbstractTestITBase {
 	private LexEVSValueSetDefinitionServices vds_;
 	private LexEVSPickListDefinitionServices pls_;
 	
-//	public LoadTestDataTest(String serverName) {
-//		super(serverName);
-//	}
+	@BeforeClass
+    public static void oneTimeSetUp() throws Exception {
+        // one-time initialization code   
+    	System.out.println("@BeforeClass - oneTimeSetUp");
+    	
+    }
+	
+	
+	@Before
+    public void setUp() throws Exception {
+		testLoadValueSetDef();
+		System.out.println("@Before - setUp");
+    }
     @Test
 	public void testLoadAutombilesV1() throws Exception {
-	    loadXML("resources/lexevs/test-content/valueset/Automobiles.xml", "devel");
+	    loadXML("src/test/resources/lexevs/test-content/valueset/Automobiles.xml", "devel");
 	}
     
     @Test	
 	public void testLoadAutombilesV2() throws Exception  {
-	     loadXML("resources/lexevs/test-content/valueset/AutomobilesV2.xml", LBConstants.KnownTags.PRODUCTION.toString());
+	     loadXML("src/test/resources/lexevs/test-content/valueset/AutomobilesV2.xml", LBConstants.KnownTags.PRODUCTION.toString());
 	}
 
 	public void testLoadGermanMadeParts() throws Exception {
-        loadXML("resources/testData/German_Made_Parts.xml", LBConstants.KnownTags.PRODUCTION.toString());
+        loadXML("src/test/resources/testData/German_Made_Parts.xml", LBConstants.KnownTags.PRODUCTION.toString());
     }
 	
 	private void loadXML(String fileName, String tag) throws Exception {
@@ -80,7 +96,7 @@ public class LoadTestDataTest extends AbstractTestITBase {
         while (loader.getStatus().getEndTime() == null) {
             Thread.sleep(2000);
         }
-        assertEquals(loader.getStatus().getEndTime(),  null);
+
         assertTrue(loader.getStatus().getState().equals(ProcessState.COMPLETED));
         assertFalse(loader.getStatus().getErrorsLogged().booleanValue());
         
@@ -96,7 +112,7 @@ public class LoadTestDataTest extends AbstractTestITBase {
 		OBO_Loader loader = (OBO_Loader) lbsm.getLoader("OBOLoader");
 
 		loader.load(new File(
-				"resources/testData/fungal_anatomy.obo").toURI(),
+				"src/test/resources/testData/fungal_anatomy.obo").toURI(),
 				null, true, true);
 
 		while (loader.getStatus().getEndTime() == null) {
@@ -136,21 +152,46 @@ public class LoadTestDataTest extends AbstractTestITBase {
 	
 	
 	@Test
-	public void testLoadValueSetDef() throws Exception {
-		getValueSetDefService().loadValueSetDefinition("resources/lexevs/test-content/valueset/vdTestData.xml", true);
+	public  void testLoadValueSetDef() throws Exception {
+		getValueSetDefService().loadValueSetDefinition("src/test/resources/lexevs/test-content/valueset/vdTestData.xml", true);
 	}
 
-	private LexEVSValueSetDefinitionServices getValueSetDefService(){
-		if (vds_ == null) {
-			vds_ = LexEVSValueSetDefinitionServicesImpl.defaultInstance();
+	
+	
+	@Test
+	public void testLoadValueSetDefinition() throws Exception {
+				
+		LexBIGServiceManager lbsm = getLexBIGService().getServiceManager(null);
+
+		ResolvedValueSetDefinitionLoader loader = (ResolvedValueSetDefinitionLoader) lbsm.getLoader("ResolvedValueSetDefinitionLoader");
+		loader.load(new URI("SRITEST:AUTO:AllDomesticButGM"), null, null, null);
+
+		while (loader.getStatus().getEndTime() == null) {
+			Thread.sleep(2000);
 		}
-		return vds_;
+		assertTrue(loader.getStatus().getState().equals(ProcessState.COMPLETED));
+		assertFalse(loader.getStatus().getErrorsLogged().booleanValue());
+
+		lbsm.activateCodingSchemeVersion(loader.getCodingSchemeReferences()[0]);
+
+	}
+
+	@Test
+	public void testListAllResolvedValueSets() throws Exception {
+		LexEVSResolvedValueSetService service= new LexEVSResolvedValueSetServiceImpl();
+		List<CodingScheme> list= service.listAllResolvedValueSets();		
+        assertTrue(list.size() > 0 );
+	}
+
+	private static LexEVSValueSetDefinitionServices getValueSetDefService(){
+		return LexEVSValueSetDefinitionServicesImpl.defaultInstance();
+		
 	}
 	
 	private LexBIGService getLexBIGService() throws Exception  {
 		LocalClasspathLexBigServiceFactory factory= new LocalClasspathLexBigServiceFactory();
 		return factory.getObject();
-		//return LexBIGServiceImpl.defaultInstance();
+		
 	}
 
 }
