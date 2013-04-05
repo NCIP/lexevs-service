@@ -37,6 +37,7 @@ import edu.mayo.cts2.framework.model.mapversion.MapVersionDirectoryEntry;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.FakeLexEvsData.DataField;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.FakeLexEvsSystem;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.MappingExtensionImpl;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.profile.mapversion.MapVersionQuery;
 
@@ -49,6 +50,7 @@ import edu.mayo.cts2.framework.service.profile.mapversion.MapVersionQuery;
 public class LexEvsMapVersionQueryServiceTest {
 	// Setup mocked environment
 	// -------------------------
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public LexEvsMapVersionQueryService createService(
 			FakeLexEvsSystem<MapVersion, MapVersionDirectoryEntry, MapVersionQuery, LexEvsMapVersionQueryService> fakeLexEvs, 
 			boolean withData) throws Exception{
@@ -69,10 +71,6 @@ public class LexEvsMapVersionQueryServiceTest {
 	
 	final static String CODE_SYSTEM_NAME = null;
 	
-//	QueryService<MapVersion, 
-//	MapVersionDirectoryEntry, 
-//	MapVersionQuery>, Cts2Profile {
-
 	// =============
 	// Test methods
 	// =============
