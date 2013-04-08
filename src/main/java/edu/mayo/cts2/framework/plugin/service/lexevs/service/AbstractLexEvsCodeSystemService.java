@@ -23,6 +23,8 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service;
 
+import javax.annotation.Resource;
+
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Utility.Constructors;
@@ -31,6 +33,8 @@ import org.apache.commons.lang.StringUtils;
 
 import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
+import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriResolver;
+import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriResolver.IdType;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 
 /**
@@ -39,6 +43,9 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
 public abstract class AbstractLexEvsCodeSystemService<T> extends AbstractLexEvsService {
+	
+	@Resource
+	private UriResolver uriResolver;
 	
 	protected abstract T transform(CodingScheme codingScheme);
 	
@@ -60,13 +67,30 @@ public abstract class AbstractLexEvsCodeSystemService<T> extends AbstractLexEvsS
 	 */
 	protected T getByVersionIdOrTag(
 			NameOrURI codeSystem, CodingSchemeVersionOrTag versionIdOrTag){
-		String nameOrUri;
+		CodingScheme codingScheme;
 		if(codeSystem.getName() != null){
-			nameOrUri = codeSystem.getName();
+			codingScheme = this.resolve(codeSystem.getName(), versionIdOrTag);
 		} else {
-			nameOrUri = codeSystem.getUri();
+			String uri = codeSystem.getUri();
+			
+			CodingScheme uriScheme = this.resolve(codeSystem.getUri(), versionIdOrTag);
+			
+			if(uriScheme == null){
+				String officialName = this.uriResolver.idToName(uri, IdType.CODE_SYSTEM);
+				uriScheme = this.resolve(officialName, versionIdOrTag);
+			}
+			
+			codingScheme = uriScheme;
 		}
 		
+		if(codingScheme != null){
+			return this.transform(codingScheme);
+		} else {
+			return null;
+		}
+	}
+	
+	protected CodingScheme resolve(String nameOrUri, CodingSchemeVersionOrTag versionIdOrTag){
 		CodingScheme codingScheme;
 		try {
 			codingScheme = this.getLexBigService().resolveCodingScheme(nameOrUri, versionIdOrTag);
@@ -76,6 +100,6 @@ public abstract class AbstractLexEvsCodeSystemService<T> extends AbstractLexEvsS
 			return null;
 		}
 		
-		return this.transform(codingScheme);
+		return codingScheme;
 	}
 }

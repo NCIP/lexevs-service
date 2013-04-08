@@ -23,12 +23,12 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.uri;
 
+import javax.annotation.Resource;
+
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedCodedNodeReference;
 import org.LexGrid.codingSchemes.CodingScheme;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriResolver.IdType;
@@ -39,21 +39,11 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriResolver.IdType;
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
 @Component
-public class RestUriResolverUriHandler implements DelegateUriHandler, InitializingBean {
+public class RestUriResolverUriHandler implements DelegateUriHandler {
 
+	@Resource
 	private UriResolver uriResolver;
 
-	@Value("${uriResolutionServiceUrl}")
-	private String uriResolutionServiceUrl;
-	  
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
-	 */
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		this.uriResolver = new RestUriResolver(this.uriResolutionServiceUrl);
-	}
-	
 	/* 
 	 * This constructs an Entity URI based on the SupportedNamespace
 	 * of LexEVS.
