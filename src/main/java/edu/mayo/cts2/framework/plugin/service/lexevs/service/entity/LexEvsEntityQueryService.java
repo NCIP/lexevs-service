@@ -168,28 +168,28 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 	
 	// Methods we still need to implement?
 	@Override
-	public EntityNameOrURIList intersectEntityList(
-			Set<EntityNameOrURI> entities,
-			EntityDescriptionQuery restrictions, 
-			ResolvedReadContext readContext) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public boolean isEntityInSet(EntityNameOrURI arg0,
 			EntityDescriptionQuery arg1, ResolvedReadContext arg2) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
+	// Not going to implement following methods
+	// ----------------------------------------
 	@Override
 	public EntityReferenceList resolveAsEntityReferenceList(
 			EntityDescriptionQuery arg0, ResolvedReadContext arg1) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	
+	@Override
+	public EntityNameOrURIList intersectEntityList(
+			Set<EntityNameOrURI> entities,
+			EntityDescriptionQuery restrictions, 
+			ResolvedReadContext readContext) {
+		throw new UnsupportedOperationException();
+	}
+
 	// Methods returning empty lists or sets
 	// -------------------------------------
 	@Override

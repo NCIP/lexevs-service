@@ -154,12 +154,12 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		return new HashSet<PropertyReference>(Arrays.asList(name,about,description));
 	}
 
-	// Methods we still need to implement?
+	// Not going to implement following methods
+	// -----------------------------------------
 	@Override
 	public DirectoryResult<EntityDirectoryEntry> mapVersionEntities(
 			NameOrURI mapVersion, MapRole mapRole, MapStatus mapStatus,
 			EntityDescriptionQuery query, SortCriteria sort, Page page) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -167,7 +167,6 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	public DirectoryResult<EntityDescription> mapVersionEntityList(
 			NameOrURI mapVersion, MapRole mapRole, MapStatus mapStatus,
 			EntityDescriptionQuery query, SortCriteria sort, Page page) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -175,7 +174,6 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	public EntityReferenceList mapVersionEntityReferences(NameOrURI mapVersion,
 			MapRole mapRole, MapStatus mapStatus, EntityDescriptionQuery query,
 			SortCriteria sort, Page page) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

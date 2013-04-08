@@ -109,27 +109,24 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 		return Arrays.asList(Constants.CURRENT_TAG);
 	}	
 
-	// Methods we still need to implement?
+	// Not going to implement following methods
+	// ----------------------------------------
 	@Override
 	public DirectoryResult<EntityListEntry> readEntityDescriptions(
 			EntityNameOrURI entityId, SortCriteria sortCriteria,
 			ResolvedReadContext readContext, Page page) {
-		
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException();
 	}
-
+	
 	@Override
 	public EntityReference availableDescriptions(EntityNameOrURI entityId,
 			ResolvedReadContext readContext) {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public EntityList readEntityDescriptions(EntityNameOrURI entityId,
 			ResolvedReadContext readContext) {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException();
 	}
 
