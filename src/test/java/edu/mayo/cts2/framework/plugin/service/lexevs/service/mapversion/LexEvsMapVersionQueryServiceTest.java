@@ -34,7 +34,7 @@ import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.mapversion.MapVersion;
 import edu.mayo.cts2.framework.model.mapversion.MapVersionDirectoryEntry;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.FakeLexEvsData.DataField;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.FakeLexEvsSystem;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.MappingExtensionImpl;
@@ -62,8 +62,8 @@ public class LexEvsMapVersionQueryServiceTest {
 		service.setLexBigService(lexBigService);
 
 		// Overwrite objects in service object 
-		service.setCodeSystemVersionNameConverter(new CodeSystemVersionNameConverter());
-		service.setCodingSchemeToMapVersionTransform(new CodingSchemeToMapVersionTransform(new CodeSystemVersionNameConverter()));
+		service.setCodeSystemVersionNameConverter(new VersionNameConverter());
+		service.setCodingSchemeToMapVersionTransform(new CodingSchemeToMapVersionTransform(new VersionNameConverter()));
 		service.setMappingExtension(new MappingExtensionImpl(fakeLexEvs));
 		
 		return service;

@@ -21,27 +21,37 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion;
+package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
 
-import org.LexGrid.codingSchemes.CodingScheme;
-import org.easymock.EasyMock;
-import org.junit.Test;
-
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
-import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
-
-public class CodingSchemeToCodeSystemTransformTest {
-
-	@Test
-	public void testTransformWithEmpty(){
-		CodingSchemeToCodeSystemTransform transform = 
-				new CodingSchemeToCodeSystemTransform(new VersionNameConverter());
-		
-		UriHandler uriHandler = EasyMock.createNiceMock(UriHandler.class);
-		EasyMock.replay(uriHandler);
-		
-		transform.setUriHandler(uriHandler);
-		
-		transform.transformDescription(new CodingScheme());
+/**
+ * A simple tuple.
+ *
+ * @param <T> the tuple type
+ * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
+ */
+public class Tuple<T> {
+	
+	private T one;
+	private T two;
+	
+	/**
+	 * Instantiates a new tuple.
+	 *
+	 * @param one the one
+	 * @param two the two
+	 */
+	public Tuple(T one, T two) {
+		super();
+		this.one = one;
+		this.two = two;
 	}
+	
+	public T getOne() {
+		return one;
+	}
+	
+	public T getTwo() {
+		return two;
+	}
+	
 }

@@ -53,7 +53,7 @@ import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.service.mapversion.types.MapRole;
 import edu.mayo.cts2.framework.model.service.mapversion.types.MapStatus;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonPageUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceSummaryUtils;
@@ -74,7 +74,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		implements MapVersionQueryService, InitializingBean {
 
 	@Resource
-	private CodeSystemVersionNameConverter nameConverter;
+	private VersionNameConverter nameConverter;
 	
 	@Resource
 	private CodingSchemeToMapVersionTransform codingSchemeToMapVersionTransform;
@@ -84,7 +84,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	public static final String MAPPING_EXTENSION = "MappingExtension";	
 	
 	// ------ Local methods ----------------------
-	public void setCodeSystemVersionNameConverter(CodeSystemVersionNameConverter converter){
+	public void setCodeSystemVersionNameConverter(VersionNameConverter converter){
 		this.nameConverter = converter;
 	}
 	

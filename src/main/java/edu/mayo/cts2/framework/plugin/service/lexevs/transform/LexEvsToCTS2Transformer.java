@@ -21,7 +21,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
+package edu.mayo.cts2.framework.plugin.service.lexevs.transform;
 
 
 
@@ -30,37 +30,13 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
  *
  */
 public interface LexEvsToCTS2Transformer <DescriptionDataType, DescriptionDataIN, DirectoryEntryDataType, DirectoryEntryDataIN> {
+	
 	// ResourceList
 	// Description
-	/*
-	public CodeSystemVersionCatalogEntry transform(CodingScheme codingScheme);
-	public MapCatalogEntry transformToMapCatalogEntry(CodingScheme codingScheme);
-	public MapVersion transform(CodingScheme codingScheme);
-	
-	public MapEntry transformToMapEntry(ResolvedConceptReference resolvedConceptReference);
-	public EntityDescription transformToEntity(ResolvedConceptReference reference);
-*/
-	
-//	public Description transformDescription(CodingScheme codingScheme);
-//	public Description transformDescription(ResolvedConceptReference conceptReference);
-
 	public DescriptionDataType transformDescription(DescriptionDataIN data);
 
 	
 	// ResourceSummaries
 	// DirectoryEntry
-	/*
-	public CodeSystemVersionCatalogEntrySummary transform(CodingSchemeRendering codingSchemeRendering);
-	public MapVersionDirectoryEntry transform(CodingSchemeRendering codingSchemeRendering);
-	
-	public EntityDirectoryEntry transformToEntry(ResolvedConceptReference reference);
-	public MapEntryDirectoryEntry transform(ResolvedConceptReference resolvedConceptReference);
-	
-	public MapCatalogEntrySummary transformToMapCatalogEntrySummary(CodingScheme codingScheme);
-	*/
-	
-//	public DirectoryEntry transformDirectoryEntry(CodingSchemeRendering codingSchemeRendering);
-//	public DirectoryEntry transformDirectoryEntry(ResolvedConceptReference reference);
-//	public DirectoryEntry transformDirectoryEntry(CodingScheme codingScheme);
 	public DirectoryEntryDataType transformDirectoryEntry(DirectoryEntryDataIN data);
 }

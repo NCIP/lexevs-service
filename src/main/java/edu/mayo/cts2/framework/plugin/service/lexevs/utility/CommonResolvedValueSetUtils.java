@@ -16,7 +16,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.service.command.restriction.ResolvedValueSetQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.profile.resolvedvalueset.ResolvedValueSetQuery;
@@ -24,7 +24,7 @@ import edu.mayo.cts2.framework.service.profile.resolvedvalueset.ResolvedValueSet
 public class CommonResolvedValueSetUtils {
 
 	@Resource
-	private CodeSystemVersionNameConverter nameConverter;
+	private VersionNameConverter nameConverter;
 
 
 	public  List<CodingScheme> restrictByQuery(List<CodingScheme> csList,
@@ -73,7 +73,7 @@ public class CommonResolvedValueSetUtils {
 			AbsoluteCodingSchemeVersionReference ref = null;
 			if (StringUtils.isNotBlank(nameURI.getName())) {
 				nameVersion = nameConverter
-						.fromCts2CodeSystemVersionName(nameURI.getName());
+						.fromCts2VersionName(nameURI.getName());
 				CodingSchemeVersionOrTag versionTag = Constructors
 						.createCodingSchemeVersionOrTagFromVersion(nameVersion
 								.getVersion());
@@ -90,12 +90,12 @@ public class CommonResolvedValueSetUtils {
 		return list;
 	}
 
-	public CodeSystemVersionNameConverter getCodeSystemVersionNameConverter() {
+	public VersionNameConverter getCodeSystemVersionNameConverter() {
 		return nameConverter;
 	}
 
 	public void setCodeSystemVersionNameConverter(
-			CodeSystemVersionNameConverter converter) {
+			VersionNameConverter converter) {
 		this.nameConverter = converter;
 	}
 
@@ -109,7 +109,7 @@ public class CommonResolvedValueSetUtils {
 	
 	private String getName(String name, String version){
 		return this.nameConverter.
-				toCts2CodeSystemVersionName(name, version);
+				toCts2VersionName(name, version);
 	}	
 
 }

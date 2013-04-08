@@ -20,7 +20,8 @@ import org.LexGrid.codingSchemes.CodingScheme;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.transform.LexEvsToCTS2Transformer;
 import edu.mayo.cts2.framework.service.profile.ResourceQuery;
 
 public class CommonResourceSummaryUtils{
@@ -140,7 +141,7 @@ public class CommonResourceSummaryUtils{
 	// --------------------------------------------
 	public static <Query extends ResourceQuery> CodingSchemeRendering[] getCodingSchemeRendering(
 			LexBIGService lexBigService, 
-			CodeSystemVersionNameConverter nameConverter, 
+			VersionNameConverter nameConverter, 
 			Query query, 
 			MappingExtension mappingExtension,
 			SortCriteria sortCriteria){
@@ -184,7 +185,7 @@ public class CommonResourceSummaryUtils{
 	
 	public static <T extends ResourceQuery> CodingSchemeRenderingList getCodingSchemeRenderingList(
 			LexBIGService lexBigService, 
-			CodeSystemVersionNameConverter nameConverter,
+			VersionNameConverter nameConverter,
 			MappingExtension mappingExtension,
 			QueryData<T> queryData,
 			SortCriteria sortCriteria) {
@@ -212,7 +213,7 @@ public class CommonResourceSummaryUtils{
 
 	public static <T extends ResourceQuery> List<CodingScheme> getCodingSchemeList(
 			LexBIGService lexBigService, 
-			CodeSystemVersionNameConverter nameConverter,
+			VersionNameConverter nameConverter,
 			MappingExtension mappingExtension,
 			QueryData<T> queryData,
 			SortCriteria sortCriteria) {

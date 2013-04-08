@@ -45,7 +45,7 @@ import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.map.MapCatalogEntry;
 import edu.mayo.cts2.framework.model.map.MapCatalogEntrySummary;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonPageUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceSummaryUtils;
@@ -67,7 +67,7 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 	CodingSchemeToMapTransform transformer;
 	
 	@Resource
-	private CodeSystemVersionNameConverter nameConverter;
+	private VersionNameConverter nameConverter;
 	
 	private MappingExtension mappingExtension;
 	
@@ -79,7 +79,7 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		this.transformer = codingSchemeToMapTransform;
 	}
 
-	public void setCodeSystemVersionNameConverter(CodeSystemVersionNameConverter converter){
+	public void setCodeSystemVersionNameConverter(VersionNameConverter converter){
 		this.nameConverter = converter;
 	}
 

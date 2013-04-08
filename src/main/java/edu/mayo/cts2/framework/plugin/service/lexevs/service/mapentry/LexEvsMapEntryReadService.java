@@ -43,7 +43,7 @@ import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.mapversion.MapEntry;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryReadService;
@@ -58,7 +58,7 @@ import edu.mayo.cts2.framework.service.profile.mapentry.name.MapEntryReadId;
 public class LexEvsMapEntryReadService extends AbstractLexEvsService implements MapEntryReadService, InitializingBean {
 
 	@Resource
-	private CodeSystemVersionNameConverter nameConverter;
+	private VersionNameConverter nameConverter;
 	
 	@Resource
 	private MappingToMapEntryTransform mappingToMapEntryTransform;
