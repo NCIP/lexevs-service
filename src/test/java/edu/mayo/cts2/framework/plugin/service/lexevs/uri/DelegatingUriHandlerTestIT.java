@@ -18,7 +18,7 @@ public class DelegatingUriHandlerTestIT extends AbstractTestITBase {
 	
 	@Test
 	public void testSetUp(){
-		assertTrue(CollectionUtils.isEmpty(this.uriHandler.getDelegateUriHandlers()));
+		assertTrue(CollectionUtils.isNotEmpty(this.uriHandler.getDelegateUriHandlers()));
 	}
 	
 	@Test

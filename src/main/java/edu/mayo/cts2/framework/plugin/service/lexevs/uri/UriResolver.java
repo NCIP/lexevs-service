@@ -28,7 +28,7 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.uri;
  *
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
-interface UriResolver {
+public interface UriResolver {
 
 	/**
 	 * The Enum IdType.

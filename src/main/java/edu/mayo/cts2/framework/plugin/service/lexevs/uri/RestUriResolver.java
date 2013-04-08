@@ -23,6 +23,9 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.uri;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import clojure.lang.RT;
 import clojure.lang.Var;
 
@@ -31,8 +34,10 @@ import clojure.lang.Var;
  *
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
+@Component
 public class RestUriResolver implements UriResolver {
 
+	@Value("${uriResolutionServiceUrl}")
 	private String uriResolutionServiceUrl;
 	
 	Var getUri;
@@ -55,13 +60,17 @@ public class RestUriResolver implements UriResolver {
 			throw new RuntimeException("Error starting Clojure.", e);
 		}
 	}
+	
+	public RestUriResolver(){
+		super();
+	}
 
 	/**
 	 * Instantiates a new rest uri resolver.
 	 *
 	 * @param uriResolutionServiceUrl the uri resolution service url
 	 */
-	protected RestUriResolver(String uriResolutionServiceUrl){
+	public RestUriResolver(String uriResolutionServiceUrl){
 		super();
 		this.uriResolutionServiceUrl = uriResolutionServiceUrl;
 	}

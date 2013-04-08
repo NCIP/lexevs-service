@@ -26,13 +26,23 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Resource;
+
+import org.LexGrid.LexBIG.DataModel.Collections.AssociationList;
+import org.LexGrid.LexBIG.DataModel.Core.Association;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
+import org.LexGrid.LexBIG.Exceptions.LBException;
+import org.LexGrid.LexBIG.Extensions.Generic.LexBIGServiceConvenienceMethods;
+import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.concepts.Entity;
 import org.LexGrid.concepts.Presentation;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import edu.mayo.cts2.framework.model.core.DescriptionInCodeSystem;
+import edu.mayo.cts2.framework.model.core.URIAndEntityName;
 import edu.mayo.cts2.framework.model.entity.Designation;
 import edu.mayo.cts2.framework.model.entity.EntityDescription;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
@@ -45,7 +55,20 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.transform.AbstractBaseTrans
  * CTS2 <-> LexEVS Transform dealing with Entities and EntityDescriptions. 
  */
 @Component
-public class EntityTransform extends AbstractBaseTransform<EntityDescription, ResolvedConceptReference, EntityDirectoryEntry, ResolvedConceptReference> {
+public class EntityTransform 
+	extends AbstractBaseTransform<EntityDescription, ResolvedConceptReference, EntityDirectoryEntry, ResolvedConceptReference> 
+	implements InitializingBean {
+
+	@Resource
+	private LexBIGService lexBigService;
+	
+	private LexBIGServiceConvenienceMethods lbscm;
+	
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.lbscm = (LexBIGServiceConvenienceMethods) 
+				this.lexBigService.getGenericExtension("LexBIGServiceConvenienceMethods");
+	}
 
 	@Override
 	public EntityDescription transformDescription(ResolvedConceptReference reference) {
@@ -68,6 +91,8 @@ public class EntityTransform extends AbstractBaseTransform<EntityDescription, Re
 				reference.getCodingSchemeVersion()));
 		
 		namedEntity.setDesignation(this.toDesignation(entity.getPresentation()));
+		
+		namedEntity.setParent(this.getParents(reference));
 		
 		EntityDescription ed = new EntityDescription();
 		ed.setNamedEntity(namedEntity);
@@ -112,6 +137,39 @@ public class EntityTransform extends AbstractBaseTransform<EntityDescription, Re
 				ModelUtils.toTsAnyType(presentation.getValue().getContent()));
 			
 			designation.setDesignationRole(role);
+		}
+		
+		return returnList;
+	}
+	
+	protected List<URIAndEntityName> getParents(ResolvedConceptReference ref){
+		List<URIAndEntityName> returnList = new ArrayList<URIAndEntityName>();
+		
+		AssociationList assocs;
+		try {
+			assocs = this.lbscm.getHierarchyLevelPrev(
+					ref.getCodingSchemeURI(), 
+					Constructors.createCodingSchemeVersionOrTagFromVersion(
+							ref.getCodingSchemeVersion()), 
+					null, 
+					ref.getCode(), 
+					false, 
+					null);
+		} catch (LBException e) {
+			return null;
+		}
+		
+		for(Association association : assocs.getAssociation()){
+			for(ResolvedConceptReference parent : 
+				association.getAssociatedConcepts().getAssociatedConcept()){
+				
+				URIAndEntityName parentName = new URIAndEntityName();
+				parentName.setName(parent.getCode());
+				parentName.setNamespace(parent.getCodeNamespace());
+				parentName.setUri(this.getUriHandler().getEntityUri(parent));
+				
+				returnList.add(parentName);
+			}
 		}
 		
 		return returnList;
