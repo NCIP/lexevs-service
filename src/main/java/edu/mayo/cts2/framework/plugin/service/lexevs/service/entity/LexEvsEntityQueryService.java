@@ -179,7 +179,7 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 	@Override
 	public EntityReferenceList resolveAsEntityReferenceList(
 			EntityDescriptionQuery arg0, ResolvedReadContext arg1) {
-		return null;
+		throw new UnsupportedOperationException();
 	}
 	
 	@Override
