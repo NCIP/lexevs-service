@@ -23,29 +23,29 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.concepts.Entity;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.LexGrid.concepts.Presentation;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import edu.mayo.cts2.framework.model.core.DescriptionInCodeSystem;
+import edu.mayo.cts2.framework.model.entity.Designation;
 import edu.mayo.cts2.framework.model.entity.EntityDescription;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.entity.NamedEntityDescription;
+import edu.mayo.cts2.framework.model.entity.types.DesignationRole;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.transform.LexEvsToCTS2Transformer;
-import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
+import edu.mayo.cts2.framework.plugin.service.lexevs.transform.AbstractBaseTransform;
 
 /**
- * 
  * CTS2 <-> LexEVS Transform dealing with Entities and EntityDescriptions. 
- *
  */
 @Component
-public class EntityTransform implements LexEvsToCTS2Transformer <EntityDescription, ResolvedConceptReference, EntityDirectoryEntry, ResolvedConceptReference> {
-
-	@Autowired
-	private UriHandler uriHandler;
+public class EntityTransform extends AbstractBaseTransform<EntityDescription, ResolvedConceptReference, EntityDirectoryEntry, ResolvedConceptReference> {
 
 	@Override
 	public EntityDescription transformDescription(ResolvedConceptReference reference) {
@@ -55,12 +55,19 @@ public class EntityTransform implements LexEvsToCTS2Transformer <EntityDescripti
 		Entity entity = reference.getEntity();
 		
 		NamedEntityDescription namedEntity = new NamedEntityDescription();
-		namedEntity.setAbout(this.uriHandler.getEntityUri(reference));
+		namedEntity.setAbout(this.getUriHandler().getEntityUri(reference));
 		
 		namedEntity.setEntityID(
 				ModelUtils.createScopedEntityName(
 						entity.getEntityCode(), 
 						entity.getEntityCodeNamespace()));
+		
+		namedEntity.setDescribingCodeSystemVersion(
+			this.getTransformUtils().toCodeSystemVersionReference(
+				reference.getCodingSchemeName(), 
+				reference.getCodingSchemeVersion()));
+		
+		namedEntity.setDesignation(this.toDesignation(entity.getPresentation()));
 		
 		EntityDescription ed = new EntityDescription();
 		ed.setNamedEntity(namedEntity);
@@ -71,9 +78,43 @@ public class EntityTransform implements LexEvsToCTS2Transformer <EntityDescripti
 	@Override
 	public EntityDirectoryEntry transformDirectoryEntry(ResolvedConceptReference reference) {
 		EntityDirectoryEntry entry = new EntityDirectoryEntry();
-		entry.setAbout(this.uriHandler.getEntityUri(reference));
+		entry.setAbout(this.getUriHandler().getEntityUri(reference));
+		
+		DescriptionInCodeSystem description = new DescriptionInCodeSystem();
+		description.setDescribingCodeSystemVersion(
+			this.getTransformUtils().toCodeSystemVersionReference(
+				reference.getCodingSchemeName(), 
+				reference.getCodingSchemeVersion()));
+		
+		if(reference.getEntityDescription() != null){
+			description.setDesignation(reference.getEntityDescription().getContent());
+		}
+		
+		entry.addKnownEntityDescription(description);
 		
 		return entry;
+	}
+	
+	protected List<Designation> toDesignation(Presentation... presentations){
+		List<Designation> returnList = new ArrayList<Designation>();
+		
+		for(Presentation presentation : presentations){
+			Designation designation = new Designation();
+			
+			DesignationRole role;
+			if(presentation.isIsPreferred()){
+				role = DesignationRole.PREFERRED;
+			} else {
+				role = DesignationRole.ALTERNATIVE;
+			}
+			
+			designation.setValue(
+				ModelUtils.toTsAnyType(presentation.getValue().getContent()));
+			
+			designation.setDesignationRole(role);
+		}
+		
+		return returnList;
 	}
 
 }

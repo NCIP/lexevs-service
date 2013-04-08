@@ -42,7 +42,6 @@ import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.entity.EntityDescription;
-import edu.mayo.cts2.framework.model.entity.EntityList;
 import edu.mayo.cts2.framework.model.entity.EntityListEntry;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
@@ -125,7 +124,7 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 	}
 
 	@Override
-	public EntityList readEntityDescriptions(EntityNameOrURI entityId,
+	public List<EntityListEntry> readEntityDescriptions(EntityNameOrURI entityId,
 			ResolvedReadContext readContext) {
 		throw new UnsupportedOperationException();
 	}
