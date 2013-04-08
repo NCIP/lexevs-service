@@ -41,6 +41,7 @@ import edu.mayo.cts2.framework.model.core.SourceAndNotation;
 import edu.mayo.cts2.framework.model.core.StatementTarget;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.LexEvsToCTS2Transformer;
 
 /**
@@ -51,8 +52,12 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.utility.LexEvsToCTS2Transfo
 @Component
 public class CodingSchemeToCodeSystemTransform implements LexEvsToCTS2Transformer<CodeSystemVersionCatalogEntry, CodingScheme, CodeSystemVersionCatalogEntrySummary, CodingSchemeRendering>{
 	//DescriptionDataType, DescriptionDataIN, DirectoryEntryDataType, DirecotoryEntryDataIN> 
+	
 	@Resource
 	private CodeSystemVersionNameConverter codeSystemVersionNameConverter;
+	
+	@Resource
+	private UriHandler uriHandler;
 	
 	public CodingSchemeToCodeSystemTransform(){
 		super();
@@ -64,8 +69,6 @@ public class CodingSchemeToCodeSystemTransform implements LexEvsToCTS2Transforme
 		this.codeSystemVersionNameConverter = codeSystemVersionNameConverter;
 	}
 	
-	
-	
 	/**
 	 * Transform.
 	 *
@@ -76,12 +79,17 @@ public class CodingSchemeToCodeSystemTransform implements LexEvsToCTS2Transforme
 	public CodeSystemVersionCatalogEntry transformDescription(CodingScheme codingScheme){
 		CodeSystemVersionCatalogEntry codeSystemVersion = new CodeSystemVersionCatalogEntry();
 
-		codeSystemVersion.setAbout(codingScheme.getCodingSchemeURI());
+		codeSystemVersion.setAbout(
+				this.uriHandler.getCodeSystemUri(codingScheme)
+		);
 		
 		String name = this.getName(codingScheme);
 		
 		codeSystemVersion.setCodeSystemVersionName(name);
-		codeSystemVersion.setDocumentURI(codingScheme.getCodingSchemeURI());
+		codeSystemVersion.setDocumentURI(
+				this.uriHandler.getCodeSystemVersionUri(codingScheme)
+		);
+		
 		codeSystemVersion.setFormalName(codingScheme.getFormalName());
 		
 		if(codingScheme.getProperties() != null){
@@ -108,7 +116,7 @@ public class CodingSchemeToCodeSystemTransform implements LexEvsToCTS2Transforme
 		
 		CodeSystemReference codeSystemReference = new CodeSystemReference();
 		codeSystemReference.setContent(codingScheme.getCodingSchemeName());
-		codeSystemReference.setUri(codingScheme.getCodingSchemeURI());
+		codeSystemReference.setUri(codeSystemVersion.getAbout());
 		codeSystemVersion.setVersionOf(codeSystemReference);
 		
 		return codeSystemVersion;
@@ -123,12 +131,16 @@ public class CodingSchemeToCodeSystemTransform implements LexEvsToCTS2Transforme
 		String name = this.getName(codingSchemeRendering);
 		
 		summary.setCodeSystemVersionName(name);
-		summary.setDocumentURI(codingSchemeSummary.getCodingSchemeURI());
-		summary.setAbout(codingSchemeSummary.getCodingSchemeURI());
+		summary.setDocumentURI(
+				this.uriHandler.getCodeSystemVersionUri(codingSchemeSummary)
+		);
+		summary.setAbout(
+				this.uriHandler.getCodeSystemUri(codingSchemeSummary)
+		);
 		
 		summary.setFormalName(codingSchemeSummary.getFormalName());
 		
-		if (codingSchemeRendering.getCodingSchemeSummary().getCodingSchemeDescription() != null && 
+		if(codingSchemeRendering.getCodingSchemeSummary().getCodingSchemeDescription() != null && 
 				codingSchemeRendering.getCodingSchemeSummary().getCodingSchemeDescription().getContent() != null) {
 			EntryDescription description = new EntryDescription();
 			description.setValue(ModelUtils.toTsAnyType(
@@ -170,6 +182,14 @@ public class CodingSchemeToCodeSystemTransform implements LexEvsToCTS2Transforme
 	private String getName(String name, String version){
 		return this.codeSystemVersionNameConverter.
 				toCts2CodeSystemVersionName(name, version);
+	}
+
+	public UriHandler getUriHandler() {
+		return uriHandler;
+	}
+
+	public void setUriHandler(UriHandler uriHandler) {
+		this.uriHandler = uriHandler;
 	}
 
 }

@@ -281,7 +281,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 		assertEquals("CodeSystemVersionName not transformed - ","Automobiles-1.0",csvCatalogEntrySummary.getCodeSystemVersionName());
 
 		assertNotNull(csvCatalogEntrySummary.getDocumentURI());
-		assertEquals("DocumentURI not transformed - ","urn:oid:11.11.0.1",csvCatalogEntrySummary.getDocumentURI());		
+		assertEquals("DocumentURI not transformed - ","urn:oid:11.11.0.1/1.0",csvCatalogEntrySummary.getDocumentURI());		
 
 		assertNotNull(csvCatalogEntrySummary.getAbout());
 		assertEquals("About not transformed - ","urn:oid:11.11.0.1",csvCatalogEntrySummary.getAbout());		

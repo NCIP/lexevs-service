@@ -23,6 +23,7 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.uri;
 
+import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedCodedNodeReference;
 import org.LexGrid.codingSchemes.CodingScheme;
 
@@ -49,6 +50,8 @@ public interface UriHandler {
 	 */
 	public String getCodeSystemUri(CodingScheme codingScheme);
 	
+	public String getCodeSystemUri(CodingSchemeSummary codingSchemeSummary);
+
 	/**
 	 * Gets the code system version uri.
 	 *
@@ -57,4 +60,6 @@ public interface UriHandler {
 	 */
 	public String getCodeSystemVersionUri(CodingScheme codingScheme);
 
+	public String getCodeSystemVersionUri(CodingSchemeSummary codingSchemeSummary);
+	
 }

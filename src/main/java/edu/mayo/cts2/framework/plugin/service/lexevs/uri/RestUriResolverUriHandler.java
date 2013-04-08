@@ -23,6 +23,7 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.uri;
 
+import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedCodedNodeReference;
 import org.LexGrid.codingSchemes.CodingScheme;
 import org.apache.commons.lang.StringUtils;
@@ -79,22 +80,47 @@ public class RestUriResolverUriHandler implements DelegateUriHandler, Initializi
 	 */
 	@Override
 	public String getCodeSystemUri(CodingScheme codingScheme) {
+		return this.doGetCodeSystemUri(codingScheme.getCodingSchemeURI());
+
+	}
+	
+	@Override
+	public String getCodeSystemUri(CodingSchemeSummary codingScheme) {
+		return this.doGetCodeSystemUri(codingScheme.getCodingSchemeURI());
+	}
+	
+	protected String doGetCodeSystemUri(String uri) {
 		return this.uriResolver.
 				idToUri(
-					codingScheme.getCodingSchemeURI(), 
+					uri, 
 					IdType.CODE_SYSTEM);
 	}
+	
 
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler#getCodeSystemVersionUri(org.LexGrid.codingSchemes.CodingScheme)
 	 */
 	@Override
 	public String getCodeSystemVersionUri(CodingScheme codingScheme) {
+		return this.doGetCodeSystemVersionUri(
+			codingScheme.getCodingSchemeURI(),
+			codingScheme.getRepresentsVersion());
+	}
+
+	protected String doGetCodeSystemVersionUri(String uri, String version) {
 		return this.uriResolver.
 				idAndVersionToVersionUri(
-					codingScheme.getCodingSchemeURI(), 
-					codingScheme.getRepresentsVersion(),
+					uri, 
+					version,
 					IdType.CODE_SYSTEM);
+	}
+	
+	@Override
+	public String getCodeSystemVersionUri(
+			CodingSchemeSummary codingSchemeSummary) {
+		return this.doGetCodeSystemVersionUri(
+				codingSchemeSummary.getCodingSchemeURI(),
+				codingSchemeSummary.getRepresentsVersion());
 	}
 
 	@Override

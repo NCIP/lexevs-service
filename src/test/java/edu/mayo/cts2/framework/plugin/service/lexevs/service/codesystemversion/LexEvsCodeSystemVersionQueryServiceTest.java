@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.easymock.EasyMock;
 import org.junit.Test;
 
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntry;
@@ -35,6 +36,7 @@ import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.FakeLexEvsData.DataField;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.FakeLexEvsSystem;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
@@ -58,8 +60,16 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 		
 		service.setLexBigService(lexBigService);
 
-		// Overwrite objects in service object 
-		service.setCodingSchemeTransformer(new CodingSchemeToCodeSystemTransform(new CodeSystemVersionNameConverter()));
+		// Overwrite objects in service object
+		CodingSchemeToCodeSystemTransform transform = 
+			new CodingSchemeToCodeSystemTransform(new CodeSystemVersionNameConverter());
+		
+		UriHandler uriHandler = EasyMock.createNiceMock(UriHandler.class);
+		EasyMock.replay(uriHandler);
+		transform.setUriHandler(uriHandler);
+		
+		service.setCodingSchemeTransformer(transform);
+		
 		service.setCodeSystemVersionNameConverter(new CodeSystemVersionNameConverter());
 		
 		return service;
