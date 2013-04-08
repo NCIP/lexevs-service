@@ -25,6 +25,7 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service.mapentry;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import javax.annotation.Resource;
@@ -83,6 +84,55 @@ public class LexEvsMapEntryReadServiceTestIT extends AbstractTestITBase {
 		MapEntry mapEntry = this.service.read(identifier, readContext);
 		assertNotNull(mapEntry);
 				
+	}
+
+	@Test
+	@LoadContents(
+		{
+			@LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml"),
+			@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
+			@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
+		}
+	)
+	public void testReadEntityCodeNotFound() {
+		
+		String sourceEntityCode = "A0001zzz";
+		ScopedEntityName mapFromName = new ScopedEntityName();
+		mapFromName.setName(sourceEntityCode);
+
+		String mapCodingSchemeURI = "urn:oid:mapping:sample";
+		NameOrURI mapVersion = ModelUtils.nameOrUriFromUri(mapCodingSchemeURI);
+		MapEntryReadId identifier = new MapEntryReadId(mapFromName, mapVersion);
+		
+		ResolvedReadContext readContext = null;
+		
+		MapEntry mapEntry = this.service.read(identifier, readContext);
+		assertNull(mapEntry);
+				
+	}
+
+	@Test(expected=RuntimeException.class)
+	@LoadContents(
+		{
+			@LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml"),
+			@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
+			@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
+		}
+	)
+	public void testReadMapVersionNotFound() {
+		
+		String sourceEntityCode = "A0001";
+		ScopedEntityName mapFromName = new ScopedEntityName();
+		mapFromName.setName(sourceEntityCode);
+
+		String mapCodingSchemeURI = "urn:oid:mapping:samplezzz";
+		NameOrURI mapVersion = ModelUtils.nameOrUriFromUri(mapCodingSchemeURI);
+		MapEntryReadId identifier = new MapEntryReadId(mapFromName, mapVersion);
+		
+		ResolvedReadContext readContext = null;
+		
+		@SuppressWarnings("unused")
+		MapEntry mapEntry = this.service.read(identifier, readContext);
 	}
 
 	@Test
