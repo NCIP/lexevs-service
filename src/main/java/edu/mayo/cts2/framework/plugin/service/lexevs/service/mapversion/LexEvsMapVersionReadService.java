@@ -140,6 +140,8 @@ public class LexEvsMapVersionReadService
 		return this.read(identifier, readContext) != null;
 	}
 
+	// Methods returning empty lists or sets
+	// -------------------------------------
 	@Override
 	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
 		return new ArrayList<DocumentedNamespaceReference>();

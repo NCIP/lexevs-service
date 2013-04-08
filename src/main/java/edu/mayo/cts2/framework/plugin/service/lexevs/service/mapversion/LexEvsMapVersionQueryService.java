@@ -154,21 +154,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		return new HashSet<PropertyReference>(Arrays.asList(name,about,description));
 	}
 
-	@Override
-	public Set<? extends PropertyReference> getSupportedSortReferences() {
-		return new HashSet<PropertyReference>();
-	}
-
-	@Override
-	public Set<PredicateReference> getKnownProperties() {
-		return new HashSet<PredicateReference>();
-	}
-
-	@Override
-	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
-		return new ArrayList<DocumentedNamespaceReference>();
-	}
-
+	// Methods we still need to implement?
 	@Override
 	public DirectoryResult<EntityDirectoryEntry> mapVersionEntities(
 			NameOrURI mapVersion, MapRole mapRole, MapStatus mapStatus,
@@ -191,6 +177,23 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 			SortCriteria sort, Page page) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	// Methods returning empty lists or sets
+	// -------------------------------------
+	@Override
+	public Set<? extends PropertyReference> getSupportedSortReferences() {
+		return new HashSet<PropertyReference>();
+	}
+
+	@Override
+	public Set<PredicateReference> getKnownProperties() {
+		return new HashSet<PredicateReference>();
+	}
+
+	@Override
+	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
+		return new ArrayList<DocumentedNamespaceReference>();
 	}
 
 }

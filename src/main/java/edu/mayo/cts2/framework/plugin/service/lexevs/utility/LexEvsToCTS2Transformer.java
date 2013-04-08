@@ -29,7 +29,7 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
  * @author <a href="mailto:hardie.linda@mayo.edu">Linda Hardie</a>
  *
  */
-public interface LexEvsToCTS2Transformer <DescriptionDataType, DescriptionDataIN, DirectoryEntryDataType, DirecotoryEntryDataIN> {
+public interface LexEvsToCTS2Transformer <DescriptionDataType, DescriptionDataIN, DirectoryEntryDataType, DirectoryEntryDataIN> {
 	// ResourceList
 	// Description
 	/*
@@ -62,5 +62,5 @@ public interface LexEvsToCTS2Transformer <DescriptionDataType, DescriptionDataIN
 //	public DirectoryEntry transformDirectoryEntry(CodingSchemeRendering codingSchemeRendering);
 //	public DirectoryEntry transformDirectoryEntry(ResolvedConceptReference reference);
 //	public DirectoryEntry transformDirectoryEntry(CodingScheme codingScheme);
-	public DirectoryEntryDataType transformDirectoryEntry(DirecotoryEntryDataIN data);
+	public DirectoryEntryDataType transformDirectoryEntry(DirectoryEntryDataIN data);
 }

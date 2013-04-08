@@ -97,34 +97,6 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(MAPPING_EXTENSION);
 	}
 	
-	/* (non-Javadoc)
-	 * @see edu.mayo.cts2.framework.service.profile.BaseService#getKnownNamespaceList()
-	 */
-	@Override
-	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
-		return new ArrayList<DocumentedNamespaceReference>();
-	}
-
-	@Override
-	public Set<? extends MatchAlgorithmReference> getSupportedMatchAlgorithms() {
-		return CommonSearchFilterUtils.createSupportedMatchAlgorithms();
-	}
-
-	@Override
-	public Set<? extends PropertyReference> getSupportedSearchReferences() {
-		return CommonSearchFilterUtils.createSupportedSearchReferences();
-	}
-
-	@Override
-	public Set<? extends PropertyReference> getSupportedSortReferences() {
-		return new HashSet<PropertyReference>();
-	}
-
-	@Override
-	public Set<PredicateReference> getKnownProperties() {
-		return new HashSet<PredicateReference>();
-	}
-
 
 	@Override
 	public DirectoryResult<MapCatalogEntrySummary> getResourceSummaries(
@@ -169,4 +141,30 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		return codingSchemeList.size();
 	}
 
+	@Override
+	public Set<? extends PropertyReference> getSupportedSearchReferences() {
+		return CommonSearchFilterUtils.createSupportedSearchReferences();
+	}
+
+	@Override
+	public Set<? extends MatchAlgorithmReference> getSupportedMatchAlgorithms() {
+		return CommonSearchFilterUtils.createSupportedMatchAlgorithms();
+	}
+
+	// Methods returning empty lists or sets
+	// -------------------------------------
+	@Override
+	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
+		return new ArrayList<DocumentedNamespaceReference>();
+	}
+
+	@Override
+	public Set<? extends PropertyReference> getSupportedSortReferences() {
+		return new HashSet<PropertyReference>();
+	}
+
+	@Override
+	public Set<PredicateReference> getKnownProperties() {
+		return new HashSet<PredicateReference>();
+	}
 }
