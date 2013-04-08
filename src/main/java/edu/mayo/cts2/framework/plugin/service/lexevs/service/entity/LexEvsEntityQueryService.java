@@ -103,6 +103,7 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		LexBIGService lexBigService = this.getLexBigService();
 		QueryData<EntityDescriptionQuery> queryData = new QueryData<EntityDescriptionQuery>(query);
 		queryData.setVersionOrTag(nameConverter);
+		
 		CodedNodeSet codedNodeSet;
 		codedNodeSet = CommonResourceSummaryUtils.getCodedNodeSet(lexBigService, queryData, null);
 		

@@ -139,14 +139,13 @@ public class CommonResourceSummaryUtils{
 
 	
 	// --------------------------------------------
-	public static <Query extends ResourceQuery> CodingSchemeRendering[] getCodingSchemeRendering(
+	public static <T extends ResourceQuery> CodingSchemeRendering[] getCodingSchemeRendering(
 			LexBIGService lexBigService, 
 			VersionNameConverter nameConverter, 
-			Query query, 
+			QueryData<T> queryData,
 			MappingExtension mappingExtension,
 			SortCriteria sortCriteria){
 		
-		QueryData<Query> queryData = new QueryData<Query>(query);
 		CodingSchemeRenderingList csrFilteredList;
 		csrFilteredList = CommonResourceSummaryUtils.getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, sortCriteria);
 		CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
