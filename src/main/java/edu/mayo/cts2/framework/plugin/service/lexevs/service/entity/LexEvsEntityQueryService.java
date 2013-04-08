@@ -161,6 +161,38 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 	}
 
 	@Override
+	public Set<VersionTagReference> getSupportedTags() {
+		return new HashSet<VersionTagReference>(Arrays.asList(Constants.CURRENT_TAG));
+	}
+
+	
+	// Methods we still need to implement?
+	@Override
+	public boolean isEntityInSet(EntityNameOrURI arg0,
+			EntityDescriptionQuery arg1, ResolvedReadContext arg2) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	// Not going to implement following methods
+	// ----------------------------------------
+	@Override
+	public EntityReferenceList resolveAsEntityReferenceList(
+			EntityDescriptionQuery arg0, ResolvedReadContext arg1) {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public EntityNameOrURIList intersectEntityList(
+			Set<EntityNameOrURI> entities,
+			EntityDescriptionQuery restrictions, 
+			ResolvedReadContext readContext) {
+		throw new UnsupportedOperationException();
+	}
+
+	// Methods returning empty lists or sets
+	// -------------------------------------
+	@Override
 	public Set<? extends PropertyReference> getSupportedSortReferences() {
 		return new HashSet<PropertyReference>();
 	}
@@ -175,32 +207,6 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		return new ArrayList<DocumentedNamespaceReference>();
 	}
 
-	@Override
-	public EntityNameOrURIList intersectEntityList(
-			Set<EntityNameOrURI> entities,
-			EntityDescriptionQuery restrictions, 
-			ResolvedReadContext readContext) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Set<VersionTagReference> getSupportedTags() {
-		return new HashSet<VersionTagReference>(Arrays.asList(Constants.CURRENT_TAG));
-	}
-
-	@Override
-	public boolean isEntityInSet(EntityNameOrURI arg0,
-			EntityDescriptionQuery arg1, ResolvedReadContext arg2) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public EntityReferenceList resolveAsEntityReferenceList(
-			EntityDescriptionQuery arg0, ResolvedReadContext arg1) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 }
 

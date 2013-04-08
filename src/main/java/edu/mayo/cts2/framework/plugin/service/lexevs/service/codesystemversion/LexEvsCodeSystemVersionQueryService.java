@@ -114,16 +114,6 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 	}
 
 	@Override
-	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
-		return new ArrayList<DocumentedNamespaceReference>();
-	}
-
-	@Override
-	public Set<PredicateReference> getKnownProperties() {
-		return new HashSet<PredicateReference>();
-	}
-
-	@Override
 	public Set<? extends MatchAlgorithmReference> getSupportedMatchAlgorithms() {
 		return CommonSearchFilterUtils.createSupportedMatchAlgorithms();
 	}
@@ -131,6 +121,18 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 	@Override
 	public Set<? extends PropertyReference> getSupportedSearchReferences() {
 		return CommonSearchFilterUtils.createSupportedSearchReferences();
+	}
+
+	// Methods returning empty lists or sets
+	// -------------------------------------
+	@Override
+	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
+		return new ArrayList<DocumentedNamespaceReference>();
+	}
+
+	@Override
+	public Set<PredicateReference> getKnownProperties() {
+		return new HashSet<PredicateReference>();
 	}
 
 	@Override

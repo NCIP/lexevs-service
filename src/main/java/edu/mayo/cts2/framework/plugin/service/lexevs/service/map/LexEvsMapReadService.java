@@ -32,6 +32,7 @@ import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.codingSchemes.CodingScheme;
+import org.springframework.beans.factory.InitializingBean;
 
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.map.MapCatalogEntry;
@@ -51,7 +52,7 @@ import edu.mayo.cts2.framework.service.profile.map.MapReadService;
 */
 public class LexEvsMapReadService 
 	extends AbstractLexEvsCodeSystemService<MapCatalogEntry>
-	implements MapReadService {
+	implements MapReadService, InitializingBean {
 
 	@Resource
 	CodingSchemeToMapTransform transformer;
@@ -60,6 +61,9 @@ public class LexEvsMapReadService
 	private VersionNameConverter nameConverter;
 	
 	private MappingExtension mappingExtension;
+	
+	public static final String MAPPING_EXTENSION = "MappingExtension";	
+
 
 	// ------ Local methods ----------------------
 	public void setCodingSchemeToMapTransform(
@@ -76,6 +80,11 @@ public class LexEvsMapReadService
 	}
 	
 	// -------- Implemented methods ----------------	
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(MAPPING_EXTENSION);
+	}
+	
 	@Override
 	protected MapCatalogEntry transform(CodingScheme codingScheme) {
 		return this.transformer.transformDescription(codingScheme);
@@ -95,6 +104,8 @@ public class LexEvsMapReadService
 		return this.read(identifier, readContext) != null;
 	}
 
+	// Methods returning empty lists or sets
+	// -------------------------------------
 	@Override
 	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
 		return new ArrayList<DocumentedNamespaceReference>();

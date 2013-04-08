@@ -154,6 +154,31 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		return new HashSet<PropertyReference>(Arrays.asList(name,about,description));
 	}
 
+	// Not going to implement following methods
+	// -----------------------------------------
+	@Override
+	public DirectoryResult<EntityDirectoryEntry> mapVersionEntities(
+			NameOrURI mapVersion, MapRole mapRole, MapStatus mapStatus,
+			EntityDescriptionQuery query, SortCriteria sort, Page page) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public DirectoryResult<EntityDescription> mapVersionEntityList(
+			NameOrURI mapVersion, MapRole mapRole, MapStatus mapStatus,
+			EntityDescriptionQuery query, SortCriteria sort, Page page) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public EntityReferenceList mapVersionEntityReferences(NameOrURI mapVersion,
+			MapRole mapRole, MapStatus mapStatus, EntityDescriptionQuery query,
+			SortCriteria sort, Page page) {
+		throw new UnsupportedOperationException();
+	}
+
+	// Methods returning empty lists or sets
+	// -------------------------------------
 	@Override
 	public Set<? extends PropertyReference> getSupportedSortReferences() {
 		return new HashSet<PropertyReference>();
@@ -167,30 +192,6 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	@Override
 	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
 		return new ArrayList<DocumentedNamespaceReference>();
-	}
-
-	@Override
-	public DirectoryResult<EntityDirectoryEntry> mapVersionEntities(
-			NameOrURI mapVersion, MapRole mapRole, MapStatus mapStatus,
-			EntityDescriptionQuery query, SortCriteria sort, Page page) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public DirectoryResult<EntityDescription> mapVersionEntityList(
-			NameOrURI mapVersion, MapRole mapRole, MapStatus mapStatus,
-			EntityDescriptionQuery query, SortCriteria sort, Page page) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public EntityReferenceList mapVersionEntityReferences(NameOrURI mapVersion,
-			MapRole mapRole, MapStatus mapStatus, EntityDescriptionQuery query,
-			SortCriteria sort, Page page) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

@@ -54,6 +54,10 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	
 	
 	// -------- Implemented methods ----------------	
+
+	
+	// Methods returning empty lists or sets
+	// -------------------------------------
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.service.profile.QueryService#getResourceSummaries(edu.mayo.cts2.framework.service.profile.ResourceQuery, edu.mayo.cts2.framework.model.core.SortCriteria, edu.mayo.cts2.framework.model.command.Page)
 	 */

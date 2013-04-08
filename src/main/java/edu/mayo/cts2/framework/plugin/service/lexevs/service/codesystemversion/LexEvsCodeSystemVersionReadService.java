@@ -114,11 +114,6 @@ public class LexEvsCodeSystemVersionReadService extends
 	}
 
 	@Override
-	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
-		return new ArrayList<DocumentedNamespaceReference>();
-	}
-
-	@Override
 	public boolean existsVersionId(NameOrURI codeSystem,
 			String officialResourceVersionId) {
 		return this.getCodeSystemByVersionId(codeSystem, officialResourceVersionId, null) != null;
@@ -137,6 +132,13 @@ public class LexEvsCodeSystemVersionReadService extends
 	@Override
 	protected CodeSystemVersionCatalogEntry transform(CodingScheme codingScheme) {
 		return this.transformer.transformDescription(codingScheme);
+	}
+
+	// Methods returning empty lists or sets
+	// -------------------------------------
+	@Override
+	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
+		return new ArrayList<DocumentedNamespaceReference>();
 	}
 
 }

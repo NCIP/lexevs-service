@@ -105,45 +105,45 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 	}
 	
 	@Override
-	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
-		return new ArrayList<DocumentedNamespaceReference>();
-	}
+	public List<VersionTagReference> getSupportedVersionTags() {
+		return Arrays.asList(Constants.CURRENT_TAG);
+	}	
 
+	// Not going to implement following methods
+	// ----------------------------------------
 	@Override
 	public DirectoryResult<EntityListEntry> readEntityDescriptions(
 			EntityNameOrURI entityId, SortCriteria sortCriteria,
 			ResolvedReadContext readContext, Page page) {
-		
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException();
 	}
-
+	
 	@Override
 	public EntityReference availableDescriptions(EntityNameOrURI entityId,
 			ResolvedReadContext readContext) {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public EntityList readEntityDescriptions(EntityNameOrURI entityId,
 			ResolvedReadContext readContext) {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public List<CodeSystemReference> getKnownCodeSystems() {
-		return new ArrayList<CodeSystemReference>();
-	}
-
+	// Methods returning empty lists or sets
+	// -------------------------------------
 	@Override
 	public List<CodeSystemVersionReference> getKnownCodeSystemVersions() {
 		return new ArrayList<CodeSystemVersionReference>();
 	}
 
 	@Override
-	public List<VersionTagReference> getSupportedVersionTags() {
-		return Arrays.asList(Constants.CURRENT_TAG);
-	}	
+	public List<CodeSystemReference> getKnownCodeSystems() {
+		return new ArrayList<CodeSystemReference>();
+	}
+	
+	@Override
+	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
+		return new ArrayList<DocumentedNamespaceReference>();
+	}
 }
