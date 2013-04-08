@@ -83,6 +83,9 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 	// -------- Implemented methods ----------------
 	@Override
 	public int count(CodeSystemVersionQuery query) {
+		if(query == null){
+			return 0;
+		}
 		LexBIGService lexBigService = this.getLexBigService();
 		QueryData<CodeSystemVersionQuery> queryData = new QueryData<CodeSystemVersionQuery>(query);
 		

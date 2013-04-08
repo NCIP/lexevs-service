@@ -70,8 +70,14 @@ public class CommonPageUtils {
 		int start = 0, end = 0;
 		try {
 			if(iterator != null){
-				start = page.getStart();
-				end = page.getEnd();
+				if(page != null){
+					start = page.getStart();
+					end = page.getEnd();
+				}
+				else{
+					end = iterator.numberRemaining();
+				}
+				
 				if(end > iterator.numberRemaining()){
 					end = iterator.numberRemaining();
 					atEnd = true;				

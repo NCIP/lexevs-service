@@ -32,6 +32,9 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.LexGrid.LexBIG.DataModel.Core.ConceptReference;
+import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
+import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Exceptions.LBResourceUnavailableException;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
@@ -44,6 +47,7 @@ import edu.mayo.cts2.framework.model.core.EntityReferenceList;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
 import edu.mayo.cts2.framework.model.core.PropertyReference;
+import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
@@ -117,6 +121,44 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 	}
 
 	@Override
+	public boolean isEntityInSet(EntityNameOrURI nameOrUri,
+			EntityDescriptionQuery query, ResolvedReadContext readContext) {
+		SortCriteria sortCriteria = null;
+		
+		LexBIGService lexBigService = this.getLexBigService();
+		QueryData<EntityDescriptionQuery> queryData = new QueryData<EntityDescriptionQuery>(query);
+		queryData.setVersionOrTag(nameConverter);
+		
+		CodedNodeSet codedNodeSet = CommonResourceSummaryUtils.getCodedNodeSet(lexBigService, queryData, sortCriteria);
+		
+		ScopedEntityName entityName = nameOrUri.getEntityName();
+		String uri = nameOrUri.getUri();
+		
+		ConceptReference cts2Code = new ConceptReference();
+		try {
+			if(entityName != null){
+				String code = entityName.getName();
+				String nameSpace = entityName.getNamespace();
+				
+				cts2Code.setCode(code);
+				cts2Code.setCodeNamespace(nameSpace);
+				return codedNodeSet.isCodeInSet(cts2Code);
+			}
+			else if(uri != null){
+				// TODO need to lookup in LexEVS, turn uri into name LexEvs can understand then update cts2Code object
+				return codedNodeSet.isCodeInSet(cts2Code);
+			}
+		
+		} catch (LBInvocationException e) {
+			throw new UnsupportedOperationException();
+		} catch (LBParameterException e) {
+			throw new UnsupportedOperationException();
+		}
+		
+		return false;
+	}
+
+	@Override
 	public DirectoryResult<EntityDescription> getResourceList(
 			EntityDescriptionQuery query, SortCriteria sortCriteria, Page page) {
 		
@@ -166,14 +208,6 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 	}
 
 	
-	// Methods we still need to implement?
-	@Override
-	public boolean isEntityInSet(EntityNameOrURI arg0,
-			EntityDescriptionQuery arg1, ResolvedReadContext arg2) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 	// Not going to implement following methods
 	// ----------------------------------------
 	@Override

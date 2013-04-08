@@ -68,6 +68,18 @@ public class CommonTestUtils {
 		return results;
 	}
 
+	public static String createValidValuesMessage(String values){
+		return "Searching for (" + values + ") and should be found";
+	}
+	public static String createInvalidValuesMessage(String values){
+		return "Searching for (" +  values + ") and should NOT be found.";
+	}
+	
+	public static String createNullValueMessage(String field){
+		return "Searching for NULL " + field + " and should NOT be found.";
+	}
+	
+
 	
 	
 	// FILTER METHODS
