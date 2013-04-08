@@ -30,6 +30,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.StringWriter;
+import java.util.ArrayList;
 
 import javax.annotation.Resource;
 import javax.xml.transform.stream.StreamResult;
@@ -44,6 +45,7 @@ import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonTestUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 
 /**
@@ -59,43 +61,320 @@ public class LexEvsCodeSystemVersionReadServiceTestIT extends AbstractTestITBase
 	@Resource
 	private Cts2Marshaller marshaller;
 
+	private String createValidValuesMessage(String values){
+		return "Searching for (" + values + ") and should be found";
+	}
+	private String createInvalidValuesMessage(String values){
+		return "Searching for (" +  values + ") and should NOT be found.";
+	}
+	
+	private String createNullValueMessage(String field){
+		return "Searching for NULL " + field + " and should NOT be found.";
+	}
+	
+
+	
+	
 	@Test
 	public void testSetUp() {
 		assertNotNull(this.service);
 		assertNotNull(this.marshaller);
 	}
 	
+	// Test exists method
+	// ------------------
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-	public void testReadByOfficialVersionId() throws Exception {
-		NameOrURI nameOrUri = new NameOrURI();
-		nameOrUri.setName("Automobiles");
-		CodeSystemVersionCatalogEntry results = this.service.getCodeSystemByVersionId(nameOrUri, "1.0", null);
-		assertNotNull("Expected data in results but it was null", results);
-	}
-
-	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-	public void testReadByOfficialVersionId2() throws Exception {
-		//NameOrURI name = ModelUtils.nameOrUriFromName("Automobiles");
-		NameOrURI nameOrUri = new NameOrURI();
-		nameOrUri.setName("Automobiles");
-		
-		CodeSystemVersionCatalogEntry results = this.service.getCodeSystemByVersionId(nameOrUri, "1.0", null);
-		assertNotNull("Expected data in results but it was null", results);
-	}
-
-	
-	
-	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-	public void testReadByTag() throws Exception {
-		String nameOrUri = "Automobiles";
-		NameOrURI codeSystem = ModelUtils.nameOrUriFromName(nameOrUri);
-		VersionTagReference tag = Constants.CURRENT_TAG; 
+	public void testExistsWithValidValues() throws Exception {
 		ResolvedReadContext readContext = null;
-		CodeSystemVersionCatalogEntry csvCatalogEntry = this.service.readByTag(codeSystem, tag, readContext);
-		assertNotNull(csvCatalogEntry);
+		int index = 0;
+		String nameOrUri = CommonTestUtils.getValidNameAndVersion(index); // Get Automobiles-1.0		
+		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
+		
+		assertTrue(this.createValidValuesMessage(nameOrUri), this.service.exists(identifier, readContext));
+	
+	}
+	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testExistsWithInvalidNameUri() throws Exception {
+		ResolvedReadContext readContext = null;
+		NameOrURI identifier;
+		ArrayList<String> values = CommonTestUtils.createInvalidNameURIs(1);
+		// Test invalid values
+		for(int i=0; i < values.size(); i++){
+			identifier = ModelUtils.nameOrUriFromName(values.get(i));
+			assertFalse(this.createInvalidValuesMessage(values.get(i)), this.service.exists(identifier, readContext));
+		}
+	}
+	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testExistsWithNullNameUri() throws Exception {
+		ResolvedReadContext readContext = null;
+		NameOrURI identifier = null;
+		assertFalse(this.createNullValueMessage("NameURI"), this.service.exists(identifier, readContext));
+	}
+	
+	// Test existsByTag method
+	// -----------------------
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testExistsByTagWithValidValues() throws Exception {
+		ResolvedReadContext readContext = null;
+		int index = 0;
+		String nameOrUri = CommonTestUtils.VALID_URI_NAMES[index];  		
+		VersionTagReference tag = Constants.CURRENT_TAG; 
+		
+		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
+		
+		assertTrue(this.createValidValuesMessage(nameOrUri + ", " + tag), this.service.existsByTag(identifier, tag, readContext));
+	}
+	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testExistsByTagWithInvalidNameUri() throws Exception {
+		ResolvedReadContext readContext = null;
+		int index = 0;
+		String nameOrUri = CommonTestUtils.VALID_URI_NAMES[index] + "FOO";  		
+		VersionTagReference tag = Constants.CURRENT_TAG; 
+		
+		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
+		
+		assertFalse(this.createInvalidValuesMessage(nameOrUri), this.service.existsByTag(identifier, tag, readContext));
+	}
+	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testExistsByTagWithInvalidTag() throws Exception {
+		ResolvedReadContext readContext = null;
+		int index = 0;
+		String nameOrUri = CommonTestUtils.VALID_URI_NAMES[index];  		
+		String tagValue = Constants.CURRENT_TAG_TEXT + "FOO";
+		VersionTagReference tag = new VersionTagReference(tagValue);
+		
+		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
+		
+		assertFalse(this.createInvalidValuesMessage(tagValue), this.service.existsByTag(identifier, tag, readContext));
+	}
+	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testExistsByTagWithNullTag() throws Exception {
+		ResolvedReadContext readContext = null;
+		int index = 0;
+		String nameOrUri = CommonTestUtils.VALID_URI_NAMES[index];  		
+		VersionTagReference tag = new VersionTagReference();
+		
+		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
+		
+		assertFalse(this.createNullValueMessage("tag"), this.service.existsByTag(identifier, tag, readContext));
+	}
+	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testExistsByTagWithNullNameUri() throws Exception {
+		ResolvedReadContext readContext = null;
+		NameOrURI identifier = null;
+		
+		VersionTagReference tag = Constants.CURRENT_TAG; 		
+		assertFalse(this.createNullValueMessage("nameUri"), this.service.existsByTag(identifier, tag, readContext));
+	}
+	
+	
+	// Test existsVersionID method
+	// ---------------------------
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testExistsByVersionIdWithValidValues() throws Exception {
+		int index = 0;
+		String nameOrUri = CommonTestUtils.VALID_URI_NAMES[index];  		
+		String version = CommonTestUtils.VALID_VERSIONS[index];
+		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
+		
+		assertTrue(this.createValidValuesMessage(nameOrUri + ", " + version), this.service.existsVersionId(identifier, version));
+	}
+	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testExistsByVersionWithInvalidNameUri() throws Exception {
+		int index = 0;
+		String nameOrUri = CommonTestUtils.VALID_URI_NAMES[index] + "FOO";  		
+		String version = CommonTestUtils.VALID_VERSIONS[index];
+		
+		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
+		assertFalse(this.createInvalidValuesMessage(nameOrUri), this.service.existsVersionId(identifier, version));
+	}	
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testExistsByVersionWithInvalidVersionID() throws Exception {
+		int index = 0;
+		String nameOrUri = CommonTestUtils.VALID_URI_NAMES[index];  		
+		String version = CommonTestUtils.VALID_VERSIONS[index] + "444";
+		
+		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
+		
+		assertFalse(this.createInvalidValuesMessage(version), this.service.existsVersionId(identifier, version));
+	}	
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testExistsByVersionWithNullNameUid() throws Exception {
+		int index = 0;
+		String version = CommonTestUtils.VALID_VERSIONS[index];
+		
+		NameOrURI identifier = null;
+		
+		assertFalse(this.createNullValueMessage("nameURI"), this.service.existsVersionId(identifier, version));
+	}	
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testExistsByVersionWithNullVersionID() throws Exception {
+		int index = 0;
+		String nameOrUri = CommonTestUtils.VALID_URI_NAMES[index];  		
+		String version = null;
+		
+		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
+		
+		assertTrue(this.createValidValuesMessage("NULL VersionID"), this.service.existsVersionId(identifier, version));
+	}	
+
+	// Test getCodeSystemByVersionID method
+	// ------------------------------------	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testGetCodeSystemByVersionIDWithValidValues() throws Exception {
+		int index = 0;
+		String nameOrUri = CommonTestUtils.VALID_URI_NAMES[index];  		
+		String version = CommonTestUtils.VALID_VERSIONS[index];
+		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
+		
+		CodeSystemVersionCatalogEntry results = this.service.getCodeSystemByVersionId(identifier, version, null);
+		assertNotNull(this.createValidValuesMessage(nameOrUri + ", " + version), results);
+	}
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testGetCodeSystemByVersionIDWithInvalidNameUri() throws Exception {
+		int index = 0;
+		String nameOrUri = CommonTestUtils.VALID_URI_NAMES[index] + "FOO";  		
+		String version = CommonTestUtils.VALID_VERSIONS[index];
+		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
+		
+		CodeSystemVersionCatalogEntry results = this.service.getCodeSystemByVersionId(identifier, version, null);
+		assertNull(this.createInvalidValuesMessage(nameOrUri + ", " + version), results);
+	}
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testGetCodeSystemByVersionIDWithInvalidVersion() throws Exception {
+		int index = 0;
+		String nameOrUri = CommonTestUtils.VALID_URI_NAMES[index];  		
+		String version = CommonTestUtils.VALID_VERSIONS[index] + "444";
+		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
+		
+		CodeSystemVersionCatalogEntry results = this.service.getCodeSystemByVersionId(identifier, version, null);
+		assertNull(this.createInvalidValuesMessage(nameOrUri + ", " + version), results);
+	}
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testGetCodeSystemByVersionIDWithNullNameUri() throws Exception {
+		int index = 0;
+		String version = CommonTestUtils.VALID_VERSIONS[index];
+		NameOrURI identifier = null;
+		
+		CodeSystemVersionCatalogEntry results = this.service.getCodeSystemByVersionId(identifier, version, null);
+		assertNull(this.createNullValueMessage("nameURI"), results);
+	}
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testGetCodeSystemByVersionIDWithNullVersion() throws Exception {
+		int index = 0;
+		String nameOrUri = CommonTestUtils.VALID_URI_NAMES[index];  		
+		String version = null;
+		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
+		
+		CodeSystemVersionCatalogEntry results = this.service.getCodeSystemByVersionId(identifier, version, null);
+		assertNotNull(this.createValidValuesMessage("VersionID is NULL"), results);
+	}
+
+	
+	// Test getSupportedTags method
+	// ----------------------------
+	
+	// Test read method
+	// -----------------
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testReadWithValidValues() throws Exception {
+		ResolvedReadContext readContext = null;
+		int index = 0;
+		String nameOrUri = CommonTestUtils.getValidNameAndVersion(index); // Get Automobiles-1.0
+		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
+		
+		CodeSystemVersionCatalogEntry csvCatalogEntry = this.service.read(identifier, readContext);
+		assertNotNull(this.createValidValuesMessage(nameOrUri), csvCatalogEntry);		
+	}
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testReadWithNullNameUri() throws Exception {
+		ResolvedReadContext readContext = null;
+		NameOrURI identifier = null;
+		
+		CodeSystemVersionCatalogEntry csvCatalogEntry = this.service.read(identifier, readContext);
+		assertNull(this.createNullValueMessage("nameUri"), csvCatalogEntry);		
+	}
+
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testReadValidXML() throws Exception {
+		ResolvedReadContext readContext = null;
+		int index = 0;
+		String nameOrUri = CommonTestUtils.getValidNameAndVersion(index); // Get Automobiles-1.0
+		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
+		
+		CodeSystemVersionCatalogEntry csvCatalogEntry = this.service.read(identifier, readContext);		
+		marshaller.marshal(csvCatalogEntry, new StreamResult(new StringWriter()));		
+	}
+	
+	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testReadWithInvalidNameUri() throws Exception {
+		ResolvedReadContext readContext = null;
+		NameOrURI identifier;
+		ArrayList<String> values = CommonTestUtils.createInvalidNameURIs(1);
+		// Test invalid values
+		for(int i=0; i < values.size(); i++){
+			identifier = ModelUtils.nameOrUriFromName(values.get(i));
+			CodeSystemVersionCatalogEntry csvCatalogEntry = this.service.read(identifier, readContext);
+			assertNull(this.createInvalidValuesMessage(values.get(i)), csvCatalogEntry);		
+		}
+	}
+	
+	
+	
+	// Test readByTag method
+	// ----------------------	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testReadByTagWithValidValues() throws Exception {
+		ResolvedReadContext readContext = null;
+		int index = 0;
+		String nameOrUri = CommonTestUtils.VALID_URI_NAMES[index];  		
+//		String nameOrUri = CommonTestUtils.getValidNameAndVersion(index); // Get Automobiles-1.0
+		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
+		
+		VersionTagReference tag = Constants.CURRENT_TAG; 
+		
+		
+		CodeSystemVersionCatalogEntry csvCatalogEntry = this.service.readByTag(identifier, tag, readContext);
+		assertNotNull(this.createValidValuesMessage(nameOrUri + ", " + tag.getContent()), csvCatalogEntry);
 		
 		// Verify LexEVS to CTS2 transform worked 
 		assertNotNull(csvCatalogEntry.getFormalName());
@@ -103,7 +382,7 @@ public class LexEvsCodeSystemVersionReadServiceTestIT extends AbstractTestITBase
 		assertNotNull(csvCatalogEntry.getCodeSystemVersionName());
 		assertEquals("CodeSystemVersionName not transformed - ","Automobiles-1.0",csvCatalogEntry.getCodeSystemVersionName());
 		assertNotNull(csvCatalogEntry.getDocumentURI());
-		assertEquals("DocumentURI not transformed - ","urn:oid:11.11.0.1",csvCatalogEntry.getDocumentURI());		
+		assertEquals("DocumentURI not transformed - ","urn:oid:11.11.0.1#1.0",csvCatalogEntry.getDocumentURI());		
 		assertNotNull(csvCatalogEntry.getAbout());
 		assertEquals("About not transformed - ","urn:oid:11.11.0.1",csvCatalogEntry.getAbout());		
 		assertNotNull(csvCatalogEntry.getResourceSynopsis());
@@ -120,118 +399,16 @@ public class LexEvsCodeSystemVersionReadServiceTestIT extends AbstractTestITBase
 
 	@Test
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-	public void testReadByTagNotFound() throws Exception {
-		String nameOrUri = "Automooobiles";
-		NameOrURI codeSystem = ModelUtils.nameOrUriFromName(nameOrUri);
+	public void testReadByTagWithInvalidNameUri() throws Exception {
+		ResolvedReadContext readContext = null;
 		VersionTagReference tag = Constants.CURRENT_TAG; 
-		ResolvedReadContext readContext = null;
-		CodeSystemVersionCatalogEntry csvCatalogEntry = this.service.readByTag(codeSystem, tag, readContext);
-		assertNull(csvCatalogEntry);
+		NameOrURI identifier;
+		ArrayList<String> values = CommonTestUtils.createInvalidNameURIs(1);
+		// Test invalid values
+		for(int i=0; i < values.size(); i++){
+			identifier = ModelUtils.nameOrUriFromName(values.get(i));
+			CodeSystemVersionCatalogEntry csvCatalogEntry = this.service.readByTag(identifier, tag, readContext);
+			assertNull(this.createInvalidValuesMessage(values.get(i)), csvCatalogEntry);		
+		}
 	}
-
-	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-	public void testRead() throws Exception {
-		String nameOrUri = "Automobiles-1.0";
-		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
-		ResolvedReadContext readContext = null;
-		CodeSystemVersionCatalogEntry csvCatalogEntry = this.service.read(identifier, readContext);
-		assertNotNull(csvCatalogEntry);		
-	}
-
-	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-	public void testReadValidXML() throws Exception {
-		String nameOrUri = "Automobiles-1.0";
-		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
-		ResolvedReadContext readContext = null;
-		CodeSystemVersionCatalogEntry csvCatalogEntry = this.service.read(identifier, readContext);
-		
-		marshaller.marshal(csvCatalogEntry, new StreamResult(new StringWriter()));		
-	}
-	
-	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-	public void testRead_ErrorWithoutDash() throws Exception {
-		String nameOrUri = "Automobiles1.0";
-		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
-		ResolvedReadContext readContext = null;
-		CodeSystemVersionCatalogEntry csvCatalogEntry = this.service.read(identifier, readContext);
-		assertNull(csvCatalogEntry);		
-	}
-
-	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-	public void testRead_WithSpace() throws Exception {
-		String nameOrUri = "Automobiles - 1.0";
-		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
-		ResolvedReadContext readContext = null;
-		CodeSystemVersionCatalogEntry csvCatalogEntry = this.service.read(identifier, readContext);
-		assertNull(csvCatalogEntry);		
-	}
-
-	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-	public void testReadNotFound() throws Exception {
-		String nameOrUri = "Automooobiles-1.0";
-		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
-		ResolvedReadContext readContext = null;
-		CodeSystemVersionCatalogEntry csvCatalogEntry = this.service.read(identifier, readContext);
-		assertNull(csvCatalogEntry);		
-	}
-
-	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-	public void testExistsTrue() throws Exception {
-		String nameOrUri = "Automobiles-1.0";
-		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
-		ResolvedReadContext readContext = null;
-		assertTrue(this.service.exists(identifier, readContext));
-	}
-	
-	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-	public void testExistsFalse() throws Exception {
-		String nameOrUri = "Automooobiles-1.0";
-		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
-		ResolvedReadContext readContext = null;
-		assertFalse(this.service.exists(identifier, readContext));
-	}
-	
-	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-	public void testExistsByTagTrue() throws Exception {
-		String nameOrUri = "Automobiles";
-		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
-		VersionTagReference tag = Constants.CURRENT_TAG; 
-		ResolvedReadContext readContext = null;
-		assertTrue(this.service.existsByTag(identifier, tag, readContext));
-	}
-	
-	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-	public void testExistsByTagFalse() throws Exception {
-		String nameOrUri = "Automooobiles";
-		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
-		VersionTagReference tag = Constants.CURRENT_TAG; 
-		ResolvedReadContext readContext = null;
-		assertFalse(this.service.existsByTag(identifier, tag, readContext));
-	}
-	
-	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-	public void testExistsByVersionIdTrue() throws Exception {
-		NameOrURI codeSystem = ModelUtils.nameOrUriFromName("Automobiles");
-		String officialResourceVersionId = "1.0";
-		assertTrue(this.service.existsVersionId(codeSystem, officialResourceVersionId));
-	}
-	
-	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-	public void testExistsByVersionIdFalse() throws Exception {
-		NameOrURI codeSystem = ModelUtils.nameOrUriFromName("Automooobiles");
-		String officialResourceVersionId = "1.0";
-		assertFalse(this.service.existsVersionId(codeSystem, officialResourceVersionId));
-	}	
-
 }

@@ -23,6 +23,7 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -39,7 +40,36 @@ import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
  *
  */
 public class CommonTestUtils {
+	public final static String [] VALID_URI_NAMES = {"Automobiles"};
+	public final static String [] VALID_VERSIONS = {"1.0"};
+	
+	public static String getValidNameAndVersion(int index){
+		if(0 <= index && index < VALID_URI_NAMES.length){
+			return VALID_URI_NAMES[index] + "-" + VALID_VERSIONS[index];
+		}
+		return null;
+	}
+	
+	public static ArrayList<String> createInvalidNameURIs(int index){
+		ArrayList<String> results = new ArrayList<String>();
+		
+		if(0 <= index && index < VALID_URI_NAMES.length){
+			String name = VALID_URI_NAMES[index];
+			String version = VALID_VERSIONS[index];
+			
+			results.add(name + version); 				//			MISSING_DASH ("Automobiles1.0"),
+			results.add(name + " " + version);			//			SPACE_INSTEAD_OF_DASH("Automobiles 1.0"),
+			results.add(name + "," + version); 			//			COMMA_INSTEAD_OF_DASH("Automobiles,1.0"),
+			results.add(name + "-");					//			MISSING_VERSION_WITH_DASH("Automobiles-"),
+			results.add(name);							//			MISSING_VERSION_WITHOUT_DASH("Automobiles"),
+			results.add(name + "FOO-" + version);		//			NAME_WRONG("AutomobilesFOO-1.0"),
+			results.add(name + "-" + version + "444");	//			VERSION_WRONG("Automobiles-1.0444");
+		}
+		return results;
+	}
 
+	
+	
 	// FILTER METHODS
 	public static ResolvedFilter createFilter(PropertyReference property, MatchAlgorithmReference algorithm, String matchValue){
 		ResolvedFilter filter = new ResolvedFilter();

@@ -78,7 +78,9 @@ public class LexEvsCodeSystemVersionReadService extends
 	@Override
 	public CodeSystemVersionCatalogEntry readByTag(NameOrURI codeSystem,
 			VersionTagReference tag, ResolvedReadContext readContext) {
-
+		if(codeSystem == null || tag == null){
+			return null;
+		}
 		return this.getByVersionIdOrTag(codeSystem, this.convertTag(tag));
 	}
 
@@ -96,6 +98,10 @@ public class LexEvsCodeSystemVersionReadService extends
 	@Override
 	public CodeSystemVersionCatalogEntry read(NameOrURI identifier,
 			ResolvedReadContext readContext) {
+		if(identifier == null){
+			return null;
+		}
+		
 		NameOrURI name = new NameOrURI();
 		CodingSchemeVersionOrTag versionOrTag = new CodingSchemeVersionOrTag();
 		
@@ -123,7 +129,10 @@ public class LexEvsCodeSystemVersionReadService extends
 	public CodeSystemVersionCatalogEntry getCodeSystemByVersionId(
 			NameOrURI codeSystem, String officialResourceVersionId,
 			ResolvedReadContext readContext) {
-
+		if(codeSystem == null){
+			return null;
+		}
+		
 		CodingSchemeVersionOrTag versionOrTag = Constructors.createCodingSchemeVersionOrTagFromVersion(officialResourceVersionId);
 		CodeSystemVersionCatalogEntry entry = this.getByVersionIdOrTag(codeSystem, versionOrTag);
         return entry;
