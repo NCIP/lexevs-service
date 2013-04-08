@@ -151,4 +151,23 @@ public class LexEvsEntityReadServiceTestIT extends AbstractTestITBase {
 		assertEquals(true, existsFlag);
 	}	
 	
+	@Test
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+	public void testParents() throws Exception {
+		EntityNameOrURI entity = new EntityNameOrURI();
+		ScopedEntityName scopedEntityName = new ScopedEntityName();
+		scopedEntityName.setNamespace("Automobiles");
+		scopedEntityName.setName("Chevy");
+		entity.setEntityName(scopedEntityName);
+		
+		NameOrURI codeSystemVersion = ModelUtils.nameOrUriFromName("Automobiles-1.0");
+			
+		EntityDescriptionReadId identifier = new EntityDescriptionReadId(entity,codeSystemVersion);		
+		
+		EntityDescription returnEntity = this.service.read(identifier, null);
+		
+		assertEquals(1, returnEntity.getNamedEntity().getParent().length);
+		assertEquals("GM", returnEntity.getNamedEntity().getParent()[0].getName());
+	}	
+	
 }

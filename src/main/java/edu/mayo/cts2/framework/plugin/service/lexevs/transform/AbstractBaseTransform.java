@@ -1,5 +1,7 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.transform;
 
+import javax.annotation.Resource;
+
 import edu.mayo.cts2.framework.core.url.UrlConstructor;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
@@ -16,12 +18,16 @@ public abstract class AbstractBaseTransform<
 		DirectoryEntryDataType, 
 		DirectoryEntryDataIN> {
 	
+	@Resource
 	private TransformUtils transformUtils;
 	
+	@Resource
 	private UrlConstructor urlConstructor;
 	
+	@Resource
 	private VersionNameConverter versionNameConverter;
 	
+	@Resource
 	private UriHandler uriHandler;
 
 	public TransformUtils getTransformUtils() {

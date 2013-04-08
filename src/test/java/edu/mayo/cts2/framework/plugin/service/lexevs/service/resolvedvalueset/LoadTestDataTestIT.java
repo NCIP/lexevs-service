@@ -53,17 +53,15 @@ import edu.mayo.cts2.framework.plugins.service.LocalClasspathLexBigServiceFactor
  * @author <A HREF="mailto:dwarkanath.sridhar@mayo.edu">Sridhar Dwarkanath</A>
  * @version subversion $Revision: $ checked in on $Date: $
  */
-public class LoadTestDataTest extends AbstractTestITBase {
+public class LoadTestDataTestIT extends AbstractTestITBase {
 	private LexEVSValueSetDefinitionServices vds_;
 //	private LexEVSPickListDefinitionServices pls_;
 	
 	@BeforeClass
     public static void oneTimeSetUp() throws Exception {
         // one-time initialization code   
-    	System.out.println("@BeforeClass - oneTimeSetUp");
-    	
+    	System.out.println("@BeforeClass - oneTimeSetUp");	
     }
-	
 	
 	@Before
     public void setUp() throws Exception {
@@ -81,7 +79,7 @@ public class LoadTestDataTest extends AbstractTestITBase {
 	}
 
 	public void testLoadGermanMadeParts() throws Exception {
-        loadXML("src/test/resources/testData/German_Made_Parts.xml", LBConstants.KnownTags.PRODUCTION.toString());
+        loadXML("src/test/resources/lexevs/test-content/valueset/German_Made_Parts.xml", LBConstants.KnownTags.PRODUCTION.toString());
     }
 	
 	private void loadXML(String fileName, String tag) throws Exception {
@@ -112,7 +110,7 @@ public class LoadTestDataTest extends AbstractTestITBase {
 		OBO_Loader loader = (OBO_Loader) lbsm.getLoader("OBOLoader");
 
 		loader.load(new File(
-				"src/test/resources/testData/fungal_anatomy.obo").toURI(),
+				"src/test/resources/lexevs/test-content/valueset/fungal_anatomy.obo").toURI(),
 				null, true, true);
 
 		while (loader.getStatus().getEndTime() == null) {
@@ -155,8 +153,6 @@ public class LoadTestDataTest extends AbstractTestITBase {
 	public  void testLoadValueSetDef() throws Exception {
 		getValueSetDefService().loadValueSetDefinition("src/test/resources/lexevs/test-content/valueset/vdTestData.xml", true);
 	}
-
-	
 	
 	@Test
 	public void testLoadValueSetDefinition() throws Exception {
@@ -185,13 +181,11 @@ public class LoadTestDataTest extends AbstractTestITBase {
 
 	private static LexEVSValueSetDefinitionServices getValueSetDefService(){
 		return LexEVSValueSetDefinitionServicesImpl.defaultInstance();
-		
 	}
 	
 	private LexBIGService getLexBIGService() throws Exception  {
 		LocalClasspathLexBigServiceFactory factory= new LocalClasspathLexBigServiceFactory();
 		return factory.getObject();
-		
 	}
 
 }

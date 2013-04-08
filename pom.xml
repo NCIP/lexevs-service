@@ -246,6 +246,12 @@
 			<artifactId>lexevs-dao</artifactId>
 			<version>${lexevs.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>lexevs</groupId>
+			<artifactId>lexgrid-resourcereader</artifactId>
+			<version>${lexevs.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>lexevs</groupId>
