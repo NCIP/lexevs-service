@@ -45,7 +45,7 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.transform.TransformUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Tuple;
 
 /**
- * Transforms a LexGrid CodingScheme into a CTS2 MayVersion.
+ * Transforms a LexGrid CodingScheme into a CTS2 MapVersion.
  *
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
