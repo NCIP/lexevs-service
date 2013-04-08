@@ -33,8 +33,8 @@ import edu.mayo.cts2.framework.model.entity.EntityDescription;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.entity.NamedEntityDescription;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.transform.LexEvsToCTS2Transformer;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.LexEvsToCTS2Transformer;
 
 /**
  * 

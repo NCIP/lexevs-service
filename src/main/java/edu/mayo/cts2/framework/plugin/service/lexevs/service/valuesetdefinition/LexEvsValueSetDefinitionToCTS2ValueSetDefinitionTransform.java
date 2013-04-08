@@ -29,7 +29,7 @@ import org.lexgrid.valuesets.dto.ResolvedValueSetCodedNodeSet;
 import edu.mayo.cts2.framework.model.core.ValueSetReference;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinition;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinitionDirectoryEntry;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.LexEvsToCTS2Transformer;
+import edu.mayo.cts2.framework.plugin.service.lexevs.transform.LexEvsToCTS2Transformer;
 
 /**
  * Transforms a LexEVS ValueSetDefinition object into a CTS2 ValueSetDefinition object.

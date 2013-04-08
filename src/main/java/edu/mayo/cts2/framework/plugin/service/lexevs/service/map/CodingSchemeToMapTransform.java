@@ -23,8 +23,6 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.map;
 
-import javax.annotation.Resource;
-
 import org.LexGrid.codingSchemes.CodingScheme;
 import org.LexGrid.commonTypes.EntityDescription;
 import org.LexGrid.commonTypes.Property;
@@ -37,9 +35,8 @@ import edu.mayo.cts2.framework.model.core.EntryDescription;
 import edu.mayo.cts2.framework.model.map.MapCatalogEntry;
 import edu.mayo.cts2.framework.model.map.MapCatalogEntrySummary;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.LexEvsToCTS2Transformer;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.TransformUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.transform.AbstractBaseTransform;
+import edu.mayo.cts2.framework.plugin.service.lexevs.transform.TransformUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Tuple;
 
 /**
@@ -48,13 +45,7 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Tuple;
  */
 @Component
 public class CodingSchemeToMapTransform 
-	implements LexEvsToCTS2Transformer <MapCatalogEntry, CodingScheme, MapCatalogEntrySummary, CodingScheme> {
-
-	@Resource
-	private UriHandler uriHandler;
-	
-	@Resource 
-	private TransformUtils transformUtils;
+	extends AbstractBaseTransform<MapCatalogEntry, CodingScheme, MapCatalogEntrySummary, CodingScheme> {
 
 	@Override
 	public MapCatalogEntry transformDescription(CodingScheme codingScheme) {
@@ -65,12 +56,12 @@ public class CodingSchemeToMapTransform
 		MapCatalogEntry mapCatalogEntry = new MapCatalogEntry();
 
 		mapCatalogEntry.setAbout(
-				this.uriHandler.getCodeSystemUri(codingScheme)
+				this.getUriHandler().getCodeSystemUri(codingScheme)
 		);
 		
 		mapCatalogEntry.setMapName(codingScheme.getCodingSchemeName());
 		mapCatalogEntry.setAbout(
-				this.uriHandler.getCodeSystemVersionUri(codingScheme)
+				this.getUriHandler().getCodeSystemVersionUri(codingScheme)
 		);
 		
 		mapCatalogEntry.setFormalName(codingScheme.getFormalName());
@@ -108,12 +99,12 @@ public class CodingSchemeToMapTransform
 		MapCatalogEntrySummary mapCatalogEntrySummary = new MapCatalogEntrySummary();
 
 		mapCatalogEntrySummary.setAbout(
-				this.uriHandler.getCodeSystemUri(codingScheme)
+				this.getUriHandler().getCodeSystemUri(codingScheme)
 		);
 		
 		mapCatalogEntrySummary.setMapName(codingScheme.getCodingSchemeName());
 		mapCatalogEntrySummary.setAbout(
-				this.uriHandler.getCodeSystemVersionUri(codingScheme)
+				this.getUriHandler().getCodeSystemVersionUri(codingScheme)
 		);
 		
 		mapCatalogEntrySummary.setFormalName(codingScheme.getFormalName());
@@ -142,25 +133,8 @@ public class CodingSchemeToMapTransform
 		String target = relations.getTargetCodingScheme();
 		
 		return new Tuple<CodeSystemReference>(
-				this.transformUtils.toCodeSystemReference(source),
-				this.transformUtils.toCodeSystemReference(target)
+				this.getTransformUtils().toCodeSystemReference(source),
+				this.getTransformUtils().toCodeSystemReference(target)
 		);
 	}
-
-	public UriHandler getUriHandler() {
-		return uriHandler;
-	}
-
-	public void setUriHandler(UriHandler uriHandler) {
-		this.uriHandler = uriHandler;
-	}
-
-	public TransformUtils getTransformUtils() {
-		return transformUtils;
-	}
-
-	public void setTransformUtils(TransformUtils transformUtils) {
-		this.transformUtils = transformUtils;
-	}
-
 }

@@ -39,9 +39,9 @@ import edu.mayo.cts2.framework.model.core.EntryDescription;
 import edu.mayo.cts2.framework.model.core.SourceAndNotation;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.transform.LexEvsToCTS2Transformer;
+import edu.mayo.cts2.framework.plugin.service.lexevs.transform.TransformUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.LexEvsToCTS2Transformer;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.TransformUtils;
 
 /**
  * Transforms a LexGrid CodingScheme into a CTS2 CodeSystemVersion CatalogEntry.

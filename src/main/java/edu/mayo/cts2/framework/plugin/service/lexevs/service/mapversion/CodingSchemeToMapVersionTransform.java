@@ -23,8 +23,6 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.mapversion;
 
-import javax.annotation.Resource;
-
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.codingSchemes.CodingScheme;
@@ -42,8 +40,8 @@ import edu.mayo.cts2.framework.model.mapversion.MapVersion;
 import edu.mayo.cts2.framework.model.mapversion.MapVersionDirectoryEntry;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.LexEvsToCTS2Transformer;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.TransformUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.transform.AbstractBaseTransform;
+import edu.mayo.cts2.framework.plugin.service.lexevs.transform.TransformUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Tuple;
 
 /**
@@ -52,14 +50,8 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Tuple;
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
 @Component
-public class CodingSchemeToMapVersionTransform implements LexEvsToCTS2Transformer <MapVersion, CodingScheme, MapVersionDirectoryEntry, CodingSchemeRendering> {
-	
-	@Resource
-	private VersionNameConverter versionNameConverter;
-	
-	@Resource 
-	private TransformUtils transformUtils;
-	
+public class CodingSchemeToMapVersionTransform extends AbstractBaseTransform <MapVersion, CodingScheme, MapVersionDirectoryEntry, CodingSchemeRendering> {
+
 	public CodingSchemeToMapVersionTransform(){
 		super();
 	}
@@ -67,7 +59,7 @@ public class CodingSchemeToMapVersionTransform implements LexEvsToCTS2Transforme
 	public CodingSchemeToMapVersionTransform(
 		VersionNameConverter versionNameConverter){
 		super();
-		this.versionNameConverter = versionNameConverter;
+		this.setVersionNameConverter(versionNameConverter);
 	}
 
 	@Override
@@ -159,8 +151,8 @@ public class CodingSchemeToMapVersionTransform implements LexEvsToCTS2Transforme
 		String targetVersion = relations.getTargetCodingSchemeVersion();
 		
 		return new Tuple<CodeSystemVersionReference>(
-				this.transformUtils.toCodeSystemVersionReference(source, sourceVersion),
-				this.transformUtils.toCodeSystemVersionReference(target, targetVersion)
+				this.getTransformUtils().toCodeSystemVersionReference(source, sourceVersion),
+				this.getTransformUtils().toCodeSystemVersionReference(target, targetVersion)
 		);
 	}
 	
@@ -170,7 +162,7 @@ public class CodingSchemeToMapVersionTransform implements LexEvsToCTS2Transforme
 	}
 	
 	private String getName(String name, String version){
-		return this.versionNameConverter.
+		return this.getVersionNameConverter().
 				toCts2VersionName(name, version);
 	}
 	

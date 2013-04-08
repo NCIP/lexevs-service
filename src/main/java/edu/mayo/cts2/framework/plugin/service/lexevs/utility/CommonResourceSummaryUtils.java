@@ -21,6 +21,7 @@ import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.transform.LexEvsToCTS2Transformer;
 import edu.mayo.cts2.framework.service.profile.ResourceQuery;
 
 public class CommonResourceSummaryUtils{
