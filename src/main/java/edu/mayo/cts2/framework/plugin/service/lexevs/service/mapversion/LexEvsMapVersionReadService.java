@@ -42,7 +42,7 @@ import edu.mayo.cts2.framework.model.mapversion.MapVersion;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsCodeSystemService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonMapUtils;
@@ -60,7 +60,7 @@ public class LexEvsMapVersionReadService
 	implements MapVersionReadService, InitializingBean {
 
 	@Resource
-	private CodeSystemVersionNameConverter nameConverter;
+	private VersionNameConverter nameConverter;
 	
 	@Resource
 	private CodingSchemeToMapVersionTransform transformer;
@@ -118,14 +118,14 @@ public class LexEvsMapVersionReadService
 		String name;
 		if(identifier.getName() != null){
 			name = identifier.getName();
-			if(!this.nameConverter.isValidCodeSystemVersionName(name)){
+			if(!this.nameConverter.isValidVersionName(name)){
 				return null;
 			}
 		} else {
 			throw new UnsupportedOperationException("Cannot resolve by DocumentURI yet.");
 		}
 		
-		NameVersionPair namePair = this.nameConverter.fromCts2CodeSystemVersionName(name);
+		NameVersionPair namePair = this.nameConverter.fromCts2VersionName(name);
 		CodingSchemeVersionOrTag version = 
 			Constructors.createCodingSchemeVersionOrTagFromVersion(namePair.getVersion());
 		

@@ -22,7 +22,7 @@ import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PropertyReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.service.mapversion.types.MapRole;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestrictions.CodeSystemRestriction;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
@@ -65,7 +65,7 @@ public class CommonSearchFilterUtils {
 	 */
 	public static CodingSchemeRenderingList filterRenderingListByResolvedFilter(ResolvedFilter resolvedFilter, 
 			CodingSchemeRenderingList renderingList,
-			CodeSystemVersionNameConverter nameConverter) {
+			VersionNameConverter nameConverter) {
 		
 		boolean caseSensitive = false;
 		CodingSchemeRenderingList temp = new CodingSchemeRenderingList();
@@ -90,7 +90,7 @@ public class CommonSearchFilterUtils {
 				retrievedAttrValue = codingSchemeSummary.getCodingSchemeDescription().getContent();
 			} else if (searchAttribute.equals(Constants.ATTRIBUTE_NAME_RESOURCE_NAME)) {
 				retrievedAttrValue = 
-					nameConverter.toCts2CodeSystemVersionName(
+					nameConverter.toCts2VersionName(
 						codingSchemeSummary.getLocalName(), 
 						codingSchemeSummary.getRepresentsVersion());
 			}

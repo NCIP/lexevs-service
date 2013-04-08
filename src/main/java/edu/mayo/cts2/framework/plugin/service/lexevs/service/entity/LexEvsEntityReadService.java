@@ -46,7 +46,7 @@ import edu.mayo.cts2.framework.model.entity.EntityList;
 import edu.mayo.cts2.framework.model.entity.EntityListEntry;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
@@ -68,12 +68,12 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 	private EntityTransform transformer;
 	
 	@Resource
-	private CodeSystemVersionNameConverter nameConverter;
+	private VersionNameConverter nameConverter;
 
 	// ------ Local methods ----------------------
 	public void setCodeSystemVersionNameConverter(
-			CodeSystemVersionNameConverter codeSystemVersionNameConverter) {
-		this.nameConverter = codeSystemVersionNameConverter;
+			VersionNameConverter versionNameConverter) {
+		this.nameConverter = versionNameConverter;
 	}
 
 	public void setEntityTransform(EntityTransform entityTransform) {

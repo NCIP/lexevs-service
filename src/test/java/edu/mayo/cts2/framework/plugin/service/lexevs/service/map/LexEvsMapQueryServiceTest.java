@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.easymock.classextension.EasyMock;
 import org.junit.Test;
 
 import edu.mayo.cts2.framework.model.command.Page;
@@ -34,13 +35,14 @@ import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.map.MapCatalogEntry;
 import edu.mayo.cts2.framework.model.map.MapCatalogEntrySummary;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.FakeLexEvsData.DataField;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.FakeLexEvsSystem;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.MappingExtensionImpl;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.profile.map.MapQuery;
 
+@SuppressWarnings("deprecation")
 public class LexEvsMapQueryServiceTest {
 
 	// Setup mocked environment
@@ -56,9 +58,12 @@ public class LexEvsMapQueryServiceTest {
 		
 		service.setLexBigService(lexBigService);
 
+		CodingSchemeToMapTransform transform = EasyMock.createNiceMock(CodingSchemeToMapTransform.class);
+		EasyMock.replay(transform);
+
 		// Overwrite objects in service object 
-		service.setCodeSystemVersionNameConverter(new CodeSystemVersionNameConverter());
-		service.setCodingSchemeToMapTransform(new CodingSchemeToMapTransform());
+		service.setCodingSchemeToMapTransform(transform);
+		service.setCodeSystemVersionNameConverter(new VersionNameConverter());
 		service.setMappingExtension(new MappingExtensionImpl(fakeLexEvs));
 		
 		return service;

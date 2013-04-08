@@ -40,7 +40,7 @@ import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsCodeSystemService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
@@ -61,7 +61,7 @@ public class LexEvsCodeSystemVersionReadService extends
 	private CodingSchemeToCodeSystemTransform transformer;
 
 	@Resource
-	private CodeSystemVersionNameConverter nameConverter;
+	private VersionNameConverter nameConverter;
 
 	// ------ Local methods ----------------------
 	public void setCodingSchemeToCodeSystemTransform(
@@ -70,7 +70,7 @@ public class LexEvsCodeSystemVersionReadService extends
 	}
 
 	public void setCodeSystemVersionNameConverter(
-			CodeSystemVersionNameConverter nameConverter) {
+			VersionNameConverter nameConverter) {
 		this.nameConverter = nameConverter;
 	}
 

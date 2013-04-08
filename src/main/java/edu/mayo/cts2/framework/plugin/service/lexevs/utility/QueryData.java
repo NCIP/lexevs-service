@@ -6,7 +6,7 @@ import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.service.command.restriction.CodeSystemVersionQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.command.restriction.EntityDescriptionQueryServiceRestrictions;
@@ -122,10 +122,10 @@ public class QueryData <Query extends ResourceQuery>{
 		return isMapQuery;
 	}
 	
-	public void setVersionOrTag(CodeSystemVersionNameConverter codeSystemVersionNameConverter){
+	public void setVersionOrTag(VersionNameConverter versionNameConverter){
 		if(codeSystemVersionName != null){
 			NameVersionPair nameVersionPair =
-					codeSystemVersionNameConverter.fromCts2CodeSystemVersionName(codeSystemVersionName);					
+					versionNameConverter.fromCts2VersionName(codeSystemVersionName);					
 			versionOrTag = new CodingSchemeVersionOrTag();
 			codingSchemeName = nameVersionPair.getName();
 			versionOrTag.setTag(nameVersionPair.getVersion());

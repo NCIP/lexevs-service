@@ -27,7 +27,7 @@ import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntry;
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntrySummary;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.FakeLexEvsSystem;
 
 /**
@@ -49,10 +49,10 @@ public class LexEvsCodeSystemVersionReadServiceTest {
 		service.setLexBigService(lexBigService);
 
 		// Overwrite objects in service object 
-		CodeSystemVersionNameConverter converter = new CodeSystemVersionNameConverter();
+		VersionNameConverter converter = new VersionNameConverter();
 		CodingSchemeToCodeSystemTransform transformer = new CodingSchemeToCodeSystemTransform(converter);
 		service.setCodingSchemeToCodeSystemTransform(transformer);
-		service.setCodeSystemVersionNameConverter(new CodeSystemVersionNameConverter());
+		service.setCodeSystemVersionNameConverter(new VersionNameConverter());
 		
 		return service;
 	}

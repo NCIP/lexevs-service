@@ -35,7 +35,7 @@ import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogE
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.FakeLexEvsData.DataField;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.FakeLexEvsSystem;
@@ -62,7 +62,7 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 
 		// Overwrite objects in service object
 		CodingSchemeToCodeSystemTransform transform = 
-			new CodingSchemeToCodeSystemTransform(new CodeSystemVersionNameConverter());
+			new CodingSchemeToCodeSystemTransform(new VersionNameConverter());
 		
 		UriHandler uriHandler = EasyMock.createNiceMock(UriHandler.class);
 		EasyMock.replay(uriHandler);
@@ -70,7 +70,7 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 		
 		service.setCodingSchemeTransformer(transform);
 		
-		service.setCodeSystemVersionNameConverter(new CodeSystemVersionNameConverter());
+		service.setCodeSystemVersionNameConverter(new VersionNameConverter());
 		
 		return service;
 	}
