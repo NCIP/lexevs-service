@@ -70,8 +70,14 @@ public class CommonPageUtils {
 		int start = 0, end = 0;
 		try {
 			if(iterator != null){
-				start = page.getStart();
-				end = page.getEnd();
+				if(page != null){
+					start = page.getStart();
+					end = page.getEnd();
+				}
+				else{
+					end = iterator.numberRemaining();
+				}
+				
 				if(end > iterator.numberRemaining()){
 					end = iterator.numberRemaining();
 					atEnd = true;				
@@ -96,7 +102,20 @@ public class CommonPageUtils {
 	
 	
 	
-
+	public static  <T> List<T> getRenderingList(List<T> list, Page page){
+		int start = page.getStart();
+		int end = page.getEnd();
+		
+		
+		if(end > list.size()){
+			end = list.size();
+		}
+		if (list.size() > start ) {
+			return list.subList(start, end);
+		}
+		return null;
+	}
+	
 
 	
 	public static <T> Object[] getRenderingPage(List<T> list, Page page){

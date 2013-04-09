@@ -6,7 +6,7 @@ import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.service.command.restriction.CodeSystemVersionQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.command.restriction.EntityDescriptionQueryServiceRestrictions;
@@ -17,6 +17,7 @@ import edu.mayo.cts2.framework.service.profile.ResourceQuery;
 import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersionQuery;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQuery;
 import edu.mayo.cts2.framework.service.profile.map.MapQuery;
+import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryQuery;
 import edu.mayo.cts2.framework.service.profile.mapversion.MapVersionQuery;
 
 public class QueryData <Query extends ResourceQuery>{
@@ -41,7 +42,6 @@ public class QueryData <Query extends ResourceQuery>{
 						codingSchemeName = (codeSystem.getUri() != null) ? codeSystem.getUri() : codeSystem.getName();
 					}
 				}
-//				codeSystemRestriction = null;
 			}
 			else if(query instanceof EntityDescriptionQuery){
 				restrictions = (EntityDescriptionQueryServiceRestrictions) ((EntityDescriptionQuery) query).getRestrictions();
@@ -49,19 +49,29 @@ public class QueryData <Query extends ResourceQuery>{
 					codeSystemVersionName = ((EntityDescriptionQueryServiceRestrictions) restrictions).getCodeSystemVersion().getName();
 					// Remaining data is collected via QueryData.setVersionOrTag method
 				}
-//				codeSystemRestriction = null;
 			}
 			else if(query instanceof MapQuery){
-				restrictions = (MapQueryServiceRestrictions) ((MapQuery) query).getRestrictions();
+				restrictions = ((MapQuery) query).getRestrictions();
 				if(restrictions != null){
 					codeSystemRestriction = ((MapQueryServiceRestrictions) restrictions).getCodeSystemRestriction();
 				}
-//				codeSystem = null;
-//				codingSchemeName = null;
 				isMapQuery = true;
 			}
 			else if(query instanceof MapVersionQuery){
-				restrictions = (MapQueryServiceRestrictions) ((MapVersionQuery) query).getRestrictions();
+				restrictions = ((MapVersionQuery) query).getRestrictions();
+				if(restrictions != null){
+					codeSystemRestriction =  ((MapQueryServiceRestrictions) restrictions).getCodeSystemRestriction();
+					if(codeSystemRestriction != null){
+						codeSystem = ((MapVersionQueryServiceRestrictions) restrictions).getMap(); 
+						if(codeSystem != null){
+							codingSchemeName = (codeSystem.getUri() != null) ? codeSystem.getUri() : codeSystem.getName();
+						}
+					}
+				}
+				isMapQuery = true;
+			}
+			else if(query instanceof MapEntryQuery){
+				restrictions = ((MapEntryQuery) query).getRestrictions();
 				if(restrictions != null){
 					codeSystemRestriction = ((MapQueryServiceRestrictions) restrictions).getCodeSystemRestriction();
 					if(codeSystemRestriction != null){
@@ -71,8 +81,7 @@ public class QueryData <Query extends ResourceQuery>{
 						}
 					}
 				}
-//				codingSchemeName = null;
-				isMapQuery = true;
+				isMapQuery = true;		
 			}
 			
 			filters = query.getFilterComponent();
@@ -122,10 +131,10 @@ public class QueryData <Query extends ResourceQuery>{
 		return isMapQuery;
 	}
 	
-	public void setVersionOrTag(CodeSystemVersionNameConverter codeSystemVersionNameConverter){
+	public void setVersionOrTag(VersionNameConverter versionNameConverter){
 		if(codeSystemVersionName != null){
 			NameVersionPair nameVersionPair =
-					codeSystemVersionNameConverter.fromCts2CodeSystemVersionName(codeSystemVersionName);					
+					versionNameConverter.fromCts2VersionName(codeSystemVersionName);					
 			versionOrTag = new CodingSchemeVersionOrTag();
 			codingSchemeName = nameVersionPair.getName();
 			versionOrTag.setTag(nameVersionPair.getVersion());

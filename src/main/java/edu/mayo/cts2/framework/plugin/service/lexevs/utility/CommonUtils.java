@@ -20,7 +20,7 @@ import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.service.profile.ResourceQuery;
 import edu.mayo.cts2.framework.service.profile.entitydescription.name.EntityDescriptionReadId;
@@ -63,7 +63,7 @@ public class CommonUtils {
 
 	public static ResolvedConceptReference getResolvedConceptReference(
 			LexBIGService lexBigService, 
-			CodeSystemVersionNameConverter nameConverter, 
+			VersionNameConverter nameConverter, 
 			EntityDescriptionReadId identifier,
 			ResolvedReadContext readContext) {
 
@@ -75,7 +75,7 @@ public class CommonUtils {
 		
 		versionName = identifier.getCodeSystemVersion().getName();
 		
-		codingSchemeName = nameConverter.fromCts2CodeSystemVersionName(versionName);
+		codingSchemeName = nameConverter.fromCts2VersionName(versionName);
 		
 		ScopedEntityName entityName = identifier.getEntityName();
 		versionOrTag = Constructors.createCodingSchemeVersionOrTagFromVersion(codingSchemeName.getVersion());
@@ -124,7 +124,7 @@ public class CommonUtils {
 
 
 	public static NameVersionPair getNamePair(
-			CodeSystemVersionNameConverter nameConverter, 
+			VersionNameConverter nameConverter, 
 			NameOrURI identifier,
 			ResolvedReadContext readContext) {
 		String name;
@@ -132,11 +132,11 @@ public class CommonUtils {
 		
 		if (identifier.getName() != null) {
 			name = identifier.getName();
-			if (!nameConverter.isValidCodeSystemVersionName(name)) {
+			if (!nameConverter.isValidVersionName(name)) {
 				namePair = null;
 			}
 			else{
-				namePair = nameConverter.fromCts2CodeSystemVersionName(name);		
+				namePair = nameConverter.fromCts2VersionName(name);		
 			}
 		} else {
 			throw new UnsupportedOperationException(
