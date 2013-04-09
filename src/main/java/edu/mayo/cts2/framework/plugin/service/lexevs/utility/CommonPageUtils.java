@@ -102,7 +102,7 @@ public class CommonPageUtils {
 	
 	
 	
-	public static  <T> List<T> getRenderingList(List<T> list, Page page){
+	public static  <T> List<T> getPaginatedList(List<T> list, Page page){
 		int start = page.getStart();
 		int end = page.getEnd();
 		
