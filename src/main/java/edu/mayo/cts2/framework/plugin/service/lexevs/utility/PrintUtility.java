@@ -7,192 +7,194 @@ import org.LexGrid.concepts.Presentation;
 
 public class PrintUtility {
 	public static String createTabs(int tabCount){
-		String results = "";
+		StringBuffer results = new StringBuffer();
 		for(int i=0; i < tabCount; i++){
-			results += "\t";
+			results.append("\t");
 		}
-		return results;
+		return results.toString();
 	}
 	
 	public static String createStringFromResolvedConceptReferenceObject(ResolvedConceptReference reference, int tabCount){
-		String results = "";
+		StringBuffer results = new StringBuffer();
 		String tabs = createTabs(tabCount);
 		
-		results += tabs + " Code: " + reference.getCode() + "\n";
-		results += tabs + " CodeNamespace: " + reference.getCodeNamespace() + "\n";
-		results += tabs + " CodingSchemeName: " + reference.getCodingSchemeName() + "\n";
-		results += tabs + " CodingSchemeURI: " + reference.getCodingSchemeURI() + "\n";
-		results += tabs + " CodingSchemeVersion: " + reference.getCodingSchemeVersion() + "\n";
-		results += tabs + " ConceptCode: " + reference.getConceptCode() + "\n";
+		results.append(tabs + " Code: " + reference.getCode() + "\n");
+		results.append(tabs + " CodeNamespace: " + reference.getCodeNamespace() + "\n");
+		results.append(tabs + " CodingSchemeName: " + reference.getCodingSchemeName() + "\n");
+		results.append(tabs + " CodingSchemeURI: " + reference.getCodingSchemeURI() + "\n");
+		results.append(tabs + " CodingSchemeVersion: " + reference.getCodingSchemeVersion() + "\n");
+		results.append(tabs + " ConceptCode: " + reference.getConceptCode() + "\n");
 
-		results += tabs + " EntityDescription: " + reference.getEntityDescription().getContent() + "\n";
-		results += tabs + " Entities: \n";
-		results += createStringFromEntityObject(reference.getEntity(), tabCount + 1) + "\n";
-		results += tabs + " SourceOf: " + reference.getSourceOf() + "\n";
-		results += tabs + " TargetOf: " + reference.getTargetOf() + "\n";
+		results.append(tabs + " EntityDescription: " + reference.getEntityDescription().getContent() + "\n");
+		results.append(tabs + " Entities: \n");
+		results.append(createStringFromEntityObject(reference.getEntity(), tabCount + 1) + "\n");
+		results.append(tabs + " SourceOf: " + reference.getSourceOf() + "\n");
+		results.append(tabs + " TargetOf: " + reference.getTargetOf() + "\n");
 		
-		return results;
+		return results.toString();
 	}
 	
 	public static String createStringFromEntityObject(Entity entity, int tabCount){
 		String tabs = createTabs(tabCount);
-		String results = tabs + " EntityCode = " + entity.getEntityCode() + "\n";
+		StringBuffer results = new StringBuffer();
 		
-		results += tabs + " EntityDescription = " + entity.getEntityDescription().getContent() + "\n";;
-		results += tabs + " EntityCodeNamespace = " + entity.getEntityCodeNamespace() + "\n";;
-		results += tabs + " Owner = " + entity.getOwner() + "\n";
-		results += tabs + " Status = " + entity.getStatus() + "\n";
+		results.append(tabs + " EntityCode = " + entity.getEntityCode() + "\n");
+		
+		results.append(tabs + " EntityDescription = " + entity.getEntityDescription().getContent() + "\n");;
+		results.append(tabs + " EntityCodeNamespace = " + entity.getEntityCodeNamespace() + "\n");;
+		results.append(tabs + " Owner = " + entity.getOwner() + "\n");
+		results.append(tabs + " Status = " + entity.getStatus() + "\n");
 
-		results += tabs + " EntityTypeCount = " + entity.getEntityTypeCount() + "\n";
-		results += tabs + " EntityTypes:\n ";
-		results += createStringFromEntityTypesInEntityObject(entity, tabCount + 1);
+		results.append(tabs + " EntityTypeCount = " + entity.getEntityTypeCount() + "\n");
+		results.append(tabs + " EntityTypes:\n");
+		results.append(createStringFromEntityTypesInEntityObject(entity, tabCount + 1));
 		
-		results += tabs + " CommentCount = " + entity.getCommentCount() + "\n";
-		results += tabs + " Comments:\n";
-		results += createStringFromCommentsInEntityObject(entity, tabCount + 1);
+		results.append(tabs + " CommentCount = " + entity.getCommentCount() + "\n");
+		results.append(tabs + " Comments:\n");
+		results.append(createStringFromCommentsInEntityObject(entity, tabCount + 1));
 		
-		results += tabs + " DefinitionCount = " + entity.getDefinitionCount() + "\n";
-		results += tabs + " Definitions:\n";
-		results += createStringFromDefinitionsInEntityObject(entity, tabCount + 1);
+		results.append(tabs + " DefinitionCount = " + entity.getDefinitionCount() + "\n");
+		results.append(tabs + " Definitions:\n");
+		results.append(createStringFromDefinitionsInEntityObject(entity, tabCount + 1));
 		
-		results += tabs + " PresentationCount = " + entity.getPresentationCount() + "\n";
-		results += tabs + " Presentations:\n";
-		results += createStringFromPresentationsInEntityObject(entity, tabCount + 1);
+		results.append(tabs + " PresentationCount = " + entity.getPresentationCount() + "\n");
+		results.append(tabs + " Presentations:\n");
+		results.append(createStringFromPresentationsInEntityObject(entity, tabCount + 1));
 		
-		results += tabs + " PropertyCount = " + entity.getPropertyCount() + "\n";
-		results += tabs + " Properties:\n";
-		results += createStringFromPropertiesInEntityObject(entity, tabCount + 1);
+		results.append(tabs + " PropertyCount = " + entity.getPropertyCount() + "\n");
+		results.append(tabs + " Properties:\n");
+		results.append(createStringFromPropertiesInEntityObject(entity, tabCount + 1));
 		
-		results += tabs + " PropertyLinkCount = " + entity.getPropertyLinkCount() + "\n";
-		results += tabs + " PropertyLinks:\n";
-		results += createStringFromPropertyLinksInEntityObject(entity, tabCount + 1);
+		results.append(tabs + " PropertyLinkCount = " + entity.getPropertyLinkCount() + "\n");
+		results.append(tabs + " PropertyLinks:\n");
+		results.append(createStringFromPropertyLinksInEntityObject(entity, tabCount + 1));
 		
 		
-		return results;
+		return results.toString();
 	}
 	
 	public static String createStringFromPresentationsInEntityObject(Entity entity, int tabCount){
 		Presentation presentation;
-		String results = "";
+		StringBuffer results = new StringBuffer();
 		String tabs = createTabs(tabCount);
 		int count = entity.getPresentationCount();
 		for(int i=0; i < count; i++){
 			presentation = entity.getPresentation(i);
-			results += tabs + "Value = " + presentation.getValue().getContent() + "\n";
-			results += tabs + "--DegreeOfFidelity = " + presentation.getDegreeOfFidelity() + "\n";
-			results += tabs + "--Language = " + presentation.getLanguage() + "\n";
-			results += tabs + "--Owner = " + presentation.getOwner() + "\n";
-			results += tabs + "--PropertyID = " + presentation.getPropertyId() + "\n";
-			results += tabs + "--PropertyName = " + presentation.getPropertyName() + "\n";
-			results += tabs + "--PropertyType = " + presentation.getPropertyType() + "\n";
-			results += tabs + "--RepresentationalForm = " + presentation.getRepresentationalForm() + "\n";
-			results += tabs + "--Status = " + presentation.getStatus() + "\n";
+			results.append(tabs + "Value = " + presentation.getValue().getContent() + "\n");
+			results.append(tabs + "--DegreeOfFidelity = " + presentation.getDegreeOfFidelity() + "\n");
+			results.append(tabs + "--Language = " + presentation.getLanguage() + "\n");
+			results.append(tabs + "--Owner = " + presentation.getOwner() + "\n");
+			results.append(tabs + "--PropertyID = " + presentation.getPropertyId() + "\n");
+			results.append(tabs + "--PropertyName = " + presentation.getPropertyName() + "\n");
+			results.append(tabs + "--PropertyType = " + presentation.getPropertyType() + "\n");
+			results.append(tabs + "--RepresentationalForm = " + presentation.getRepresentationalForm() + "\n");
+			results.append(tabs + "--Status = " + presentation.getStatus() + "\n");
 			
-			results += tabs + "--SourceCount = " + presentation.getSourceCount() + "\n";
-			results += tabs + "--Sources:\n";
-			results += createStringFromSourceInPresentationObject(presentation, tabCount + 1);
+			results.append(tabs + "--SourceCount = " + presentation.getSourceCount() + "\n");
+			results.append(tabs + "--Sources:\n");
+			results.append(createStringFromSourceInPresentationObject(presentation, tabCount + 1));
 			
-			results += tabs + "--PropertyQualifierCount = " + presentation.getPropertyQualifierCount() + "\n";
-			results += tabs + "--PropertyQualifiers:\n";
-			results += createStringFromPropertyQualifiersInPresentationObject(presentation, tabCount + 1);
+			results.append(tabs + "--PropertyQualifierCount = " + presentation.getPropertyQualifierCount() + "\n");
+			results.append(tabs + "--PropertyQualifiers:\n");
+			results.append(createStringFromPropertyQualifiersInPresentationObject(presentation, tabCount + 1));
 			
-			results += tabs + "--UsageContextCount = " + presentation.getUsageContextCount() + "\n";
-			results += tabs + "--UsageContexts:\n";
-			results += createStringFromUsageContextsInPresentationObject(presentation, tabCount + 1);			
+			results.append(tabs + "--UsageContextCount = " + presentation.getUsageContextCount() + "\n");
+			results.append(tabs + "--UsageContexts:\n");
+			results.append(createStringFromUsageContextsInPresentationObject(presentation, tabCount + 1));			
 		}
-		return results;
+		return results.toString();
 	}
 	
 	public static String createStringFromSourceInPresentationObject(Presentation presentation, int tabCount){
-		String results = "";
+		StringBuffer results = new StringBuffer();
 		String tabs = createTabs(tabCount);
 		int count = presentation.getSourceCount();
 		for(int i=0; i < count; i++){
-			results += tabs + " " + presentation.getSource(i).getContent() + "\n";
+			results.append(tabs + " " + presentation.getSource(i).getContent() + "\n");
 		}
-		return results;
+		return results.toString();
 	}
 	
 	public static String createStringFromPropertyQualifiersInPresentationObject(Presentation presentation, int tabCount){
-		String results = "";
+		StringBuffer results = new StringBuffer();
 		String tabs = createTabs(tabCount);
 		int count = presentation.getPropertyQualifierCount();
 		for(int i=0; i < count; i++){
-			results += tabs + " " + presentation.getPropertyQualifier(i) + "\n";
+			results.append(tabs + " " + presentation.getPropertyQualifier(i) + "\n");
 		}
-		return results;
+		return results.toString();
 	}
 	
 	public static String createStringFromUsageContextsInPresentationObject(Presentation presentation, int tabCount){
-		String results = "";
+		StringBuffer results = new StringBuffer();
 		String tabs = createTabs(tabCount);
 		int count = presentation.getUsageContextCount();
 		for(int i=0; i < count; i++){
-			results += tabs + " " + presentation.getUsageContext(i) + "\n";
+			results.append(tabs + " " + presentation.getUsageContext(i) + "\n");
 		}
-		return results;
+		return results.toString();
 	}
 	
 	public static String createStringFromPropertiesInEntityObject(Entity entity, int tabCount){
-		String results = "";
+		StringBuffer results = new StringBuffer();
 		String tabs = createTabs(tabCount);
 		int count = entity.getPropertyCount();
 		for(int i=0; i < count; i++){
-			results += tabs + " " + entity.getProperty(i) + "\n";
+			results.append(tabs + " " + entity.getProperty(i) + "\n");
 		}
-		return results;
+		return results.toString();
 	}
 	
 	public static String createStringFromPropertyLinksInEntityObject(Entity entity, int tabCount){
-		String results = "";
+		StringBuffer results = new StringBuffer();
 		String tabs = createTabs(tabCount);
 		int count = entity.getPropertyLinkCount();
 		for(int i=0; i < count; i++){
-			results += tabs + " " + entity.getPropertyLink(i) + "\n";
+			results.append(tabs + " " + entity.getPropertyLink(i) + "\n");
 		}
-		return results;
+		return results.toString();
 	}
 	
 	public static String createStringFromDefinitionsInEntityObject(Entity entity, int tabCount){
-		String results = "";
+		StringBuffer results = new StringBuffer();
 		String tabs = createTabs(tabCount);
 		int count = entity.getDefinitionCount();
 		for(int i=0; i < count; i++){
-			results += tabs + " " + entity.getDefinition(i) + "\n";
+			results.append(tabs + " " + entity.getDefinition(i) + "\n");
 		}
-		return results;
+		return results.toString();
 	}
 	
 	public static String createStringFromCommentsInEntityObject(Entity entity, int tabCount){
-		String results = "";
+		StringBuffer results = new StringBuffer();
 		String tabs = createTabs(tabCount);
 		int count = entity.getCommentCount();
 		for(int i=0; i < count; i++){
-			results += tabs + " " + entity.getComment(i) + "\n";
+			results.append(tabs + " " + entity.getComment(i) + "\n");
 		}
-		return results;
+		return results.toString();
 	}
 
 	public static String createStringFromEntityTypesInEntityObject(Entity entity, int tabCount){
-		String results = "";
+		StringBuffer results = new StringBuffer();
 		String tabs = createTabs(tabCount);
 		int count = entity.getEntityTypeCount();
 		for(int i=0; i < count; i++){
-			results += tabs + " " + entity.getEntityType(i) + "\n";
+			results.append(tabs + " " + entity.getEntityType(i) + "\n");
 		}
-		return results;
+		return results.toString();
 	}
 
 	public static String codingSchemeSummary(CodingSchemeSummary codingSchemeSummary, int tabCount) {
-		String results = "";
+		StringBuffer results = new StringBuffer();
 		String tabs = createTabs(tabCount);
 
-		results += tabs + "CodingSchemeURI = " + codingSchemeSummary.getCodingSchemeURI() + "\n";
-		results += tabs + "FormalName = " + codingSchemeSummary.getFormalName() + "\n";
-		results += tabs + "LocalName = " + codingSchemeSummary.getLocalName() + "\n";
-		results += tabs + "RepresentsVersion = " + codingSchemeSummary.getRepresentsVersion() + "\n";
+		results.append(tabs + "CodingSchemeURI = " + codingSchemeSummary.getCodingSchemeURI() + "\n");
+		results.append(tabs + "FormalName = " + codingSchemeSummary.getFormalName() + "\n");
+		results.append(tabs + "LocalName = " + codingSchemeSummary.getLocalName() + "\n");
+		results.append(tabs + "RepresentsVersion = " + codingSchemeSummary.getRepresentsVersion() + "\n");
 
-		return results;
+		return results.toString();
 	}
 
 }

@@ -33,6 +33,7 @@ public class QueryData <Query extends ResourceQuery>{
 	private CodingSchemeVersionOrTag versionOrTag = null;
 	
 	public QueryData(Query query){
+		super();
 		if (query != null) {
 			if(query instanceof CodeSystemVersionQuery){
 				restrictions = (CodeSystemVersionQueryServiceRestrictions) ((CodeSystemVersionQuery) query).getRestrictions();
