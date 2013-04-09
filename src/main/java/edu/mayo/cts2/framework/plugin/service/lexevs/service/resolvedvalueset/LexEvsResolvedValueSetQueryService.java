@@ -106,7 +106,7 @@ public class LexEvsResolvedValueSetQueryService extends AbstractLexEvsService
 		}
 		
 		List<ResolvedValueSetDirectoryEntry> results= transform.transform(restrictedList);
-		List<ResolvedValueSetDirectoryEntry> pagedResult =CommonPageUtils.getRenderingList(results, page);
+		List<ResolvedValueSetDirectoryEntry> pagedResult =CommonPageUtils.getPaginatedList(results, page);
         boolean moreResults = results.size() > page.getEnd();
 		
 		
