@@ -21,16 +21,16 @@ import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryQuery;
 import edu.mayo.cts2.framework.service.profile.mapversion.MapVersionQuery;
 
 public class QueryData <Query extends ResourceQuery>{
-	Set<ResolvedFilter> filters = null;
-	Object restrictions = null;
-	NameOrURI codeSystem = null;
-	CodeSystemRestriction codeSystemRestriction = null;
-	String codingSchemeName = null;
-	boolean isMapQuery = false;
+	private Set<ResolvedFilter> filters = null;
+	private Object restrictions = null;
+	private NameOrURI codeSystem = null;
+	private CodeSystemRestriction codeSystemRestriction = null;
+	private String codingSchemeName = null;
+	private boolean isMapQuery = false;
 	
-	String codeSystemVersionName = null;
-	boolean hasNameAndVersion = false;
-	CodingSchemeVersionOrTag versionOrTag = null;
+	private String codeSystemVersionName = null;
+	private boolean hasNameAndVersion = false;
+	private CodingSchemeVersionOrTag versionOrTag = null;
 	
 	public QueryData(Query query){
 		if (query != null) {

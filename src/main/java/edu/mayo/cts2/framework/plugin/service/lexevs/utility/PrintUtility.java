@@ -14,7 +14,7 @@ public class PrintUtility {
 		return results;
 	}
 	
-	public static String resolvedConceptReference_toString(ResolvedConceptReference reference, int tabCount){
+	public static String createStringFromResolvedConceptReferenceObject(ResolvedConceptReference reference, int tabCount){
 		String results = "";
 		String tabs = createTabs(tabCount);
 		
@@ -27,14 +27,14 @@ public class PrintUtility {
 
 		results += tabs + " EntityDescription: " + reference.getEntityDescription().getContent() + "\n";
 		results += tabs + " Entities: \n";
-		results += entity_toString(reference.getEntity(), tabCount + 1) + "\n";
+		results += createStringFromEntityObject(reference.getEntity(), tabCount + 1) + "\n";
 		results += tabs + " SourceOf: " + reference.getSourceOf() + "\n";
 		results += tabs + " TargetOf: " + reference.getTargetOf() + "\n";
 		
 		return results;
 	}
 	
-	public static String entity_toString(Entity entity, int tabCount){
+	public static String createStringFromEntityObject(Entity entity, int tabCount){
 		String tabs = createTabs(tabCount);
 		String results = tabs + " EntityCode = " + entity.getEntityCode() + "\n";
 		
@@ -45,33 +45,33 @@ public class PrintUtility {
 
 		results += tabs + " EntityTypeCount = " + entity.getEntityTypeCount() + "\n";
 		results += tabs + " EntityTypes:\n ";
-		results += entityTypes_toString(entity, tabCount + 1);
+		results += createStringFromEntityTypesInEntityObject(entity, tabCount + 1);
 		
 		results += tabs + " CommentCount = " + entity.getCommentCount() + "\n";
 		results += tabs + " Comments:\n";
-		results += comments_toString(entity, tabCount + 1);
+		results += createStringFromCommentsInEntityObject(entity, tabCount + 1);
 		
 		results += tabs + " DefinitionCount = " + entity.getDefinitionCount() + "\n";
 		results += tabs + " Definitions:\n";
-		results += definitions_toString(entity, tabCount + 1);
+		results += createStringFromDefinitionsInEntityObject(entity, tabCount + 1);
 		
 		results += tabs + " PresentationCount = " + entity.getPresentationCount() + "\n";
 		results += tabs + " Presentations:\n";
-		results += presentations_toString(entity, tabCount + 1);
+		results += createStringFromPresentationsInEntityObject(entity, tabCount + 1);
 		
 		results += tabs + " PropertyCount = " + entity.getPropertyCount() + "\n";
 		results += tabs + " Properties:\n";
-		results += properties_toString(entity, tabCount + 1);
+		results += createStringFromPropertiesInEntityObject(entity, tabCount + 1);
 		
 		results += tabs + " PropertyLinkCount = " + entity.getPropertyLinkCount() + "\n";
 		results += tabs + " PropertyLinks:\n";
-		results += propertyLinks_toString(entity, tabCount + 1);
+		results += createStringFromPropertyLinksInEntityObject(entity, tabCount + 1);
 		
 		
 		return results;
 	}
 	
-	public static String presentations_toString(Entity entity, int tabCount){
+	public static String createStringFromPresentationsInEntityObject(Entity entity, int tabCount){
 		Presentation presentation;
 		String results = "";
 		String tabs = createTabs(tabCount);
@@ -90,20 +90,20 @@ public class PrintUtility {
 			
 			results += tabs + "--SourceCount = " + presentation.getSourceCount() + "\n";
 			results += tabs + "--Sources:\n";
-			results += source_toString(presentation, tabCount + 1);
+			results += createStringFromSourceInPresentationObject(presentation, tabCount + 1);
 			
 			results += tabs + "--PropertyQualifierCount = " + presentation.getPropertyQualifierCount() + "\n";
 			results += tabs + "--PropertyQualifiers:\n";
-			results += propertyQualifiers_toString(presentation, tabCount + 1);
+			results += createStringFromPropertyQualifiersInPresentationObject(presentation, tabCount + 1);
 			
 			results += tabs + "--UsageContextCount = " + presentation.getUsageContextCount() + "\n";
 			results += tabs + "--UsageContexts:\n";
-			results += usageContexts_toString(presentation, tabCount + 1);			
+			results += createStringFromUsageContextsInPresentationObject(presentation, tabCount + 1);			
 		}
 		return results;
 	}
 	
-	public static String source_toString(Presentation presentation, int tabCount){
+	public static String createStringFromSourceInPresentationObject(Presentation presentation, int tabCount){
 		String results = "";
 		String tabs = createTabs(tabCount);
 		int count = presentation.getSourceCount();
@@ -113,7 +113,7 @@ public class PrintUtility {
 		return results;
 	}
 	
-	public static String propertyQualifiers_toString(Presentation presentation, int tabCount){
+	public static String createStringFromPropertyQualifiersInPresentationObject(Presentation presentation, int tabCount){
 		String results = "";
 		String tabs = createTabs(tabCount);
 		int count = presentation.getPropertyQualifierCount();
@@ -123,7 +123,7 @@ public class PrintUtility {
 		return results;
 	}
 	
-	public static String usageContexts_toString(Presentation presentation, int tabCount){
+	public static String createStringFromUsageContextsInPresentationObject(Presentation presentation, int tabCount){
 		String results = "";
 		String tabs = createTabs(tabCount);
 		int count = presentation.getUsageContextCount();
@@ -133,7 +133,7 @@ public class PrintUtility {
 		return results;
 	}
 	
-	public static String properties_toString(Entity entity, int tabCount){
+	public static String createStringFromPropertiesInEntityObject(Entity entity, int tabCount){
 		String results = "";
 		String tabs = createTabs(tabCount);
 		int count = entity.getPropertyCount();
@@ -143,7 +143,7 @@ public class PrintUtility {
 		return results;
 	}
 	
-	public static String propertyLinks_toString(Entity entity, int tabCount){
+	public static String createStringFromPropertyLinksInEntityObject(Entity entity, int tabCount){
 		String results = "";
 		String tabs = createTabs(tabCount);
 		int count = entity.getPropertyLinkCount();
@@ -153,7 +153,7 @@ public class PrintUtility {
 		return results;
 	}
 	
-	public static String definitions_toString(Entity entity, int tabCount){
+	public static String createStringFromDefinitionsInEntityObject(Entity entity, int tabCount){
 		String results = "";
 		String tabs = createTabs(tabCount);
 		int count = entity.getDefinitionCount();
@@ -163,7 +163,7 @@ public class PrintUtility {
 		return results;
 	}
 	
-	public static String comments_toString(Entity entity, int tabCount){
+	public static String createStringFromCommentsInEntityObject(Entity entity, int tabCount){
 		String results = "";
 		String tabs = createTabs(tabCount);
 		int count = entity.getCommentCount();
@@ -173,7 +173,7 @@ public class PrintUtility {
 		return results;
 	}
 
-	public static String entityTypes_toString(Entity entity, int tabCount){
+	public static String createStringFromEntityTypesInEntityObject(Entity entity, int tabCount){
 		String results = "";
 		String tabs = createTabs(tabCount);
 		int count = entity.getEntityTypeCount();
