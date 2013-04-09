@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.mapversion.MapEntry;
 import edu.mayo.cts2.framework.model.mapversion.MapEntryDirectoryEntry;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.LexEvsToCTS2Transformer;
+import edu.mayo.cts2.framework.plugin.service.lexevs.transform.LexEvsToCTS2Transformer;
 
 @Component
 public class MappingToMapEntryTransform implements LexEvsToCTS2Transformer <MapEntry, ResolvedConceptReference, MapEntryDirectoryEntry, ResolvedConceptReference>  {

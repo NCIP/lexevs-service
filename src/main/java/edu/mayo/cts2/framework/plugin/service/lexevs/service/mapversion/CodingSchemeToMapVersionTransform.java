@@ -23,45 +23,43 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.mapversion;
 
-import javax.annotation.Resource;
-
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.codingSchemes.CodingScheme;
 import org.LexGrid.commonTypes.EntityDescription;
 import org.LexGrid.commonTypes.Property;
+import org.LexGrid.relations.Relations;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
+import edu.mayo.cts2.framework.model.core.CodeSystemVersionReference;
 import edu.mayo.cts2.framework.model.core.EntryDescription;
 import edu.mayo.cts2.framework.model.core.MapReference;
-import edu.mayo.cts2.framework.model.core.PredicateReference;
 import edu.mayo.cts2.framework.model.core.SourceAndNotation;
-import edu.mayo.cts2.framework.model.core.StatementTarget;
 import edu.mayo.cts2.framework.model.mapversion.MapVersion;
 import edu.mayo.cts2.framework.model.mapversion.MapVersionDirectoryEntry;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.LexEvsToCTS2Transformer;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.transform.AbstractBaseTransform;
+import edu.mayo.cts2.framework.plugin.service.lexevs.transform.TransformUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Tuple;
 
 /**
- * Transforms a LexGrid CodingScheme into a CTS2 MayVersion.
+ * Transforms a LexGrid CodingScheme into a CTS2 MapVersion.
  *
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
 @Component
-public class CodingSchemeToMapVersionTransform implements LexEvsToCTS2Transformer <MapVersion, CodingScheme, MapVersionDirectoryEntry, CodingSchemeRendering> {
-	
-	@Resource
-	private CodeSystemVersionNameConverter codeSystemVersionNameConverter;
-	
+public class CodingSchemeToMapVersionTransform extends AbstractBaseTransform <MapVersion, CodingScheme, MapVersionDirectoryEntry, CodingSchemeRendering> {
+
 	public CodingSchemeToMapVersionTransform(){
 		super();
 	}
 	
 	public CodingSchemeToMapVersionTransform(
-		CodeSystemVersionNameConverter codeSystemVersionNameConverter){
+		VersionNameConverter versionNameConverter){
 		super();
-		this.codeSystemVersionNameConverter = codeSystemVersionNameConverter;
+		this.setVersionNameConverter(versionNameConverter);
 	}
 
 	@Override
@@ -78,7 +76,7 @@ public class CodingSchemeToMapVersionTransform implements LexEvsToCTS2Transforme
 		
 		if(codingScheme.getProperties() != null){
 			for(Property property : codingScheme.getProperties().getProperty()){
-				mapVersion.addProperty(this.toProperty(property));
+				mapVersion.addProperty(TransformUtils.toProperty(property));
 			}
 		}
 		
@@ -102,6 +100,11 @@ public class CodingSchemeToMapVersionTransform implements LexEvsToCTS2Transforme
 		mapReference.setContent(codingScheme.getCodingSchemeName());
 		mapReference.setUri(codingScheme.getCodingSchemeURI());
 		mapVersion.setVersionOf(mapReference);
+		
+	
+		Tuple<CodeSystemVersionReference> fromAndTo = this.getFromToCodingSchemes(codingScheme);
+		mapVersion.setFromCodeSystemVersion(fromAndTo.getOne());
+		mapVersion.setToCodeSystemVersion(fromAndTo.getTwo());
 		
 		return mapVersion;
 	}
@@ -131,27 +134,26 @@ public class CodingSchemeToMapVersionTransform implements LexEvsToCTS2Transforme
 		return summary;
 	}
 	
-	protected edu.mayo.cts2.framework.model.core.Property toProperty(Property property){
-		edu.mayo.cts2.framework.model.core.Property cts2Prop = 
-			new edu.mayo.cts2.framework.model.core.Property();
-		
-		PredicateReference predicateRef = new PredicateReference();
-		predicateRef.setName(property.getPropertyName());
-		predicateRef.setUri(property.getPropertyName());
-		
-		cts2Prop.setPredicate(predicateRef);
-		
-		StatementTarget target = new StatementTarget();
-		target.setLiteral(ModelUtils.createOpaqueData(property.getValue().getContent()));
-		
-		cts2Prop.addValue(target);
-		
-		return cts2Prop;
-	}
-	
 	private String getName(CodingScheme codingScheme){
 		return this.getName(codingScheme.getCodingSchemeName(), 
 					codingScheme.getRepresentsVersion());
+	}
+	
+	protected Tuple<CodeSystemVersionReference> getFromToCodingSchemes(CodingScheme codingScheme){
+		Assert.isTrue(
+			codingScheme.getRelationsCount() == 1,
+			"Only ONE Relations container is allowed in a Mapping Coding Scheme.");
+		
+		Relations relations = codingScheme.getRelations(0);
+		String source = relations.getSourceCodingScheme();
+		String sourceVersion = relations.getSourceCodingSchemeVersion();
+		String target = relations.getTargetCodingScheme();
+		String targetVersion = relations.getTargetCodingSchemeVersion();
+		
+		return new Tuple<CodeSystemVersionReference>(
+				this.getTransformUtils().toCodeSystemVersionReference(source, sourceVersion),
+				this.getTransformUtils().toCodeSystemVersionReference(target, targetVersion)
+		);
 	}
 	
 	private String getName(CodingSchemeRendering codingScheme){
@@ -160,8 +162,8 @@ public class CodingSchemeToMapVersionTransform implements LexEvsToCTS2Transforme
 	}
 	
 	private String getName(String name, String version){
-		return this.codeSystemVersionNameConverter.
-				toCts2CodeSystemVersionName(name, version);
+		return this.getVersionNameConverter().
+				toCts2VersionName(name, version);
 	}
 	
 }

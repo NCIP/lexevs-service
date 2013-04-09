@@ -23,11 +23,12 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.uri;
 
+import javax.annotation.Resource;
+
+import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedCodedNodeReference;
 import org.LexGrid.codingSchemes.CodingScheme;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriResolver.IdType;
@@ -38,21 +39,11 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriResolver.IdType;
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
 @Component
-public class RestUriResolverUriHandler implements DelegateUriHandler, InitializingBean {
+public class RestUriResolverUriHandler implements DelegateUriHandler {
 
+	@Resource
 	private UriResolver uriResolver;
 
-	@Value("${uriResolutionServiceUrl}")
-	private String uriResolutionServiceUrl;
-	  
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
-	 */
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		this.uriResolver = new RestUriResolver(this.uriResolutionServiceUrl);
-	}
-	
 	/* 
 	 * This constructs an Entity URI based on the SupportedNamespace
 	 * of LexEVS.
@@ -79,22 +70,47 @@ public class RestUriResolverUriHandler implements DelegateUriHandler, Initializi
 	 */
 	@Override
 	public String getCodeSystemUri(CodingScheme codingScheme) {
+		return this.doGetCodeSystemUri(codingScheme.getCodingSchemeURI());
+
+	}
+	
+	@Override
+	public String getCodeSystemUri(CodingSchemeSummary codingScheme) {
+		return this.doGetCodeSystemUri(codingScheme.getCodingSchemeURI());
+	}
+	
+	protected String doGetCodeSystemUri(String uri) {
 		return this.uriResolver.
 				idToUri(
-					codingScheme.getCodingSchemeURI(), 
+					uri, 
 					IdType.CODE_SYSTEM);
 	}
+	
 
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler#getCodeSystemVersionUri(org.LexGrid.codingSchemes.CodingScheme)
 	 */
 	@Override
 	public String getCodeSystemVersionUri(CodingScheme codingScheme) {
+		return this.doGetCodeSystemVersionUri(
+			codingScheme.getCodingSchemeURI(),
+			codingScheme.getRepresentsVersion());
+	}
+
+	protected String doGetCodeSystemVersionUri(String uri, String version) {
 		return this.uriResolver.
 				idAndVersionToVersionUri(
-					codingScheme.getCodingSchemeURI(), 
-					codingScheme.getRepresentsVersion(),
+					uri, 
+					version,
 					IdType.CODE_SYSTEM);
+	}
+	
+	@Override
+	public String getCodeSystemVersionUri(
+			CodingSchemeSummary codingSchemeSummary) {
+		return this.doGetCodeSystemVersionUri(
+				codingSchemeSummary.getCodingSchemeURI(),
+				codingSchemeSummary.getRepresentsVersion());
 	}
 
 	@Override

@@ -43,7 +43,7 @@ import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.mapversion.MapEntry;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryReadService;
@@ -58,7 +58,7 @@ import edu.mayo.cts2.framework.service.profile.mapentry.name.MapEntryReadId;
 public class LexEvsMapEntryReadService extends AbstractLexEvsService implements MapEntryReadService, InitializingBean {
 
 	@Resource
-	private CodeSystemVersionNameConverter nameConverter;
+	private VersionNameConverter nameConverter;
 	
 	@Resource
 	private MappingToMapEntryTransform mappingToMapEntryTransform;
@@ -129,13 +129,8 @@ public class LexEvsMapEntryReadService extends AbstractLexEvsService implements 
 			MapEntryReadId identifier,
 			ResolvedReadContext readContext) {
 		
-		ResolvedConceptReference resolvedConceptReference = getResolvedConceptReference(identifier, readContext);
-		
-		if (resolvedConceptReference != null) {
-			return this.mappingToMapEntryTransform.transformDescription(resolvedConceptReference);
-		} else {
-			return new MapEntry();
-		}
+		ResolvedConceptReference resolvedConceptReference = getResolvedConceptReference(identifier, readContext);		
+		return this.mappingToMapEntryTransform.transformDescription(resolvedConceptReference);
 	}
 
 	@Override
@@ -143,6 +138,8 @@ public class LexEvsMapEntryReadService extends AbstractLexEvsService implements 
 		return getResolvedConceptReference(identifier, readContext) != null;
 	}
 
+	// Methods returning empty lists or sets
+	// -------------------------------------
 	@Override
 	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
 		return new ArrayList<DocumentedNamespaceReference>();

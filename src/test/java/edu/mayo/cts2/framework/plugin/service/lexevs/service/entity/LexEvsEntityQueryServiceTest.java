@@ -35,7 +35,7 @@ import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.entity.EntityDescription;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.FakeLexEvsData.DataField;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.FakeLexEvsSystem;
 import edu.mayo.cts2.framework.service.command.restriction.EntityDescriptionQueryServiceRestrictions;
@@ -63,7 +63,7 @@ public class LexEvsEntityQueryServiceTest {
 
 		// Overwrite objects in service object 
 		service.setEntityTransformer(new EntityTransform());
-		service.setCodeSystemVersionNameConverter(new CodeSystemVersionNameConverter());
+		service.setCodeSystemVersionNameConverter(new VersionNameConverter());
 		
 		return service;
 	}

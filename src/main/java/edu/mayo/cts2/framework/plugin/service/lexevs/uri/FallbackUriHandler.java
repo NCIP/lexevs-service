@@ -25,6 +25,7 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.uri;
 
 import javax.annotation.Resource;
 
+import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedCodedNodeReference;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.codingSchemes.CodingScheme;
@@ -61,15 +62,25 @@ public class FallbackUriHandler implements DelegateUriHandler {
 	public String getCodeSystemUri(CodingScheme codingScheme) {
 		return codingScheme.getCodingSchemeURI();
 	}
+	
+	@Override
+	public String getCodeSystemUri(CodingSchemeSummary codingSchemeSummary) {
+		return codingSchemeSummary.getCodingSchemeURI();
+	}
 
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler#getCodeSystemVersionUri(org.LexGrid.codingSchemes.CodingScheme)
 	 */
 	@Override
 	public String getCodeSystemVersionUri(CodingScheme codingScheme) {
-		return codingScheme.getCodingSchemeURI() + "#" + codingScheme.getRepresentsVersion();
+		return codingScheme.getCodingSchemeURI() + "/" + codingScheme.getRepresentsVersion();
 	}
 
+	@Override
+	public String getCodeSystemVersionUri(CodingSchemeSummary codingSchemeSummary) {
+		return codingSchemeSummary.getCodingSchemeURI() + "/" + codingSchemeSummary.getRepresentsVersion();
+	}
+	
 	@Override
 	public int getOrder() {
 		return 2;

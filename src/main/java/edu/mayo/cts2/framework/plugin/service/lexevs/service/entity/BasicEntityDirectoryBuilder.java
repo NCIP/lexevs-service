@@ -21,45 +21,36 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package edu.mayo.cts2.framework.plugin.service.lexevs.uri;
+package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 
-import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
-import org.LexGrid.LexBIG.DataModel.Core.ResolvedCodedNodeReference;
-import org.LexGrid.codingSchemes.CodingScheme;
+import java.util.Set;
+
+import edu.mayo.cts2.framework.filter.directory.AbstractStateBuildingDirectoryBuilder;
+import edu.mayo.cts2.framework.filter.match.StateAdjustingPropertyReference;
+import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 
 /**
- * Responsible for constructing URIs from LexEVS resources.
+ * A Basic EntityDirectoryBuilder.
  *
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
-public interface UriHandler {
+public class BasicEntityDirectoryBuilder<T> extends AbstractStateBuildingDirectoryBuilder<String,T> {
 
 	/**
-	 * Gets the entity uri.
+	 * Instantiates a new basic entity directory builder.
 	 *
-	 * @param reference the reference
-	 * @return the entity uri
+	 * @param initialState the initial state
+	 * @param callback the callback
+	 * @param matchAlgorithmReferences the match algorithm references
+	 * @param stateAdjustingPropertyReferences the state adjusting property references
 	 */
-	public String getEntityUri(ResolvedCodedNodeReference reference);
-	
-	/**
-	 * Gets the code system uri.
-	 *
-	 * @param codingScheme the coding scheme
-	 * @return the code system uri
-	 */
-	public String getCodeSystemUri(CodingScheme codingScheme);
-	
-	public String getCodeSystemUri(CodingSchemeSummary codingSchemeSummary);
+	public BasicEntityDirectoryBuilder(
+			String initialState,
+			AbstractStateBuildingDirectoryBuilder.Callback<String, T> callback,
+			Set<MatchAlgorithmReference> matchAlgorithmReferences,
+			Set<StateAdjustingPropertyReference<String>> stateAdjustingPropertyReferences) {
+		super(initialState, callback, matchAlgorithmReferences,
+				stateAdjustingPropertyReferences);
+	}
 
-	/**
-	 * Gets the code system version uri.
-	 *
-	 * @param codingScheme the coding scheme
-	 * @return the code system version uri
-	 */
-	public String getCodeSystemVersionUri(CodingScheme codingScheme);
-
-	public String getCodeSystemVersionUri(CodingSchemeSummary codingSchemeSummary);
-	
 }

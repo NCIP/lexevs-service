@@ -42,11 +42,10 @@ import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.entity.EntityDescription;
-import edu.mayo.cts2.framework.model.entity.EntityList;
 import edu.mayo.cts2.framework.model.entity.EntityListEntry;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
@@ -68,12 +67,12 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 	private EntityTransform transformer;
 	
 	@Resource
-	private CodeSystemVersionNameConverter nameConverter;
+	private VersionNameConverter nameConverter;
 
 	// ------ Local methods ----------------------
 	public void setCodeSystemVersionNameConverter(
-			CodeSystemVersionNameConverter codeSystemVersionNameConverter) {
-		this.nameConverter = codeSystemVersionNameConverter;
+			VersionNameConverter versionNameConverter) {
+		this.nameConverter = versionNameConverter;
 	}
 
 	public void setEntityTransform(EntityTransform entityTransform) {
@@ -105,45 +104,45 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 	}
 	
 	@Override
-	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
-		return new ArrayList<DocumentedNamespaceReference>();
-	}
+	public List<VersionTagReference> getSupportedVersionTags() {
+		return Arrays.asList(Constants.CURRENT_TAG);
+	}	
 
+	// Not going to implement following methods
+	// ----------------------------------------
 	@Override
 	public DirectoryResult<EntityListEntry> readEntityDescriptions(
 			EntityNameOrURI entityId, SortCriteria sortCriteria,
 			ResolvedReadContext readContext, Page page) {
-		
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException();
 	}
-
+	
 	@Override
 	public EntityReference availableDescriptions(EntityNameOrURI entityId,
 			ResolvedReadContext readContext) {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public EntityList readEntityDescriptions(EntityNameOrURI entityId,
+	public List<EntityListEntry> readEntityDescriptions(EntityNameOrURI entityId,
 			ResolvedReadContext readContext) {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public List<CodeSystemReference> getKnownCodeSystems() {
-		return new ArrayList<CodeSystemReference>();
-	}
-
+	// Methods returning empty lists or sets
+	// -------------------------------------
 	@Override
 	public List<CodeSystemVersionReference> getKnownCodeSystemVersions() {
 		return new ArrayList<CodeSystemVersionReference>();
 	}
 
 	@Override
-	public List<VersionTagReference> getSupportedVersionTags() {
-		return Arrays.asList(Constants.CURRENT_TAG);
-	}	
+	public List<CodeSystemReference> getKnownCodeSystems() {
+		return new ArrayList<CodeSystemReference>();
+	}
+	
+	@Override
+	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
+		return new ArrayList<DocumentedNamespaceReference>();
+	}
 }

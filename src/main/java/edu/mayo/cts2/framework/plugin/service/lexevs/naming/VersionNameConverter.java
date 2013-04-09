@@ -38,7 +38,7 @@ import org.springframework.util.Assert;
  * CodingSchemeName: SNOMEDCT, VersionId: 20120101
  */
 @Component
-public class CodeSystemVersionNameConverter {
+public class VersionNameConverter {
 
 	private static final String SEPARATOR = "-";
 	
@@ -49,7 +49,7 @@ public class CodeSystemVersionNameConverter {
 	 * @param version the version
 	 * @return the string
 	 */
-	public String toCts2CodeSystemVersionName(String lexEvsCodingSchemeName, String version){
+	public String toCts2VersionName(String lexEvsCodingSchemeName, String version){
 		return lexEvsCodingSchemeName + SEPARATOR + version;
 	}
 	
@@ -59,7 +59,7 @@ public class CodeSystemVersionNameConverter {
 	 * @param cts2CodeSystemVersionName the cts2 code system version name
 	 * @return the name version pair
 	 */
-	public NameVersionPair fromCts2CodeSystemVersionName(String cts2CodeSystemVersionName){
+	public NameVersionPair fromCts2VersionName(String cts2CodeSystemVersionName){
 		String[] nameParts = StringUtils.split(cts2CodeSystemVersionName, SEPARATOR);
 		
 		Assert.isTrue(nameParts.length == 2);
@@ -67,7 +67,7 @@ public class CodeSystemVersionNameConverter {
 		return new NameVersionPair(nameParts[0], nameParts[1]);
 	}
 	
-	public boolean isValidCodeSystemVersionName(String cts2CodeSystemVersionName){
+	public boolean isValidVersionName(String cts2CodeSystemVersionName){
 		boolean answer = false;
 		
 		String[] nameParts = StringUtils.split(cts2CodeSystemVersionName, SEPARATOR);

@@ -23,9 +23,18 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.mapentry;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Resource;
+
+import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
+import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
+import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
+import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.command.Page;
@@ -37,7 +46,12 @@ import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.mapversion.MapEntry;
 import edu.mayo.cts2.framework.model.mapversion.MapEntryDirectoryEntry;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonPageUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceSummaryUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.QueryData;
 import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryQuery;
 import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryQueryService;
 
@@ -48,20 +62,57 @@ import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryQueryService;
 */
 @Component
 public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
-		MapEntryQueryService {
+		MapEntryQueryService, InitializingBean {
 
-	// ------ Local methods ----------------------
+	@Resource
+	private VersionNameConverter nameConverter;
 	
+	@Resource
+	private MappingToMapEntryTransform transformer;
+		
+	private MappingExtension mappingExtension;
+	
+	public static final String MAPPING_EXTENSION = "MappingExtension";	
+	
+	// ------ Local methods ----------------------
+	public void setCodeSystemVersionNameConverter(
+			VersionNameConverter versionNameConverter) {
+		this.nameConverter = versionNameConverter;
+	}
+	
+	public void setEntityTransformer(
+			MappingToMapEntryTransform mapTransform) {
+		this.transformer = mapTransform;
+	}
+	
+	public void setMappingExtension(MappingExtension extension){
+		this.mappingExtension = extension;
+	}
+
+
 	
 	// -------- Implemented methods ----------------	
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(MAPPING_EXTENSION);
+	}
+		
+
+	
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.service.profile.QueryService#getResourceSummaries(edu.mayo.cts2.framework.service.profile.ResourceQuery, edu.mayo.cts2.framework.model.core.SortCriteria, edu.mayo.cts2.framework.model.command.Page)
 	 */
 	@Override
 	public DirectoryResult<MapEntryDirectoryEntry> getResourceSummaries(
 			MapEntryQuery query, SortCriteria sortCriteria, Page page) {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO not correct implementation yet, still in progress
+		LexBIGService lexBigService = this.getLexBigService();
+		QueryData<MapEntryQuery> queryData = new QueryData<MapEntryQuery>(query);
+		
+		CodingSchemeRendering[] csRendering = CommonResourceSummaryUtils.getCodingSchemeRendering(lexBigService, nameConverter, queryData, null, sortCriteria);
+		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPageFromArray(csRendering, page);
+		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
+		return CommonResourceSummaryUtils.createDirectoryResultWithEntrySummaryData(lexBigService, this.transformer, csRenderingPage, atEnd);
 	}
 
 	/* (non-Javadoc)
@@ -70,17 +121,28 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	@Override
 	public DirectoryResult<MapEntry> getResourceList(MapEntryQuery query,
 			SortCriteria sortCriteria, Page page) {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO not correct implementation yet, still in progress
+		LexBIGService lexBigService = this.getLexBigService();
+		QueryData<MapEntryQuery> queryData = new QueryData<MapEntryQuery>(query);
+		
+		CodingSchemeRendering[] csRendering = CommonResourceSummaryUtils.getCodingSchemeRendering(lexBigService, nameConverter, queryData, null, sortCriteria);
+		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPageFromArray(csRendering, page);
+		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
+		return CommonResourceSummaryUtils.createDirectoryResultWithRenderedEntryData(lexBigService, this.transformer, csRenderingPage, atEnd);
 	}
 
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.service.profile.QueryService#count(edu.mayo.cts2.framework.service.profile.ResourceQuery)
 	 */
 	@Override
-	public int count(MapEntryQuery query) {
-		// TODO Auto-generated method stub
-		return 0;
+	public int count(MapEntryQuery query) {		
+		// TODO not correct implementation yet, still in progress
+		LexBIGService lexBigService = this.getLexBigService();
+		QueryData<MapEntryQuery> queryData = new QueryData<MapEntryQuery>(query);
+		
+		CodingSchemeRenderingList csrFilteredList;
+		csrFilteredList = CommonResourceSummaryUtils.getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, null);
+		return csrFilteredList.getCodingSchemeRendering().length;
 	}
 
 	/* (non-Javadoc)
@@ -88,8 +150,7 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	 */
 	@Override
 	public Set<? extends MatchAlgorithmReference> getSupportedMatchAlgorithms() {
-		// TODO Auto-generated method stub
-		return null;
+		return CommonSearchFilterUtils.createSupportedMatchAlgorithms();
 	}
 
 	/* (non-Javadoc)
@@ -97,17 +158,20 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	 */
 	@Override
 	public Set<? extends PropertyReference> getSupportedSearchReferences() {
-		// TODO Auto-generated method stub
-		return null;
+		return CommonSearchFilterUtils.createSupportedSearchReferences();
 	}
 
+	
+	
+	// Methods returning empty lists or sets
+	// -------------------------------------
+	
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.service.profile.BaseQueryService#getSupportedSortReferences()
 	 */
 	@Override
 	public Set<? extends PropertyReference> getSupportedSortReferences() {
-		// TODO Auto-generated method stub
-		return null;
+		return new HashSet<PropertyReference>();
 	}
 
 	/* (non-Javadoc)
@@ -115,8 +179,7 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	 */
 	@Override
 	public Set<PredicateReference> getKnownProperties() {
-		// TODO Auto-generated method stub
-		return null;
+		return new HashSet<PredicateReference>();
 	}
 
 	/* (non-Javadoc)
@@ -124,8 +187,7 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	 */
 	@Override
 	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<DocumentedNamespaceReference>();
 	}
 
 }

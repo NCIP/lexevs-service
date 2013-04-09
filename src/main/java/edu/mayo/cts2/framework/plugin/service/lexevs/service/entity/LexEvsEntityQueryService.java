@@ -32,6 +32,9 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.LexGrid.LexBIG.DataModel.Core.ConceptReference;
+import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
+import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Exceptions.LBResourceUnavailableException;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
@@ -44,6 +47,7 @@ import edu.mayo.cts2.framework.model.core.EntityReferenceList;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
 import edu.mayo.cts2.framework.model.core.PropertyReference;
+import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
@@ -52,7 +56,7 @@ import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURIList;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonPageUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceSummaryUtils;
@@ -74,15 +78,15 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		implements EntityDescriptionQueryService {
 
 	@Resource
-	private CodeSystemVersionNameConverter nameConverter;
+	private VersionNameConverter nameConverter;
 	
 	@Resource
 	private EntityTransform transformer;
 		
 	// ------ Local methods ----------------------
 	public void setCodeSystemVersionNameConverter(
-			CodeSystemVersionNameConverter codeSystemVersionNameConverter) {
-		this.nameConverter = codeSystemVersionNameConverter;
+			VersionNameConverter versionNameConverter) {
+		this.nameConverter = versionNameConverter;
 	}
 	
 	public void setEntityTransformer(
@@ -99,6 +103,7 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		LexBIGService lexBigService = this.getLexBigService();
 		QueryData<EntityDescriptionQuery> queryData = new QueryData<EntityDescriptionQuery>(query);
 		queryData.setVersionOrTag(nameConverter);
+		
 		CodedNodeSet codedNodeSet;
 		codedNodeSet = CommonResourceSummaryUtils.getCodedNodeSet(lexBigService, queryData, null);
 		
@@ -114,6 +119,44 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		}
 		
 		return count;
+	}
+
+	@Override
+	public boolean isEntityInSet(EntityNameOrURI nameOrUri,
+			EntityDescriptionQuery query, ResolvedReadContext readContext) {
+		SortCriteria sortCriteria = null;
+		
+		LexBIGService lexBigService = this.getLexBigService();
+		QueryData<EntityDescriptionQuery> queryData = new QueryData<EntityDescriptionQuery>(query);
+		queryData.setVersionOrTag(nameConverter);
+		
+		CodedNodeSet codedNodeSet = CommonResourceSummaryUtils.getCodedNodeSet(lexBigService, queryData, sortCriteria);
+		
+		ScopedEntityName entityName = nameOrUri.getEntityName();
+		String uri = nameOrUri.getUri();
+		
+		ConceptReference cts2Code = new ConceptReference();
+		try {
+			if(entityName != null){
+				String code = entityName.getName();
+				String nameSpace = entityName.getNamespace();
+				
+				cts2Code.setCode(code);
+				cts2Code.setCodeNamespace(nameSpace);
+				return codedNodeSet.isCodeInSet(cts2Code);
+			}
+			else if(uri != null){
+				// TODO need to lookup in LexEVS, turn uri into name LexEvs can understand then update cts2Code object
+				return codedNodeSet.isCodeInSet(cts2Code);
+			}
+		
+		} catch (LBInvocationException e) {
+			throw new UnsupportedOperationException();
+		} catch (LBParameterException e) {
+			throw new UnsupportedOperationException();
+		}
+		
+		return false;
 	}
 
 	@Override
@@ -161,6 +204,30 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 	}
 
 	@Override
+	public Set<VersionTagReference> getSupportedTags() {
+		return new HashSet<VersionTagReference>(Arrays.asList(Constants.CURRENT_TAG));
+	}
+
+	
+	// Not going to implement following methods
+	// ----------------------------------------
+	@Override
+	public EntityReferenceList resolveAsEntityReferenceList(
+			EntityDescriptionQuery arg0, ResolvedReadContext arg1) {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public EntityNameOrURIList intersectEntityList(
+			Set<EntityNameOrURI> entities,
+			EntityDescriptionQuery restrictions, 
+			ResolvedReadContext readContext) {
+		throw new UnsupportedOperationException();
+	}
+
+	// Methods returning empty lists or sets
+	// -------------------------------------
+	@Override
 	public Set<? extends PropertyReference> getSupportedSortReferences() {
 		return new HashSet<PropertyReference>();
 	}
@@ -175,32 +242,6 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		return new ArrayList<DocumentedNamespaceReference>();
 	}
 
-	@Override
-	public EntityNameOrURIList intersectEntityList(
-			Set<EntityNameOrURI> entities,
-			EntityDescriptionQuery restrictions, 
-			ResolvedReadContext readContext) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Set<VersionTagReference> getSupportedTags() {
-		return new HashSet<VersionTagReference>(Arrays.asList(Constants.CURRENT_TAG));
-	}
-
-	@Override
-	public boolean isEntityInSet(EntityNameOrURI arg0,
-			EntityDescriptionQuery arg1, ResolvedReadContext arg2) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public EntityReferenceList resolveAsEntityReferenceList(
-			EntityDescriptionQuery arg0, ResolvedReadContext arg1) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 }
 

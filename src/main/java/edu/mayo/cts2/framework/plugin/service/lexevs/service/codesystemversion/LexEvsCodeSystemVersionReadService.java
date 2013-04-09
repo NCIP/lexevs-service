@@ -40,7 +40,7 @@ import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodeSystemVersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsCodeSystemService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
@@ -61,7 +61,7 @@ public class LexEvsCodeSystemVersionReadService extends
 	private CodingSchemeToCodeSystemTransform transformer;
 
 	@Resource
-	private CodeSystemVersionNameConverter nameConverter;
+	private VersionNameConverter nameConverter;
 
 	// ------ Local methods ----------------------
 	public void setCodingSchemeToCodeSystemTransform(
@@ -70,7 +70,7 @@ public class LexEvsCodeSystemVersionReadService extends
 	}
 
 	public void setCodeSystemVersionNameConverter(
-			CodeSystemVersionNameConverter nameConverter) {
+			VersionNameConverter nameConverter) {
 		this.nameConverter = nameConverter;
 	}
 
@@ -78,7 +78,9 @@ public class LexEvsCodeSystemVersionReadService extends
 	@Override
 	public CodeSystemVersionCatalogEntry readByTag(NameOrURI codeSystem,
 			VersionTagReference tag, ResolvedReadContext readContext) {
-
+		if(codeSystem == null || tag == null){
+			return null;
+		}
 		return this.getByVersionIdOrTag(codeSystem, this.convertTag(tag));
 	}
 
@@ -96,6 +98,10 @@ public class LexEvsCodeSystemVersionReadService extends
 	@Override
 	public CodeSystemVersionCatalogEntry read(NameOrURI identifier,
 			ResolvedReadContext readContext) {
+		if(identifier == null){
+			return null;
+		}
+		
 		NameOrURI name = new NameOrURI();
 		CodingSchemeVersionOrTag versionOrTag = new CodingSchemeVersionOrTag();
 		
@@ -114,11 +120,6 @@ public class LexEvsCodeSystemVersionReadService extends
 	}
 
 	@Override
-	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
-		return new ArrayList<DocumentedNamespaceReference>();
-	}
-
-	@Override
 	public boolean existsVersionId(NameOrURI codeSystem,
 			String officialResourceVersionId) {
 		return this.getCodeSystemByVersionId(codeSystem, officialResourceVersionId, null) != null;
@@ -128,7 +129,10 @@ public class LexEvsCodeSystemVersionReadService extends
 	public CodeSystemVersionCatalogEntry getCodeSystemByVersionId(
 			NameOrURI codeSystem, String officialResourceVersionId,
 			ResolvedReadContext readContext) {
-
+		if(codeSystem == null){
+			return null;
+		}
+		
 		CodingSchemeVersionOrTag versionOrTag = Constructors.createCodingSchemeVersionOrTagFromVersion(officialResourceVersionId);
 		CodeSystemVersionCatalogEntry entry = this.getByVersionIdOrTag(codeSystem, versionOrTag);
         return entry;
@@ -137,6 +141,13 @@ public class LexEvsCodeSystemVersionReadService extends
 	@Override
 	protected CodeSystemVersionCatalogEntry transform(CodingScheme codingScheme) {
 		return this.transformer.transformDescription(codingScheme);
+	}
+
+	// Methods returning empty lists or sets
+	// -------------------------------------
+	@Override
+	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
+		return new ArrayList<DocumentedNamespaceReference>();
 	}
 
 }

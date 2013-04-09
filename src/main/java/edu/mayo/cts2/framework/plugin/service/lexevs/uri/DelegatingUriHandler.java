@@ -26,8 +26,10 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.uri;
 import java.util.Collections;
 import java.util.List;
 
+import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedCodedNodeReference;
 import org.LexGrid.codingSchemes.CodingScheme;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
@@ -57,30 +59,76 @@ public class DelegatingUriHandler implements UriHandler, InitializingBean {
 	 * @see edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler#getEntityUri(org.LexGrid.LexBIG.DataModel.Core.ResolvedCodedNodeReference)
 	 */
 	@Override
-	public String getEntityUri(ResolvedCodedNodeReference reference) {
-		String codingSchemeUri = reference.getCodingSchemeURI();
-	
-		String name = reference.getCode();
-		
-		return codingSchemeUri + "/" + name;
+	public String getEntityUri(final ResolvedCodedNodeReference reference) {
+		return this.doIn(new DoInDelegates(){
+			@Override
+			public String f(UriHandler uriHandler) {
+				return uriHandler.getEntityUri(reference);
+			}	
+		});
 	}
 	
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler#getCodeSystemUri(org.LexGrid.codingSchemes.CodingScheme)
 	 */
 	@Override
-	public String getCodeSystemUri(CodingScheme codingScheme) {
-		return codingScheme.getCodingSchemeURI();
+	public String getCodeSystemUri(final CodingScheme codingScheme) {
+		return this.doIn(new DoInDelegates(){
+			@Override
+			public String f(UriHandler uriHandler) {
+				return uriHandler.getCodeSystemUri(codingScheme);
+			}	
+		});
+	}
+	
+	@Override
+	public String getCodeSystemUri(final CodingSchemeSummary codingScheme) {
+		return this.doIn(new DoInDelegates(){
+			@Override
+			public String f(UriHandler uriHandler) {
+				return uriHandler.getCodeSystemUri(codingScheme);
+			}	
+		});
 	}
 
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler#getCodeSystemVersionUri(org.LexGrid.codingSchemes.CodingScheme)
 	 */
 	@Override
-	public String getCodeSystemVersionUri(CodingScheme codingScheme) {
-		return codingScheme.getCodingSchemeURI() + "#" + codingScheme.getRepresentsVersion();
+	public String getCodeSystemVersionUri(final CodingScheme codingScheme) {
+		return this.doIn(new DoInDelegates(){
+			@Override
+			public String f(UriHandler uriHandler) {
+				return uriHandler.getCodeSystemVersionUri(codingScheme);
+			}			
+		});
 	}
 
+	@Override
+	public String getCodeSystemVersionUri(final CodingSchemeSummary codingSchemeSummary) {
+		return this.doIn(new DoInDelegates(){
+			@Override
+			public String f(UriHandler uriHandler) {
+				return uriHandler.getCodeSystemVersionUri(codingSchemeSummary);
+			}			
+		});
+	}
+	
+	private interface DoInDelegates {
+		public String f(UriHandler uriHandler);
+	}
+	
+	protected String doIn(DoInDelegates doIn){
+		for(UriHandler handler : this.delegateUriHandlers){
+			String uri = doIn.f(handler);
+			if(StringUtils.isNotBlank(uri)){
+				return uri;
+			}
+		}
+		
+		throw new IllegalStateException("Uri not found - please implement a Fallback Handler.");
+	}
+	
 	public List<DelegateUriHandler> getDelegateUriHandlers() {
 		return delegateUriHandlers;
 	}
