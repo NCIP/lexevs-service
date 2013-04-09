@@ -17,21 +17,23 @@ import edu.mayo.cts2.framework.service.profile.ResourceQuery;
 import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersionQuery;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQuery;
 import edu.mayo.cts2.framework.service.profile.map.MapQuery;
+import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryQuery;
 import edu.mayo.cts2.framework.service.profile.mapversion.MapVersionQuery;
 
 public class QueryData <Query extends ResourceQuery>{
-	Set<ResolvedFilter> filters = null;
-	Object restrictions = null;
-	NameOrURI codeSystem = null;
-	CodeSystemRestriction codeSystemRestriction = null;
-	String codingSchemeName = null;
-	boolean isMapQuery = false;
+	private Set<ResolvedFilter> filters = null;
+	private Object restrictions = null;
+	private NameOrURI codeSystem = null;
+	private CodeSystemRestriction codeSystemRestriction = null;
+	private String codingSchemeName = null;
+	private boolean isMapQuery = false;
 	
-	String codeSystemVersionName = null;
-	boolean hasNameAndVersion = false;
-	CodingSchemeVersionOrTag versionOrTag = null;
+	private String codeSystemVersionName = null;
+	private boolean hasNameAndVersion = false;
+	private CodingSchemeVersionOrTag versionOrTag = null;
 	
 	public QueryData(Query query){
+		super();
 		if (query != null) {
 			if(query instanceof CodeSystemVersionQuery){
 				restrictions = (CodeSystemVersionQueryServiceRestrictions) ((CodeSystemVersionQuery) query).getRestrictions();
@@ -41,7 +43,6 @@ public class QueryData <Query extends ResourceQuery>{
 						codingSchemeName = (codeSystem.getUri() != null) ? codeSystem.getUri() : codeSystem.getName();
 					}
 				}
-//				codeSystemRestriction = null;
 			}
 			else if(query instanceof EntityDescriptionQuery){
 				restrictions = (EntityDescriptionQueryServiceRestrictions) ((EntityDescriptionQuery) query).getRestrictions();
@@ -49,19 +50,29 @@ public class QueryData <Query extends ResourceQuery>{
 					codeSystemVersionName = ((EntityDescriptionQueryServiceRestrictions) restrictions).getCodeSystemVersion().getName();
 					// Remaining data is collected via QueryData.setVersionOrTag method
 				}
-//				codeSystemRestriction = null;
 			}
 			else if(query instanceof MapQuery){
-				restrictions = (MapQueryServiceRestrictions) ((MapQuery) query).getRestrictions();
+				restrictions = ((MapQuery) query).getRestrictions();
 				if(restrictions != null){
 					codeSystemRestriction = ((MapQueryServiceRestrictions) restrictions).getCodeSystemRestriction();
 				}
-//				codeSystem = null;
-//				codingSchemeName = null;
 				isMapQuery = true;
 			}
 			else if(query instanceof MapVersionQuery){
-				restrictions = (MapQueryServiceRestrictions) ((MapVersionQuery) query).getRestrictions();
+				restrictions = ((MapVersionQuery) query).getRestrictions();
+				if(restrictions != null){
+					codeSystemRestriction =  ((MapQueryServiceRestrictions) restrictions).getCodeSystemRestriction();
+					if(codeSystemRestriction != null){
+						codeSystem = ((MapVersionQueryServiceRestrictions) restrictions).getMap(); 
+						if(codeSystem != null){
+							codingSchemeName = (codeSystem.getUri() != null) ? codeSystem.getUri() : codeSystem.getName();
+						}
+					}
+				}
+				isMapQuery = true;
+			}
+			else if(query instanceof MapEntryQuery){
+				restrictions = ((MapEntryQuery) query).getRestrictions();
 				if(restrictions != null){
 					codeSystemRestriction = ((MapQueryServiceRestrictions) restrictions).getCodeSystemRestriction();
 					if(codeSystemRestriction != null){
@@ -71,8 +82,7 @@ public class QueryData <Query extends ResourceQuery>{
 						}
 					}
 				}
-//				codingSchemeName = null;
-				isMapQuery = true;
+				isMapQuery = true;		
 			}
 			
 			filters = query.getFilterComponent();

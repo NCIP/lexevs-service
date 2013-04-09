@@ -31,7 +31,9 @@ public final class Constants {
 	public static final String MAP_FROM_ROLE = "MAP_FROM_ROLE"; // represents target mapping
 	public static final String BOTH_MAP_ROLES = "BOTH_MAP_ROLES"; // represents source or target mapping
 	
+	public static final String MAPPING_EXTENSION = "MappingExtension";	
 	
+
 	private Constants(){
 		super();
 	}

@@ -31,8 +31,12 @@ import java.util.Set;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PropertyReference;
+import edu.mayo.cts2.framework.model.util.ModelUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.service.entity.EntityDescriptionQueryImpl;
+import edu.mayo.cts2.framework.service.command.restriction.EntityDescriptionQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
+import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQuery;
 
 /**
  *  @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
@@ -68,7 +72,44 @@ public class CommonTestUtils {
 		return results;
 	}
 
+	public static String createValidValuesMessage(String values){
+		return "Searching for (" + values + ") and should be found";
+	}
+	public static String createInvalidValuesMessage(String values){
+		return "Searching for (" +  values + ") and should NOT be found.";
+	}
 	
+	public static String createNullValueMessage(String field){
+		return "Searching for NULL " + field + " and should NOT be found.";
+	}
+	
+	public static EntityDescriptionQuery createQuery(String matchAlgorithmReference, String matchValue, String codeSystemVersion){
+		// Create filters for query
+		// ------------------------
+		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();	
+		ResolvedFilter filter = CommonTestUtils.createFilter(matchAlgorithmReference,  matchValue, null);				
+		filters.add(filter);
+		
+		// Create restriction for query
+		// ----------------------------
+		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
+		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName(codeSystemVersion));
+		
+		
+		EntityDescriptionQuery query = new EntityDescriptionQueryImpl(null, filters, restrictions);
+		return query;
+	}
+
+	public static ResolvedFilter createFilter(String matchAlgorithmReference, String matchValue, PropertyReference propertyReference){
+		ResolvedFilter filter = new ResolvedFilter();			
+		filter.setMatchAlgorithmReference(new MatchAlgorithmReference(matchAlgorithmReference));
+		filter.setMatchValue(matchValue);
+		filter.setPropertyReference(propertyReference);				// Should this field be used??			
+		return filter;
+	}
+
+
+
 	
 	// FILTER METHODS
 	public static ResolvedFilter createFilter(PropertyReference property, MatchAlgorithmReference algorithm, String matchValue){

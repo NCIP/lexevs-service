@@ -11,6 +11,8 @@ import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.LexBIG.Exceptions.LBException;
+import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
+import org.LexGrid.LexBIG.Exceptions.LBRuntimeException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
@@ -25,11 +27,13 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.transform.LexEvsToCTS2Trans
 import edu.mayo.cts2.framework.service.profile.ResourceQuery;
 
 public class CommonResourceSummaryUtils{
+	private final static String UNCHECKED = "unchecked";
+	private final static String RAWTYPES = "rawtypes";
 	
 	/// create DirectoryResults with EntrySummaryData
 	// ---------------------------------------
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ UNCHECKED, RAWTYPES })
 	public static <SummaryType, DataType> DirectoryResult<SummaryType> createDirectoryResultWithResolvedEntrySummaryData(
 			LexBIGService lexBigService, 
 			LexEvsToCTS2Transformer transformer,
@@ -52,7 +56,7 @@ public class CommonResourceSummaryUtils{
 		return directoryResult;
 	}	
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ UNCHECKED, RAWTYPES })
 	public static <SummaryType, DataType> DirectoryResult<SummaryType> createDirectoryResultWithEntrySummaryData(
 			LexBIGService lexBigService,
 			LexEvsToCTS2Transformer transformer,
@@ -72,7 +76,7 @@ public class CommonResourceSummaryUtils{
 	/// create DirectoryResults with EntryData
 	// ---------------------------------------
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ UNCHECKED, RAWTYPES })
 	public static <EntryType> DirectoryResult<EntryType> createDirectoryResultWithEntryData(
 			LexBIGService lexBigService,
 			LexEvsToCTS2Transformer transformer,
@@ -88,7 +92,7 @@ public class CommonResourceSummaryUtils{
 		return new DirectoryResult<EntryType>(list, atEnd);
 	}
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ RAWTYPES, UNCHECKED })
 	public static <EntryType> DirectoryResult<EntryType> createDirectoryResultWithResolvedEntryData(
 			LexBIGService lexBigService, 
 			LexEvsToCTS2Transformer transformer,
@@ -111,7 +115,7 @@ public class CommonResourceSummaryUtils{
 		return directoryResult;
 	}	
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ RAWTYPES, UNCHECKED })
 	public static <EntryType> DirectoryResult<EntryType> createDirectoryResultWithRenderedEntryData(
 			LexBIGService lexBigService, 
 			LexEvsToCTS2Transformer transformer, 
@@ -139,14 +143,13 @@ public class CommonResourceSummaryUtils{
 
 	
 	// --------------------------------------------
-	public static <Query extends ResourceQuery> CodingSchemeRendering[] getCodingSchemeRendering(
+	public static <T extends ResourceQuery> CodingSchemeRendering[] getCodingSchemeRendering(
 			LexBIGService lexBigService, 
 			VersionNameConverter nameConverter, 
-			Query query, 
+			QueryData<T> queryData,
 			MappingExtension mappingExtension,
 			SortCriteria sortCriteria){
 		
-		QueryData<Query> queryData = new QueryData<Query>(query);
 		CodingSchemeRenderingList csrFilteredList;
 		csrFilteredList = CommonResourceSummaryUtils.getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, sortCriteria);
 		CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
@@ -170,7 +173,7 @@ public class CommonResourceSummaryUtils{
 					codedNodeSet = lexBigService.getNodeSet(queryData.getCodingSchemeName(), queryData.getVersionOrTag() , entityTypes);
 				}
 			} catch (LBException e) {
-				throw new RuntimeException(e);
+				throw new LBRuntimeException(e.getMessage());
 			}
 			Set<ResolvedFilter> filters = queryData.getFilters();
 			if(containsData && (filters != null)){
@@ -189,8 +192,10 @@ public class CommonResourceSummaryUtils{
 			MappingExtension mappingExtension,
 			QueryData<T> queryData,
 			SortCriteria sortCriteria) {
-		try {
-			CodingSchemeRenderingList renderingList = lexBigService.getSupportedCodingSchemes();
+		
+			CodingSchemeRenderingList renderingList;
+			try {
+				renderingList = lexBigService.getSupportedCodingSchemes();
 			
 			renderingList = CommonSearchFilterUtils.filterIfMappingExtensionValid(mappingExtension, renderingList);
 			renderingList = CommonSearchFilterUtils.filterIfCodingSchemeNameValid(queryData.getCodingSchemeName(), renderingList);
@@ -205,9 +210,9 @@ public class CommonResourceSummaryUtils{
 			}
 						
 			return renderingList;
-		} catch(Exception e){
-			throw new RuntimeException(e);
-		}
+			} catch (LBInvocationException e) {
+				throw new LBRuntimeException(e.getMessage());
+			}
 	}
 	
 

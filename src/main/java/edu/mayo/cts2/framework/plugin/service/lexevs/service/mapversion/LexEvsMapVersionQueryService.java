@@ -24,7 +24,6 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.mapversion;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -57,9 +56,9 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonPageUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceSummaryUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.QueryData;
-import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
-import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQuery;
 import edu.mayo.cts2.framework.service.profile.mapversion.MapVersionQuery;
 import edu.mayo.cts2.framework.service.profile.mapversion.MapVersionQueryService;
@@ -77,11 +76,9 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	private VersionNameConverter nameConverter;
 	
 	@Resource
-	private CodingSchemeToMapVersionTransform codingSchemeToMapVersionTransform;
+	private CodingSchemeToMapVersionTransform transformer;
 	
 	private MappingExtension mappingExtension;
-	
-	public static final String MAPPING_EXTENSION = "MappingExtension";	
 	
 	// ------ Local methods ----------------------
 	public void setCodeSystemVersionNameConverter(VersionNameConverter converter){
@@ -89,7 +86,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	}
 	
 	public void setCodingSchemeToMapVersionTransform(CodingSchemeToMapVersionTransform transformer){
-			this.codingSchemeToMapVersionTransform = transformer;
+			this.transformer = transformer;
 	}
 	
 	public void setMappingExtension(MappingExtension extension){
@@ -100,7 +97,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(MAPPING_EXTENSION);
+		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(Constants.MAPPING_EXTENSION);
 	}
 		
 	@Override
@@ -115,12 +112,16 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	
 	@Override
 	public DirectoryResult<MapVersionDirectoryEntry> getResourceSummaries(
-			MapVersionQuery query, SortCriteria sortCriteria, Page page) {
+			MapVersionQuery query, 
+			SortCriteria sortCriteria, 
+			Page page) {
 		LexBIGService lexBigService = this.getLexBigService();
-		CodingSchemeRendering[] csRendering = CommonResourceSummaryUtils.getCodingSchemeRendering(lexBigService, nameConverter, query, null, sortCriteria);
+		QueryData<MapVersionQuery> queryData = new QueryData<MapVersionQuery>(query);
+		
+		CodingSchemeRendering[] csRendering = CommonResourceSummaryUtils.getCodingSchemeRendering(lexBigService, nameConverter, queryData, null, sortCriteria);
 		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPageFromArray(csRendering, page);
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
-		return CommonResourceSummaryUtils.createDirectoryResultWithEntrySummaryData(lexBigService, this.codingSchemeToMapVersionTransform, csRenderingPage, atEnd);
+		return CommonResourceSummaryUtils.createDirectoryResultWithEntrySummaryData(lexBigService, this.transformer, csRenderingPage, atEnd);
 	}
 
 	@Override
@@ -128,30 +129,22 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 			SortCriteria sortCriteria, Page page) {
 
 		LexBIGService lexBigService = this.getLexBigService();
-		CodingSchemeRendering[] csRendering = CommonResourceSummaryUtils.getCodingSchemeRendering(lexBigService, nameConverter, query, null, sortCriteria);
+		QueryData<MapVersionQuery> queryData = new QueryData<MapVersionQuery>(query);
+		
+		CodingSchemeRendering[] csRendering = CommonResourceSummaryUtils.getCodingSchemeRendering(lexBigService, nameConverter, queryData, null, sortCriteria);
 		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPageFromArray(csRendering, page);
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
-		return CommonResourceSummaryUtils.createDirectoryResultWithRenderedEntryData(lexBigService, this.codingSchemeToMapVersionTransform, csRenderingPage, atEnd);
+		return CommonResourceSummaryUtils.createDirectoryResultWithRenderedEntryData(lexBigService, this.transformer, csRenderingPage, atEnd);
 	}
 
 	@Override
 	public Set<? extends MatchAlgorithmReference> getSupportedMatchAlgorithms() {
-
-		MatchAlgorithmReference exactMatch = StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference();
-		MatchAlgorithmReference contains = StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference();
-		MatchAlgorithmReference startsWith = StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference();
-
-		return new HashSet<MatchAlgorithmReference>(Arrays.asList(exactMatch,contains,startsWith));
+		return CommonSearchFilterUtils.createSupportedMatchAlgorithms();
 	}
 
 	@Override
 	public Set<? extends PropertyReference> getSupportedSearchReferences() {
-		
-		PropertyReference name = StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference();		
-		PropertyReference about = StandardModelAttributeReference.ABOUT.getPropertyReference();	
-		PropertyReference description = StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference();
-		
-		return new HashSet<PropertyReference>(Arrays.asList(name,about,description));
+		return CommonSearchFilterUtils.createSupportedSearchReferences();
 	}
 
 	// Not going to implement following methods
