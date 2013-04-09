@@ -50,13 +50,13 @@ import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
  *  @author <a href="mailto:hardie.linda@mayo.edu">Linda Hardie</a>
  *
  */
+@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 		AbstractTestITBase {
 	
 	private final static String ABOUT_CONTAINS = "11.11.0.1";
 	private final static String RESOURCESYNOPSIS_STARTSWITH = "Auto";
 	private final static String RESOURCENAME_EXACTMATCH = "Automobiles-1.0";
-	
 	
 	@Resource
 	private LexEvsCodeSystemVersionQueryService service;
@@ -71,7 +71,6 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	// Count with All valid filters
 	// -----------------------------
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testCount_FilterSet() throws Exception {
 		// Call local method to create set of all filters
 		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(ABOUT_CONTAINS, RESOURCESYNOPSIS_STARTSWITH, RESOURCENAME_EXACTMATCH);
@@ -88,7 +87,6 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	// Count with valid filters
 	// -------------------------
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testCount_Filter_About_Found() throws Exception {
 
 		// Build query using filters
@@ -105,7 +103,6 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	}
 		
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testCount_Filter_ResorceSynopsis_Found() throws Exception {
 
 		// Build query using filters
@@ -121,7 +118,6 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	}
 		
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testCount_Filter_ResourceName_Found() throws Exception {
 
 		// Build query using filters
@@ -141,7 +137,6 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	// Count with invalid filters
 	// ---------------------------
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testCount_Filter_About_NotFound() throws Exception {
 
 		// Call local method to create set of all filters, Create error in resource name
@@ -156,7 +151,6 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	}
 	
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testCount_Filter_ResourceName_NotFound() throws Exception {
 
 		// Call local method to create set of all filters, Create error in resource name
@@ -171,7 +165,6 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	}
 		
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testCount_Filter_ResorceSynopsis_NotFound() throws Exception {
 
 		// Call local method to create set of all filters, Create error in resource name
@@ -189,7 +182,6 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	// resourceSummaries test codeSetName
 	// -----------------------------------------
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Restriction_CodeSetName_Found() throws Exception {
 
 		// Restrict to given codeSystem
@@ -210,7 +202,6 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	}
 	
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Restriction_CodeSetName_NotFound() throws Exception {
 
 		// Restrict to given codeSystem
@@ -234,7 +225,6 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	// resourceSummaries with All valid filters
 	// -----------------------------------------
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_FiltersSet() throws Exception {
 
 		// Call local method to create set of all filters
@@ -254,7 +244,6 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	}
 	
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_FilterSet_VerifyTransformation() throws Exception {
 
 		// Call local method to create set of all filters
@@ -296,7 +285,6 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	// resourceSummaries with individual filters
 	// -----------------------------------------
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_About_Contains_Found() throws Exception {
 
 		// Build query using filters
@@ -316,7 +304,6 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	}
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_ResourceSynopsis_StartsWith_Found() throws Exception {
 
 		// Build query using filters
@@ -336,7 +323,6 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	}
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_ResourceName_ExactMatch_Found() throws Exception {
 
 		// Build query using filters
@@ -356,7 +342,6 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	}
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_About_Contains_NotFound() throws Exception {
 
 		// Build query using filters
@@ -376,7 +361,6 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	}
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_ResourceSynopsis_StartsWith_NotFound() throws Exception {
 
 		// Build query using filters
@@ -396,7 +380,6 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	}
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_ResourceName_ExactMatch_NotFound() throws Exception {
 
 		// Build query using filters
@@ -419,7 +402,6 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	// resourceList test codeSetName
 	// -----------------------------------------
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceList_Restriction_CodeSetName_Found() throws Exception {
 
 		// Restrict to given codeSystem
@@ -440,7 +422,6 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 	}
 	
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceList_Restriction_CodeSetName_NotFound() throws Exception {
 
 		// Restrict to given codeSystem

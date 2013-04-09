@@ -49,7 +49,8 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
  *  @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
  *  @author <a href="mailto:hardie.linda@mayo.edu">Linda Hardie</a>
  *
- */
+ */	
+@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 public class LexEvsMapVersionReadServiceTestIT extends AbstractTestITBase {
 
 	@Resource
@@ -64,7 +65,6 @@ public class LexEvsMapVersionReadServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 	public void testRead() throws Exception {
 		
 		String mapCodingSchemeNameAndVersion = "Mapping Sample-1.0";
@@ -75,7 +75,6 @@ public class LexEvsMapVersionReadServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testReadNotMappingCodingScheme() throws Exception {
 		
 		String mapCodingSchemeNameAndVersion = "Automobiles-1.0";
@@ -86,7 +85,6 @@ public class LexEvsMapVersionReadServiceTestIT extends AbstractTestITBase {
 	}
 	
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 	public void testReadByTag() throws Exception {
 		String nameOrUri = "Mapping Sample";
 		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
@@ -97,7 +95,6 @@ public class LexEvsMapVersionReadServiceTestIT extends AbstractTestITBase {
 	}
 	
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 	public void testReadByTagNotFound() throws Exception {
 		String nameOrUri = "Mooopping Sample";
 		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
@@ -108,7 +105,6 @@ public class LexEvsMapVersionReadServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 	public void testReadValidXML() throws Exception {
 		
 		String mapCodingSchemeNameAndVersion = "Mapping Sample-1.0";
@@ -121,7 +117,6 @@ public class LexEvsMapVersionReadServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 	public void testExistsTrue() throws Exception {
 		String nameOrUri = "Mapping Sample-1.0";
 		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
@@ -130,7 +125,6 @@ public class LexEvsMapVersionReadServiceTestIT extends AbstractTestITBase {
 	}
 	
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 	public void testExistsFalse() throws Exception {
 		String nameOrUri = "Mapping Sample-2.0";
 		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
@@ -139,7 +133,6 @@ public class LexEvsMapVersionReadServiceTestIT extends AbstractTestITBase {
 	}
 	
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 	public void testExistsByTagTrue() throws Exception {
 		String nameOrUri = "Mapping Sample";
 		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
@@ -149,7 +142,6 @@ public class LexEvsMapVersionReadServiceTestIT extends AbstractTestITBase {
 	}
 	
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 	public void testExistsByTagFalse() throws Exception {
 		String nameOrUri = "Mooopping Sample";
 		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
@@ -159,7 +151,6 @@ public class LexEvsMapVersionReadServiceTestIT extends AbstractTestITBase {
 	}
 	
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 	public void testRead_ErrorWithoutDash() throws Exception {
 		String nameOrUri = "Mapping Sample1.0";
 		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);
@@ -169,7 +160,6 @@ public class LexEvsMapVersionReadServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 	public void testRead_WithSpace() throws Exception {
 		String nameOrUri = "Mapping Sample - 1.0";
 		NameOrURI identifier = ModelUtils.nameOrUriFromName(nameOrUri);

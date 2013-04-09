@@ -54,6 +54,7 @@ import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescripti
  *  @author <a href="mailto:hardie.linda@mayo.edu">Linda Hardie</a>
  *
  */
+@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	
 	@Resource
@@ -93,7 +94,6 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	}
 	
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_CodingSchemeExists_andNotEmpty() throws Exception {
 		final NameOrURI name = ModelUtils.nameOrUriFromName("Automobiles-1.0");
 		
@@ -122,7 +122,6 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_CodingSchemeDoesNotExist() throws Exception {
 		final NameOrURI name = ModelUtils.nameOrUriFromName("Automooobiles-1.0");
 		
@@ -149,7 +148,6 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	}
 	
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_startsWith() throws Exception {
 				
 		// Create query
@@ -173,7 +171,6 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	}	
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_startsWith_Empty() throws Exception {
 				
 		// Create query
@@ -198,7 +195,6 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 
 	
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_exactMatch() throws Exception {
 				
 		// Create query
@@ -222,7 +218,6 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	}	
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_exactMatch_Empty() throws Exception {
 				
 		// Create query
@@ -246,7 +241,6 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	}	
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_contains() throws Exception {
 		
 		// NOTE:  The CTS2 "word starts with" filtered query maps to the LexEVS "contains" registered
@@ -273,7 +267,6 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	}	
 	
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_contains_Empty() throws Exception {
 		
 		// Create query
@@ -297,7 +290,6 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	}	
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_contains_Multiple() throws Exception {
 		
 		// NOTE:  The CTS2 "word starts with" filtered query maps to the LexEVS "contains" registered
@@ -325,7 +317,6 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_Leading_Wildcard() throws Exception {
 		
 		// Create query - searching for "General Motors" entity
@@ -350,7 +341,6 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	
 	
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_Leading_Wildcard_Empty() throws Exception {
 
 		// Create query
@@ -374,7 +364,6 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	}	
 	
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_Lagging_Wildcard() throws Exception {
 		
 		// Create query - searching for "General Motors" entity
@@ -399,7 +388,6 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	
 	
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_Lagging_Wildcard_Empty() throws Exception {
 		
 		// Create query
@@ -424,7 +412,6 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	
 	
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_LeadingAndLagging_Wildcard() throws Exception {
 		
 		// Create query - searching for "General Motors" entity
@@ -449,7 +436,6 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	
 	
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_LeadingAndLagging_Wildcard_Empty() throws Exception {
 		
 		// Create query
@@ -473,7 +459,6 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	}	
 	
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_Paging() throws Exception {
 		
 		// NOTE:  The CTS2 "word starts with" filtered query maps to the LexEVS "contains" registered
@@ -510,7 +495,6 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	}	
 	
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testGetResourceSummaries_Filter_Paging_Empty() throws Exception {
 		
 		// NOTE:  The CTS2 "word starts with" filtered query maps to the LexEVS "contains" registered

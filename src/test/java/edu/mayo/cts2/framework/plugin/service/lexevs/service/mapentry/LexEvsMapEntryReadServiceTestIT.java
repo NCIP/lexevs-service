@@ -48,6 +48,13 @@ import edu.mayo.cts2.framework.service.profile.mapentry.name.MapEntryReadId;
  *  @author <a href="mailto:hardie.linda@mayo.edu">Linda Hardie</a>
  *
  */
+@LoadContents(
+	{
+		@LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml"),
+		@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
+		@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
+	}
+)
 public class LexEvsMapEntryReadServiceTestIT extends AbstractTestITBase {
 
 	@Resource
@@ -62,13 +69,6 @@ public class LexEvsMapEntryReadServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	@LoadContents(
-		{
-			@LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml"),
-			@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
-			@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
-		}
-	)
 	public void testRead() {
 		
 		String sourceEntityCode = "A0001";
@@ -87,13 +87,6 @@ public class LexEvsMapEntryReadServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	@LoadContents(
-		{
-			@LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml"),
-			@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
-			@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
-		}
-	)
 	public void testReadEntityCodeNotFound() {
 		
 		String sourceEntityCode = "A0001zzz";
@@ -112,13 +105,6 @@ public class LexEvsMapEntryReadServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test(expected=RuntimeException.class)
-	@LoadContents(
-		{
-			@LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml"),
-			@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
-			@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
-		}
-	)
 	public void testReadMapVersionNotFound() {
 		
 		String sourceEntityCode = "A0001";
@@ -136,13 +122,6 @@ public class LexEvsMapEntryReadServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	@LoadContents(
-			{
-				@LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml"),
-				@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
-				@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
-			}
-	)
 	public void testExistsFound() {
 		String sourceEntityCode = "Ford";
 		ScopedEntityName mapFromName = new ScopedEntityName();
@@ -158,13 +137,6 @@ public class LexEvsMapEntryReadServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	@LoadContents(
-			{
-				@LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml"),
-				@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
-				@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
-			}
-	)
 	public void testExistsNotFound() {
 		String sourceEntityCode = "Fjord";
 		ScopedEntityName mapFromName = new ScopedEntityName();

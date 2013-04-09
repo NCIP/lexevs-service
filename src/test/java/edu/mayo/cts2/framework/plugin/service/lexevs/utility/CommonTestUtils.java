@@ -40,7 +40,7 @@ import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
  *
  */
 public class CommonTestUtils {
-	public final static String [] VALID_URI_NAMES = {"Automobiles"};
+	public final static String [] VALID_URI_NAMES = {"Automobiles", "urn:oid:11.11.0.1"};
 	public final static String [] VALID_VERSIONS = {"1.0"};
 	
 	public static String getValidNameAndVersion(int index){

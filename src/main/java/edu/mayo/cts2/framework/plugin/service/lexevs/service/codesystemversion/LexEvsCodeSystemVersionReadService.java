@@ -39,9 +39,8 @@ import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
-import edu.mayo.cts2.framework.model.util.ModelUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsCodeSystemService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
@@ -76,11 +75,14 @@ public class LexEvsCodeSystemVersionReadService extends
 
 	// -------- Implemented methods ----------------
 	@Override
-	public CodeSystemVersionCatalogEntry readByTag(NameOrURI codeSystem,
-			VersionTagReference tag, ResolvedReadContext readContext) {
+	public CodeSystemVersionCatalogEntry readByTag(
+			NameOrURI codeSystem,
+			VersionTagReference tag, 
+			ResolvedReadContext readContext) {
 		if(codeSystem == null || tag == null){
 			return null;
 		}
+		
 		return this.getByVersionIdOrTag(codeSystem, this.convertTag(tag));
 	}
 
@@ -98,20 +100,9 @@ public class LexEvsCodeSystemVersionReadService extends
 	@Override
 	public CodeSystemVersionCatalogEntry read(NameOrURI identifier,
 			ResolvedReadContext readContext) {
-		if(identifier == null){
-			return null;
-		}
+		NameVersionPair pair = CommonUtils.getNamePair(nameConverter, identifier, readContext);
 		
-		NameOrURI name = new NameOrURI();
-		CodingSchemeVersionOrTag versionOrTag = new CodingSchemeVersionOrTag();
-		
-		NameVersionPair namePair = CommonUtils.getNamePair(nameConverter, identifier, readContext);
-		if(namePair != null){
-			name = ModelUtils.nameOrUriFromName(namePair.getName());
-			versionOrTag = Constructors.createCodingSchemeVersionOrTagFromVersion(namePair.getVersion());
-		}
-		
-		return this.getByVersionIdOrTag(name, versionOrTag);
+		return this.getByVersionIdOrTag(pair);
 	}
 
 	@Override
