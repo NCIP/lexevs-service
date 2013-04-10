@@ -98,12 +98,7 @@ public class LexEvsResolvedValueSetQueryService extends AbstractLexEvsService
 		List<CodingScheme> csList= getLexEVSResolvedService().listAllResolvedValueSets();
 		// TODO Auto-generated method stub
 		List<CodingScheme> restrictedList= resolverUtils.restrictByQuery(csList, query);
-		if(query != null){
-			for(ResolvedFilter filter : query.getFilterComponent()){
-				PropertyReference modelRef = filter.getPropertyReference();
-				
-			}
-		}
+		
 		
 		List<ResolvedValueSetDirectoryEntry> results= transform.transform(restrictedList);
 		List<ResolvedValueSetDirectoryEntry> pagedResult =CommonPageUtils.getPaginatedList(results, page);
