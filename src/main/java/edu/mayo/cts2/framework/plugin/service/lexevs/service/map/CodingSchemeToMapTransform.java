@@ -126,9 +126,10 @@ public class CodingSchemeToMapTransform
 		String source = relations.getSourceCodingScheme();
 		String target = relations.getTargetCodingScheme();
 		
+		//TODO:
 		return new Tuple<CodeSystemReference>(
-				this.getTransformUtils().toCodeSystemReference(source),
-				this.getTransformUtils().toCodeSystemReference(target)
+				this.getTransformUtils().toCodeSystemReference(source, null),
+				this.getTransformUtils().toCodeSystemReference(target, null)
 		);
 	}
 }

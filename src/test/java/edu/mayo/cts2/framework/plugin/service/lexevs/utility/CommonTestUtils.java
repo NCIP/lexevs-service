@@ -84,10 +84,18 @@ public class CommonTestUtils {
 	}
 	
 	public static EntityDescriptionQuery createQuery(String matchAlgorithmReference, String matchValue, String codeSystemVersion){
+		return createQuery(
+				matchAlgorithmReference, 
+				matchValue, 
+				codeSystemVersion,
+				StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference());
+	}
+	
+	public static EntityDescriptionQuery createQuery(String matchAlgorithmReference, String matchValue, String codeSystemVersion, PropertyReference propertyReference){
 		// Create filters for query
 		// ------------------------
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();	
-		ResolvedFilter filter = CommonTestUtils.createFilter(matchAlgorithmReference,  matchValue, null);				
+		ResolvedFilter filter = CommonTestUtils.createFilter(matchAlgorithmReference,  matchValue, propertyReference);				
 		filters.add(filter);
 		
 		// Create restriction for query

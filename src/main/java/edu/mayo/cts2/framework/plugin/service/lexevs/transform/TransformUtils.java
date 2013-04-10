@@ -25,9 +25,11 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.transform;
 
 import javax.annotation.Resource;
 
+import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.commonTypes.Property;
 import org.springframework.stereotype.Component;
 
+import edu.mayo.cts2.framework.core.url.UrlConstructor;
 import edu.mayo.cts2.framework.model.core.CodeSystemReference;
 import edu.mayo.cts2.framework.model.core.CodeSystemVersionReference;
 import edu.mayo.cts2.framework.model.core.NameAndMeaningReference;
@@ -46,6 +48,9 @@ public class TransformUtils {
 	
 	@Resource
 	private VersionNameConverter versionNameConverter;
+	
+	@Resource
+	private UrlConstructor urlConstructor;
 
 	/**
 	 * To property.
@@ -78,26 +83,36 @@ public class TransformUtils {
 	 * @return the code system reference
 	 */
 	public CodeSystemReference toCodeSystemReference(
-			String name){
+			String name, String uri){
 		CodeSystemReference ref = new CodeSystemReference();
 		ref.setContent(name);
-		
+		ref.setUri(uri);
+
 		return ref;
 	}
 
 	public CodeSystemVersionReference toCodeSystemVersionReference(
-			String name, String version) {
+			String name, String version, String about) {
 		CodeSystemVersionReference ref = new CodeSystemVersionReference();
-		ref.setCodeSystem(toCodeSystemReference(name));
+		ref.setCodeSystem(toCodeSystemReference(name, about));
 		
 		NameAndMeaningReference nameAndMeaning = new NameAndMeaningReference();
 		
 		String versionName = this.versionNameConverter.toCts2VersionName(name, version);
 		nameAndMeaning.setContent(versionName);
+		nameAndMeaning.setHref(
+			this.urlConstructor.createCodeSystemVersionUrl(name, version));
 
 		ref.setVersion(nameAndMeaning);
 		
 		return ref;
+	}
+	
+	public String createEntityHref(ResolvedConceptReference reference){
+		return this.urlConstructor.createEntityUrl(
+				reference.getCodingSchemeName(), 
+				reference.getCodingSchemeVersion(), 
+				ModelUtils.createScopedEntityName(reference.getCode(), reference.getCodeNamespace()));
 	}
 	
 }

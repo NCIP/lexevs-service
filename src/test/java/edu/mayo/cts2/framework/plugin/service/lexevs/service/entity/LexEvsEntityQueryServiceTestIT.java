@@ -29,21 +29,33 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.LexGrid.LexBIG.Exceptions.LBException;
+import org.LexGrid.LexBIG.Extensions.Generic.SearchExtension;
+import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.junit.Test;
 
 import edu.mayo.cts2.framework.model.command.Page;
+import edu.mayo.cts2.framework.model.command.ResolvedFilter;
+import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
+import edu.mayo.cts2.framework.model.entity.EntityDescription;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
+import edu.mayo.cts2.framework.model.service.core.Query;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
+import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractQueryServiceTest;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonTestUtils;
 import edu.mayo.cts2.framework.service.command.restriction.EntityDescriptionQueryServiceRestrictions;
+import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
+import edu.mayo.cts2.framework.service.profile.QueryService;
+import edu.mayo.cts2.framework.service.profile.entitydescription.EntitiesFromAssociationsQuery;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQuery;
 
 /**
@@ -52,7 +64,8 @@ import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescripti
  *
  */
 @LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
+public class LexEvsEntityQueryServiceTestIT 
+	extends AbstractQueryServiceTest<EntityDescription, EntityDirectoryEntry, EntityDescriptionQuery> {
 	
 	@Resource
 	private LexEvsEntityQueryService service;
@@ -61,6 +74,17 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 	@Test
 	public void testSetUp() {
 		assertNotNull(this.service);
+	}
+	
+	@Test
+	public void testMappingExtensionFunctioning() throws LBException {
+		LexBIGService lbs = service.getLexBigService();
+		SearchExtension searchExtension = (SearchExtension) lbs.getGenericExtension("SearchExtension");
+	
+		ResolvedConceptReferencesIterator itr = searchExtension.search("Jaguar");
+		assertTrue(itr.hasNext());
+		assertEquals("Jaguar", itr.next().getCode());
+		assertFalse(itr.hasNext());
 	}
 	
 	@Test
@@ -130,7 +154,8 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 				
 		// Create query
 		// ------------
-		EntityDescriptionQuery query = CommonTestUtils.createQuery("startsWith", "Jaguar", "Automobiles-1.0");	
+		EntityDescriptionQuery query = CommonTestUtils.createQuery("startsWith", "Jaguar", "Automobiles-1.0", 
+			StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference());	
 				
 		// Call getResourceSummaries from service
 		// --------------------------------------
@@ -498,5 +523,44 @@ public class LexEvsEntityQueryServiceTestIT extends AbstractTestITBase {
 		assertTrue("Expected to be at the end of the pages ", directoryResult.isAtEnd());
 	}	
 
+	@Override
+	protected QueryService<EntityDescription, EntityDirectoryEntry, EntityDescriptionQuery> getService() {
+		return this.service;
+	}
+
+	@Override
+	protected EntityDescriptionQuery getQuery() {
+		return new EntityDescriptionQuery(){
+
+			@Override
+			public Query getQuery() {
+				return null;
+			}
+
+			@Override
+			public Set<ResolvedFilter> getFilterComponent() {
+				return null;
+			}
+
+			@Override
+			public ResolvedReadContext getReadContext() {
+				return null;
+			}
+
+			@Override
+			public EntitiesFromAssociationsQuery getEntitiesFromAssociationsQuery() {
+				return null;
+			}
+
+			@Override
+			public EntityDescriptionQueryServiceRestrictions getRestrictions() {
+				EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
+				restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName("Automobiles-1.0"));
+				
+				return restrictions;
+			}
+			
+		};
+	}
 }
 

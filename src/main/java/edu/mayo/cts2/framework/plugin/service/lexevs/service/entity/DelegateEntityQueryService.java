@@ -23,33 +23,24 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 
-import java.util.Set;
+import org.springframework.core.Ordered;
 
-import edu.mayo.cts2.framework.filter.directory.AbstractStateBuildingDirectoryBuilder;
-import edu.mayo.cts2.framework.filter.match.StateAdjustingPropertyReference;
-import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
+import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQuery;
+import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQueryService;
 
 /**
- * A Basic EntityDirectoryBuilder.
+ * The Interface DelegateEntityQueryService.
  *
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
-public class BasicEntityDirectoryBuilder<T> extends AbstractStateBuildingDirectoryBuilder<String,T> {
+public interface DelegateEntityQueryService extends EntityDescriptionQueryService, Ordered {
 
 	/**
-	 * Instantiates a new basic entity directory builder.
+	 * Can handle.
 	 *
-	 * @param initialState the initial state
-	 * @param callback the callback
-	 * @param matchAlgorithmReferences the match algorithm references
-	 * @param stateAdjustingPropertyReferences the state adjusting property references
+	 * @param query the query
+	 * @return true, if successful
 	 */
-	public BasicEntityDirectoryBuilder(
-			AbstractStateBuildingDirectoryBuilder.Callback<String, T> callback,
-			Set<MatchAlgorithmReference> matchAlgorithmReferences,
-			Set<StateAdjustingPropertyReference<String>> stateAdjustingPropertyReferences) {
-		super("", callback, matchAlgorithmReferences,
-				stateAdjustingPropertyReferences);
-	}
-
+	public boolean canHandle(EntityDescriptionQuery query);
+	
 }

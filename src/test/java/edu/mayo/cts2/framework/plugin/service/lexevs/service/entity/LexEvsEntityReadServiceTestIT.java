@@ -40,7 +40,8 @@ import edu.mayo.cts2.framework.model.entity.NamedEntityDescription;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
+import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractReadServiceTest;
+import edu.mayo.cts2.framework.service.profile.ReadService;
 import edu.mayo.cts2.framework.service.profile.entitydescription.name.EntityDescriptionReadId;
 
 /**
@@ -49,7 +50,8 @@ import edu.mayo.cts2.framework.service.profile.entitydescription.name.EntityDesc
  *
  */
 @LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-public class LexEvsEntityReadServiceTestIT extends AbstractTestITBase {
+public class LexEvsEntityReadServiceTestIT extends
+	AbstractReadServiceTest<EntityDescription, EntityDescriptionReadId> {
 
 	@Resource
 	private LexEvsEntityReadService service;
@@ -64,7 +66,7 @@ public class LexEvsEntityReadServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	public void testRead() throws Exception {
+	public void testReadCorrect() throws Exception {
 
 		EntityNameOrURI entity = new EntityNameOrURI();
 		ScopedEntityName scopedEntityName = new ScopedEntityName();
@@ -91,7 +93,7 @@ public class LexEvsEntityReadServiceTestIT extends AbstractTestITBase {
 
 
 	@Test
-	public void testReadNotFound() throws Exception {
+	public void testReadNotFoundWrongNamespace() throws Exception {
 
 		EntityNameOrURI entity = new EntityNameOrURI();
 		ScopedEntityName scopedEntityName = new ScopedEntityName();
@@ -164,6 +166,37 @@ public class LexEvsEntityReadServiceTestIT extends AbstractTestITBase {
 		
 		assertEquals(1, returnEntity.getNamedEntity().getParent().length);
 		assertEquals("GM", returnEntity.getNamedEntity().getParent()[0].getName());
+	}
+
+	@Override
+	protected ReadService<EntityDescription, EntityDescriptionReadId> getService() {
+		return this.service;
+	}
+
+	@Override
+	protected EntityDescriptionReadId getGoodIdentifier() {
+		EntityNameOrURI entity = new EntityNameOrURI();
+		ScopedEntityName scopedEntityName = new ScopedEntityName();
+		scopedEntityName.setNamespace("Automobiles");
+		scopedEntityName.setName("005");
+		entity.setEntityName(scopedEntityName);
+		
+		NameOrURI codeSystemVersion = ModelUtils.nameOrUriFromName("Automobiles-1.0");
+			
+		return new EntityDescriptionReadId(entity,codeSystemVersion);		
+	}
+
+	@Override
+	protected EntityDescriptionReadId getBadIdentifier() {
+		EntityNameOrURI entity = new EntityNameOrURI();
+		ScopedEntityName scopedEntityName = new ScopedEntityName();
+		scopedEntityName.setNamespace("Automobiles");
+		scopedEntityName.setName("__INVALID");
+		entity.setEntityName(scopedEntityName);
+		
+		NameOrURI codeSystemVersion = ModelUtils.nameOrUriFromName("Automobiles-1.0");
+			
+		return new EntityDescriptionReadId(entity,codeSystemVersion);		
 	}	
 	
 }

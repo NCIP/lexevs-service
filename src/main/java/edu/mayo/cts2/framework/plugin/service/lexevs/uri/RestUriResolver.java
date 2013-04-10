@@ -23,11 +23,15 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.uri;
 
+import javax.annotation.Resource;
+
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import clojure.lang.RT;
 import clojure.lang.Var;
+import edu.mayo.cts2.framework.plugin.service.lexevs.LexEvsOsgiClassLoader;
 
 /**
  * Client service based on an external URI Resolver JSON Service.
@@ -35,31 +39,19 @@ import clojure.lang.Var;
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
 @Component
-public class RestUriResolver implements UriResolver {
+public class RestUriResolver implements UriResolver, InitializingBean {
 
 	@Value("${uriResolutionServiceUrl}")
 	private String uriResolutionServiceUrl;
+	
+	@Resource
+	private LexEvsOsgiClassLoader lexEvsOsgiClassLoader;
 	
 	Var getUri;
 	Var getName;
 	Var getBaseEntityUri;
 	Var getVersionName;
 	Var getVersionUri;
-	
-	{
-		try {
-			RT.loadResourceScript("cts2/uri/UriResolutionService.clj");
-
-			getUri = RT.var("cts2.uri", "getUri");
-			getName = RT.var("cts2.uri", "getName");
-			getBaseEntityUri = RT.var("cts2.uri", "getBaseEntityUri");
-			getVersionName = RT.var("cts2.uri", "getVersionName");
-			getVersionUri = RT.var("cts2.uri", "getVersionUri");
-
-		} catch (Exception e) {
-			throw new RuntimeException("Error starting Clojure.", e);
-		}
-	}
 	
 	public RestUriResolver(){
 		super();
@@ -158,5 +150,27 @@ public class RestUriResolver implements UriResolver {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		Thread.currentThread().setContextClassLoader(lexEvsOsgiClassLoader.getOsgiClassLoader());
+		try {
+			this.loadClojureScripts();
+		} catch (Exception e) {
+			throw new RuntimeException("Error starting Clojure.", e);
+		} finally {
+			Thread.currentThread().setContextClassLoader(lexEvsOsgiClassLoader);
+		}
+	}
+	
+	protected void loadClojureScripts() throws Exception {
+		RT.loadResourceScript("cts2/uri/UriResolutionService.clj");
+
+		getUri = RT.var("cts2.uri", "getUri");
+		getName = RT.var("cts2.uri", "getName");
+		getBaseEntityUri = RT.var("cts2.uri", "getBaseEntityUri");
+		getVersionName = RT.var("cts2.uri", "getVersionName");
+		getVersionUri = RT.var("cts2.uri", "getVersionUri");
 	}
 }

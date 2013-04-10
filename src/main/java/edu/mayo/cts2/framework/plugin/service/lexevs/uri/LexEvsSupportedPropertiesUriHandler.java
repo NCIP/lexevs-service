@@ -76,7 +76,7 @@ public class LexEvsSupportedPropertiesUriHandler implements DelegateUriHandler {
 				codingScheme.getMappings().getSupportedNamespace());
 		
 		if(sns != null && StringUtils.isNotEmpty(sns.getUri())){
-			return sns.getUri() + name;
+			return sns.getUri() + "/" + name;
 		} else {
 			return null;
 		}

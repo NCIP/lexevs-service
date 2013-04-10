@@ -166,7 +166,13 @@
 							lexgrid-util,
 							castor-*,
 							clj-http,
-							clojure
+							clojure,
+							httpclient,
+							httpcore,
+							httpmime,
+							slingshot,
+							commons-codec,
+							commons-io
 						</Embed-Dependency>
 						<Spring-Context>*;timeout:=60</Spring-Context>
 						<_nouses>true</_nouses>
@@ -246,7 +252,7 @@
 			<artifactId>lexevs-dao</artifactId>
 			<version>${lexevs.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>lexevs</groupId>
 			<artifactId>lexgrid-resourcereader</artifactId>
@@ -343,6 +349,42 @@
 			<groupId>clj-http</groupId>
 			<artifactId>clj-http</artifactId>
 			<version>0.5.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.2.3</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+			<version>4.2.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpmime</artifactId>
+			<version>4.2.3</version>
+		</dependency>
+
+		<dependency>
+			<groupId>slingshot</groupId>
+			<artifactId>slingshot</artifactId>
+			<version>0.10.3</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.7</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
 		</dependency>
 
 		<dependency>
