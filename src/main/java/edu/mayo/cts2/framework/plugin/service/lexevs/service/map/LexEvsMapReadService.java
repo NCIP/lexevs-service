@@ -29,6 +29,7 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
+import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.codingSchemes.CodingScheme;
@@ -39,8 +40,8 @@ import edu.mayo.cts2.framework.model.map.MapCatalogEntry;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsCodeSystemService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
 import edu.mayo.cts2.framework.service.profile.map.MapReadService;
@@ -78,7 +79,18 @@ public class LexEvsMapReadService
 	public void setMappingExtension(MappingExtension mappingExtension){
 		this.mappingExtension = mappingExtension;
 	}
-	
+
+	@Override
+	protected boolean isValidCodingScheme(CodingScheme codingScheme) {
+		try {
+			return this.mappingExtension.isMappingCodingScheme(
+				codingScheme.getCodingSchemeURI(),
+				Constructors.createCodingSchemeVersionOrTagFromVersion(codingScheme.getRepresentsVersion()));
+		} catch (LBParameterException e) {
+			return false;
+		}
+	}
+
 	// -------- Implemented methods ----------------	
 	@Override
 	public void afterPropertiesSet() throws Exception {

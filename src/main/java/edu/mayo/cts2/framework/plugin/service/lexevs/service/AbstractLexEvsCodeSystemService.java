@@ -33,8 +33,9 @@ import org.apache.commons.lang.StringUtils;
 
 import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriResolver;
-import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriResolver.IdType;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 
 /**
@@ -47,6 +48,9 @@ public abstract class AbstractLexEvsCodeSystemService<T> extends AbstractLexEvsS
 	@Resource
 	private UriResolver uriResolver;
 	
+	@Resource
+	private VersionNameConverter versionNameConverter;
+	
 	protected abstract T transform(CodingScheme codingScheme);
 	
 	protected CodingSchemeVersionOrTag convertTag(VersionTagReference tag){
@@ -57,6 +61,41 @@ public abstract class AbstractLexEvsCodeSystemService<T> extends AbstractLexEvsS
 			return Constructors.createCodingSchemeVersionOrTagFromTag(tagValue);
 		}
 	}
+
+	protected T getByVersionIdOrTag(
+			NameOrURI parentIdentifier,
+			CodingSchemeVersionOrTag convertTag) {
+		String id;
+		if(parentIdentifier.getName() != null){
+			id = parentIdentifier.getName();
+		} else {
+			id = parentIdentifier.getUri();
+		}
+		
+		CodingSchemeVersionOrTag csvt;
+		if(convertTag.getTag() != null){
+			csvt = Constructors.createCodingSchemeVersionOrTagFromTag(convertTag.getTag());
+		} else {
+			csvt = Constructors.createCodingSchemeVersionOrTagFromVersion(convertTag.getVersion());
+		}
+		CodingScheme codingScheme = this.resolve(id,csvt);
+
+		if(codingScheme != null && this.isValidCodingScheme(codingScheme)){
+			return this.transform(codingScheme);
+		} else {
+			return null;
+		}
+	}
+	
+	/**
+	 * Allow subclasses to validate the CodingScheme before transforming.
+	 *
+	 * @param codingScheme the coding scheme
+	 * @return true, if is valid coding scheme
+	 */
+	protected boolean isValidCodingScheme(CodingScheme codingScheme){
+		return true;
+	}
 	
 	/**
 	 * Gets the code system by version id or tag.
@@ -66,24 +105,15 @@ public abstract class AbstractLexEvsCodeSystemService<T> extends AbstractLexEvsS
 	 * @return the code system by version id or tag
 	 */
 	protected T getByVersionIdOrTag(
-			NameOrURI codeSystem, CodingSchemeVersionOrTag versionIdOrTag){
-		CodingScheme codingScheme;
-		if(codeSystem.getName() != null){
-			codingScheme = this.resolve(codeSystem.getName(), versionIdOrTag);
-		} else {
-			String uri = codeSystem.getUri();
-			
-			CodingScheme uriScheme = this.resolve(codeSystem.getUri(), versionIdOrTag);
-			
-			if(uriScheme == null){
-				String officialName = this.uriResolver.idToName(uri, IdType.CODE_SYSTEM);
-				uriScheme = this.resolve(officialName, versionIdOrTag);
-			}
-			
-			codingScheme = uriScheme;
+			NameVersionPair namePair){
+		if(namePair == null){
+			return null;
 		}
-		
-		if(codingScheme != null){
+
+		CodingScheme codingScheme = this.resolve(namePair.getName(), 
+			Constructors.createCodingSchemeVersionOrTagFromVersion(namePair.getVersion()));
+
+		if(codingScheme != null && this.isValidCodingScheme(codingScheme)){
 			return this.transform(codingScheme);
 		} else {
 			return null;

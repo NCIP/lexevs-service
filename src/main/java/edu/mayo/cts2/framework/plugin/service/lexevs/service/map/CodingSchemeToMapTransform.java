@@ -60,9 +60,6 @@ public class CodingSchemeToMapTransform
 		);
 		
 		mapCatalogEntry.setMapName(codingScheme.getCodingSchemeName());
-		mapCatalogEntry.setAbout(
-				this.getUriHandler().getCodeSystemVersionUri(codingScheme)
-		);
 		
 		mapCatalogEntry.setFormalName(codingScheme.getFormalName());
 		
@@ -103,9 +100,6 @@ public class CodingSchemeToMapTransform
 		);
 		
 		mapCatalogEntrySummary.setMapName(codingScheme.getCodingSchemeName());
-		mapCatalogEntrySummary.setAbout(
-				this.getUriHandler().getCodeSystemVersionUri(codingScheme)
-		);
 		
 		mapCatalogEntrySummary.setFormalName(codingScheme.getFormalName());
 		

@@ -20,6 +20,7 @@ import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSetDirector
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
 import edu.mayo.cts2.framework.service.command.restriction.ResolvedValueSetQueryServiceRestrictions;
 
+@LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosAndGM.xml")
 public class LexEVSResolvedValuesetQueryServiceTestIT extends
 		AbstractTestITBase {
 
@@ -33,7 +34,6 @@ public class LexEVSResolvedValuesetQueryServiceTestIT extends
 	}
 
 	@Test
-	@LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosAndGM.xml")
 	public void testGetResourceSummaries()
 			throws Exception {
 
@@ -50,7 +50,6 @@ public class LexEVSResolvedValuesetQueryServiceTestIT extends
 
 	
 	@Test
-	@LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosAndGM.xml")
 	public void testGetResourceSummaries_Restriction_ValueSetDefinitions()
 			throws Exception {
 
@@ -75,7 +74,6 @@ public class LexEVSResolvedValuesetQueryServiceTestIT extends
 	}
 
 	@Test
-	@LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosAndGM.xml")
 	public void testGetResourceSummaries_Restriction_CodeSystemVersions()
 			throws Exception {
 
@@ -100,7 +98,6 @@ public class LexEVSResolvedValuesetQueryServiceTestIT extends
 	}
 
 	@Test
-	@LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosAndGM.xml")
 	public void testGetResourceSummaries_Restriction_Entity() throws Exception {
 
 		// Restrict to given codeSystem

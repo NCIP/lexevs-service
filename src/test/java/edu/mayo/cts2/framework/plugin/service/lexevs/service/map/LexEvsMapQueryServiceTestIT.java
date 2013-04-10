@@ -52,7 +52,8 @@ import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestri
  *  @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
  *  @author <a href="mailto:hardie.linda@mayo.edu">Linda Hardie</a>
  *
- */
+ */	
+@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 public class LexEvsMapQueryServiceTestIT extends AbstractTestITBase {
 
 	@Resource
@@ -67,13 +68,6 @@ public class LexEvsMapQueryServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
-	public void testLoadMap() {
-		// Just a test to see time involved with the load
-	}
-
-	@Test
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 	public void testGetResourceListMapToRoleFound() {
 		
 		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();
@@ -97,7 +91,6 @@ public class LexEvsMapQueryServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 	public void testGetResourceSummariesMapToRoleFound() {
 		
 		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();
@@ -121,7 +114,6 @@ public class LexEvsMapQueryServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 	public void testMapToRoleFoundForMultipleCodeSchemes() {
 		
 		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();
@@ -149,7 +141,6 @@ public class LexEvsMapQueryServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 	public void testMapToRoleNotFoundForMultipleCodeSchemes() {
 		
 		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();
@@ -177,7 +168,6 @@ public class LexEvsMapQueryServiceTestIT extends AbstractTestITBase {
 	}
 	
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 	public void testGetResourceListMapToRoleNotFound() {
 		
 		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();
@@ -201,7 +191,6 @@ public class LexEvsMapQueryServiceTestIT extends AbstractTestITBase {
 	}
 	
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 	public void testGetResourceSummariesMapToRoleNotFound() {
 		
 		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();
@@ -225,7 +214,6 @@ public class LexEvsMapQueryServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 	public void testMapFromRoleFound() {
 		
 		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();
@@ -249,7 +237,6 @@ public class LexEvsMapQueryServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 	public void testMapFromRoleNotFound() {
 		
 		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();
@@ -274,7 +261,6 @@ public class LexEvsMapQueryServiceTestIT extends AbstractTestITBase {
 
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 	public void testBothMapRolesFoundViaMapTo() {
 		
 		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();
@@ -302,7 +288,6 @@ public class LexEvsMapQueryServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 	public void testBothMapRolesFoundViaMapFrom() {
 		
 		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();
@@ -331,7 +316,6 @@ public class LexEvsMapQueryServiceTestIT extends AbstractTestITBase {
 
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 	public void testBothMapRolesNotFound() {
 		
 		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();
@@ -360,7 +344,6 @@ public class LexEvsMapQueryServiceTestIT extends AbstractTestITBase {
 
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 	public void testCountUsingMapFromRoleRestrictionOneFound() {
 		
 		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();
@@ -379,7 +362,6 @@ public class LexEvsMapQueryServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 	public void testCountUsingNoMapFromRoleRestrictionsOneFound() {
 		
 		MapQueryServiceRestrictions restrictions = new MapQueryServiceRestrictions();

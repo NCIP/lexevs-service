@@ -51,6 +51,7 @@ import edu.mayo.cts2.framework.service.command.restriction.AssociationQueryServi
  * @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
  *
  */
+@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 public class LexEvsAssociationQueryServiceTestIT extends AbstractTestITBase {
 	
 	@Resource
@@ -62,7 +63,6 @@ public class LexEvsAssociationQueryServiceTestIT extends AbstractTestITBase {
 	}
 	
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testResourceSummaries() throws Exception {
 		final String srcEntityName = "A0001";  // LexEVS entity code for entity description "Automobile"
 		NameOrURI csvName = ModelUtils.nameOrUriFromName("Automobiles");

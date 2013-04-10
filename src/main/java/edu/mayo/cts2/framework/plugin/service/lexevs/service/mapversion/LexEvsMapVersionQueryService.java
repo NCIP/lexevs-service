@@ -57,6 +57,7 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsServi
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonPageUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceSummaryUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.QueryData;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQuery;
 import edu.mayo.cts2.framework.service.profile.mapversion.MapVersionQuery;
@@ -79,8 +80,6 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	
 	private MappingExtension mappingExtension;
 	
-	public static final String MAPPING_EXTENSION = "MappingExtension";	
-	
 	// ------ Local methods ----------------------
 	public void setCodeSystemVersionNameConverter(VersionNameConverter converter){
 		this.nameConverter = converter;
@@ -98,7 +97,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(MAPPING_EXTENSION);
+		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(Constants.MAPPING_EXTENSION);
 	}
 		
 	@Override
@@ -113,7 +112,9 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	
 	@Override
 	public DirectoryResult<MapVersionDirectoryEntry> getResourceSummaries(
-			MapVersionQuery query, SortCriteria sortCriteria, Page page) {
+			MapVersionQuery query, 
+			SortCriteria sortCriteria, 
+			Page page) {
 		LexBIGService lexBigService = this.getLexBigService();
 		QueryData<MapVersionQuery> queryData = new QueryData<MapVersionQuery>(query);
 		

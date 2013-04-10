@@ -127,6 +127,9 @@ public class CommonUtils {
 			VersionNameConverter nameConverter, 
 			NameOrURI identifier,
 			ResolvedReadContext readContext) {
+		if(identifier == null){
+			return null;
+		}
 		String name;
 		NameVersionPair namePair;
 		

@@ -53,6 +53,7 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterU
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.QueryData;
 import edu.mayo.cts2.framework.service.profile.map.MapQuery;
 import edu.mayo.cts2.framework.service.profile.map.MapQueryService;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 
 /**
  *  @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
@@ -71,36 +72,31 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 	
 	private MappingExtension mappingExtension;
 	
-	public static final String MAPPING_EXTENSION = "MappingExtension";	
-
 	// ------ Local methods ----------------------
-	public void setCodingSchemeToMapTransform(
-			CodingSchemeToMapTransform codingSchemeToMapTransform) {
-		this.transformer = codingSchemeToMapTransform;
+	public void setCodingSchemeToMapTransform(CodingSchemeToMapTransform transformer) {
+		this.transformer = transformer;
 	}
 
 	public void setCodeSystemVersionNameConverter(VersionNameConverter converter){
 		this.nameConverter = converter;
 	}
 
-	public MappingExtension getMappingExtension() {
-		return mappingExtension;
-	}
-
-	public void setMappingExtension(MappingExtension mappingExtension) {
-		this.mappingExtension = mappingExtension;
+	public void setMappingExtension(MappingExtension extension) {
+		this.mappingExtension = extension;
 	}
 
 	// -------- Implemented methods ----------------	
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(MAPPING_EXTENSION);
+		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(Constants.MAPPING_EXTENSION);
 	}
 	
 
 	@Override
 	public DirectoryResult<MapCatalogEntrySummary> getResourceSummaries(
-			MapQuery query, SortCriteria sortCriteria, Page page) {
+			MapQuery query, 
+			SortCriteria sortCriteria, 
+			Page page) {
 		
 		LexBIGService lexBigService = this.getLexBigService();
 		QueryData<MapQuery> queryData = new QueryData<MapQuery>(query);
@@ -111,7 +107,7 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		
 		boolean atEnd = (page.getEnd() >= codingSchemeList.size()) ? true : false;
 			
-		return CommonResourceSummaryUtils.createDirectoryResultWithEntrySummaryData(lexBigService, transformer, codingSchemePage, atEnd);		
+		return CommonResourceSummaryUtils.createDirectoryResultWithEntrySummaryData(lexBigService, this.transformer, codingSchemePage, atEnd);		
 	}
 
 

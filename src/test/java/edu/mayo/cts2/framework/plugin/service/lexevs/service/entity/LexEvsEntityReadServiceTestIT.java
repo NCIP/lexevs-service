@@ -48,6 +48,7 @@ import edu.mayo.cts2.framework.service.profile.entitydescription.name.EntityDesc
  *  @author <a href="mailto:hardie.linda@mayo.edu">Linda Hardie</a>
  *
  */
+@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 public class LexEvsEntityReadServiceTestIT extends AbstractTestITBase {
 
 	@Resource
@@ -63,7 +64,6 @@ public class LexEvsEntityReadServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testRead() throws Exception {
 
 		EntityNameOrURI entity = new EntityNameOrURI();
@@ -91,7 +91,6 @@ public class LexEvsEntityReadServiceTestIT extends AbstractTestITBase {
 
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testReadNotFound() throws Exception {
 
 		EntityNameOrURI entity = new EntityNameOrURI();
@@ -111,7 +110,6 @@ public class LexEvsEntityReadServiceTestIT extends AbstractTestITBase {
 	}	
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testExistsForInactiveEntity() throws Exception {
 		// Note:  this retired entity should exist since the search is using 
 		// the entityCode value (73)
@@ -133,7 +131,6 @@ public class LexEvsEntityReadServiceTestIT extends AbstractTestITBase {
 
 
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testExistsForActiveEntity() throws Exception {
 		EntityNameOrURI entity = new EntityNameOrURI();
 		ScopedEntityName scopedEntityName = new ScopedEntityName();
@@ -152,7 +149,6 @@ public class LexEvsEntityReadServiceTestIT extends AbstractTestITBase {
 	}	
 	
 	@Test
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 	public void testParents() throws Exception {
 		EntityNameOrURI entity = new EntityNameOrURI();
 		ScopedEntityName scopedEntityName = new ScopedEntityName();

@@ -110,13 +110,13 @@ public class LexEvsSupportedPropertiesUriHandler implements DelegateUriHandler {
 	 */
 	@Override
 	public String getCodeSystemVersionUri(CodingScheme codingScheme) {
-		return codingScheme.getCodingSchemeURI() + "#" + codingScheme.getRepresentsVersion();
+		return null;
 	}
 	
 	@Override
 	public String getCodeSystemVersionUri(
 			CodingSchemeSummary codingSchemeSummary) {
-		return codingSchemeSummary.getCodingSchemeURI() + "#" + codingSchemeSummary.getRepresentsVersion();
+		return null;
 	}
 
 	@Override
