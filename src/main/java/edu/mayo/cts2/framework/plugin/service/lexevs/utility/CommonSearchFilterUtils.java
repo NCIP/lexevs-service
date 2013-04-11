@@ -37,7 +37,7 @@ public class CommonSearchFilterUtils {
 	/**
 	 * @return
 	 */
-	public static Set<? extends MatchAlgorithmReference> createSupportedMatchAlgorithms() {
+	public static Set<MatchAlgorithmReference> createSupportedMatchAlgorithms() {
 
 		MatchAlgorithmReference exactMatch = StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference();
 		MatchAlgorithmReference contains = StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference();

@@ -65,10 +65,9 @@ public class LexEvsOsgiClassLoader extends URLClassLoader implements
 			return super.loadClass(clazz);
 		}
 	}
-
+	
 	public ClassLoader getOsgiClassLoader() {
 		return this.osgiClassLoader;
 	}
 
 }
-

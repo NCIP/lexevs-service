@@ -39,11 +39,13 @@ import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
+import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractQueryServiceTest;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonTestUtils;
 import edu.mayo.cts2.framework.service.command.restriction.CodeSystemVersionQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
+import edu.mayo.cts2.framework.service.profile.QueryService;
+import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersionQuery;
 
 /**
  *  @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
@@ -51,8 +53,10 @@ import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
  *
  */
 @LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-public class LexEvsCodeSystemVersionQueryServiceTestIT extends
-		AbstractTestITBase {
+public class LexEvsCodeSystemVersionQueryServiceTestIT
+	extends AbstractQueryServiceTest<CodeSystemVersionCatalogEntry, 
+		CodeSystemVersionCatalogEntrySummary, 
+		CodeSystemVersionQuery> {
 	
 	private final static String ABOUT_CONTAINS = "11.11.0.1";
 	private final static String RESOURCESYNOPSIS_STARTSWITH = "Auto";
@@ -449,6 +453,17 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT extends
 		int expecting = 0;
 		int actual = dirResult.getEntries().size();
 		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
+	}
+
+
+	@Override
+	protected QueryService<CodeSystemVersionCatalogEntry, CodeSystemVersionCatalogEntrySummary, CodeSystemVersionQuery> getService() {
+		return this.service;
+	}
+
+	@Override
+	protected CodeSystemVersionQuery getQuery() {
+		return new CodeSystemVersionQueryImpl(null, null, null, null);
 	}
 
 }

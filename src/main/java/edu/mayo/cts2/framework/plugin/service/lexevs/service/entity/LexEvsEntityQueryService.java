@@ -39,6 +39,7 @@ import org.LexGrid.LexBIG.Exceptions.LBResourceUnavailableException;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.command.Page;
@@ -66,16 +67,16 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.QueryData;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.ResolvedConceptReferenceResults;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQuery;
-import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQueryService;
 
 /**
  *  @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
  *  @author <a href="mailto:hardie.linda@mayo.edu">Linda Hardie</a>
  *
 */
+@Primary
 @Component
 public class LexEvsEntityQueryService extends AbstractLexEvsService 
-		implements EntityDescriptionQueryService {
+		implements DelegateEntityQueryService {
 
 	@Resource
 	private VersionNameConverter nameConverter;
@@ -238,6 +239,17 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		return new ArrayList<DocumentedNamespaceReference>();
 	}
 
-	
+	@Override
+	public boolean canHandle(EntityDescriptionQuery query) {
+		return query.getEntitiesFromAssociationsQuery() == null &&
+				query.getRestrictions().getHierarchyRestriction() == null &&
+				query.getRestrictions().getCodeSystemVersion() != null;
+	}
+
+	@Override
+	public int getOrder() {
+		return 1;
+	}
+
 }
 

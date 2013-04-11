@@ -44,9 +44,10 @@ import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
+import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractReadServiceTest;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonTestUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
+import edu.mayo.cts2.framework.service.profile.ReadService;
 
 /**
  *  @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
@@ -54,7 +55,8 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
  *
  */
 @LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
-public class LexEvsCodeSystemVersionReadServiceTestIT extends AbstractTestITBase {
+public class LexEvsCodeSystemVersionReadServiceTestIT 
+	extends AbstractReadServiceTest<CodeSystemVersionCatalogEntry, NameOrURI> {
 	
 	@Resource
 	private LexEvsCodeSystemVersionReadService service;
@@ -355,5 +357,20 @@ public class LexEvsCodeSystemVersionReadServiceTestIT extends AbstractTestITBase
 			CodeSystemVersionCatalogEntry csvCatalogEntry = this.service.readByTag(identifier, tag, readContext);
 			assertNull(CommonTestUtils.createInvalidValuesMessage(values.get(i)), csvCatalogEntry);		
 		}
+	}
+
+	@Override
+	protected ReadService<CodeSystemVersionCatalogEntry, NameOrURI> getService() {
+		return this.service;
+	}
+
+	@Override
+	protected NameOrURI getGoodIdentifier() {
+		return ModelUtils.nameOrUriFromName("Automobiles-1.0");
+	}
+
+	@Override
+	protected NameOrURI getBadIdentifier() {
+		return ModelUtils.nameOrUriFromName("Automobiles-2.0");
 	}
 }

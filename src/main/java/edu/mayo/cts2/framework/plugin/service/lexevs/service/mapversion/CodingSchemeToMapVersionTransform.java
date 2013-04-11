@@ -150,9 +150,10 @@ public class CodingSchemeToMapVersionTransform extends AbstractBaseTransform <Ma
 		String target = relations.getTargetCodingScheme();
 		String targetVersion = relations.getTargetCodingSchemeVersion();
 		
+		//TODO
 		return new Tuple<CodeSystemVersionReference>(
-				this.getTransformUtils().toCodeSystemVersionReference(source, sourceVersion),
-				this.getTransformUtils().toCodeSystemVersionReference(target, targetVersion)
+				this.getTransformUtils().toCodeSystemVersionReference(source, sourceVersion, null),
+				this.getTransformUtils().toCodeSystemVersionReference(target, targetVersion, null)
 		);
 	}
 	
