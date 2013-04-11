@@ -30,6 +30,7 @@ import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
+import edu.mayo.cts2.framework.core.url.UrlConstructor;
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntry;
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntrySummary;
 import edu.mayo.cts2.framework.model.command.Page;
@@ -50,6 +51,7 @@ import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 public class LexEvsCodeSystemVersionQueryServiceTest {
 	// Setup mocked environment
 	// -------------------------
+	@SuppressWarnings("deprecation")
 	public LexEvsCodeSystemVersionQueryService createService(
 			FakeLexEvsSystem<CodeSystemVersionCatalogEntry, CodeSystemVersionCatalogEntrySummary, CodeSystemVersionQueryImpl, LexEvsCodeSystemVersionQueryService> fakeLexEvs, 
 			boolean withData) throws Exception{
@@ -66,7 +68,12 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 		
 		UriHandler uriHandler = EasyMock.createNiceMock(UriHandler.class);
 		EasyMock.replay(uriHandler);
+		
+		UrlConstructor urlConstructor = org.easymock.classextension.EasyMock.createNiceMock(UrlConstructor.class);
+		org.easymock.classextension.EasyMock.replay(urlConstructor);
+		
 		transform.setUriHandler(uriHandler);
+		transform.setUrlConstructor(urlConstructor);
 		
 		service.setCodingSchemeTransformer(transform);
 		

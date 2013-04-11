@@ -154,13 +154,14 @@ public class RestUriResolver implements UriResolver, InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		Thread.currentThread().setContextClassLoader(lexEvsOsgiClassLoader.getOsgiClassLoader());
 		try {
 			this.loadClojureScripts();
 		} catch (Exception e) {
 			throw new RuntimeException("Error starting Clojure.", e);
 		} finally {
-			Thread.currentThread().setContextClassLoader(lexEvsOsgiClassLoader);
+			Thread.currentThread().setContextClassLoader(classLoader);
 		}
 	}
 	

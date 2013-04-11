@@ -27,12 +27,14 @@ import org.LexGrid.codingSchemes.CodingScheme;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
+import edu.mayo.cts2.framework.core.url.UrlConstructor;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
 
 public class CodingSchemeToCodeSystemTransformTest {
 
 	@Test
+	@SuppressWarnings("deprecation")
 	public void testTransformWithEmpty(){
 		CodingSchemeToCodeSystemTransform transform = 
 				new CodingSchemeToCodeSystemTransform(new VersionNameConverter());
@@ -41,6 +43,10 @@ public class CodingSchemeToCodeSystemTransformTest {
 		EasyMock.replay(uriHandler);
 		
 		transform.setUriHandler(uriHandler);
+		
+		UrlConstructor urlConstructor = org.easymock.classextension.EasyMock.createNiceMock(UrlConstructor.class);
+		org.easymock.classextension.EasyMock.replay(urlConstructor);
+		transform.setUrlConstructor(urlConstructor);
 		
 		transform.transformDescription(new CodingScheme());
 	}
