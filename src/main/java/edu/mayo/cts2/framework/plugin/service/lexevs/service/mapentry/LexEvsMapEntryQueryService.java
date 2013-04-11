@@ -45,7 +45,7 @@ import edu.mayo.cts2.framework.model.mapversion.MapEntryDirectoryEntry;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceSummaryUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.ResolvedConceptReferenceResults;
@@ -104,8 +104,8 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 			MapEntryQuery query, SortCriteria sortCriteria, Page page) {
 		
 		DirectoryResult<MapEntryDirectoryEntry> directoryResult;
-		ResolvedConceptReferenceResults referenceResults = CommonResourceSummaryUtils.getMapReferenceResults(query, sortCriteria, page, this.nameConverter, this.mappingExtension);
-		directoryResult = CommonResourceSummaryUtils.createDirectoryResultWithEntryDescriptions(this.transformer, referenceResults, Constants.SUMMARY_DESCRIPTION);
+		ResolvedConceptReferenceResults referenceResults = CommonResourceUtils.getMapReferenceResults(query, sortCriteria, page, this.nameConverter, this.mappingExtension);
+		directoryResult = CommonResourceUtils.createDirectoryResultWithEntryDescriptions(this.transformer, referenceResults, Constants.SUMMARY_DESCRIPTION);
 		
 		return directoryResult;
 	}
@@ -118,8 +118,8 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 			SortCriteria sortCriteria, Page page) {
 				
 		DirectoryResult<MapEntry> directoryResult = null;
-		ResolvedConceptReferenceResults referenceResults = CommonResourceSummaryUtils.getMapReferenceResults(query, sortCriteria, page, this.nameConverter, this.mappingExtension);
-		directoryResult = CommonResourceSummaryUtils.createDirectoryResultWithEntryDescriptions(this.transformer, referenceResults, Constants.FULL_DESCRIPTION);
+		ResolvedConceptReferenceResults referenceResults = CommonResourceUtils.getMapReferenceResults(query, sortCriteria, page, this.nameConverter, this.mappingExtension);
+		directoryResult = CommonResourceUtils.createDirectoryResultWithEntryDescriptions(this.transformer, referenceResults, Constants.FULL_DESCRIPTION);
 
 		return directoryResult;
 	}
@@ -129,7 +129,7 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	 */
 	@Override
 	public int count(MapEntryQuery query) {		
-		ResolvedConceptReferenceResults referenceResults = CommonResourceSummaryUtils.getMapReferenceResults(query, null, null, this.nameConverter, this.mappingExtension);
+		ResolvedConceptReferenceResults referenceResults = CommonResourceUtils.getMapReferenceResults(query, null, null, this.nameConverter, this.mappingExtension);
 		return referenceResults.getResolvedConceptReference().length;
 	}
 

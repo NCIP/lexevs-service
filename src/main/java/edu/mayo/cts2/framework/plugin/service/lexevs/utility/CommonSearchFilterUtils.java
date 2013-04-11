@@ -129,7 +129,7 @@ public class CommonSearchFilterUtils {
 	
 	public static List<CodingScheme> filterByRenderingListAndMappingExtension(
 			LexBIGService lexBigService, 
-			CodingSchemeRenderingList renderingList, 
+			CodingSchemeRendering[] codingSchemeRendering, 
 			CodeSystemRestriction mappingRestriction) {
 
 		List<CodingScheme> codingSchemeList = new ArrayList<CodingScheme>();
@@ -143,8 +143,8 @@ public class CommonSearchFilterUtils {
 			if(haveMapRoleAndCodeSystems(mappingRestriction, codeSystemSet)){
 				mapRole = mappingRestriction.getMapRole();
 				// Get array of CodingSchemeRendering object and loop checking each item in array
-				CodingSchemeRendering[] csRendering = renderingList.getCodingSchemeRendering();
-				for (CodingSchemeRendering render : csRendering) {
+			//	CodingSchemeRendering[] csRendering = codingSchemeRendering.getCodingSchemeRendering();
+				for (CodingSchemeRendering render : codingSchemeRendering) {
 					codingScheme = CommonCodingSchemeUtils.getMappedCodingSchemeForCodeSystemRestriction(lexBigService, render, codeSystemSet, mapRole.value()); 
 					if (codingScheme != null) {
 						codingSchemeList.add(codingScheme);

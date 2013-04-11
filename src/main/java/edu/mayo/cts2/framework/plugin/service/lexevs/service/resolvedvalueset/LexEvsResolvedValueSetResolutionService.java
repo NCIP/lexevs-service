@@ -46,7 +46,7 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.entity.LexEvsEntityQueryService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonPageUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceSummaryUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.QueryData;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.ResolvedConceptReferenceResults;
 import edu.mayo.cts2.framework.service.command.restriction.EntityDescriptionQueryServiceRestrictions;

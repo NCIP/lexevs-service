@@ -53,7 +53,7 @@ public class CommonPageUtils {
 		ResolvedConceptReferencesIterator iterator;
 		CodedNodeSet codedNodeSet;
 		
-		codedNodeSet = CommonResourceSummaryUtils.getCodedNodeSet(lexBigService, queryData, sortCriteria);
+		codedNodeSet = CommonResourceUtils.getCodedNodeSet(lexBigService, queryData, sortCriteria);
 		if(codedNodeSet != null){
 			iterator = CommonUtils.getResolvedConceptReferencesIterator(codedNodeSet, sortCriteria);
 			results = CommonPageUtils.getPageFromIterator(iterator, page);

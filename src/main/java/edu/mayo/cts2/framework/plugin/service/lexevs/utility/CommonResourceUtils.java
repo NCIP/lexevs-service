@@ -31,7 +31,7 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.transform.LexEvsToCTS2Trans
 import edu.mayo.cts2.framework.service.profile.ResourceQuery;
 import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryQuery;
 
-public class CommonResourceSummaryUtils{
+public class CommonResourceUtils{
 	private final static String UNCHECKED = "unchecked";
 	private final static String RAWTYPES = "rawtypes";
 	
@@ -127,13 +127,55 @@ public class CommonResourceSummaryUtils{
 			MappingExtension mappingExtension,
 			SortCriteria sortCriteria){
 		
-		CodingSchemeRenderingList csrFilteredList;
-		csrFilteredList = CommonResourceSummaryUtils.getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, sortCriteria);
-		CodingSchemeRendering[] csRendering = csrFilteredList.getCodingSchemeRendering();
+		CodingSchemeRenderingList renderingList = null;
+		try {
+			renderingList = lexBigService.getSupportedCodingSchemes();
+		
+			renderingList = CommonSearchFilterUtils.filterIfMappingExtensionValid(mappingExtension, renderingList);
+			renderingList = CommonSearchFilterUtils.filterIfCodingSchemeNameValid(queryData.getNameVersionPairName(), renderingList);
+		
+			if (CommonUtils.hasCodingSchemeRenderings(queryData, renderingList)){ 
+				Iterator<ResolvedFilter> filtersItr = queryData.getFilters().iterator();
+				while (filtersItr.hasNext() && (renderingList.getCodingSchemeRenderingCount() > 0)) {
+						ResolvedFilter resolvedFilter = filtersItr.next();
+						renderingList = CommonSearchFilterUtils.filterRenderingListByResolvedFilter(resolvedFilter, 
+								renderingList, nameConverter);
+				}
+			}
+						
+		} catch (LBInvocationException e) {
+			throw new LBRuntimeException(e.getMessage());
+		}
 
-		return csRendering;
+		if(renderingList != null){
+			return renderingList.getCodingSchemeRendering();
+		}
+		
+		return null;
 	}
 	
+	public static <T extends ResourceQuery> List<CodingScheme> getCodingSchemeList(
+			LexBIGService lexBigService, 
+			VersionNameConverter nameConverter,
+			MappingExtension mappingExtension,
+			QueryData<T> queryData,
+			SortCriteria sortCriteria) {
+
+		List<CodingScheme> codingSchemeList = new ArrayList<CodingScheme>();
+		
+		CodingSchemeRendering[] codingSchemeRendering;
+		codingSchemeRendering = CommonResourceUtils.getCodingSchemeRendering(lexBigService, nameConverter, queryData, mappingExtension, sortCriteria); // getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, sortCriteria);
+
+		if (queryData.getCodeSystemRestriction() != null) {
+			codingSchemeList = CommonSearchFilterUtils.filterByRenderingListAndMappingExtension(lexBigService, codingSchemeRendering, queryData.getCodeSystemRestriction());
+		}
+		else {
+			codingSchemeList = CommonCodingSchemeUtils.getCodingSchemeListFromCodingSchemeRenderings(lexBigService, codingSchemeRendering);
+		}
+					
+		return codingSchemeList;
+	}
+
 	public static <T extends ResourceQuery> CodedNodeSet getCodedNodeSet(
 			LexBIGService lexBigService, 
 			QueryData<T> queryData,
@@ -164,61 +206,6 @@ public class CommonResourceSummaryUtils{
 		return codedNodeSet;
 	}
 	
-	public static <T extends ResourceQuery> CodingSchemeRenderingList getCodingSchemeRenderingList(
-			LexBIGService lexBigService, 
-			VersionNameConverter nameConverter,
-			MappingExtension mappingExtension,
-			QueryData<T> queryData,
-			SortCriteria sortCriteria) {
-		
-			CodingSchemeRenderingList renderingList;
-			try {
-				renderingList = lexBigService.getSupportedCodingSchemes();
-			
-				renderingList = CommonSearchFilterUtils.filterIfMappingExtensionValid(mappingExtension, renderingList);
-				renderingList = CommonSearchFilterUtils.filterIfCodingSchemeNameValid(queryData.getNameVersionPairName(), renderingList);
-			
-				if (CommonUtils.hasCodingSchemeRenderings(queryData, renderingList)){ 
-					Iterator<ResolvedFilter> filtersItr = queryData.getFilters().iterator();
-					while (filtersItr.hasNext() && (renderingList.getCodingSchemeRenderingCount() > 0)) {
-							ResolvedFilter resolvedFilter = filtersItr.next();
-							renderingList = CommonSearchFilterUtils.filterRenderingListByResolvedFilter(resolvedFilter, 
-									renderingList, nameConverter);
-					}
-				}
-							
-				return renderingList;
-			} catch (LBInvocationException e) {
-				throw new LBRuntimeException(e.getMessage());
-			}
-	}
-	
-
-	public static <T extends ResourceQuery> List<CodingScheme> getCodingSchemeList(
-			LexBIGService lexBigService, 
-			VersionNameConverter nameConverter,
-			MappingExtension mappingExtension,
-			QueryData<T> queryData,
-			SortCriteria sortCriteria) {
-
-		List<CodingScheme> codingSchemeList = new ArrayList<CodingScheme>();
-		boolean resolvedToCodingSchemeFlag = false;
-		
-		CodingSchemeRenderingList csrFilteredList;
-		csrFilteredList = getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, sortCriteria);
-
-		if (queryData.getCodeSystemRestriction() != null) {
-			codingSchemeList = CommonSearchFilterUtils.filterByRenderingListAndMappingExtension(lexBigService, csrFilteredList, queryData.getCodeSystemRestriction());
-			resolvedToCodingSchemeFlag = true;
-		}
-		
-		if (!resolvedToCodingSchemeFlag) {
-			codingSchemeList = CommonCodingSchemeUtils.getCodingSchemeListFromCodingSchemeRenderings(lexBigService, csrFilteredList.getCodingSchemeRendering());
-		}
-					
-		return codingSchemeList;
-	}
-
 	public static ResolvedConceptReferenceResults getMapReferenceResults(
 			MapEntryQuery query, SortCriteria sortCriteria, Page page,
 			VersionNameConverter nameConverter, MappingExtension mappingExtension) {

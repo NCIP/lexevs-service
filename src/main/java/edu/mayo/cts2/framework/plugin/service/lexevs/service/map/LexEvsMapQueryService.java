@@ -48,7 +48,7 @@ import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonPageUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceSummaryUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.QueryData;
 import edu.mayo.cts2.framework.service.profile.map.MapQuery;
@@ -102,12 +102,12 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		QueryData<MapQuery> queryData = new QueryData<MapQuery>(query, null);
 		List<CodingScheme> codingSchemeList;
 		
-		codingSchemeList = CommonResourceSummaryUtils.getCodingSchemeList(lexBigService, this.nameConverter, mappingExtension, queryData, sortCriteria);
+		codingSchemeList = CommonResourceUtils.getCodingSchemeList(lexBigService, this.nameConverter, mappingExtension, queryData, sortCriteria);
 		CodingScheme[] codingSchemePage = (CodingScheme[]) CommonPageUtils.getRenderingPage(codingSchemeList, page);
 		
 		boolean atEnd = (page.getEnd() >= codingSchemeList.size()) ? true : false;
 			
-		return CommonResourceSummaryUtils.createDirectoryResultWithEntryDescriptions(this.transformer, codingSchemePage, atEnd, Constants.SUMMARY_DESCRIPTION);		
+		return CommonResourceUtils.createDirectoryResultWithEntryDescriptions(this.transformer, codingSchemePage, atEnd, Constants.SUMMARY_DESCRIPTION);		
 	}
 
 
@@ -119,12 +119,12 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		List<CodingScheme> codingSchemeList;
 		
 		QueryData<MapQuery> queryData = new QueryData<MapQuery>(query, null);
-		codingSchemeList = CommonResourceSummaryUtils.getCodingSchemeList(lexBigService, this.nameConverter, mappingExtension, queryData, sortCriteria);		
+		codingSchemeList = CommonResourceUtils.getCodingSchemeList(lexBigService, this.nameConverter, mappingExtension, queryData, sortCriteria);		
 		CodingScheme[] codingSchemePage = (CodingScheme[]) CommonPageUtils.getRenderingPage(codingSchemeList, page);
 		
 		boolean atEnd = (page.getEnd() >= codingSchemeList.size()) ? true : false;
 		
-		return CommonResourceSummaryUtils.createDirectoryResultWithEntryDescriptions(transformer, codingSchemePage, atEnd, Constants.FULL_DESCRIPTION);
+		return CommonResourceUtils.createDirectoryResultWithEntryDescriptions(transformer, codingSchemePage, atEnd, Constants.FULL_DESCRIPTION);
 	}
 
 
@@ -133,7 +133,7 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		LexBIGService lexBigService = this.getLexBigService();
 		List<CodingScheme> codingSchemeList;
 		QueryData<MapQuery> queryData = new QueryData<MapQuery>(query, null);
-		codingSchemeList = CommonResourceSummaryUtils.getCodingSchemeList(lexBigService, this.nameConverter, mappingExtension, queryData, null);
+		codingSchemeList = CommonResourceUtils.getCodingSchemeList(lexBigService, this.nameConverter, mappingExtension, queryData, null);
 		return codingSchemeList.size();
 	}
 

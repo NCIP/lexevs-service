@@ -31,7 +31,6 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
-import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.springframework.stereotype.Component;
@@ -48,7 +47,7 @@ import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonPageUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceSummaryUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.QueryData;
@@ -90,9 +89,8 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		LexBIGService lexBigService = this.getLexBigService();
 		QueryData<CodeSystemVersionQuery> queryData = new QueryData<CodeSystemVersionQuery>(query, null);
 		
-		CodingSchemeRenderingList csrFilteredList;
-		csrFilteredList = CommonResourceSummaryUtils.getCodingSchemeRenderingList(lexBigService, nameConverter, null, queryData, null);
-		return csrFilteredList.getCodingSchemeRendering().length;
+		CodingSchemeRendering [] renderings = CommonResourceUtils.getCodingSchemeRendering(lexBigService, nameConverter, queryData, null, null);
+		return renderings.length;
 	}
 
 	@Override
@@ -101,10 +99,10 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		LexBIGService lexBigService = this.getLexBigService();		
 		QueryData<CodeSystemVersionQuery> queryData = new QueryData<CodeSystemVersionQuery>(query, null);
 		
-		CodingSchemeRendering[] csRendering = CommonResourceSummaryUtils.getCodingSchemeRendering(lexBigService, nameConverter, queryData, null, sortCriteria);
+		CodingSchemeRendering[] csRendering = CommonResourceUtils.getCodingSchemeRendering(lexBigService, nameConverter, queryData, null, sortCriteria);
 		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPageFromArray(csRendering, page);
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
-		return CommonResourceSummaryUtils.createDirectoryResultWithEntryFullVersionDescriptions(lexBigService, this.transformer, csRenderingPage, atEnd);
+		return CommonResourceUtils.createDirectoryResultWithEntryFullVersionDescriptions(lexBigService, this.transformer, csRenderingPage, atEnd);
 	}
 
 	@Override
@@ -113,10 +111,10 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		LexBIGService lexBigService = this.getLexBigService();
 		QueryData<CodeSystemVersionQuery> queryData = new QueryData<CodeSystemVersionQuery>(query, null);
 		
-		CodingSchemeRendering[] csRendering = CommonResourceSummaryUtils.getCodingSchemeRendering(lexBigService, nameConverter, queryData, null, sortCriteria);
+		CodingSchemeRendering[] csRendering = CommonResourceUtils.getCodingSchemeRendering(lexBigService, nameConverter, queryData, null, sortCriteria);
 		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPageFromArray(csRendering, page);
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
-		return CommonResourceSummaryUtils.createDirectoryResultWithEntryDescriptions(this.transformer, csRenderingPage, atEnd, Constants.SUMMARY_DESCRIPTION);
+		return CommonResourceUtils.createDirectoryResultWithEntryDescriptions(this.transformer, csRenderingPage, atEnd, Constants.SUMMARY_DESCRIPTION);
 	}
 
 	@Override
