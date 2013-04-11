@@ -49,12 +49,12 @@ public class LexEVSResolvedValueSetServiceFactory implements
 
 	@Override
 	public Class<?> getObjectType() {
-		return LexEVSValueSetDefinitionServices.class;
+		return LexEVSResolvedValueSetService.class;
 	}
 
 	@Override
 	public boolean isSingleton() {
-		return false;
+		return true;
 	}
 
 }

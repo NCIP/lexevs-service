@@ -57,7 +57,7 @@ public abstract class AbstractLexEvsService implements BaseService {
 	@Resource
 	private LexBIGService lexBigService;
 
-	//TODO: Create factories for this
+	@Resource
 	private LexEVSResolvedValueSetService lexEVSResolvedService;
 	
 	//TODO: Create factories for this

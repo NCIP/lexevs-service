@@ -31,6 +31,9 @@ public class CommonResolvedValueSetUtils {
 			ResolvedValueSetQuery query) throws Exception {
 		List<CodingScheme> temp = new ArrayList<CodingScheme>();
 		List<AbsoluteCodingSchemeVersionReference> inCodingSchemes=new ArrayList<AbsoluteCodingSchemeVersionReference>();
+		if (query == null || query.getResolvedValueSetQueryServiceRestrictions()==null) {
+			return csList;
+		}
 		ResolvedValueSetQueryServiceRestrictions restrictions = query
 				.getResolvedValueSetQueryServiceRestrictions();
 		inCodingSchemes.addAll(getAbsoluteCodingSchemeVersionReferenceList(restrictions.getCodeSystemVersions()));
