@@ -34,9 +34,9 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT extends
 	@Test
 	public void testGetRolution() throws Exception {
 
-		ResolvedValueSetReadId identifier = new ResolvedValueSetReadId("41011",
-				ModelUtils.nameOrUriFromName("BRO"),
-				ModelUtils.nameOrUriFromName("BRO-41011"));
+		ResolvedValueSetReadId identifier = new ResolvedValueSetReadId("SRITEST:AUTO:AllDomesticANDGM-06736a30878a0f8bd0ea83196732380a",
+				ModelUtils.nameOrUriFromName("SRITEST:AUTO:AllDomesticANDGM"),
+				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM-06736a30878a0f8bd0ea83196732380a"));
 		DirectoryResult<EntitySynopsis> dirResult = service.getResolution(
 				identifier, null, new Page());
 
@@ -48,10 +48,10 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT extends
 	}
 
 	@Test
-	void TestGetResolutionEntitiesNoFilter() {
-		ResolvedValueSetReadId identifier = new ResolvedValueSetReadId("41011",
-				ModelUtils.nameOrUriFromName("BRO"),
-				ModelUtils.nameOrUriFromName("BRO-41011"));
+	public void TestGetResolutionEntitiesNoFilter() {
+		ResolvedValueSetReadId identifier = new ResolvedValueSetReadId("SRITEST:AUTO:AllDomesticANDGM-06736a30878a0f8bd0ea83196732380a",
+				ModelUtils.nameOrUriFromName("SRITEST:AUTO:AllDomesticANDGM"),
+				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM-06736a30878a0f8bd0ea83196732380a"));
 		DirectoryResult<EntityDirectoryEntry> dirResult = service.getEntities(
 				identifier, null, null, new Page());
 		assertTrue(dirResult.getEntries().size() > 0);
