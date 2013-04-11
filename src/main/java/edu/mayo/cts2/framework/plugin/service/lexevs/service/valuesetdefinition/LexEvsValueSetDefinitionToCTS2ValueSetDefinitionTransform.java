@@ -77,7 +77,7 @@ public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform implement
 	
 	// TODO Not sure if method is needed/useful. May be better to transform directly in LexValueSetDefinitionQueryService
 	@Override
-	public ValueSetDefinitionDirectoryEntry transformDirectoryEntry(ResolvedValueSetCodedNodeSet resolvedValueSetCodedNodeSet) {
+	public ValueSetDefinitionDirectoryEntry transformSummaryDescription(ResolvedValueSetCodedNodeSet resolvedValueSetCodedNodeSet) {
 //		ValueSetDefinitionDirectoryEntry vsdDirEntry = new ValueSetDefinitionDirectoryEntry();
 		
 		//return vsdDirEntry;
@@ -88,7 +88,7 @@ public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform implement
 	 * @see edu.mayo.cts2.framework.plugin.service.lexevs.utility.LexEvsToCTS2Transformer#transformDescription(java.lang.Object)
 	 */
 	@Override
-	public ValueSetDefinition transformDescription(CodingScheme data) {
+	public ValueSetDefinition transformFullDescription(CodingScheme data) {
 		// TODO Auto-generated method stub
 		return null;
 	}

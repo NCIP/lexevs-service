@@ -99,7 +99,7 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 			Page page) {
 		
 		LexBIGService lexBigService = this.getLexBigService();
-		QueryData<MapQuery> queryData = new QueryData<MapQuery>(query);
+		QueryData<MapQuery> queryData = new QueryData<MapQuery>(query, null);
 		List<CodingScheme> codingSchemeList;
 		
 		codingSchemeList = CommonResourceSummaryUtils.getCodingSchemeList(lexBigService, this.nameConverter, mappingExtension, queryData, sortCriteria);
@@ -107,7 +107,7 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		
 		boolean atEnd = (page.getEnd() >= codingSchemeList.size()) ? true : false;
 			
-		return CommonResourceSummaryUtils.createDirectoryResultWithEntrySummaryData(lexBigService, this.transformer, codingSchemePage, atEnd);		
+		return CommonResourceSummaryUtils.createDirectoryResultWithEntryDescriptions(this.transformer, codingSchemePage, atEnd, Constants.SUMMARY_DESCRIPTION);		
 	}
 
 
@@ -118,13 +118,13 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		LexBIGService lexBigService = this.getLexBigService();
 		List<CodingScheme> codingSchemeList;
 		
-		QueryData<MapQuery> queryData = new QueryData<MapQuery>(query);
+		QueryData<MapQuery> queryData = new QueryData<MapQuery>(query, null);
 		codingSchemeList = CommonResourceSummaryUtils.getCodingSchemeList(lexBigService, this.nameConverter, mappingExtension, queryData, sortCriteria);		
 		CodingScheme[] codingSchemePage = (CodingScheme[]) CommonPageUtils.getRenderingPage(codingSchemeList, page);
 		
 		boolean atEnd = (page.getEnd() >= codingSchemeList.size()) ? true : false;
 		
-		return CommonResourceSummaryUtils.createDirectoryResultWithEntryData(lexBigService, transformer, codingSchemePage, atEnd);
+		return CommonResourceSummaryUtils.createDirectoryResultWithEntryDescriptions(transformer, codingSchemePage, atEnd, Constants.FULL_DESCRIPTION);
 	}
 
 
@@ -132,7 +132,7 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 	public int count(MapQuery query) {
 		LexBIGService lexBigService = this.getLexBigService();
 		List<CodingScheme> codingSchemeList;
-		QueryData<MapQuery> queryData = new QueryData<MapQuery>(query);
+		QueryData<MapQuery> queryData = new QueryData<MapQuery>(query, null);
 		codingSchemeList = CommonResourceSummaryUtils.getCodingSchemeList(lexBigService, this.nameConverter, mappingExtension, queryData, null);
 		return codingSchemeList.size();
 	}

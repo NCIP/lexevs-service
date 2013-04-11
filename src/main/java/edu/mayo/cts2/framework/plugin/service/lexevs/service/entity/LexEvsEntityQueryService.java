@@ -101,8 +101,7 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		int count = 0;
 		
 		LexBIGService lexBigService = this.getLexBigService();
-		QueryData<EntityDescriptionQuery> queryData = new QueryData<EntityDescriptionQuery>(query);
-		queryData.setVersionOrTag(nameConverter);
+		QueryData<EntityDescriptionQuery> queryData = new QueryData<EntityDescriptionQuery>(query, nameConverter);
 		
 		CodedNodeSet codedNodeSet;
 		codedNodeSet = CommonResourceSummaryUtils.getCodedNodeSet(lexBigService, queryData, null);
@@ -127,8 +126,7 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		SortCriteria sortCriteria = null;
 		
 		LexBIGService lexBigService = this.getLexBigService();
-		QueryData<EntityDescriptionQuery> queryData = new QueryData<EntityDescriptionQuery>(query);
-		queryData.setVersionOrTag(nameConverter);
+		QueryData<EntityDescriptionQuery> queryData = new QueryData<EntityDescriptionQuery>(query, nameConverter);
 		
 		CodedNodeSet codedNodeSet = CommonResourceSummaryUtils.getCodedNodeSet(lexBigService, queryData, sortCriteria);
 		
@@ -164,14 +162,13 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 			EntityDescriptionQuery query, SortCriteria sortCriteria, Page page) {
 		
 		LexBIGService lexBigService = this.getLexBigService();
-		QueryData<EntityDescriptionQuery> queryData = new QueryData<EntityDescriptionQuery>(query);
-		queryData.setVersionOrTag(nameConverter);
+		QueryData<EntityDescriptionQuery> queryData = new QueryData<EntityDescriptionQuery>(query, nameConverter);
 		
 		ResolvedConceptReferenceResults resolvedConceptReferenceResultsPage;
 		resolvedConceptReferenceResultsPage = CommonPageUtils.getResolvedConceptReferenceResultsPage(lexBigService, queryData, sortCriteria, page);
 
 		DirectoryResult<EntityDescription> directoryResult;
-		directoryResult = CommonResourceSummaryUtils.createDirectoryResultWithResolvedEntrySummaryData(lexBigService, this.transformer, resolvedConceptReferenceResultsPage);
+		directoryResult = CommonResourceSummaryUtils.createDirectoryResultWithEntryDescriptions(this.transformer, resolvedConceptReferenceResultsPage, Constants.FULL_DESCRIPTION);
 
 		return directoryResult;
 	}
@@ -181,14 +178,13 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		
 		LexBIGService lexBigService = this.getLexBigService();
 		
-		QueryData<EntityDescriptionQuery> queryData = new QueryData<EntityDescriptionQuery>(query);
-		queryData.setVersionOrTag(nameConverter);
+		QueryData<EntityDescriptionQuery> queryData = new QueryData<EntityDescriptionQuery>(query, nameConverter);
 		
 		ResolvedConceptReferenceResults resolvedConceptReferenceResults;
 		resolvedConceptReferenceResults = CommonPageUtils.getResolvedConceptReferenceResultsPage(lexBigService, queryData, sortCriteria, page);
 		
 		DirectoryResult<EntityDirectoryEntry> directoryResult;
-		directoryResult = CommonResourceSummaryUtils.createDirectoryResultWithResolvedEntryData(lexBigService, transformer, resolvedConceptReferenceResults);
+		directoryResult = CommonResourceSummaryUtils.createDirectoryResultWithEntryDescriptions(this.transformer, resolvedConceptReferenceResults, Constants.SUMMARY_DESCRIPTION);
 			
 		return directoryResult;
 	}

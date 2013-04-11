@@ -85,7 +85,7 @@ public class LexEvsMapVersionReadService
 				mappingExtension)){
 			return null;
 		} else {
-			return this.transformer.transformDescription(codingScheme);
+			return this.transformer.transformFullDescription(codingScheme);
 		}
 	}
 	

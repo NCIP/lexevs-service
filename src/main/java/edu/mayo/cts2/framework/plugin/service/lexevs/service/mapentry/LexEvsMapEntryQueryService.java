@@ -30,10 +30,7 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
-import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
-import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
-import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
@@ -48,10 +45,10 @@ import edu.mayo.cts2.framework.model.mapversion.MapEntryDirectoryEntry;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonPageUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceSummaryUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.QueryData;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.ResolvedConceptReferenceResults;
 import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryQuery;
 import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryQueryService;
 
@@ -105,14 +102,12 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	@Override
 	public DirectoryResult<MapEntryDirectoryEntry> getResourceSummaries(
 			MapEntryQuery query, SortCriteria sortCriteria, Page page) {
-		// TODO not correct implementation yet, still in progress
-		LexBIGService lexBigService = this.getLexBigService();
-		QueryData<MapEntryQuery> queryData = new QueryData<MapEntryQuery>(query);
 		
-		CodingSchemeRendering[] csRendering = CommonResourceSummaryUtils.getCodingSchemeRendering(lexBigService, nameConverter, queryData, null, sortCriteria);
-		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPageFromArray(csRendering, page);
-		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
-		return CommonResourceSummaryUtils.createDirectoryResultWithEntrySummaryData(lexBigService, this.transformer, csRenderingPage, atEnd);
+		DirectoryResult<MapEntryDirectoryEntry> directoryResult;
+		ResolvedConceptReferenceResults referenceResults = CommonResourceSummaryUtils.getMapReferenceResults(query, sortCriteria, page, this.nameConverter, this.mappingExtension);
+		directoryResult = CommonResourceSummaryUtils.createDirectoryResultWithEntryDescriptions(this.transformer, referenceResults, Constants.SUMMARY_DESCRIPTION);
+		
+		return directoryResult;
 	}
 
 	/* (non-Javadoc)
@@ -121,14 +116,12 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	@Override
 	public DirectoryResult<MapEntry> getResourceList(MapEntryQuery query,
 			SortCriteria sortCriteria, Page page) {
-		// TODO not correct implementation yet, still in progress
-		LexBIGService lexBigService = this.getLexBigService();
-		QueryData<MapEntryQuery> queryData = new QueryData<MapEntryQuery>(query);
-		
-		CodingSchemeRendering[] csRendering = CommonResourceSummaryUtils.getCodingSchemeRendering(lexBigService, nameConverter, queryData, null, sortCriteria);
-		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPageFromArray(csRendering, page);
-		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
-		return CommonResourceSummaryUtils.createDirectoryResultWithRenderedEntryData(lexBigService, this.transformer, csRenderingPage, atEnd);
+				
+		DirectoryResult<MapEntry> directoryResult = null;
+		ResolvedConceptReferenceResults referenceResults = CommonResourceSummaryUtils.getMapReferenceResults(query, sortCriteria, page, this.nameConverter, this.mappingExtension);
+		directoryResult = CommonResourceSummaryUtils.createDirectoryResultWithEntryDescriptions(this.transformer, referenceResults, Constants.FULL_DESCRIPTION);
+
+		return directoryResult;
 	}
 
 	/* (non-Javadoc)
@@ -136,13 +129,8 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	 */
 	@Override
 	public int count(MapEntryQuery query) {		
-		// TODO not correct implementation yet, still in progress
-		LexBIGService lexBigService = this.getLexBigService();
-		QueryData<MapEntryQuery> queryData = new QueryData<MapEntryQuery>(query);
-		
-		CodingSchemeRenderingList csrFilteredList;
-		csrFilteredList = CommonResourceSummaryUtils.getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, null);
-		return csrFilteredList.getCodingSchemeRendering().length;
+		ResolvedConceptReferenceResults referenceResults = CommonResourceSummaryUtils.getMapReferenceResults(query, null, null, this.nameConverter, this.mappingExtension);
+		return referenceResults.getResolvedConceptReference().length;
 	}
 
 	/* (non-Javadoc)

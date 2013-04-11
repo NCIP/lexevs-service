@@ -130,7 +130,7 @@ public class LexEvsMapEntryReadService extends AbstractLexEvsService implements 
 			ResolvedReadContext readContext) {
 		
 		ResolvedConceptReference resolvedConceptReference = getResolvedConceptReference(identifier, readContext);		
-		return this.mappingToMapEntryTransform.transformDescription(resolvedConceptReference);
+		return this.mappingToMapEntryTransform.transformFullDescription(resolvedConceptReference);
 	}
 
 	@Override

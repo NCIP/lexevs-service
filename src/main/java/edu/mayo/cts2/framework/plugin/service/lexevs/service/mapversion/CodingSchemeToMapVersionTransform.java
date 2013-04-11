@@ -63,7 +63,7 @@ public class CodingSchemeToMapVersionTransform extends AbstractBaseTransform <Ma
 	}
 
 	@Override
-	public MapVersion transformDescription(CodingScheme codingScheme){
+	public MapVersion transformFullDescription(CodingScheme codingScheme){
 		MapVersion mapVersion = new MapVersion();
 
 		mapVersion.setAbout(codingScheme.getCodingSchemeURI());
@@ -110,7 +110,7 @@ public class CodingSchemeToMapVersionTransform extends AbstractBaseTransform <Ma
 	}
 	
 	@Override
-	public MapVersionDirectoryEntry transformDirectoryEntry(CodingSchemeRendering codingSchemeRendering){
+	public MapVersionDirectoryEntry transformSummaryDescription(CodingSchemeRendering codingSchemeRendering){
 		MapVersionDirectoryEntry summary = new MapVersionDirectoryEntry();
 		
 		CodingSchemeSummary codingSchemeSummary = codingSchemeRendering.getCodingSchemeSummary();

@@ -48,7 +48,7 @@ public class CodingSchemeToMapTransform
 	extends AbstractBaseTransform<MapCatalogEntry, CodingScheme, MapCatalogEntrySummary, CodingScheme> {
 
 	@Override
-	public MapCatalogEntry transformDescription(CodingScheme codingScheme) {
+	public MapCatalogEntry transformFullDescription(CodingScheme codingScheme) {
 		if(codingScheme == null){
 			return null;
 		}
@@ -88,7 +88,7 @@ public class CodingSchemeToMapTransform
 	}
 	
 	@Override
-	public MapCatalogEntrySummary transformDirectoryEntry(CodingScheme codingScheme) {
+	public MapCatalogEntrySummary transformSummaryDescription(CodingScheme codingScheme) {
 		if(codingScheme == null){
 			return null;
 		}

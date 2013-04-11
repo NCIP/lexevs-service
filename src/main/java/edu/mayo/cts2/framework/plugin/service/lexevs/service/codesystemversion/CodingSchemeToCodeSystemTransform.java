@@ -75,7 +75,7 @@ public class CodingSchemeToCodeSystemTransform implements LexEvsToCTS2Transforme
 	 * @return the code system version catalog entry
 	 */
 	@Override
-	public CodeSystemVersionCatalogEntry transformDescription(CodingScheme codingScheme){
+	public CodeSystemVersionCatalogEntry transformFullDescription(CodingScheme codingScheme){
 		CodeSystemVersionCatalogEntry codeSystemVersion = new CodeSystemVersionCatalogEntry();
 
 		codeSystemVersion.setAbout(
@@ -122,7 +122,7 @@ public class CodingSchemeToCodeSystemTransform implements LexEvsToCTS2Transforme
 	}
 	
 	@Override
-	public CodeSystemVersionCatalogEntrySummary transformDirectoryEntry(CodingSchemeRendering codingSchemeRendering){
+	public CodeSystemVersionCatalogEntrySummary transformSummaryDescription(CodingSchemeRendering codingSchemeRendering){
 		CodeSystemVersionCatalogEntrySummary summary = new CodeSystemVersionCatalogEntrySummary();
 		
 		CodingSchemeSummary codingSchemeSummary = codingSchemeRendering.getCodingSchemeSummary();

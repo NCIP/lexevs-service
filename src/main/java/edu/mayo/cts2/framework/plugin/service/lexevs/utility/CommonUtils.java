@@ -45,13 +45,16 @@ public class CommonUtils {
 			CodingSchemeRenderingList codingSchemeRenderingList){
 		boolean found = false;
 		String localName, version;
+		CodingSchemeSummary codingSchemeSummary;
+		
 		int count = codingSchemeRenderingList.getCodingSchemeRenderingCount();
+		
 		for(int index=0; index < count; index++){
-			CodingSchemeSummary codingSchemeSummary;
 			codingSchemeSummary = codingSchemeRenderingList.getCodingSchemeRendering(index).getCodingSchemeSummary();
 			localName = codingSchemeSummary.getLocalName();
 			version = codingSchemeSummary.getRepresentsVersion();
-			if(localName.equals(queryData.getCodingSchemeName()) && 
+	
+			if(localName.equals(queryData.getNameVersionPairName()) && 
 				version.equals(queryData.getVersionOrTag().getVersion())){
 				found = true;
 			}

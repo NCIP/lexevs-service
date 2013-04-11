@@ -33,10 +33,10 @@ public interface LexEvsToCTS2Transformer <DescriptionDataType, DescriptionDataIN
 	
 	// ResourceList
 	// Description
-	public DescriptionDataType transformDescription(DescriptionDataIN data);
+	public DescriptionDataType transformFullDescription(DescriptionDataIN data);
 
 	
 	// ResourceSummaries
 	// DirectoryEntry
-	public DirectoryEntryDataType transformDirectoryEntry(DirectoryEntryDataIN data);
+	public DirectoryEntryDataType transformSummaryDescription(DirectoryEntryDataIN data);
 }

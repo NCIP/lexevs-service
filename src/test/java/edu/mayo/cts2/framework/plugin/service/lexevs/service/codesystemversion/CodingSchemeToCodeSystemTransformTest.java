@@ -42,6 +42,6 @@ public class CodingSchemeToCodeSystemTransformTest {
 		
 		transform.setUriHandler(uriHandler);
 		
-		transform.transformDescription(new CodingScheme());
+		transform.transformFullDescription(new CodingScheme());
 	}
 }

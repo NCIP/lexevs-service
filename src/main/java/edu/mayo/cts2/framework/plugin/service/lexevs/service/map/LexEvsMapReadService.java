@@ -99,7 +99,7 @@ public class LexEvsMapReadService
 	
 	@Override
 	protected MapCatalogEntry transform(CodingScheme codingScheme) {
-		return this.transformer.transformDescription(codingScheme);
+		return this.transformer.transformFullDescription(codingScheme);
 	}
 
 	@Override

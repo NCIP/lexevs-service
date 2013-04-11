@@ -58,7 +58,7 @@ public class AssociatedConceptToAssociationTransform
 	 * #transformDescription(java.lang.Object)
 	 */
 	@Override
-	public Void transformDescription(Void data) {
+	public Void transformFullDescription(Void data) {
 		throw new UnsupportedOperationException(
 				"Not reading Associations by ID.");
 	}
@@ -71,7 +71,7 @@ public class AssociatedConceptToAssociationTransform
 	 * #transformDirectoryEntry(java.lang.Object)
 	 */
 	@Override
-	public List<AssociationDirectoryEntry> transformDirectoryEntry(
+	public List<AssociationDirectoryEntry> transformSummaryDescription(
 			AssociatedConcept subject) {
 
 		List<AssociationDirectoryEntry> returnList = new ArrayList<AssociationDirectoryEntry>();

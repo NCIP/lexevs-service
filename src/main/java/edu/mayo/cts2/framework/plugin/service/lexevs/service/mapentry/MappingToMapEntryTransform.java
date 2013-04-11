@@ -39,7 +39,7 @@ public class MappingToMapEntryTransform implements LexEvsToCTS2Transformer <MapE
 	}
 
 	@Override
-	public MapEntry transformDescription(ResolvedConceptReference resolvedConceptReference) {
+	public MapEntry transformFullDescription(ResolvedConceptReference resolvedConceptReference) {
 //		MapEntry mapEntry = new MapEntry();
 //
 //		String code = resolvedConceptReference.getCode();
@@ -58,7 +58,7 @@ public class MappingToMapEntryTransform implements LexEvsToCTS2Transformer <MapE
 	
 	
 	@Override
-	public MapEntryDirectoryEntry transformDirectoryEntry(ResolvedConceptReference resolvedConceptReference) {
+	public MapEntryDirectoryEntry transformSummaryDescription(ResolvedConceptReference resolvedConceptReference) {
 		
 //		MapEntryDirectoryEntry mapEntryDirectoryEntry = new MapEntryDirectoryEntry();
 //		

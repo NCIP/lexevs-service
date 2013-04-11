@@ -90,7 +90,7 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 		if(entity == null){
 			return null;
 		} else {
-			return this.transformer.transformDescription(entity);
+			return this.transformer.transformFullDescription(entity);
 		}
 	}
 

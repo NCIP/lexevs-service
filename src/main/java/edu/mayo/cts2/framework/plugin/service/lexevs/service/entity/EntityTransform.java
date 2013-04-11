@@ -71,7 +71,7 @@ public class EntityTransform
 	}
 
 	@Override
-	public EntityDescription transformDescription(ResolvedConceptReference reference) {
+	public EntityDescription transformFullDescription(ResolvedConceptReference reference) {
 		Assert.isTrue(reference.getEntity() != null, 
 				"The Entity is null. Please resolve the CodedNodeSet with Resolve = true");
 
@@ -101,7 +101,7 @@ public class EntityTransform
 	}
 
 	@Override
-	public EntityDirectoryEntry transformDirectoryEntry(ResolvedConceptReference reference) {
+	public EntityDirectoryEntry transformSummaryDescription(ResolvedConceptReference reference) {
 		EntityDirectoryEntry entry = new EntityDirectoryEntry();
 		entry.setAbout(this.getUriHandler().getEntityUri(reference));
 		
