@@ -23,6 +23,8 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs;
 
+import java.lang.reflect.Method;
+
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
@@ -48,6 +50,10 @@ public class LexBigServiceFactory implements FactoryBean<LexBIGService> {
 		LexBIGService impl = 
 			(LexBIGService) 
 				this.lexEvsOsgiClassLoader.getServiceClass("org.LexGrid.LexBIG.Impl.LexBIGServiceImpl");
+		
+		Method register = impl.getClass().getDeclaredMethod("registerExtensions");
+		register.setAccessible(true);
+		register.invoke(impl);
 		
 		return impl;
 	}

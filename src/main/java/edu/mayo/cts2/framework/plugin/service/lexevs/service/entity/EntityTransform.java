@@ -24,7 +24,10 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -64,6 +67,8 @@ public class EntityTransform
 	
 	private LexBIGServiceConvenienceMethods lbscm;
 	
+	private static Set<String> ROOT_NODES = new HashSet<String>(Arrays.asList("@", "@@"));
+	
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		this.lbscm = (LexBIGServiceConvenienceMethods) 
@@ -88,12 +93,27 @@ public class EntityTransform
 		namedEntity.setDescribingCodeSystemVersion(
 			this.getTransformUtils().toCodeSystemVersionReference(
 				reference.getCodingSchemeName(), 
-				reference.getCodingSchemeVersion()));
+				reference.getCodingSchemeVersion(),
+				reference.getCodingSchemeURI()));
 		
 		namedEntity.setDesignation(this.toDesignation(entity.getPresentation()));
 		
-		namedEntity.setParent(this.getParents(reference));
+		try {
+			namedEntity.setParent(this.getParents(reference));
+		} catch (Exception e) {
+			log.warn("Error resolving Parents for: " + reference.getCode());
+			if(log.isDebugEnabled()){
+				log.debug(e);
+			}
+		}
 		
+		URIAndEntityName entityType = new URIAndEntityName();
+	    entityType.setName("Class");
+	    entityType.setNamespace("owl");
+	    entityType.setUri("http://www.w3.org/2002/07/owl#Class");
+
+	    namedEntity.addEntityType(entityType);
+
 		EntityDescription ed = new EntityDescription();
 		ed.setNamedEntity(namedEntity);
 		
@@ -109,13 +129,16 @@ public class EntityTransform
 		description.setDescribingCodeSystemVersion(
 			this.getTransformUtils().toCodeSystemVersionReference(
 				reference.getCodingSchemeName(), 
-				reference.getCodingSchemeVersion()));
+				reference.getCodingSchemeVersion(),
+				reference.getCodingSchemeURI()));
 		
 		if(reference.getEntityDescription() != null){
 			description.setDesignation(reference.getEntityDescription().getContent());
 		}
 		
 		entry.addKnownEntityDescription(description);
+		
+		entry.setHref(this.getTransformUtils().createEntityHref(reference));
 		
 		return entry;
 	}
@@ -163,12 +186,15 @@ public class EntityTransform
 			for(ResolvedConceptReference parent : 
 				association.getAssociatedConcepts().getAssociatedConcept()){
 				
-				URIAndEntityName parentName = new URIAndEntityName();
-				parentName.setName(parent.getCode());
-				parentName.setNamespace(parent.getCodeNamespace());
-				parentName.setUri(this.getUriHandler().getEntityUri(parent));
-				
-				returnList.add(parentName);
+				if(! ROOT_NODES.contains(parent.getCode())){
+					URIAndEntityName parentName = new URIAndEntityName();
+					parentName.setName(parent.getCode());
+					parentName.setNamespace(parent.getCodeNamespace());
+					parentName.setUri(this.getUriHandler().getEntityUri(parent));
+					parentName.setHref(this.getTransformUtils().createEntityHref(parent));
+					
+					returnList.add(parentName);
+				}
 			}
 		}
 		

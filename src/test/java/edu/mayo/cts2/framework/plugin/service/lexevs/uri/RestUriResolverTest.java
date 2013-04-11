@@ -12,9 +12,11 @@ public class RestUriResolverTest {
 	RestUriResolver resolver;
 
 	@Before
-	public void SetUp() {
+	public void SetUp() throws Exception {
 		resolver = new RestUriResolver(
 				"https://informatics.mayo.edu/cts2/services/uriresolver");
+		
+		resolver.loadClojureScripts();
 	}
 
 	@Test

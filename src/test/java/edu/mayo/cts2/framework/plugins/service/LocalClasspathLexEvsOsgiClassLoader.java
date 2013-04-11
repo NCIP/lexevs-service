@@ -16,4 +16,15 @@ public class LocalClasspathLexEvsOsgiClassLoader extends LexEvsOsgiClassLoader {
 	protected Object getServiceClass(String clazz, boolean forceFromJar) throws Exception {
 		return this.loadClass(clazz).newInstance();
 	}
+
+	@Override
+	public ClassLoader getOsgiClassLoader() {
+		return Thread.currentThread().getContextClassLoader();
+	}
+
+	@Override
+	protected Object getServiceClass(String clazz) throws Exception {
+		return Thread.currentThread().getContextClassLoader().loadClass(clazz).newInstance();
+	}
+
 }

@@ -45,11 +45,10 @@ public class BasicEntityDirectoryBuilder<T> extends AbstractStateBuildingDirecto
 	 * @param stateAdjustingPropertyReferences the state adjusting property references
 	 */
 	public BasicEntityDirectoryBuilder(
-			String initialState,
 			AbstractStateBuildingDirectoryBuilder.Callback<String, T> callback,
 			Set<MatchAlgorithmReference> matchAlgorithmReferences,
 			Set<StateAdjustingPropertyReference<String>> stateAdjustingPropertyReferences) {
-		super(initialState, callback, matchAlgorithmReferences,
+		super("", callback, matchAlgorithmReferences,
 				stateAdjustingPropertyReferences);
 	}
 

@@ -21,33 +21,26 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion;
+package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 
-import org.LexGrid.codingSchemes.CodingScheme;
-import org.easymock.EasyMock;
-import org.junit.Test;
+import org.springframework.core.Ordered;
 
-import edu.mayo.cts2.framework.core.url.UrlConstructor;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
-import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
+import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQuery;
+import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQueryService;
 
-public class CodingSchemeToCodeSystemTransformTest {
+/**
+ * The Interface DelegateEntityQueryService.
+ *
+ * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
+ */
+public interface DelegateEntityQueryService extends EntityDescriptionQueryService, Ordered {
 
-	@Test
-	@SuppressWarnings("deprecation")
-	public void testTransformWithEmpty(){
-		CodingSchemeToCodeSystemTransform transform = 
-				new CodingSchemeToCodeSystemTransform(new VersionNameConverter());
-		
-		UriHandler uriHandler = EasyMock.createNiceMock(UriHandler.class);
-		EasyMock.replay(uriHandler);
-		
-		transform.setUriHandler(uriHandler);
-		
-		UrlConstructor urlConstructor = org.easymock.classextension.EasyMock.createNiceMock(UrlConstructor.class);
-		org.easymock.classextension.EasyMock.replay(urlConstructor);
-		transform.setUrlConstructor(urlConstructor);
-		
-		transform.transformDescription(new CodingScheme());
-	}
+	/**
+	 * Can handle.
+	 *
+	 * @param query the query
+	 * @return true, if successful
+	 */
+	public boolean canHandle(EntityDescriptionQuery query);
+	
 }
