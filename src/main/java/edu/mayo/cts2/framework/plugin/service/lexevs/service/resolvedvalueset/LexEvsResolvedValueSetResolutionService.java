@@ -125,8 +125,23 @@ ResolvedValueSetResolutionService {
 	public ResolvedValueSetResult<EntitySynopsis> getResolution(
 			ResolvedValueSetReadId identifier,
 			Set<ResolvedFilter> filterComponent, Page page) {
-		// TODO Auto-generated method stub
-		return null;
+		String id = identifier.getLocalName();
+		EntityDescriptionQueryImpl query= new EntityDescriptionQueryImpl();
+		query.setFilterComponent(filterComponent);
+		EntityDescriptionQueryServiceRestrictions entityRestrictions =
+				new EntityDescriptionQueryServiceRestrictions();
+		entityRestrictions.setCodeSystemVersion(
+				ModelUtils.nameOrUriFromName(identifier.getValueSetDefinition().getName()));
+
+		query.setRestrictions(entityRestrictions);
+		DirectoryResult<EntityDirectoryEntry> result = this.lexEvsEntityQueryService.getResourceSummaries(
+				query, null, page);
+		List<EntitySynopsis> transformedResult= transform.transform(result);
+		
+		return new ResolvedValueSetResult<EntitySynopsis>(
+				this.getResolvedValueSetHeader(id), 
+				transformedResult, 
+				result.isAtEnd());
 	}
 
 	@Override
