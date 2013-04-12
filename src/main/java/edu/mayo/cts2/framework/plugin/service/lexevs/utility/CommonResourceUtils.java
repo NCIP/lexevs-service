@@ -13,7 +13,6 @@ import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
 import org.LexGrid.LexBIG.Exceptions.LBParameterException;
-import org.LexGrid.LexBIG.Exceptions.LBRuntimeException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension.MappingSortOption;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
@@ -144,7 +143,7 @@ public class CommonResourceUtils{
 			}
 						
 		} catch (LBInvocationException e) {
-			throw new LBRuntimeException(e.getMessage());
+			throw new RuntimeException(e);
 		}
 
 		if(renderingList != null){
@@ -193,7 +192,7 @@ public class CommonResourceUtils{
 					codedNodeSet = lexBigService.getNodeSet(queryData.getNameVersionPairName(), queryData.getVersionOrTag() , entityTypes);
 				}
 			} catch (LBException e) {
-				throw new LBRuntimeException(e.getMessage());
+				throw new RuntimeException(e);
 			}
 			Set<ResolvedFilter> filters = queryData.getFilters();
 			if(containsData && (filters != null)){
@@ -223,7 +222,7 @@ public class CommonResourceUtils{
 		try {
 			iterator = mappingExtension.resolveMapping(codingScheme, versionOrTag, relationsContainerName, sortOptionList);
 		} catch (LBParameterException e) {
-			throw new LBRuntimeException(e.getMessage());
+			throw new RuntimeException(e);
 		}
 		
 		return CommonPageUtils.getPageFromIterator(iterator, page);	
