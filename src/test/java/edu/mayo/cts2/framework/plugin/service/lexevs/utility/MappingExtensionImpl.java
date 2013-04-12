@@ -1,5 +1,6 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.LexGrid.LexBIG.DataModel.Collections.AbsoluteCodingSchemeVersionReferenceList;
@@ -7,6 +8,7 @@ import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
+import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
 
 import edu.mayo.cts2.framework.service.profile.QueryService;
@@ -97,8 +99,14 @@ public class MappingExtensionImpl<DescriptionTemplate, EntryTemplate, QueryTempl
 			CodingSchemeVersionOrTag codingSchemeVersionOrTag,
 			String relationsContainerName,
 			List<MappingSortOption> sortOptionList) throws LBParameterException {
-		// TODO Auto-generated method stub
-		return null;
+		
+		CodedNodeSet nodeSet = new FakeCodedNodeSetImpl(codingScheme, codingSchemeVersionOrTag, null);
+		List<FakeCodedNode> list = new ArrayList<FakeCodedNode>();
+		
+		//list.add(nodeSet);
+		
+		ResolvedConceptReferencesIterator iterator = new FakeResolvedConceptReferencesIteratorImpl((List<FakeCodedNode>) nodeSet);
+		return iterator;
 	}
 
 	@Override

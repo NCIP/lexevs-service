@@ -77,9 +77,9 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 		this.nameConverter = versionNameConverter;
 	}
 	
-	public void setEntityTransformer(
-			MappingToMapEntryTransform mapTransform) {
-		this.transformer = mapTransform;
+	public void setMapEntryTransformer(
+			MappingToMapEntryTransform mapTransformer) {
+		this.transformer = mapTransformer;
 	}
 	
 	public void setMappingExtension(MappingExtension extension){

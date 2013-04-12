@@ -40,19 +40,16 @@ import org.LexGrid.codingSchemes.CodingScheme;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 
-import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntry;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PropertyReference;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
-import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.FakeLexEvsData.DataField;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 import edu.mayo.cts2.framework.service.profile.QueryService;
 import edu.mayo.cts2.framework.service.profile.ResourceQuery;
-import edu.mayo.cts2.framework.service.profile.TagAwareReadService;
 
 /**
  *  @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
@@ -80,6 +77,7 @@ public class FakeLexEvsSystem <DescriptionTemplate, EntryTemplate, QueryTemplate
 			fakeName = fakeData.getScheme_DataField(schemeIndex, DataField.ABOUT).toUpperCase();
 			fakeVersion = fakeData.getScheme_DataField(schemeIndex, DataField.RESOURCE_VERSION).toUpperCase();
 			codeVersion = codingSchemeVersionOrTag.getVersion().toUpperCase();
+			
 			if(fakeName.equals(codingSchemeName.toUpperCase())){
 				if(fakeVersion.equals(codeVersion)){
 					answer = fakeData.isMapping(schemeIndex);					
@@ -176,12 +174,12 @@ public class FakeLexEvsSystem <DescriptionTemplate, EntryTemplate, QueryTemplate
 		return lexBigService;
 	}
 	
-	public <ReadService extends TagAwareReadService<CodeSystemVersionCatalogEntry, NameOrURI>> LexBIGService createMockedLexBIGServiceWithFakeLexEvsData(
-			ReadService service, boolean withData) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
+//	public <ReadService extends TagAwareReadService<CodeSystemVersionCatalogEntry, NameOrURI>> LexBIGService createMockedLexBIGServiceWithFakeLexEvsData(
+//			ReadService service, boolean withData) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+//	
 	
 	
 
@@ -406,9 +404,7 @@ public class FakeLexEvsSystem <DescriptionTemplate, EntryTemplate, QueryTemplate
 		for (int start = 0; start < testValue.length(); start++) {
 			for (int end = start; end < testValue.length(); end++) {
 				testValue = testValue.substring(start, end);
-				Set<ResolvedFilter> filters = CommonTestUtils.createFilterSet(
-						dataField.propertyReference(), matchAlgorithmReference,
-						testValue);
+				Set<ResolvedFilter> filters = CommonTestUtils.createFilterSet(dataField.propertyReference(), matchAlgorithmReference, testValue);
 				for (ResolvedFilter filter : filters) {
 					query.getFilterComponent().add(filter);
 				}
