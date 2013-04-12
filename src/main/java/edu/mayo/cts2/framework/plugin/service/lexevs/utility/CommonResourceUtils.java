@@ -7,12 +7,14 @@ import java.util.Set;
 
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.Collections.LocalNameList;
+import org.LexGrid.LexBIG.DataModel.Collections.ResolvedConceptReferenceList;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
 import org.LexGrid.LexBIG.Exceptions.LBParameterException;
+import org.LexGrid.LexBIG.Exceptions.LBResourceUnavailableException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension.MappingSortOption;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
@@ -225,7 +227,36 @@ public class CommonResourceUtils{
 			throw new RuntimeException(e);
 		}
 		
-		return CommonPageUtils.getPageFromIterator(iterator, page);	
+		
+		// TODO: Should be able to remove when reference class implements "get" method, then just need following return method
+//		return CommonPageUtils.getPageFromIterator(iterator, page);	
+		
+		
+		ArrayList<ResolvedConceptReference> referenceList = new ArrayList<ResolvedConceptReference>();
+		boolean atEnd = true;
+		int start = page.getStart();
+		int end = page.getEnd();
+		int index = 0;
+		try {
+			// Move iterator to start index
+			while((index < start) && (iterator.numberRemaining() > 0)){
+				index++;
+				iterator.next();
+			}
+			
+			// Collect page references
+			while((start < end) && (iterator.numberRemaining() > 0)){
+				ResolvedConceptReference ref = iterator.next();
+				referenceList.add(ref);
+			}
+		} catch (LBResourceUnavailableException e) {
+			throw new RuntimeException(e);
+		} catch (LBInvocationException e) {
+			throw new RuntimeException(e);
+		}
+		
+		ResolvedConceptReference [] resolvedConceptReference = (ResolvedConceptReference[]) referenceList.toArray();
+		return new ResolvedConceptReferenceResults(resolvedConceptReference, atEnd);
 	}
 
 }

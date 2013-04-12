@@ -73,6 +73,11 @@ public class FakeLexEvsSystem <DescriptionTemplate, EntryTemplate, QueryTemplate
 			CodingSchemeVersionOrTag codingSchemeVersionOrTag){
 		boolean answer = false;
 		String fakeName, fakeVersion, codeVersion;
+		
+		if(codingSchemeVersionOrTag == null){
+			return answer;
+		}
+		
 		for(int schemeIndex=0; schemeIndex < fakeData.size(); schemeIndex++){
 			fakeName = fakeData.getScheme_DataField(schemeIndex, DataField.ABOUT).toUpperCase();
 			fakeVersion = fakeData.getScheme_DataField(schemeIndex, DataField.RESOURCE_VERSION).toUpperCase();
