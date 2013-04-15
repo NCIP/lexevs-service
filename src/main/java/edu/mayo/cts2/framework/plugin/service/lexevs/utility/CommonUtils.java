@@ -15,10 +15,12 @@ import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet.PropertyType;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
+import org.apache.commons.lang.StringUtils;
 
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
+import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
@@ -142,6 +144,16 @@ public class CommonUtils {
 		}
 
 		return namePair;
+	}
+	
+	
+	public static CodingSchemeVersionOrTag convertTag(VersionTagReference tag){
+		String tagValue = tag.getContent();
+		if(StringUtils.equals(tagValue, Constants.CURRENT_TAG.getContent())){
+			return Constants.CURRENT_LEXEVS_TAG;
+		} else {
+			return Constructors.createCodingSchemeVersionOrTagFromTag(tagValue);
+		}
 	}
 		
 }

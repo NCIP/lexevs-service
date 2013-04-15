@@ -23,53 +23,87 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.mapentry;
 
+import org.LexGrid.LexBIG.DataModel.Collections.AssociationList;
+import org.LexGrid.LexBIG.DataModel.Core.AssociatedConcept;
+import org.LexGrid.LexBIG.DataModel.Core.Association;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.springframework.stereotype.Component;
 
+import edu.mayo.cts2.framework.core.util.EncodingUtils;
+import edu.mayo.cts2.framework.model.core.URIAndEntityName;
 import edu.mayo.cts2.framework.model.mapversion.MapEntry;
 import edu.mayo.cts2.framework.model.mapversion.MapEntryDirectoryEntry;
-import edu.mayo.cts2.framework.plugin.service.lexevs.transform.LexEvsToCTS2Transformer;
+import edu.mayo.cts2.framework.model.mapversion.MapSet;
+import edu.mayo.cts2.framework.model.mapversion.MapTarget;
+import edu.mayo.cts2.framework.model.mapversion.types.MapProcessingRule;
+import edu.mayo.cts2.framework.plugin.service.lexevs.transform.AbstractBaseTransform;
 
 @Component
-public class MappingToMapEntryTransform implements LexEvsToCTS2Transformer <MapEntry, ResolvedConceptReference, MapEntryDirectoryEntry, ResolvedConceptReference>  {
-
-	public MappingToMapEntryTransform() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
+public class MappingToMapEntryTransform 
+	extends AbstractBaseTransform<MapEntry, ResolvedConceptReference, MapEntryDirectoryEntry, ResolvedConceptReference>  {
 
 	@Override
 	public MapEntry transformFullDescription(ResolvedConceptReference resolvedConceptReference) {
-//		MapEntry mapEntry = new MapEntry();
-//
-//		String code = resolvedConceptReference.getCode();
-//		String codeNameSpace = resolvedConceptReference.getCodeNamespace();
-//		String codingSchemeName = resolvedConceptReference.getCodingSchemeName();
-//		String codingSchemeURI = resolvedConceptReference.getCodingSchemeURI();
-//		String codingSchemeVersion = resolvedConceptReference.getCodingSchemeVersion();
-//		String entityDescription = resolvedConceptReference.getEntityDescription().getContent();
-//		
-//		resolvedConceptReference.getConceptCode();
-//		
-		//mapEntry.
+		if(resolvedConceptReference == null){
+			return null;
+		}
+		
+		MapEntry mapEntry = new MapEntry();
+		mapEntry.setMapFrom(this.getTransformUtils().toUriAndEntityName(resolvedConceptReference));
+		mapEntry.setProcessingRule(MapProcessingRule.ALL_MATCHES);
+		
+		mapEntry.setAssertedBy(this.getTransformUtils().
+			toMapVersionReference(
+					resolvedConceptReference.getCodingSchemeName(), 
+					resolvedConceptReference.getCodingSchemeVersion(), 
+					resolvedConceptReference.getCodingSchemeURI()));
+		
+		MapSet mapSet = new MapSet();
+		mapSet.setEntryOrder(1L);
+		mapSet.setProcessingRule(MapProcessingRule.ALL_MATCHES);
+		
+		AssociationList source = resolvedConceptReference.getSourceOf();
 
-		throw new UnsupportedOperationException("Transform to MapEntry is under construction");
+		for(Association association : source.getAssociation()){
+			for(AssociatedConcept ac :
+				association.getAssociatedConcepts().getAssociatedConcept()){
+				MapTarget target = new MapTarget();
+				target.setEntryOrder((long) (mapSet.getMapTargetCount() + 1));
+				target.setMapTo(this.getTransformUtils().toUriAndEntityName(ac));
+				mapSet.addMapTarget(target);
+			}
+		}
+
+		return mapEntry;
 	}
-	
 	
 	@Override
 	public MapEntryDirectoryEntry transformSummaryDescription(ResolvedConceptReference resolvedConceptReference) {
+		if(resolvedConceptReference == null){
+			return null;
+		}
 		
-//		MapEntryDirectoryEntry mapEntryDirectoryEntry = new MapEntryDirectoryEntry();
-//		
-//		String code = resolvedConceptReference.getCode();
-//		String codeNameSpace = resolvedConceptReference.getCodeNamespace();
-//		String codingSchemeName = resolvedConceptReference.getCodingSchemeName();
-//		String codingSchemeURI = resolvedConceptReference.getCodingSchemeURI();
-//		String codingSchemeVersion = resolvedConceptReference.getCodingSchemeVersion();
-//		String entityDescription = resolvedConceptReference.getEntityDescription().getContent();
+		MapEntryDirectoryEntry mapEntryDirectoryEntry = new MapEntryDirectoryEntry();
+		
+		URIAndEntityName fromName = this.getTransformUtils().toUriAndEntityName(resolvedConceptReference);
+		
+		mapEntryDirectoryEntry.setMapFrom(fromName);
+		
+		String mapName = resolvedConceptReference.getCodingSchemeName();
+		String versionName = this.getVersionNameConverter().
+			toCts2VersionName(mapName, resolvedConceptReference.getCodingSchemeVersion());
+		
+		String encodedName = EncodingUtils.encodeScopedEntityName(fromName);
+		
+		mapEntryDirectoryEntry.setHref(
+			this.getUrlConstructor().createMapEntryUrl(
+					mapName, 
+					versionName, 
+					encodedName));
+		
+		mapEntryDirectoryEntry.setResourceName(encodedName);
 
-		throw new UnsupportedOperationException("Transform to MapEntryDirectoryEntry is under construction");
+		return mapEntryDirectoryEntry;
 	}
 
 }

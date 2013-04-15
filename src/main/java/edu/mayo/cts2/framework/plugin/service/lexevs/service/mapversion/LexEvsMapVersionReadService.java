@@ -42,10 +42,11 @@ import edu.mayo.cts2.framework.model.mapversion.MapVersion;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsCodeSystemService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonMapUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.service.profile.mapversion.MapVersionReadService;
 
@@ -96,7 +97,7 @@ public class LexEvsMapVersionReadService
 			ResolvedReadContext readContext) {
 		
 		return this.getByVersionIdOrTag(parentIdentifier, 
-				this.convertTag(tag));
+				CommonUtils.convertTag(tag));
 	}
 
 	@Override

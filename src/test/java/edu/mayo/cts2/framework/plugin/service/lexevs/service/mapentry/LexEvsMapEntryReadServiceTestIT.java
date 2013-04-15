@@ -25,6 +25,7 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service.mapentry;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import javax.annotation.Resource;
@@ -39,7 +40,8 @@ import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.mapversion.MapEntry;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
+import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractReadServiceTest;
+import edu.mayo.cts2.framework.service.profile.ReadService;
 import edu.mayo.cts2.framework.service.profile.mapentry.name.MapEntryReadId;
 
 /**
@@ -54,7 +56,8 @@ import edu.mayo.cts2.framework.service.profile.mapentry.name.MapEntryReadId;
 		@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 	}
 )
-public class LexEvsMapEntryReadServiceTestIT extends AbstractTestITBase {
+public class LexEvsMapEntryReadServiceTestIT 
+	extends AbstractReadServiceTest<MapEntry, MapEntryReadId> {
 
 	@Resource
 	private LexEvsMapEntryReadService service;
@@ -67,57 +70,38 @@ public class LexEvsMapEntryReadServiceTestIT extends AbstractTestITBase {
 		assertNotNull(this.service);
 	}
 
-//	@Test
-//	public void testRead() {
-//		
-//		String sourceEntityCode = "A0001";
-//		ScopedEntityName mapFromName = new ScopedEntityName();
-//		mapFromName.setName(sourceEntityCode);
-//
-//		String mapCodingSchemeURI = "urn:oid:mapping:sample";
-//		NameOrURI mapVersion = ModelUtils.nameOrUriFromUri(mapCodingSchemeURI);
-//		MapEntryReadId identifier = new MapEntryReadId(mapFromName, mapVersion);
-//		
-//		ResolvedReadContext readContext = null;
-//		
-//		MapEntry mapEntry = this.service.read(identifier, readContext);
-//		assertNotNull(mapEntry);
-//				
-//	}
-//
-//	@Test
-//	public void testReadEntityCodeNotFound() {
-//		
-//		String sourceEntityCode = "A0001zzz";
-//		ScopedEntityName mapFromName = new ScopedEntityName();
-//		mapFromName.setName(sourceEntityCode);
-//
-//		String mapCodingSchemeURI = "urn:oid:mapping:sample";
-//		NameOrURI mapVersion = ModelUtils.nameOrUriFromUri(mapCodingSchemeURI);
-//		MapEntryReadId identifier = new MapEntryReadId(mapFromName, mapVersion);
-//		
-//		ResolvedReadContext readContext = null;
-//		
-//		MapEntry mapEntry = this.service.read(identifier, readContext);
-//		assertNull(mapEntry);
-//				
-//	}
+	@Test
+	public void testReadEntityCodeNotFound() {
+		
+		String sourceEntityCode = "A0001zzz";
+		ScopedEntityName mapFromName = new ScopedEntityName();
+		mapFromName.setName(sourceEntityCode);
 
-	@Test(expected=RuntimeException.class)
+		String mapVersionName = "MappingSample-1.0";
+		NameOrURI mapVersion = ModelUtils.nameOrUriFromName(mapVersionName);
+		MapEntryReadId identifier = new MapEntryReadId(mapFromName, mapVersion);
+		
+		ResolvedReadContext readContext = null;
+		
+		MapEntry mapEntry = this.service.read(identifier, readContext);
+		assertNull(mapEntry);
+				
+	}
+
+	@Test
 	public void testReadMapVersionNotFound() {
 		
 		String sourceEntityCode = "A0001";
 		ScopedEntityName mapFromName = new ScopedEntityName();
 		mapFromName.setName(sourceEntityCode);
 
-		String mapCodingSchemeURI = "urn:oid:mapping:samplezzz";
-		NameOrURI mapVersion = ModelUtils.nameOrUriFromUri(mapCodingSchemeURI);
+		String mapVersionName = "MappingSample-99999";
+		NameOrURI mapVersion = ModelUtils.nameOrUriFromName(mapVersionName);
 		MapEntryReadId identifier = new MapEntryReadId(mapFromName, mapVersion);
 		
 		ResolvedReadContext readContext = null;
 		
-		@SuppressWarnings("unused")
-		MapEntry mapEntry = this.service.read(identifier, readContext);
+		assertNull(this.service.read(identifier, readContext));
 	}
 
 	@Test
@@ -126,8 +110,8 @@ public class LexEvsMapEntryReadServiceTestIT extends AbstractTestITBase {
 		ScopedEntityName mapFromName = new ScopedEntityName();
 		mapFromName.setName(sourceEntityCode);
 
-		String mapCodingSchemeURI = "urn:oid:mapping:sample";
-		NameOrURI mapVersion = ModelUtils.nameOrUriFromUri(mapCodingSchemeURI);
+		String mapVersionName = "MappingSample-1.0";
+		NameOrURI mapVersion = ModelUtils.nameOrUriFromName(mapVersionName);
 		MapEntryReadId identifier = new MapEntryReadId(mapFromName, mapVersion);
 		
 		ResolvedReadContext readContext = null;
@@ -141,13 +125,40 @@ public class LexEvsMapEntryReadServiceTestIT extends AbstractTestITBase {
 		ScopedEntityName mapFromName = new ScopedEntityName();
 		mapFromName.setName(sourceEntityCode);
 
-		String mapCodingSchemeURI = "urn:oid:mapping:sample";
-		NameOrURI mapVersion = ModelUtils.nameOrUriFromUri(mapCodingSchemeURI);
+		String mapVersionName = "MappingSample-1.0";
+		NameOrURI mapVersion = ModelUtils.nameOrUriFromName(mapVersionName);
 		MapEntryReadId identifier = new MapEntryReadId(mapFromName, mapVersion);
 		
 		ResolvedReadContext readContext = null;
 		
 		assertFalse(this.service.exists(identifier, readContext));				
+	}
+
+	@Override
+	protected ReadService<MapEntry, MapEntryReadId> getService() {
+		return this.service;
+	}
+
+	@Override
+	protected MapEntryReadId getGoodIdentifier() {
+		String sourceEntityCode = "A0001";
+		ScopedEntityName mapFromName = new ScopedEntityName();
+		mapFromName.setName(sourceEntityCode);
+
+		NameOrURI mapVersion = ModelUtils.nameOrUriFromUri("MappingSample-1.0");
+		
+		return new MapEntryReadId(mapFromName, mapVersion);
+	}
+
+	@Override
+	protected MapEntryReadId getBadIdentifier() {
+		String sourceEntityCode = "A0001";
+		ScopedEntityName mapFromName = new ScopedEntityName();
+		mapFromName.setName(sourceEntityCode);
+
+		NameOrURI mapVersion = ModelUtils.nameOrUriFromUri("MappingSample-1.99999");
+		
+		return new MapEntryReadId(mapFromName, mapVersion);
 	}
 
 }
