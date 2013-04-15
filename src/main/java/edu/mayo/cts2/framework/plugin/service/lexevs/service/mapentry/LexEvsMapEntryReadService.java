@@ -87,18 +87,20 @@ public class LexEvsMapEntryReadService extends AbstractLexEvsService implements 
 			String relationsContainerName) throws LBException {
 		
 		NameVersionPair nameVersionPair = this.nameConverter.fromCts2VersionName(mapVersion);
-
+		Mapping mapping = null;
 		CodingSchemeVersionOrTag csvt = 
 			Constructors.createCodingSchemeVersionOrTagFromVersion(nameVersionPair.getVersion());
-					
-		Mapping mapping = mappingExtension.getMapping
-			(nameVersionPair.getName(), 
-					csvt,
-					relationsContainerName);
-		mapping = mapping.restrictToCodes(Constructors.createConceptReferenceList(sourceEntityCode), SearchContext.SOURCE_CODES);
 		
-		return mapping.resolveMapping();
+		if(mappingExtension.isMappingCodingScheme(nameVersionPair.getName(), csvt)){
+			mapping = mappingExtension.getMapping(nameVersionPair.getName(), csvt, relationsContainerName);
+			mapping = mapping.restrictToCodes(Constructors.createConceptReferenceList(sourceEntityCode), SearchContext.SOURCE_CODES);
+			return mapping.resolveMapping();
+		}
+		
+		return null;
 	}
+	
+	
 	
 	private ResolvedConceptReference getResolvedConceptReference(MapEntryReadId identifier,
 			ResolvedReadContext readContext) {
@@ -112,15 +114,11 @@ public class LexEvsMapEntryReadService extends AbstractLexEvsService implements 
 		ResolvedConceptReferencesIterator resolvedConceptReferencesIterator;
 		ResolvedConceptReference resolvedConceptReference = null;
 		try {
-			resolvedConceptReferencesIterator = getInteratorFromMapping(mappingExtension, mapVersion, sourceEntityCode, relationsContainerName); 
-			
-			if (resolvedConceptReferencesIterator.hasNext()) {
-				resolvedConceptReference = resolvedConceptReferencesIterator.next();				
-			}
-			
+			resolvedConceptReferencesIterator = getInteratorFromMapping(this.mappingExtension, mapVersion, sourceEntityCode, relationsContainerName); 
+				
 			if (resolvedConceptReferencesIterator != null && resolvedConceptReferencesIterator.numberRemaining() == 1) {
-				resolvedConceptReference = resolvedConceptReferencesIterator.next();
-			}			
+				resolvedConceptReference = resolvedConceptReferencesIterator.next();							
+			}
 		} catch (LBParameterException e) {
 			return null;
 		} catch (Exception e) {

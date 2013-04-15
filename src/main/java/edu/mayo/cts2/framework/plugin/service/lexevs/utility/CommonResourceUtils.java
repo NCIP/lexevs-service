@@ -154,9 +154,9 @@ public class CommonResourceUtils{
 			return renderingList;
 		}
 
-		boolean restrictBOTH = (codingSchemeName != null && mappingExtension != null);
-		boolean restrictNAME = (!restrictBOTH && codingSchemeName != null);
-		boolean restrictMAP = (!restrictBOTH && mappingExtension != null);
+		boolean restrictToBOTH = (codingSchemeName != null && mappingExtension != null);
+		boolean restrictToNAME = (!restrictToBOTH && codingSchemeName != null);
+		boolean restrictToMAP = (!restrictToBOTH && mappingExtension != null);
 		
 		CodingSchemeRenderingList temp = new CodingSchemeRenderingList();
 		
@@ -166,7 +166,7 @@ public class CommonResourceUtils{
 			String uri = codingSchemeSummary.getCodingSchemeURI();
 			String version = codingSchemeSummary.getRepresentsVersion();
 			
-			if(restrictBOTH){
+			if(restrictToBOTH){
 				if (codingSchemeSummary.getLocalName().equals(codingSchemeName)) {
 					// Add if valid Mapping Coding Scheme
 					if (CommonMapUtils.validateMappingCodingScheme(uri, version, mappingExtension)) {
@@ -174,12 +174,12 @@ public class CommonResourceUtils{
 					}
 				}
 			}
-			else if(restrictNAME){
+			else if(restrictToNAME){
 				if (codingSchemeSummary.getLocalName().equals(codingSchemeName)) {
 					temp.addCodingSchemeRendering(render);
 				}
 			}
-			else if(restrictMAP){
+			else if(restrictToMAP){
 				if (CommonMapUtils.validateMappingCodingScheme(uri, version, mappingExtension)) {
 					temp.addCodingSchemeRendering(render);
 				}
@@ -248,21 +248,24 @@ public class CommonResourceUtils{
 		
 		if(queryData.hasNameAndVersion()){
 			try {
-				// Get Code Node Set from LexBIG service for given coding scheme
 				LocalNameList entityTypes = new LocalNameList();
 				CodingSchemeRenderingList codingSchemeRenderingList = lexBigService.getSupportedCodingSchemes();
-				codingSchemeExists = CommonUtils.queryContainsValidCodingScheme(queryData, codingSchemeRenderingList);			
+				
+				codingSchemeExists = CommonUtils.queryContainsExistingCodingScheme(queryData, codingSchemeRenderingList);			
 				if(codingSchemeExists){
+					// Get Code Node Set from LexBIG service for given coding scheme
 					codedNodeSet = lexBigService.getNodeSet(queryData.getNameVersionPairName(), queryData.getVersionOrTag() , entityTypes);
+					
+					// Apply filters if they exist
+					Set<ResolvedFilter> filters = queryData.getFilters();
+					if(filters != null){
+						for(ResolvedFilter filter : filters){
+							CommonSearchFilterUtils.filterCodedNodeSetByResolvedFilter(filter, codedNodeSet);
+						}
+					}
 				}
 			} catch (LBException e) {
 				throw new RuntimeException(e);
-			}
-			Set<ResolvedFilter> filters = queryData.getFilters();
-			if(codingSchemeExists && (filters != null)){
-				for(ResolvedFilter filter : filters){
-					CommonSearchFilterUtils.filterCodedNodeSetByResolvedFilter(filter, codedNodeSet);
-				}
 			}
 		}
 		

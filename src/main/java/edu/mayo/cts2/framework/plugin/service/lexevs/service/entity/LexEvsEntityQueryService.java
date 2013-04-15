@@ -108,7 +108,7 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		codedNodeSet = CommonResourceUtils.getCodedNodeSet(lexBigService, queryData, null);
 		
 		if(codedNodeSet != null){
-			ResolvedConceptReferencesIterator iterator = CommonUtils.getResolvedConceptReferencesIterator(codedNodeSet, null);
+			ResolvedConceptReferencesIterator iterator = CommonUtils.getResolvedConceptReferencesFromCodedNodeSet(codedNodeSet, null);
 			if(iterator != null){
 				try {
 					count = iterator.numberRemaining();

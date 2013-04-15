@@ -57,14 +57,7 @@ public class CommonSearchFilterUtils {
 		return new HashSet<PropertyReference>(Arrays.asList(name,about,description));
 	}
 
-	/**
-	 * Common filter routine needed for specialized filtering that cannot leverage existing LexEVS filter extensions.
-	 * 
-	 * @param resolvedFilter
-	 * @param renderingList
-	 * @param nameConverter
-	 * @return
-	 */
+
 	public static CodingSchemeRenderingList filterRenderingList(ResolvedFilter resolvedFilter, 
 			CodingSchemeRenderingList renderingList,
 			VersionNameConverter nameConverter) {
@@ -72,37 +65,43 @@ public class CommonSearchFilterUtils {
 		boolean caseSensitive = false;
 		CodingSchemeRenderingList temp = new CodingSchemeRenderingList();
 		
+		// Collect Property References
 		MatchAlgorithmReference matchAlgorithmReference = resolvedFilter.getMatchAlgorithmReference();
-		
 		PropertyReference propertyReference = resolvedFilter.getPropertyReference();
 		String searchAttribute = propertyReference.getReferenceTarget().getName();
 		
 		String matchStr = resolvedFilter.getMatchValue();	
+		String sourceValue = null;
 		
 		CodingSchemeRendering[] csRendering = renderingList.getCodingSchemeRendering();
 		for (CodingSchemeRendering render : csRendering) {
 			CodingSchemeSummary codingSchemeSummary = render.getCodingSchemeSummary();
-			if(codingSchemeSummary == null){
-				break;
-			}
-			String retrievedAttrValue = null;
-			if (searchAttribute.equals(Constants.ATTRIBUTE_NAME_ABOUT)) {
-				retrievedAttrValue = codingSchemeSummary.getCodingSchemeURI();
-			} else if (searchAttribute.equals(Constants.ATTRIBUTE_NAME_RESOURCE_SYNOPSIS)) {
-				retrievedAttrValue = codingSchemeSummary.getCodingSchemeDescription().getContent();
-			} else if (searchAttribute.equals(Constants.ATTRIBUTE_NAME_RESOURCE_NAME)) {
-				retrievedAttrValue = 
-					nameConverter.toCts2VersionName(
-						codingSchemeSummary.getLocalName(), 
-						codingSchemeSummary.getRepresentsVersion());
-			}
-			if ((retrievedAttrValue != null) && (matchStr != null) && 
-				(CommonStringUtils.executeMatchAlgorithm(retrievedAttrValue, matchStr, matchAlgorithmReference, caseSensitive))) {
-					temp.addCodingSchemeRendering(render);
+			sourceValue = CommonSearchFilterUtils.determineSourceValue(searchAttribute, codingSchemeSummary, nameConverter);
+			if (CommonStringUtils.executeMatchAlgorithm(sourceValue, matchStr, matchAlgorithmReference, caseSensitive)) {
+				temp.addCodingSchemeRendering(render);
 			} 
 		}  
 		
 		return temp;
+	}
+	
+	public static String determineSourceValue(String searchAttribute, CodingSchemeSummary summary, VersionNameConverter nameConverter){
+		String sourceValue = null;
+		if(summary == null){
+			return sourceValue;
+		}
+		if (searchAttribute.equals(Constants.ATTRIBUTE_NAME_ABOUT)) {
+			sourceValue = summary.getCodingSchemeURI();
+		} else if (searchAttribute.equals(Constants.ATTRIBUTE_NAME_RESOURCE_SYNOPSIS)) {
+			sourceValue = summary.getCodingSchemeDescription().getContent();
+		} else if (searchAttribute.equals(Constants.ATTRIBUTE_NAME_RESOURCE_NAME)) {
+			sourceValue = 
+				nameConverter.toCts2VersionName(
+					summary.getLocalName(), 
+					summary.getRepresentsVersion());
+		}
+		
+		return sourceValue;
 	}
 	
 	public static void filterCodedNodeSetByResolvedFilter(ResolvedFilter filter, CodedNodeSet codedNodeSet){

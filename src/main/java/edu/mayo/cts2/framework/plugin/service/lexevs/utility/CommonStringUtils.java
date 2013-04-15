@@ -10,6 +10,10 @@ public class CommonStringUtils {
 			MatchAlgorithmReference matchAlgorithmReference, 
 			boolean caseSensitive) {
 		
+		if(sourceValue == null || searchValue == null){
+			return false;
+		}
+		
 		String searchType = matchAlgorithmReference.getContent();
 		
 		if (searchType.equals(Constants.SEARCH_TYPE_EXACT_MATCH)) {

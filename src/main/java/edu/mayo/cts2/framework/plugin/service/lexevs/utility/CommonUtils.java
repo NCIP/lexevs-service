@@ -34,7 +34,7 @@ public class CommonUtils {
 		super();
 	}
 
-	public static <T extends ResourceQuery> boolean queryContainsValidCodingScheme(
+	public static <T extends ResourceQuery> boolean queryContainsExistingCodingScheme(
 			QueryData<T> queryData,
 			CodingSchemeRenderingList codingSchemeRenderingList){
 		boolean found = false;
@@ -99,7 +99,7 @@ public class CommonUtils {
 	
 	
 
-	public static ResolvedConceptReferencesIterator getResolvedConceptReferencesIterator(CodedNodeSet codedNodeSet, SortCriteria sortCriteria){
+	public static ResolvedConceptReferencesIterator getResolvedConceptReferencesFromCodedNodeSet(CodedNodeSet codedNodeSet, SortCriteria sortCriteria){
 		ResolvedConceptReferencesIterator iterator = null;
 		if(codedNodeSet != null){
 			try {
