@@ -7,7 +7,6 @@ import java.util.Set;
 
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.Collections.LocalNameList;
-import org.LexGrid.LexBIG.DataModel.Collections.ResolvedConceptReferenceList;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
@@ -168,10 +167,14 @@ public class CommonResourceUtils{
 		codingSchemeRendering = CommonResourceUtils.getCodingSchemeRendering(lexBigService, nameConverter, queryData, mappingExtension, sortCriteria); // getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, sortCriteria);
 
 		if (queryData.getCodeSystemRestriction() != null) {
-			codingSchemeList = CommonSearchFilterUtils.filterByRenderingListAndMappingExtension(lexBigService, codingSchemeRendering, queryData.getCodeSystemRestriction());
+			codingSchemeList = CommonSearchFilterUtils.filterByRenderingListAndMappingRestrictions(lexBigService, codingSchemeRendering, queryData.getCodeSystemRestriction());
 		}
 		else {
-			codingSchemeList = CommonCodingSchemeUtils.getCodingSchemeListFromCodingSchemeRenderings(lexBigService, codingSchemeRendering);
+			codingSchemeList = CommonSearchFilterUtils.filterByRenderingList(lexBigService, codingSchemeRendering);
+		}
+		
+		if(queryData.getEntitiesRestriction() != null){
+			codingSchemeList = CommonSearchFilterUtils.filterByEntitiesRestriction(lexBigService, codingSchemeRendering, queryData.getEntitiesRestriction());
 		}
 					
 		return codingSchemeList;
@@ -182,22 +185,22 @@ public class CommonResourceUtils{
 			QueryData<T> queryData,
 			SortCriteria sortCriteria){
 		CodedNodeSet codedNodeSet = null;
-		boolean containsData = false;
+		boolean codingSchemeExists = false;
 		
 		if(queryData.hasNameAndVersion()){
 			try {
 				// Get Code Node Set from LexBIG service for given coding scheme
 				LocalNameList entityTypes = new LocalNameList();
 				CodingSchemeRenderingList codingSchemeRenderingList = lexBigService.getSupportedCodingSchemes();
-				containsData = CommonUtils.queryReturnsData(queryData, codingSchemeRenderingList);			
-				if(containsData){
+				codingSchemeExists = CommonUtils.queryContainsValidCodingScheme(queryData, codingSchemeRenderingList);			
+				if(codingSchemeExists){
 					codedNodeSet = lexBigService.getNodeSet(queryData.getNameVersionPairName(), queryData.getVersionOrTag() , entityTypes);
 				}
 			} catch (LBException e) {
 				throw new RuntimeException(e);
 			}
 			Set<ResolvedFilter> filters = queryData.getFilters();
-			if(containsData && (filters != null)){
+			if(codingSchemeExists && (filters != null)){
 				for(ResolvedFilter filter : filters){
 					CommonSearchFilterUtils.filterCodedNodeSetByResolvedFilter(filter, codedNodeSet);
 				}

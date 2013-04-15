@@ -40,7 +40,7 @@ public class CommonUtils {
 		return answer;
 	}
 	
-	public static <T extends ResourceQuery> boolean queryReturnsData(
+	public static <T extends ResourceQuery> boolean queryContainsValidCodingScheme(
 			QueryData<T> queryData,
 			CodingSchemeRenderingList codingSchemeRenderingList){
 		boolean found = false;

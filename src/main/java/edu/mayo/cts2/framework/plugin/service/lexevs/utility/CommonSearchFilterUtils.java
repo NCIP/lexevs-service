@@ -20,10 +20,12 @@ import org.LexGrid.codingSchemes.CodingScheme;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PropertyReference;
+import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.service.mapversion.types.MapRole;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestrictions.CodeSystemRestriction;
+import edu.mayo.cts2.framework.service.command.restriction.MapVersionQueryServiceRestrictions.EntitiesRestriction;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 
@@ -126,8 +128,56 @@ public class CommonSearchFilterUtils {
 	}
 	
 
+	public static List<CodingScheme> filterByRenderingList(
+			LexBIGService lexBigService, 
+			CodingSchemeRendering[] codingSchemeRenderings) {
+		List<CodingScheme> codingSchemeList = new ArrayList<CodingScheme>();
+		
+		if (codingSchemeRenderings != null) {
+			for (int i = 0; i < codingSchemeRenderings.length; i++) {
+				CodingScheme codingScheme = CommonCodingSchemeUtils.getCodingSchemeFromCodingSchemeRendering(lexBigService, codingSchemeRenderings[i]);
+				codingSchemeList.add(codingScheme);
+			}
+		}
+		return codingSchemeList;
+	}
 	
-	public static List<CodingScheme> filterByRenderingListAndMappingExtension(
+	/**
+	 * @param lexBigService
+	 * @param entitiesRestriction
+	 * @return
+	 */
+	public static List<CodingScheme> filterByEntitiesRestriction(
+			LexBIGService lexBigService, 
+			CodingSchemeRendering[] codingSchemeRendering, 
+			EntitiesRestriction entitiesRestriction) {
+		
+		List<CodingScheme> codingSchemeList = new ArrayList<CodingScheme>();
+
+		Set<EntityNameOrURI> entitiesSet = null;
+		MapRole mapRole = null;
+		CodingScheme codingScheme;
+		
+		if (entitiesRestriction != null) {
+			entitiesSet = entitiesRestriction.getEntities();
+			if(haveMapRoleAndEntities(entitiesRestriction, entitiesSet)){
+				mapRole = entitiesRestriction.getMapRole();
+				for (CodingSchemeRendering render : codingSchemeRendering) {
+					
+					// TODO: This needs to be written for Entities
+					codingScheme = CommonCodingSchemeUtils.getMappedCodingSchemeForEntitiesRestriction(lexBigService, render, entitiesSet, mapRole.value()); 
+					
+					if (codingScheme != null) {
+						codingSchemeList.add(codingScheme);
+					}			
+				} 
+			}
+		}
+		
+		return codingSchemeList;		
+	}
+	
+	public static List<CodingScheme> filterByRenderingListAndMappingRestrictions(
 			LexBIGService lexBigService, 
 			CodingSchemeRendering[] codingSchemeRendering, 
 			CodeSystemRestriction mappingRestriction) {
@@ -156,6 +206,22 @@ public class CommonSearchFilterUtils {
 		return codingSchemeList;		
 	}
 	
+	private static boolean haveMapRoleAndEntities(
+			EntitiesRestriction entitiesRestriction,
+			Set<EntityNameOrURI> entitiesSet) {
+		boolean answer = false;
+		String mapRoleValue = null;
+		MapRole mapRole = entitiesRestriction.getMapRole();
+		if (mapRole != null) {
+			mapRoleValue = mapRole.value();
+			if (mapRoleValue != null && entitiesSet != null && entitiesSet.size() > 0) {
+				answer = true;
+			}
+		}
+		return answer;
+	}
+
+
 	public static boolean haveMapRoleAndCodeSystems(CodeSystemRestriction mappingRestriction, Set<NameOrURI> codeSystemSet){
 		boolean answer = false;
 		String mapRoleValue = null;
@@ -218,9 +284,5 @@ public class CommonSearchFilterUtils {
 		}		
 		return temp;		
 	}
-
-
-	
-
 
 }

@@ -1,8 +1,6 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
@@ -13,6 +11,7 @@ import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.codingSchemes.CodingScheme;
 import org.LexGrid.relations.Relations;
 
+import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 
 public class CommonCodingSchemeUtils {
@@ -36,20 +35,6 @@ public class CommonCodingSchemeUtils {
 			}
 		}
 		return returnFlag;
-	}
-	
-	public static List<CodingScheme> getCodingSchemeListFromCodingSchemeRenderings(
-			LexBIGService lexBigService, 
-			CodingSchemeRendering[] codingSchemeRenderings) {
-		List<CodingScheme> codingSchemeList = new ArrayList<CodingScheme>();
-		
-		if (codingSchemeRenderings != null) {
-			for (int i = 0; i < codingSchemeRenderings.length; i++) {
-				CodingScheme codingScheme = CommonCodingSchemeUtils.getCodingSchemeFromCodingSchemeRendering(lexBigService, codingSchemeRenderings[i]);
-				codingSchemeList.add(codingScheme);
-			}
-		}
-		return codingSchemeList;
 	}
 	
 	public static CodingScheme getCodingSchemeFromCodingSchemeRendering(
@@ -107,5 +92,19 @@ public class CommonCodingSchemeUtils {
 		}
 		
 		return notFoundCodingScheme;
+	}
+
+	/**
+	 * @param lexBigService
+	 * @param render
+	 * @param entitiesSet
+	 * @param value
+	 * @return
+	 */
+	public static CodingScheme getMappedCodingSchemeForEntitiesRestriction(
+			LexBIGService lexBigService, CodingSchemeRendering render,
+			Set<EntityNameOrURI> entitiesSet, String value) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

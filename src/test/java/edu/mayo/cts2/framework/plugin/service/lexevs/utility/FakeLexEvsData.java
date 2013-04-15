@@ -57,6 +57,7 @@ public class FakeLexEvsData {
 	final static String STARTS_WITH = STARTS_WITH_REF.getContent().toLowerCase();
 	final static String EXACT_MATCH = EXACT_MATCH_REF.getContent().toLowerCase();
 	
+	final static String ISMAP = "true";
 
 	public enum DataField{
 		ABOUT (0, ABOUT_REF),
@@ -87,12 +88,20 @@ public class FakeLexEvsData {
 
 //	private List<FakeLexEvsCodingSchemeData> DEFAULT_DATA = null;
 	private final static String [][] DEFAULT_DATA = {
-		{"11.11.0.1", "Auto", "Automobiles", "1.0", "", "1.2.3.4", "true", "true"},
+		{"11.11.0.1", "Auto", "Automobiles", "1.0", "", "1.2.3.4", "true", ISMAP},
 		{"9.0.0.1", "Car", "Vehicles", "1.0", "", "2.3.4.5", "true", "false"},
 		{"13.11.0.2", "Auto3", "Automobiles", "1.1", "", "3.4.5.6", "true", "false"},
 		{"1.2.3.4", "2Auto", "automobiles", "1.0", "", "4.5.6.7", "true", "false"},
 		{"5.6.7.8", "auto", "vehicles", "1.0", "", "5.6.7.8", "true", "false"},
-		{"7.6.5.4", "utoA", "hicle", "1.0", "", "6.7.8.9", "true", "false"}
+		{"7.6.5.4", "utoA", "hicle", "1.0", "", "6.7.8.9", "true", "false"},
+		{"1.1.1", "AAA", "Aaaaaa", "2.2", "", "a.a.a", "true", ISMAP},
+		{"2.2.2", "BBB", "Bbbbbb", "2.2", "", "b.b.b", "true", ISMAP},
+		{"3.3.3", "CCC", "Cccccc", "2.2", "", "c.c.c", "true", ISMAP},
+		{"4.4.4", "DDD", "Dddddd", "2.2", "", "d.d.d", "true", ISMAP},
+		{"5.5.5", "EEE", "Eeeeee", "2.2", "", "e.e.e", "true", ISMAP},
+		{"6.6.6", "FFF", "Ffffff", "2.2", "", "f.f.f", "true", ISMAP},
+		{"7.7.7", "GGG", "Gggggg", "2.2", "", "g.g.g", "true", ISMAP},
+		{"8.8.8", "HHH", "Hhhhhh", "2.2", "", "h.h.h", "true", ISMAP}
 	};
 	
 	private final static int CODESYSTEM_FIELDCOUNT = DataField.values().length;

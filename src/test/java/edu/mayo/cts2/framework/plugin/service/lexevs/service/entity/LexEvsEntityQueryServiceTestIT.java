@@ -52,6 +52,7 @@ import edu.mayo.cts2.framework.model.service.core.Query;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractQueryServiceTest;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonTestUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.PrintUtility;
 import edu.mayo.cts2.framework.service.command.restriction.EntityDescriptionQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 import edu.mayo.cts2.framework.service.profile.QueryService;
@@ -82,6 +83,9 @@ public class LexEvsEntityQueryServiceTestIT
 		SearchExtension searchExtension = (SearchExtension) lbs.getGenericExtension("SearchExtension");
 	
 		ResolvedConceptReferencesIterator itr = searchExtension.search("Jaguar");
+		String objectData = PrintUtility.createStringFromResolvedConceptReferenceIterator(itr);
+		System.out.println(objectData);
+		
 		assertTrue(itr.hasNext());
 		assertEquals("Jaguar", itr.next().getCode());
 		assertFalse(itr.hasNext());
@@ -154,6 +158,7 @@ public class LexEvsEntityQueryServiceTestIT
 				
 		// Create query
 		// ------------
+//		Set<ResolvedFilter> filters = CommonTestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference(),, "Jaguar")
 		EntityDescriptionQuery query = CommonTestUtils.createQuery("startsWith", "Jaguar", "Automobiles-1.0", 
 			StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference());	
 				
