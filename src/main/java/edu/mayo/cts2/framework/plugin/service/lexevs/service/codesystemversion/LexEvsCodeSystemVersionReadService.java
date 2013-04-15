@@ -83,7 +83,7 @@ public class LexEvsCodeSystemVersionReadService extends
 			return null;
 		}
 		
-		return this.getByVersionIdOrTag(codeSystem, this.convertTag(tag));
+		return this.getByVersionIdOrTag(codeSystem, CommonUtils.convertTag(tag));
 	}
 
 	@Override

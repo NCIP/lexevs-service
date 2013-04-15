@@ -29,14 +29,11 @@ import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.codingSchemes.CodingScheme;
-import org.apache.commons.lang.StringUtils;
 
-import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriResolver;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 
 /**
  * A base service for all services needing to deal with LexEVS CodingSchemes.
@@ -52,15 +49,6 @@ public abstract class AbstractLexEvsCodeSystemService<T> extends AbstractLexEvsS
 	private VersionNameConverter versionNameConverter;
 	
 	protected abstract T transform(CodingScheme codingScheme);
-	
-	protected CodingSchemeVersionOrTag convertTag(VersionTagReference tag){
-		String tagValue = tag.getContent();
-		if(StringUtils.equals(tagValue, Constants.CURRENT_TAG.getContent())){
-			return Constants.CURRENT_LEXEVS_TAG;
-		} else {
-			return Constructors.createCodingSchemeVersionOrTagFromTag(tagValue);
-		}
-	}
 
 	protected T getByVersionIdOrTag(
 			NameOrURI parentIdentifier,

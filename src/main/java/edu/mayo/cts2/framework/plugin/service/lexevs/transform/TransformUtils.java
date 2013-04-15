@@ -32,11 +32,15 @@ import org.springframework.stereotype.Component;
 import edu.mayo.cts2.framework.core.url.UrlConstructor;
 import edu.mayo.cts2.framework.model.core.CodeSystemReference;
 import edu.mayo.cts2.framework.model.core.CodeSystemVersionReference;
+import edu.mayo.cts2.framework.model.core.MapReference;
+import edu.mayo.cts2.framework.model.core.MapVersionReference;
 import edu.mayo.cts2.framework.model.core.NameAndMeaningReference;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
 import edu.mayo.cts2.framework.model.core.StatementTarget;
+import edu.mayo.cts2.framework.model.core.URIAndEntityName;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
 
 /**
  * Common Transformation Utilities.
@@ -51,6 +55,9 @@ public class TransformUtils {
 	
 	@Resource
 	private UrlConstructor urlConstructor;
+	
+	@Resource
+	private UriHandler uriHandler;
 
 	/**
 	 * To property.
@@ -90,6 +97,16 @@ public class TransformUtils {
 
 		return ref;
 	}
+	
+	public MapReference toMapReference(
+			String name, String uri){
+		MapReference ref = new MapReference();
+		ref.setContent(name);
+		ref.setUri(uri);
+		ref.setHref(this.urlConstructor.createMapUrl(name));
+
+		return ref;
+	}
 
 	public CodeSystemVersionReference toCodeSystemVersionReference(
 			String name, String version, String about) {
@@ -108,11 +125,38 @@ public class TransformUtils {
 		return ref;
 	}
 	
+	public MapVersionReference toMapVersionReference(
+			String name, String version, String about) {
+		MapVersionReference ref = new MapVersionReference();
+		ref.setMap(toMapReference(name, about));
+		
+		NameAndMeaningReference nameAndMeaning = new NameAndMeaningReference();
+		
+		String versionName = this.versionNameConverter.toCts2VersionName(name, version);
+		nameAndMeaning.setContent(versionName);
+		nameAndMeaning.setHref(
+			this.urlConstructor.createCodeSystemVersionUrl(name, version));
+
+		ref.setMapVersion(nameAndMeaning);
+		
+		return ref;
+	}
+	
 	public String createEntityHref(ResolvedConceptReference reference){
 		return this.urlConstructor.createEntityUrl(
 				reference.getCodingSchemeName(), 
 				reference.getCodingSchemeVersion(), 
 				ModelUtils.createScopedEntityName(reference.getCode(), reference.getCodeNamespace()));
+	}
+
+	public URIAndEntityName toUriAndEntityName(
+			ResolvedConceptReference resolvedConceptReference) {
+		URIAndEntityName uriAndName = new URIAndEntityName();
+		uriAndName.setName(resolvedConceptReference.getCode());
+		uriAndName.setNamespace(resolvedConceptReference.getCodeNamespace());
+		uriAndName.setUri(this.uriHandler.getEntityUri(resolvedConceptReference));
+		
+		return uriAndName;
 	}
 	
 }

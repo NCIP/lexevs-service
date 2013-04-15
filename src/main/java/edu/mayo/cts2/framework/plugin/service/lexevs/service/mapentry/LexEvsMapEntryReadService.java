@@ -28,8 +28,10 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.LexBIG.Exceptions.LBException;
+import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension.Mapping;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension.Mapping.SearchContext;
@@ -43,9 +45,9 @@ import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.mapversion.MapEntry;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryReadService;
 import edu.mayo.cts2.framework.service.profile.mapentry.name.MapEntryReadId;
 
@@ -83,9 +85,18 @@ public class LexEvsMapEntryReadService extends AbstractLexEvsService implements 
 			String mapVersion,
 			String sourceEntityCode, 
 			String relationsContainerName) throws LBException {
+		
+		NameVersionPair nameVersionPair = this.nameConverter.fromCts2VersionName(mapVersion);
 
-		Mapping mapping = mappingExtension.getMapping(mapVersion, Constants.CURRENT_LEXEVS_TAG,	relationsContainerName);
+		CodingSchemeVersionOrTag csvt = 
+			Constructors.createCodingSchemeVersionOrTagFromVersion(nameVersionPair.getVersion());
+					
+		Mapping mapping = mappingExtension.getMapping
+			(nameVersionPair.getName(), 
+					csvt,
+					relationsContainerName);
 		mapping = mapping.restrictToCodes(Constructors.createConceptReferenceList(sourceEntityCode), SearchContext.SOURCE_CODES);
+		
 		return mapping.resolveMapping();
 	}
 	
@@ -110,6 +121,8 @@ public class LexEvsMapEntryReadService extends AbstractLexEvsService implements 
 			if (resolvedConceptReferencesIterator != null && resolvedConceptReferencesIterator.numberRemaining() == 1) {
 				resolvedConceptReference = resolvedConceptReferencesIterator.next();
 			}			
+		} catch (LBParameterException e) {
+			return null;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
