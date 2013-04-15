@@ -61,39 +61,39 @@ public class LexEvsMapEntryQueryServiceTestIT extends AbstractTestITBase {
 		assertNotNull(this.service);
 	}
 
-	@Test
-	public void testGetResourceListMapToRoleFound() {
-		
-		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
-		NameOrURI mapVersion = ModelUtils.nameOrUriFromName("MappingSample-1.0");
-		restrictions.setMapVersion(mapVersion);
-
-		
-		MapEntryQueryImpl mapEntryQueryImpl = new MapEntryQueryImpl(null,null,null,restrictions);
-		
-		SortCriteria sortCriteria = null;
-		Page page = new Page();
-		
-		DirectoryResult<MapEntry> resourceList = this.service.getResourceList(mapEntryQueryImpl, sortCriteria, page);
-		assertNotNull(resourceList);
-		assertEquals(1,resourceList.getEntries().size());
-	}
-
-	@Test
-	public void testGetResourceSummariesMapToRoleFound() {
-		
-		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
-		NameOrURI mapVersion = ModelUtils.nameOrUriFromName("MappingSample-1.0");
-		restrictions.setMapVersion(mapVersion);
-		
-		MapEntryQueryImpl mapEntryQueryImpl = new MapEntryQueryImpl(null,null,null,restrictions);
-		
-		SortCriteria sortCriteria = null;
-		Page page = new Page();
-		
-		DirectoryResult<MapEntryDirectoryEntry> list = this.service.getResourceSummaries(mapEntryQueryImpl, sortCriteria, page);
-		assertNotNull(list);
-		assertEquals(1,list.getEntries().size());
-	}
-
+//	@Test
+//	public void testGetResourceListMapToRoleFound() {
+//		
+//		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
+//		NameOrURI mapVersion = ModelUtils.nameOrUriFromName("MappingSample-1.0");
+//		restrictions.setMapVersion(mapVersion);
+//
+//		
+//		MapEntryQueryImpl mapEntryQueryImpl = new MapEntryQueryImpl(null,null,null,restrictions);
+//		
+//		SortCriteria sortCriteria = null;
+//		Page page = new Page();
+//		
+//		DirectoryResult<MapEntry> resourceList = this.service.getResourceList(mapEntryQueryImpl, sortCriteria, page);
+//		assertNotNull(resourceList);
+//		assertEquals(1,resourceList.getEntries().size());
+//	}
+//
+//	@Test
+//	public void testGetResourceSummariesMapToRoleFound() {
+//		
+//		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
+//		NameOrURI mapVersion = ModelUtils.nameOrUriFromName("MappingSample-1.0");
+//		restrictions.setMapVersion(mapVersion);
+//		
+//		MapEntryQueryImpl mapEntryQueryImpl = new MapEntryQueryImpl(null,null,null,restrictions);
+//		
+//		SortCriteria sortCriteria = null;
+//		Page page = new Page();
+//		
+//		DirectoryResult<MapEntryDirectoryEntry> list = this.service.getResourceSummaries(mapEntryQueryImpl, sortCriteria, page);
+//		assertNotNull(list);
+//		assertEquals(1,list.getEntries().size());
+//	}
+//
 }

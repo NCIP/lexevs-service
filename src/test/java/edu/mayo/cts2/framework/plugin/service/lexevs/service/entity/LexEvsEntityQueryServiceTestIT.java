@@ -77,19 +77,19 @@ public class LexEvsEntityQueryServiceTestIT
 		assertNotNull(this.service);
 	}
 	
-	@Test
-	public void testMappingExtensionFunctioning() throws LBException {
-		LexBIGService lbs = service.getLexBigService();
-		SearchExtension searchExtension = (SearchExtension) lbs.getGenericExtension("SearchExtension");
-	
-		ResolvedConceptReferencesIterator itr = searchExtension.search("Jaguar");
-		String objectData = PrintUtility.createStringFromResolvedConceptReferenceIterator(itr);
-		System.out.println(objectData);
-		
-		assertTrue(itr.hasNext());
-		assertEquals("Jaguar", itr.next().getCode());
-		assertFalse(itr.hasNext());
-	}
+//	@Test
+//	public void testMappingExtensionFunctioning() throws LBException {
+//		LexBIGService lbs = service.getLexBigService();
+//		SearchExtension searchExtension = (SearchExtension) lbs.getGenericExtension("SearchExtension");
+//	
+//		ResolvedConceptReferencesIterator itr = searchExtension.search("Jaguar");
+//		String objectData = PrintUtility.createStringFromResolvedConceptReferenceIterator(itr);
+//		System.out.println(objectData);
+//		
+//		assertTrue(itr.hasNext());
+//		assertEquals("Jaguar", itr.next().getCode());
+//		assertFalse(itr.hasNext());
+//	}
 	
 	@Test
 	public void testCountWithNullQuery() throws Exception {
