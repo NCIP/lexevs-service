@@ -133,6 +133,7 @@ public class QueryData <Query extends ResourceQuery>{
 		MapEntryQueryServiceRestrictions restrictions = query.getRestrictions();
 		this.restrictions = restrictions;
 		this.filters = query.getFilterComponent();
+		
 
 		// Not needed?
 //		query.getReadContext();
@@ -142,6 +143,7 @@ public class QueryData <Query extends ResourceQuery>{
 			this.setVersionOrTag(nameConverter);
 			this.targetEntities = restrictions.getTargetEntities();
 		}
+		
 		
 		this.isMapQuery = true;		
 	}

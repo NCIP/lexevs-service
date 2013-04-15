@@ -17,7 +17,7 @@ import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 public class CommonCodingSchemeUtils {
 
 
-	public static boolean containsCodingScheme(String nameOrUriOne, String nameOrUriTwo, Set<NameOrURI> codeSystemSet) {
+	public static boolean codeSystemSetContainsCodingScheme(String nameOrUriOne, String nameOrUriTwo, Set<NameOrURI> codeSystemSet) {
 
 		boolean returnFlag = false;
 		Iterator<NameOrURI> iterator = codeSystemSet.iterator();
@@ -37,7 +37,7 @@ public class CommonCodingSchemeUtils {
 		return returnFlag;
 	}
 	
-	public static CodingScheme getCodingSchemeFromCodingSchemeRendering(
+	public static CodingScheme getCodingSchemeFromRendering(
 			LexBIGService lexBigService, 
 			CodingSchemeRendering codingSchemeRendering) {
 		CodingScheme codingScheme = null;
@@ -49,27 +49,23 @@ public class CommonCodingSchemeUtils {
 				codingSchemeName = codingSchemeRendering.getCodingSchemeSummary().getCodingSchemeURI();			
 				version = codingSchemeRendering.getCodingSchemeSummary().getRepresentsVersion();
 				tagOrVersion = Constructors.createCodingSchemeVersionOrTagFromVersion(version);			
-				codingScheme = lexBigService.resolveCodingScheme(codingSchemeName, tagOrVersion);
 			}
-			else{
-				codingScheme = lexBigService.resolveCodingScheme(codingSchemeName, tagOrVersion);			
-			}
+			
+			codingScheme = lexBigService.resolveCodingScheme(codingSchemeName, tagOrVersion);			
+			
 		} catch (LBException e) {
 			throw new RuntimeException(e);
 		}
 		return codingScheme;
 	}
 	
-	public static CodingScheme getMappedCodingSchemeForCodeSystemRestriction(
-			LexBIGService lexBigService, 
-			CodingSchemeRendering codingSchemeRendering, 
+	public static boolean validateMapRole(
+			CodingScheme codingScheme, 
 			Set<NameOrURI> codeSystemSet, 
 			String mapRoleValue) {
 
-		CodingScheme notFoundCodingScheme = null;
+		boolean validCodingScheme = false;
 
-		CodingScheme codingScheme = CommonCodingSchemeUtils.getCodingSchemeFromCodingSchemeRendering(lexBigService, codingSchemeRendering);
-		
 		// Assuming format of Map has only has 1 relations section/1 relations element in xml file
 		if (codingScheme.getRelationsCount() != 1) {
 			throw new UnsupportedOperationException("Invalid format for Map. Expecting only one metadata section for Relations.");
@@ -78,20 +74,20 @@ public class CommonCodingSchemeUtils {
 		String sourceCodingScheme = relations.getSourceCodingScheme();
 		String targetCodingScheme = relations.getTargetCodingScheme();
 		
-		if (mapRoleValue.equals(Constants.MAP_TO_ROLE) && CommonCodingSchemeUtils.containsCodingScheme(targetCodingScheme, null, codeSystemSet)) {
-			return codingScheme;
+		if (mapRoleValue.equals(Constants.MAP_TO_ROLE) && CommonCodingSchemeUtils.codeSystemSetContainsCodingScheme(targetCodingScheme, null, codeSystemSet)) {
+			validCodingScheme = true;
 		}
 		
-		if (mapRoleValue.equals(Constants.MAP_FROM_ROLE) && CommonCodingSchemeUtils.containsCodingScheme(sourceCodingScheme, null, codeSystemSet)) { 
-			return codingScheme;
+		if (mapRoleValue.equals(Constants.MAP_FROM_ROLE) && CommonCodingSchemeUtils.codeSystemSetContainsCodingScheme(sourceCodingScheme, null, codeSystemSet)) { 
+			validCodingScheme = true;
 		}
 		
 		if (mapRoleValue.equals(Constants.BOTH_MAP_ROLES) && 
-				CommonCodingSchemeUtils.containsCodingScheme(targetCodingScheme, sourceCodingScheme, codeSystemSet)) {
-			return codingScheme;
+				CommonCodingSchemeUtils.codeSystemSetContainsCodingScheme(targetCodingScheme, sourceCodingScheme, codeSystemSet)) {
+			validCodingScheme = true;
 		}
 		
-		return notFoundCodingScheme;
+		return validCodingScheme;
 	}
 
 

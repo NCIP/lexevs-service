@@ -7,13 +7,13 @@ import java.util.Set;
 
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.Collections.LocalNameList;
+import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
 import org.LexGrid.LexBIG.Exceptions.LBParameterException;
-import org.LexGrid.LexBIG.Exceptions.LBResourceUnavailableException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension.MappingSortOption;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
@@ -122,7 +122,7 @@ public class CommonResourceUtils{
 	}
 	
 	// --------------------------------------------
-	public static <T extends ResourceQuery> CodingSchemeRendering[] getCodingSchemeRendering(
+	public static <T extends ResourceQuery> CodingSchemeRendering[] getRenderingListForQuery(
 			LexBIGService lexBigService, 
 			VersionNameConverter nameConverter, 
 			QueryData<T> queryData,
@@ -130,32 +130,88 @@ public class CommonResourceUtils{
 			SortCriteria sortCriteria){
 		
 		CodingSchemeRenderingList renderingList = null;
+		String codingSchemeName = queryData.getNameVersionPairName();
+		
 		try {
 			renderingList = lexBigService.getSupportedCodingSchemes();
-		
-			renderingList = CommonSearchFilterUtils.filterIfMappingExtensionValid(mappingExtension, renderingList);
-			renderingList = CommonSearchFilterUtils.filterIfCodingSchemeNameValid(queryData.getNameVersionPairName(), renderingList);
-		
-			if (CommonUtils.hasCodingSchemeRenderings(queryData, renderingList)){ 
-				Iterator<ResolvedFilter> filtersItr = queryData.getFilters().iterator();
-				while (filtersItr.hasNext() && (renderingList.getCodingSchemeRenderingCount() > 0)) {
-						ResolvedFilter resolvedFilter = filtersItr.next();
-						renderingList = CommonSearchFilterUtils.filterRenderingListByResolvedFilter(resolvedFilter, 
-								renderingList, nameConverter);
-				}
-			}
-						
 		} catch (LBInvocationException e) {
-			throw new RuntimeException(e);
-		}
-
-		if(renderingList != null){
-			return renderingList.getCodingSchemeRendering();
+			throw new RuntimeException();
 		}
 		
-		return null;
+		renderingList = CommonResourceUtils.restrictRenderingListBySchemeNameAndMapExtension(renderingList, codingSchemeName, mappingExtension);
+		renderingList = CommonResourceUtils.restrictRenderingListByQuery(renderingList, queryData.getFilters(), nameConverter);
+		
+		return renderingList.getCodingSchemeRendering();
 	}
 	
+	
+	public static CodingSchemeRenderingList restrictRenderingListBySchemeNameAndMapExtension(
+			CodingSchemeRenderingList renderingList, 
+			String codingSchemeName, 
+			MappingExtension mappingExtension) {
+		
+		if(renderingList == null){
+			return renderingList;
+		}
+
+		boolean restrictBOTH = (codingSchemeName != null && mappingExtension != null);
+		boolean restrictNAME = (!restrictBOTH && codingSchemeName != null);
+		boolean restrictMAP = (!restrictBOTH && mappingExtension != null);
+		
+		CodingSchemeRenderingList temp = new CodingSchemeRenderingList();
+		
+		CodingSchemeRendering[] csRendering = renderingList.getCodingSchemeRendering();
+		for(CodingSchemeRendering render : csRendering) {
+			CodingSchemeSummary codingSchemeSummary = render.getCodingSchemeSummary();
+			String uri = codingSchemeSummary.getCodingSchemeURI();
+			String version = codingSchemeSummary.getRepresentsVersion();
+			
+			if(restrictBOTH){
+				if (codingSchemeSummary.getLocalName().equals(codingSchemeName)) {
+					// Add if valid Mapping Coding Scheme
+					if (CommonMapUtils.validateMappingCodingScheme(uri, version, mappingExtension)) {
+						temp.addCodingSchemeRendering(render);
+					}
+				}
+			}
+			else if(restrictNAME){
+				if (codingSchemeSummary.getLocalName().equals(codingSchemeName)) {
+					temp.addCodingSchemeRendering(render);
+				}
+			}
+			else if(restrictMAP){
+				if (CommonMapUtils.validateMappingCodingScheme(uri, version, mappingExtension)) {
+					temp.addCodingSchemeRendering(render);
+				}
+			}
+			else{
+				temp.addCodingSchemeRendering(render);
+			}
+			
+		}
+		
+		return temp;
+	}
+
+	public static CodingSchemeRenderingList restrictRenderingListByQuery(
+			CodingSchemeRenderingList renderingList, 
+			Set<ResolvedFilter> filters,
+			VersionNameConverter nameConverter) {
+		
+		if(renderingList != null && filters != null){
+			Iterator<ResolvedFilter> filtersItr = filters.iterator();
+			while (filtersItr.hasNext() && (renderingList.getCodingSchemeRenderingCount() > 0)) {
+				ResolvedFilter resolvedFilter = filtersItr.next();
+				renderingList = CommonSearchFilterUtils.filterRenderingList(resolvedFilter, 
+						renderingList, nameConverter);
+			}
+		}
+		
+		return renderingList;
+	}
+	
+
+
 	public static <T extends ResourceQuery> List<CodingScheme> getCodingSchemeList(
 			LexBIGService lexBigService, 
 			VersionNameConverter nameConverter,
@@ -166,20 +222,18 @@ public class CommonResourceUtils{
 		List<CodingScheme> codingSchemeList = new ArrayList<CodingScheme>();
 		
 		CodingSchemeRendering[] codingSchemeRendering;
-		codingSchemeRendering = CommonResourceUtils.getCodingSchemeRendering(lexBigService, nameConverter, queryData, mappingExtension, sortCriteria); // getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, sortCriteria);
+		codingSchemeRendering = CommonResourceUtils.getRenderingListForQuery(lexBigService, nameConverter, queryData, mappingExtension, sortCriteria); 
 
-		CodeSystemRestriction codeSystemRestriction = queryData.getCodeSystemRestriction();
-		EntitiesRestriction entitiesRestriction = queryData.getEntitiesRestriction();
-		
-		if (queryData.getCodeSystemRestriction() != null) {
-			codingSchemeList = CommonSearchFilterUtils.filterByRenderingListAndCodeSystemRestrictions(lexBigService, codingSchemeRendering, codeSystemRestriction);
-		}
-		else {
-			codingSchemeList = CommonSearchFilterUtils.filterByRenderingList(lexBigService, codingSchemeRendering);
-		}
-		
-		if(queryData.getEntitiesRestriction() != null){
-			codingSchemeList = CommonSearchFilterUtils.filterCodingSchemeListByEntitiesRestriction(codingSchemeList, entitiesRestriction);
+		if(codingSchemeRendering != null){
+			CodeSystemRestriction codeSystemRestriction = queryData.getCodeSystemRestriction();
+			EntitiesRestriction entitiesRestriction = queryData.getEntitiesRestriction();
+			
+			codingSchemeList = CommonSearchFilterUtils.getCodingSchemeListFromCodeSchemeRenderings(lexBigService, codingSchemeRendering, codeSystemRestriction);
+			
+			
+	//		if(entitiesRestriction != null && codingSchemeList != null){
+	//			codingSchemeList = CommonSearchFilterUtils.filterCodingSchemeListByEntitiesRestriction(codingSchemeList, entitiesRestriction);
+	//		}
 		}
 		
 		return codingSchemeList;
@@ -237,34 +291,34 @@ public class CommonResourceUtils{
 		
 		
 		// TODO: Should be able to remove when reference class implements "get" method, then just need following return method
-//		return CommonPageUtils.getPageFromIterator(iterator, page);	
+		return CommonPageUtils.getPageFromIterator(iterator, page);	
 		
 		
-		ArrayList<ResolvedConceptReference> referenceList = new ArrayList<ResolvedConceptReference>();
-		boolean atEnd = true;
-		int start = page.getStart();
-		int end = page.getEnd();
-		int index = 0;
-		try {
-			// Move iterator to start index
-			while((index < start) && (iterator.numberRemaining() > 0)){
-				index++;
-				iterator.next();
-			}
-			
-			// Collect page references
-			while((start < end) && (iterator.numberRemaining() > 0)){
-				ResolvedConceptReference ref = iterator.next();
-				referenceList.add(ref);
-			}
-		} catch (LBResourceUnavailableException e) {
-			throw new RuntimeException(e);
-		} catch (LBInvocationException e) {
-			throw new RuntimeException(e);
-		}
-		
-		ResolvedConceptReference [] resolvedConceptReference = (ResolvedConceptReference[]) referenceList.toArray();
-		return new ResolvedConceptReferenceResults(resolvedConceptReference, atEnd);
+//		ArrayList<ResolvedConceptReference> referenceList = new ArrayList<ResolvedConceptReference>();
+//		boolean atEnd = true;
+//		int start = page.getStart();
+//		int end = page.getEnd();
+//		int index = 0;
+//		try {
+//			// Move iterator to start index
+//			while((index < start) && (iterator.numberRemaining() > 0)){
+//				index++;
+//				iterator.next();
+//			}
+//			
+//			// Collect page references
+//			while((start < end) && (iterator.numberRemaining() > 0)){
+//				ResolvedConceptReference ref = iterator.next();
+//				referenceList.add(ref);
+//			}
+//		} catch (LBResourceUnavailableException e) {
+//			throw new RuntimeException(e);
+//		} catch (LBInvocationException e) {
+//			throw new RuntimeException(e);
+//		}
+//		
+//		ResolvedConceptReference [] resolvedConceptReference = (ResolvedConceptReference[]) referenceList.toArray();
+//		return new ResolvedConceptReferenceResults(resolvedConceptReference, atEnd);
 	}
 
 }

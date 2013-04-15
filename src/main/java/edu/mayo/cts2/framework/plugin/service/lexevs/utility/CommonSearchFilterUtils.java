@@ -11,7 +11,6 @@ import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
 import org.LexGrid.LexBIG.Exceptions.LBParameterException;
-import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet.SearchDesignationOption;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
@@ -66,7 +65,7 @@ public class CommonSearchFilterUtils {
 	 * @param nameConverter
 	 * @return
 	 */
-	public static CodingSchemeRenderingList filterRenderingListByResolvedFilter(ResolvedFilter resolvedFilter, 
+	public static CodingSchemeRenderingList filterRenderingList(ResolvedFilter resolvedFilter, 
 			CodingSchemeRenderingList renderingList,
 			VersionNameConverter nameConverter) {
 		
@@ -128,70 +127,53 @@ public class CommonSearchFilterUtils {
 		}
 	}
 	
-
-	public static List<CodingScheme> filterByRenderingList(
+	
+	public static List<CodingScheme> getCodingSchemeListFromCodeSchemeRenderings(
 			LexBIGService lexBigService, 
-			CodingSchemeRendering[] codingSchemeRenderings) {
+			CodingSchemeRendering[] codingSchemeRenderings, 
+			CodeSystemRestriction codeSystemRestriction) {
+
 		List<CodingScheme> codingSchemeList = new ArrayList<CodingScheme>();
+		Set<NameOrURI> codeSystemSet = null;
+		MapRole mapRole = null;
 		
-		if (codingSchemeRenderings != null) {
-			for (int i = 0; i < codingSchemeRenderings.length; i++) {
-				CodingScheme codingScheme = CommonCodingSchemeUtils.getCodingSchemeFromCodingSchemeRendering(lexBigService, codingSchemeRenderings[i]);
+		CodingScheme codingScheme;
+
+		if(codeSystemRestriction != null){
+			codeSystemSet = codeSystemRestriction.getCodeSystems();
+			mapRole = codeSystemRestriction.getMapRole();
+		}
+		
+		for (CodingSchemeRendering render : codingSchemeRenderings) {
+			codingScheme = CommonCodingSchemeUtils.getCodingSchemeFromRendering(lexBigService, render);
+			if(mapRole != null && codeSystemSet != null){
+				if(CommonCodingSchemeUtils.validateMapRole(codingScheme, codeSystemSet, mapRole.value())){
+					codingSchemeList.add(codingScheme);
+				}			
+			}
+			else{
 				codingSchemeList.add(codingScheme);
 			}
-		}
-		return codingSchemeList;
+		} 
+		
+		return codingSchemeList;		
 	}
 	
-	/**
-	 * @param lexBigService
-	 * @param entitiesRestriction
-	 * @return
-	 */
+
 	public static List<CodingScheme> filterCodingSchemeListByEntitiesRestriction(
 			List<CodingScheme> codingSchemeList, 
 			EntitiesRestriction entitiesRestriction) {
 		
 		Set<EntityNameOrURI> entitiesSet = null;
 		MapRole mapRole = null;
-		CodingScheme codingScheme;
 		
-		if (entitiesRestriction != null) {
-			entitiesSet = entitiesRestriction.getEntities();
-			mapRole = entitiesRestriction.getMapRole();
-			if(haveMapRoleAndSetNotEmpty(mapRole, entitiesSet)){
-				for (CodingScheme scheme : codingSchemeList) {
-					Entities entities = scheme.getEntities();
-					// TODO: need to see if entity exists in given scheme?? if not remove scheme from codingSchemeList
-				} 
-			}
-		}
-		
-		return codingSchemeList;		
-	}
-	
-	public static List<CodingScheme> filterByRenderingListAndCodeSystemRestrictions(
-			LexBIGService lexBigService, 
-			CodingSchemeRendering[] codingSchemeRendering, 
-			CodeSystemRestriction codeSystemRestriction) {
-
-		List<CodingScheme> codingSchemeList = new ArrayList<CodingScheme>();
-
-		Set<NameOrURI> codeSystemSet = null;
-		MapRole mapRole = null;
-		CodingScheme codingScheme;
-		
-		if (codeSystemRestriction != null) {
-			codeSystemSet = codeSystemRestriction.getCodeSystems();
-			mapRole = codeSystemRestriction.getMapRole();
-			if(haveMapRoleAndSetNotEmpty(mapRole, codeSystemSet)){
-				for (CodingSchemeRendering render : codingSchemeRendering) {
-					codingScheme = CommonCodingSchemeUtils.getMappedCodingSchemeForCodeSystemRestriction(lexBigService, render, codeSystemSet, mapRole.value()); 
-					if (codingScheme != null) {
-						codingSchemeList.add(codingScheme);
-					}			
-				} 
-			}
+		entitiesSet = entitiesRestriction.getEntities();
+		mapRole = entitiesRestriction.getMapRole();
+		if(haveMapRoleAndSetNotEmpty(mapRole, entitiesSet)){
+			for (CodingScheme scheme : codingSchemeList) {
+				Entities entities = scheme.getEntities();
+				// TODO: need to see if entity exists in given scheme?? if not remove scheme from codingSchemeList
+			} 
 		}
 		
 		return codingSchemeList;		
@@ -212,54 +194,5 @@ public class CommonSearchFilterUtils {
 	}
 
 
-	/**
-	 * Common filter routine needed for specialized CodingScheme name filtering that cannot leverage existing LexEVS filter extensions.
-	 * 
-	 * @param codingSchemeName
-	 * @param renderingList
-	 * @return
-	 */
-	public static CodingSchemeRenderingList filterIfCodingSchemeNameValid(String codingSchemeName, CodingSchemeRenderingList renderingList) {
-		if(codingSchemeName == null || renderingList == null){
-			return renderingList;
-		}
-		
-		CodingSchemeRenderingList temp = new CodingSchemeRenderingList();
-		
-		CodingSchemeRendering[] csRendering = renderingList.getCodingSchemeRendering();
-		for(CodingSchemeRendering render : csRendering) {
-			CodingSchemeSummary codingSchemeSummary = render.getCodingSchemeSummary();
-			
-			// Add if names match
-			if (codingSchemeSummary.getLocalName().equals(codingSchemeName)) {
-				temp.addCodingSchemeRendering(render);
-			}
-		}
-		
-		return temp;
-	}
 	
-	public static CodingSchemeRenderingList filterIfMappingExtensionValid(
-			MappingExtension mappingExtension,
-			CodingSchemeRenderingList renderingList) {
-		if(mappingExtension == null || renderingList == null){
-			return renderingList;
-		}
-		
-		CodingSchemeRenderingList temp = new CodingSchemeRenderingList();
-		
-		CodingSchemeRendering[] csRendering = renderingList.getCodingSchemeRendering();
-		for(CodingSchemeRendering render : csRendering) {
-			CodingSchemeSummary codingSchemeSummary = render.getCodingSchemeSummary();
-			
-			// Add if valid Mapping Coding Scheme
-			String uri = codingSchemeSummary.getCodingSchemeURI();
-			String version = codingSchemeSummary.getRepresentsVersion();
-			if (CommonMapUtils.validateMappingCodingScheme(uri, version, mappingExtension)) {
-				temp.addCodingSchemeRendering(render);
-			}
-		}		
-		return temp;		
-	}
-
 }

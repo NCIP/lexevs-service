@@ -89,7 +89,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		LexBIGService lexBigService = this.getLexBigService();
 		QueryData<CodeSystemVersionQuery> queryData = new QueryData<CodeSystemVersionQuery>(query, null);
 		
-		CodingSchemeRendering [] renderings = CommonResourceUtils.getCodingSchemeRendering(lexBigService, nameConverter, queryData, null, null);
+		CodingSchemeRendering [] renderings = CommonResourceUtils.getRenderingListForQuery(lexBigService, nameConverter, queryData, null, null);
 		return renderings.length;
 	}
 
@@ -99,7 +99,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		LexBIGService lexBigService = this.getLexBigService();		
 		QueryData<CodeSystemVersionQuery> queryData = new QueryData<CodeSystemVersionQuery>(query, null);
 		
-		CodingSchemeRendering[] csRendering = CommonResourceUtils.getCodingSchemeRendering(lexBigService, nameConverter, queryData, null, sortCriteria);
+		CodingSchemeRendering[] csRendering = CommonResourceUtils.getRenderingListForQuery(lexBigService, nameConverter, queryData, null, sortCriteria);
 		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPageFromArray(csRendering, page);
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
 		return CommonResourceUtils.createDirectoryResultWithEntryFullVersionDescriptions(lexBigService, this.transformer, csRenderingPage, atEnd);
@@ -111,7 +111,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		LexBIGService lexBigService = this.getLexBigService();
 		QueryData<CodeSystemVersionQuery> queryData = new QueryData<CodeSystemVersionQuery>(query, null);
 		
-		CodingSchemeRendering[] csRendering = CommonResourceUtils.getCodingSchemeRendering(lexBigService, nameConverter, queryData, null, sortCriteria);
+		CodingSchemeRendering[] csRendering = CommonResourceUtils.getRenderingListForQuery(lexBigService, nameConverter, queryData, null, sortCriteria);
 		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPageFromArray(csRendering, page);
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
 		return CommonResourceUtils.createDirectoryResultWithEntryDescriptions(this.transformer, csRenderingPage, atEnd, Constants.SUMMARY_DESCRIPTION);

@@ -32,14 +32,6 @@ public class CommonUtils {
 		super();
 	}
 
-	public static <T extends ResourceQuery> boolean hasCodingSchemeRenderings(QueryData<T> queryData, CodingSchemeRenderingList csrFilteredList){
-		boolean answer = false;
-		if((queryData.getFilters() != null) && (csrFilteredList != null) && (csrFilteredList.getCodingSchemeRenderingCount() > 0)){
-			answer = true;
-		}
-		return answer;
-	}
-	
 	public static <T extends ResourceQuery> boolean queryContainsValidCodingScheme(
 			QueryData<T> queryData,
 			CodingSchemeRenderingList codingSchemeRenderingList){
