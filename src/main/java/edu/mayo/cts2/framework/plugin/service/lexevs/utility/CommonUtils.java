@@ -96,7 +96,7 @@ public class CommonUtils {
 				return iterator.next();
 			}
 		} catch (LBException e) {
-			throw new RuntimeException();
+			throw new RuntimeException(e);
 		}
 		
 	}

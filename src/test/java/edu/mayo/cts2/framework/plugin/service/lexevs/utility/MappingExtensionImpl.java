@@ -1,5 +1,6 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.LexGrid.LexBIG.DataModel.Collections.AbsoluteCodingSchemeVersionReferenceList;
@@ -97,8 +98,17 @@ public class MappingExtensionImpl<DescriptionTemplate, EntryTemplate, QueryTempl
 			CodingSchemeVersionOrTag codingSchemeVersionOrTag,
 			String relationsContainerName,
 			List<MappingSortOption> sortOptionList) throws LBParameterException {
-		// TODO Auto-generated method stub
-		return null;
+
+		List<FakeCodedNode> list = new ArrayList<FakeCodedNode>();
+		
+		if(fakeLexEvsSystem.isMappingCodingScheme(codingScheme, codingSchemeVersionOrTag)){
+			String version = (codingSchemeVersionOrTag == null) ? null : codingSchemeVersionOrTag.getVersion();
+			FakeCodedNode node = new FakeCodedNode(codingScheme, version);
+			
+			list.add(node);	
+		}
+		ResolvedConceptReferencesIterator iterator = new FakeResolvedConceptReferencesIteratorImpl(list);
+		return iterator;
 	}
 
 	@Override

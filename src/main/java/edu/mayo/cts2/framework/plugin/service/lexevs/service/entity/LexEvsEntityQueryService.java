@@ -150,9 +150,9 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 			}
 		
 		} catch (LBInvocationException e) {
-			throw new UnsupportedOperationException();
+			throw new RuntimeException(e);
 		} catch (LBParameterException e) {
-			throw new UnsupportedOperationException();
+			throw new RuntimeException(e);
 		}
 		
 		return false;

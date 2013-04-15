@@ -189,15 +189,16 @@ public class QueryData <Query extends ResourceQuery>{
 	private void setVersionOrTag(VersionNameConverter nameConverter){
 		NameVersionPair nameVersionPair;
 		if(this.codeSystemVersion != null){
-			this.codeSystemVersionName = this.codeSystemVersion.getName();
-			if(codeSystemVersionName != null){
-				nameVersionPair = nameConverter.fromCts2VersionName(codeSystemVersionName);					
-				versionOrTag = new CodingSchemeVersionOrTag();
-				nameVersionPairName = nameVersionPair.getName();
-				versionOrTag.setTag(nameVersionPair.getVersion());
-				versionOrTag.setVersion(nameVersionPair.getVersion());
+//			this.codeSystemVersionName = this.codeSystemVersion.getName();
+//			if(this.codeSystemVersionName != null){
+				nameVersionPair = nameConverter.fromCts2VersionName(this.codeSystemVersion.getName());	
+				this.codeSystemVersionName = nameVersionPair.getName();
+				this.versionOrTag = new CodingSchemeVersionOrTag();
+				this.nameVersionPairName = nameVersionPair.getName();
+				this.versionOrTag.setTag(nameVersionPair.getVersion());
+				this.versionOrTag.setVersion(nameVersionPair.getVersion());
 				this.checkNameAndVersion();
-			}
+//			}
 		}
 	}
 

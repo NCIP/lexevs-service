@@ -77,7 +77,7 @@ public class FakeCodedNodeSetImpl implements org.LexGrid.LexBIG.LexBIGService.Co
     	//	this.restrictToEntityTypes(entityTypes);
         }
             
-        String version = tagOrVersion.getVersion();
+        String version = (tagOrVersion == null) ? null : tagOrVersion.getVersion();
         FakeCodedNode codedNode = new FakeCodedNode(codingScheme, version);
         codedNodeList.add(codedNode);
     }
