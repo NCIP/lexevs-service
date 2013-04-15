@@ -1,14 +1,16 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 
 public class LexEvsOsgiClassLoader extends URLClassLoader implements
-		InitializingBean {
-
+		InitializingBean, DisposableBean {
+	
 	@Value("${LG_RUNTIME_JAR}")
 	private String lgRuntimeJar;
 
@@ -25,7 +27,7 @@ public class LexEvsOsgiClassLoader extends URLClassLoader implements
 	public void afterPropertiesSet() throws Exception {
 		this.osgiClassLoader = Thread.currentThread().getContextClassLoader();
 		this.addURL(new URL(this.lgRuntimeJar));
-
+		
 		Thread.currentThread().setContextClassLoader(this);
 	}
 
@@ -66,8 +68,34 @@ public class LexEvsOsgiClassLoader extends URLClassLoader implements
 		}
 	}
 	
+	@Override
+	public InputStream getResourceAsStream(String name) {
+		InputStream stream = super.getResourceAsStream(name);
+		if(stream == null){
+			stream = this.osgiClassLoader.getResourceAsStream(name);
+		}
+		
+		return stream;
+	}
+	
+	@Override
+	public URL getResource(String name) {
+		URL resource = super.getResource(name);
+		if(resource == null){
+			resource = this.osgiClassLoader.getResource(name);
+		}
+		
+		return resource;
+	}
+
 	public ClassLoader getOsgiClassLoader() {
 		return this.osgiClassLoader;
+	}
+
+	@Override
+	public void destroy() throws Exception {
+		this.osgiClassLoader = null;
+		Thread.currentThread().setContextClassLoader(null);
 	}
 
 }

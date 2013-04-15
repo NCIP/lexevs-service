@@ -26,7 +26,6 @@ package edu.mayo.cts2.framework.plugin.service.lexevs;
 import javax.annotation.Resource;
 
 import org.lexgrid.resolvedvalueset.LexEVSResolvedValueSetService;
-import org.lexgrid.valuesets.LexEVSValueSetDefinitionServices;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.stereotype.Component;
 
