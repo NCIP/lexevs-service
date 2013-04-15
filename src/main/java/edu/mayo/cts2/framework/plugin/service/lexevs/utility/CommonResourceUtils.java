@@ -28,6 +28,8 @@ import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.transform.LexEvsToCTS2Transformer;
+import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestrictions.CodeSystemRestriction;
+import edu.mayo.cts2.framework.service.command.restriction.MapVersionQueryServiceRestrictions.EntitiesRestriction;
 import edu.mayo.cts2.framework.service.profile.ResourceQuery;
 import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryQuery;
 
@@ -166,17 +168,20 @@ public class CommonResourceUtils{
 		CodingSchemeRendering[] codingSchemeRendering;
 		codingSchemeRendering = CommonResourceUtils.getCodingSchemeRendering(lexBigService, nameConverter, queryData, mappingExtension, sortCriteria); // getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, sortCriteria);
 
+		CodeSystemRestriction codeSystemRestriction = queryData.getCodeSystemRestriction();
+		EntitiesRestriction entitiesRestriction = queryData.getEntitiesRestriction();
+		
 		if (queryData.getCodeSystemRestriction() != null) {
-			codingSchemeList = CommonSearchFilterUtils.filterByRenderingListAndMappingRestrictions(lexBigService, codingSchemeRendering, queryData.getCodeSystemRestriction());
+			codingSchemeList = CommonSearchFilterUtils.filterByRenderingListAndCodeSystemRestrictions(lexBigService, codingSchemeRendering, codeSystemRestriction);
 		}
 		else {
 			codingSchemeList = CommonSearchFilterUtils.filterByRenderingList(lexBigService, codingSchemeRendering);
 		}
 		
 		if(queryData.getEntitiesRestriction() != null){
-			codingSchemeList = CommonSearchFilterUtils.filterByEntitiesRestriction(lexBigService, codingSchemeRendering, queryData.getEntitiesRestriction());
+			codingSchemeList = CommonSearchFilterUtils.filterCodingSchemeListByEntitiesRestriction(codingSchemeList, entitiesRestriction);
 		}
-					
+		
 		return codingSchemeList;
 	}
 

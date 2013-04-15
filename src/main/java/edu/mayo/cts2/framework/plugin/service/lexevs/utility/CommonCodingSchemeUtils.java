@@ -63,7 +63,7 @@ public class CommonCodingSchemeUtils {
 	public static CodingScheme getMappedCodingSchemeForCodeSystemRestriction(
 			LexBIGService lexBigService, 
 			CodingSchemeRendering codingSchemeRendering, 
-			Set<NameOrURI> nameOrUriSet, 
+			Set<NameOrURI> codeSystemSet, 
 			String mapRoleValue) {
 
 		CodingScheme notFoundCodingScheme = null;
@@ -78,33 +78,34 @@ public class CommonCodingSchemeUtils {
 		String sourceCodingScheme = relations.getSourceCodingScheme();
 		String targetCodingScheme = relations.getTargetCodingScheme();
 		
-		if (mapRoleValue.equals(Constants.MAP_TO_ROLE) && CommonCodingSchemeUtils.containsCodingScheme(targetCodingScheme, null, nameOrUriSet)) {
+		if (mapRoleValue.equals(Constants.MAP_TO_ROLE) && CommonCodingSchemeUtils.containsCodingScheme(targetCodingScheme, null, codeSystemSet)) {
 			return codingScheme;
 		}
 		
-		if (mapRoleValue.equals(Constants.MAP_FROM_ROLE) && CommonCodingSchemeUtils.containsCodingScheme(sourceCodingScheme, null, nameOrUriSet)) { 
+		if (mapRoleValue.equals(Constants.MAP_FROM_ROLE) && CommonCodingSchemeUtils.containsCodingScheme(sourceCodingScheme, null, codeSystemSet)) { 
 			return codingScheme;
 		}
 		
 		if (mapRoleValue.equals(Constants.BOTH_MAP_ROLES) && 
-				CommonCodingSchemeUtils.containsCodingScheme(targetCodingScheme, sourceCodingScheme, nameOrUriSet)) {
+				CommonCodingSchemeUtils.containsCodingScheme(targetCodingScheme, sourceCodingScheme, codeSystemSet)) {
 			return codingScheme;
 		}
 		
 		return notFoundCodingScheme;
 	}
 
-	/**
-	 * @param lexBigService
-	 * @param render
-	 * @param entitiesSet
-	 * @param value
-	 * @return
-	 */
+
 	public static CodingScheme getMappedCodingSchemeForEntitiesRestriction(
 			LexBIGService lexBigService, CodingSchemeRendering render,
 			Set<EntityNameOrURI> entitiesSet, String value) {
-		// TODO Auto-generated method stub
+
+		
+//		Iterator<EntityNameOrURI> iterator = entitiesSet.iterator();
+//		while(iterator.hasNext()){
+//			EntityNameOrURI entity = iterator.next();
+//			entity.getEntityName();
+//			entity.getUri();
+//		}
 		return null;
 	}
 }
