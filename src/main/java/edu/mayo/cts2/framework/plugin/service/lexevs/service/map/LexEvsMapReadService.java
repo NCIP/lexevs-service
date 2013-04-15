@@ -28,22 +28,20 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.codingSchemes.CodingScheme;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.map.MapCatalogEntry;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
-import edu.mayo.cts2.framework.model.util.ModelUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsCodeSystemService;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.service.profile.map.MapReadService;
 
 /**
@@ -51,6 +49,7 @@ import edu.mayo.cts2.framework.service.profile.map.MapReadService;
  *  @author <a href="mailto:hardie.linda@mayo.edu">Linda Hardie</a>
  *
 */
+@Component
 public class LexEvsMapReadService 
 	extends AbstractLexEvsCodeSystemService<MapCatalogEntry>
 	implements MapReadService, InitializingBean {
@@ -105,10 +104,8 @@ public class LexEvsMapReadService
 	@Override
 	public MapCatalogEntry read(NameOrURI identifier,
 			ResolvedReadContext readContext) {
-		NameVersionPair namePair = CommonUtils.getNamePair(nameConverter, identifier, readContext);
-		NameOrURI name = ModelUtils.nameOrUriFromName(namePair.getName());
-		CodingSchemeVersionOrTag versionOrTag = Constructors.createCodingSchemeVersionOrTagFromVersion(namePair.getVersion());
-		return this.getByVersionIdOrTag(name, versionOrTag);
+		
+		return this.getByVersionIdOrTag(identifier, Constants.CURRENT_LEXEVS_TAG);
 	}
 
 	@Override
