@@ -61,8 +61,12 @@ public class SearchExtensionEntityQueryService
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
+		try {
 		this.searchExtension = 
 			(SearchExtension) this.getLexBigService().getGenericExtension("SearchExtension");
+		} catch (Exception e){
+			log.warn("SearchExtension is not available.");
+		}
 	}
 
 	private class SearchExtensionCallback implements Callback<String,EntityDirectoryEntry>{
@@ -274,7 +278,8 @@ public class SearchExtensionEntityQueryService
 
 	@Override
 	public boolean canHandle(EntityDescriptionQuery query) {
-		return query.getEntitiesFromAssociationsQuery() == null &&
+		return this.searchExtension != null &&
+				query.getEntitiesFromAssociationsQuery() == null &&
 				query.getRestrictions().getHierarchyRestriction() == null &&
 				this.checkFilters(query.getFilterComponent());
 	}
@@ -289,7 +294,7 @@ public class SearchExtensionEntityQueryService
 			 }
 		 }
 		 
-		 return false;
+		 return true;
 	}
 	
 	@Override

@@ -77,6 +77,7 @@ public class CodingSchemeToCodeSystemTransform
 		String name = this.getName(codingScheme);
 		
 		codeSystemVersion.setCodeSystemVersionName(name);
+		codeSystemVersion.setOfficialResourceVersionId(codingScheme.getRepresentsVersion());
 		codeSystemVersion.setDocumentURI(
 				this.getUriHandler().getCodeSystemVersionUri(codingScheme)
 		);
@@ -127,6 +128,7 @@ public class CodingSchemeToCodeSystemTransform
 		String name = this.getName(codingSchemeRendering);
 		
 		summary.setCodeSystemVersionName(name);
+		summary.setOfficialResourceVersionId(codingSchemeSummary.getRepresentsVersion());
 		summary.setDocumentURI(
 				this.getUriHandler().getCodeSystemVersionUri(codingSchemeSummary)
 		);

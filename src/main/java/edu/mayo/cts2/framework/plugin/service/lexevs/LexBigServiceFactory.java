@@ -29,17 +29,20 @@ import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 
 /**
  * A factory for creating LexBigService objects.
  */
-public class LexBigServiceFactory implements FactoryBean<LexBIGService> {
+public class LexBigServiceFactory implements FactoryBean<LexBIGService>, DisposableBean {
 
 	protected Logger log = Logger.getLogger(this.getClass());
 	
 	@Resource
 	private LexEvsOsgiClassLoader lexEvsOsgiClassLoader;
+	
+	private LexBIGService lexBIGService;
 
 	/* (non-Javadoc)
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
@@ -47,15 +50,15 @@ public class LexBigServiceFactory implements FactoryBean<LexBIGService> {
 	@Override
 	public LexBIGService getObject() throws Exception {
 
-		LexBIGService impl = 
-			(LexBIGService) 
-				this.lexEvsOsgiClassLoader.getServiceClass("org.LexGrid.LexBIG.Impl.LexBIGServiceImpl");
+		Method method = this.lexEvsOsgiClassLoader.
+			loadClass("org.LexGrid.LexBIG.Impl.LexBIGServiceImpl").
+				getDeclaredMethod("defaultInstance");
 		
-		Method register = impl.getClass().getDeclaredMethod("registerExtensions");
-		register.setAccessible(true);
-		register.invoke(impl);
+		method.setAccessible(true);
 		
-		return impl;
+		this.lexBIGService = (LexBIGService) method.invoke(null);
+
+		return lexBIGService;
 	}
 
 	/* (non-Javadoc)
@@ -72,5 +75,11 @@ public class LexBigServiceFactory implements FactoryBean<LexBIGService> {
 	@Override
 	public boolean isSingleton() {
 		return true;
+	}
+	
+	@Override
+	public void destroy() throws Exception {
+		log.info("Shutting down LexEVS.");
+		this.lexBIGService.getServiceManager(null).shutdown();
 	}
 }
