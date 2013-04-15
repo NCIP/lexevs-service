@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
-import org.easymock.EasyMock;
+import org.easymock.classextension.EasyMock;
 import org.junit.Test;
 
 import edu.mayo.cts2.framework.model.command.Page;

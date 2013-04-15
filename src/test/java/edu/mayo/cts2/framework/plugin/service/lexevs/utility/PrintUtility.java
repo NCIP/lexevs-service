@@ -2,6 +2,9 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
 
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
+import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
+import org.LexGrid.LexBIG.Exceptions.LBResourceUnavailableException;
+import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
 import org.LexGrid.concepts.Entity;
 import org.LexGrid.concepts.Presentation;
 
@@ -13,6 +16,20 @@ public class PrintUtility {
 		}
 		return results.toString();
 	}
+	
+	public static String createStringFromResolvedConceptReferenceIterator(ResolvedConceptReferencesIterator iterator) throws LBResourceUnavailableException, LBInvocationException{
+		StringBuffer results = new StringBuffer();
+	
+		while(iterator.hasNext()){
+			String objectData = createStringFromResolvedConceptReferenceObject(iterator.next(), 0); 
+			if(objectData != null){
+				results.append(objectData + "\n=============\n\n");
+			}
+		}
+		
+		return results.toString();
+	}
+	
 	
 	public static String createStringFromResolvedConceptReferenceObject(ResolvedConceptReference reference, int tabCount){
 		StringBuffer results = new StringBuffer();
@@ -37,6 +54,10 @@ public class PrintUtility {
 	public static String createStringFromEntityObject(Entity entity, int tabCount){
 		String tabs = createTabs(tabCount);
 		StringBuffer results = new StringBuffer();
+
+		if(entity == null){
+			return "";
+		}
 		
 		results.append(tabs + " EntityCode = " + entity.getEntityCode() + "\n");
 		

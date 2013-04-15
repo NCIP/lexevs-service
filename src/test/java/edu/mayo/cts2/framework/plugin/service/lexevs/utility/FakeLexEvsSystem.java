@@ -253,22 +253,13 @@ public class FakeLexEvsSystem <DescriptionTemplate, EntryTemplate, QueryTemplate
 
 		Set<ResolvedFilter> filters;
 		for (int schemeIndex = 0; schemeIndex < schemeCount; schemeIndex++) {
-			aboutIndex = aboutValid ? schemeIndex
-					: ((schemeIndex + 1) % schemeCount);
-			synopsisIndex = resourceSynopsisValid ? schemeIndex
-					: ((schemeIndex + 1) % schemeCount);
-			nameIndex = resourceNameValid ? schemeIndex
-					: ((schemeIndex + 1) % schemeCount);
+			aboutIndex = aboutValid ? schemeIndex : ((schemeIndex + 1) % schemeCount);
+			synopsisIndex = resourceSynopsisValid ? schemeIndex	: ((schemeIndex + 1) % schemeCount);
+			nameIndex = resourceNameValid ? schemeIndex	: ((schemeIndex + 1) % schemeCount);
 
-			aboutValue = fakeData.getScheme_DataField(aboutIndex,
-					StandardModelAttributeReference.ABOUT
-							.getPropertyReference());
-			synopsisValue = fakeData.getScheme_DataField(synopsisIndex,
-					StandardModelAttributeReference.RESOURCE_SYNOPSIS
-							.getPropertyReference());
-			nameValue = fakeData.getScheme_DataField(nameIndex,
-					StandardModelAttributeReference.RESOURCE_NAME
-							.getPropertyReference());
+			aboutValue = fakeData.getScheme_DataField(aboutIndex, StandardModelAttributeReference.ABOUT.getPropertyReference());
+			synopsisValue = fakeData.getScheme_DataField(synopsisIndex, StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference());
+			nameValue = fakeData.getScheme_DataField(nameIndex, StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference());
 
 			filters = CommonTestUtils.createFilterSet(aboutValue,
 					synopsisValue, nameValue);

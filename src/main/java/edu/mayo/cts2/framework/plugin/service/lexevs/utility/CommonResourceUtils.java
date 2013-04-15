@@ -7,7 +7,6 @@ import java.util.Set;
 
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.Collections.LocalNameList;
-import org.LexGrid.LexBIG.DataModel.Collections.ResolvedConceptReferenceList;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
@@ -29,6 +28,8 @@ import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.transform.LexEvsToCTS2Transformer;
+import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestrictions.CodeSystemRestriction;
+import edu.mayo.cts2.framework.service.command.restriction.MapVersionQueryServiceRestrictions.EntitiesRestriction;
 import edu.mayo.cts2.framework.service.profile.ResourceQuery;
 import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryQuery;
 
@@ -167,13 +168,20 @@ public class CommonResourceUtils{
 		CodingSchemeRendering[] codingSchemeRendering;
 		codingSchemeRendering = CommonResourceUtils.getCodingSchemeRendering(lexBigService, nameConverter, queryData, mappingExtension, sortCriteria); // getCodingSchemeRenderingList(lexBigService, nameConverter, mappingExtension, queryData, sortCriteria);
 
+		CodeSystemRestriction codeSystemRestriction = queryData.getCodeSystemRestriction();
+		EntitiesRestriction entitiesRestriction = queryData.getEntitiesRestriction();
+		
 		if (queryData.getCodeSystemRestriction() != null) {
-			codingSchemeList = CommonSearchFilterUtils.filterByRenderingListAndMappingExtension(lexBigService, codingSchemeRendering, queryData.getCodeSystemRestriction());
+			codingSchemeList = CommonSearchFilterUtils.filterByRenderingListAndCodeSystemRestrictions(lexBigService, codingSchemeRendering, codeSystemRestriction);
 		}
 		else {
-			codingSchemeList = CommonCodingSchemeUtils.getCodingSchemeListFromCodingSchemeRenderings(lexBigService, codingSchemeRendering);
+			codingSchemeList = CommonSearchFilterUtils.filterByRenderingList(lexBigService, codingSchemeRendering);
 		}
-					
+		
+		if(queryData.getEntitiesRestriction() != null){
+			codingSchemeList = CommonSearchFilterUtils.filterCodingSchemeListByEntitiesRestriction(codingSchemeList, entitiesRestriction);
+		}
+		
 		return codingSchemeList;
 	}
 
@@ -182,22 +190,22 @@ public class CommonResourceUtils{
 			QueryData<T> queryData,
 			SortCriteria sortCriteria){
 		CodedNodeSet codedNodeSet = null;
-		boolean containsData = false;
+		boolean codingSchemeExists = false;
 		
 		if(queryData.hasNameAndVersion()){
 			try {
 				// Get Code Node Set from LexBIG service for given coding scheme
 				LocalNameList entityTypes = new LocalNameList();
 				CodingSchemeRenderingList codingSchemeRenderingList = lexBigService.getSupportedCodingSchemes();
-				containsData = CommonUtils.queryReturnsData(queryData, codingSchemeRenderingList);			
-				if(containsData){
+				codingSchemeExists = CommonUtils.queryContainsValidCodingScheme(queryData, codingSchemeRenderingList);			
+				if(codingSchemeExists){
 					codedNodeSet = lexBigService.getNodeSet(queryData.getNameVersionPairName(), queryData.getVersionOrTag() , entityTypes);
 				}
 			} catch (LBException e) {
 				throw new RuntimeException(e);
 			}
 			Set<ResolvedFilter> filters = queryData.getFilters();
-			if(containsData && (filters != null)){
+			if(codingSchemeExists && (filters != null)){
 				for(ResolvedFilter filter : filters){
 					CommonSearchFilterUtils.filterCodedNodeSetByResolvedFilter(filter, codedNodeSet);
 				}

@@ -1,8 +1,6 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
@@ -13,6 +11,7 @@ import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.codingSchemes.CodingScheme;
 import org.LexGrid.relations.Relations;
 
+import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 
 public class CommonCodingSchemeUtils {
@@ -36,20 +35,6 @@ public class CommonCodingSchemeUtils {
 			}
 		}
 		return returnFlag;
-	}
-	
-	public static List<CodingScheme> getCodingSchemeListFromCodingSchemeRenderings(
-			LexBIGService lexBigService, 
-			CodingSchemeRendering[] codingSchemeRenderings) {
-		List<CodingScheme> codingSchemeList = new ArrayList<CodingScheme>();
-		
-		if (codingSchemeRenderings != null) {
-			for (int i = 0; i < codingSchemeRenderings.length; i++) {
-				CodingScheme codingScheme = CommonCodingSchemeUtils.getCodingSchemeFromCodingSchemeRendering(lexBigService, codingSchemeRenderings[i]);
-				codingSchemeList.add(codingScheme);
-			}
-		}
-		return codingSchemeList;
 	}
 	
 	public static CodingScheme getCodingSchemeFromCodingSchemeRendering(
@@ -78,7 +63,7 @@ public class CommonCodingSchemeUtils {
 	public static CodingScheme getMappedCodingSchemeForCodeSystemRestriction(
 			LexBIGService lexBigService, 
 			CodingSchemeRendering codingSchemeRendering, 
-			Set<NameOrURI> nameOrUriSet, 
+			Set<NameOrURI> codeSystemSet, 
 			String mapRoleValue) {
 
 		CodingScheme notFoundCodingScheme = null;
@@ -93,19 +78,34 @@ public class CommonCodingSchemeUtils {
 		String sourceCodingScheme = relations.getSourceCodingScheme();
 		String targetCodingScheme = relations.getTargetCodingScheme();
 		
-		if (mapRoleValue.equals(Constants.MAP_TO_ROLE) && CommonCodingSchemeUtils.containsCodingScheme(targetCodingScheme, null, nameOrUriSet)) {
+		if (mapRoleValue.equals(Constants.MAP_TO_ROLE) && CommonCodingSchemeUtils.containsCodingScheme(targetCodingScheme, null, codeSystemSet)) {
 			return codingScheme;
 		}
 		
-		if (mapRoleValue.equals(Constants.MAP_FROM_ROLE) && CommonCodingSchemeUtils.containsCodingScheme(sourceCodingScheme, null, nameOrUriSet)) { 
+		if (mapRoleValue.equals(Constants.MAP_FROM_ROLE) && CommonCodingSchemeUtils.containsCodingScheme(sourceCodingScheme, null, codeSystemSet)) { 
 			return codingScheme;
 		}
 		
 		if (mapRoleValue.equals(Constants.BOTH_MAP_ROLES) && 
-				CommonCodingSchemeUtils.containsCodingScheme(targetCodingScheme, sourceCodingScheme, nameOrUriSet)) {
+				CommonCodingSchemeUtils.containsCodingScheme(targetCodingScheme, sourceCodingScheme, codeSystemSet)) {
 			return codingScheme;
 		}
 		
 		return notFoundCodingScheme;
+	}
+
+
+	public static CodingScheme getMappedCodingSchemeForEntitiesRestriction(
+			LexBIGService lexBigService, CodingSchemeRendering render,
+			Set<EntityNameOrURI> entitiesSet, String value) {
+
+		
+//		Iterator<EntityNameOrURI> iterator = entitiesSet.iterator();
+//		while(iterator.hasNext()){
+//			EntityNameOrURI entity = iterator.next();
+//			entity.getEntityName();
+//			entity.getUri();
+//		}
+		return null;
 	}
 }

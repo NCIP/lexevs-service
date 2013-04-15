@@ -16,14 +16,17 @@ import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet.SearchDesignationOption;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.codingSchemes.CodingScheme;
+import org.LexGrid.concepts.Entities;
 
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PropertyReference;
+import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.service.mapversion.types.MapRole;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestrictions.CodeSystemRestriction;
+import edu.mayo.cts2.framework.service.command.restriction.MapVersionQueryServiceRestrictions.EntitiesRestriction;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 
@@ -126,11 +129,51 @@ public class CommonSearchFilterUtils {
 	}
 	
 
+	public static List<CodingScheme> filterByRenderingList(
+			LexBIGService lexBigService, 
+			CodingSchemeRendering[] codingSchemeRenderings) {
+		List<CodingScheme> codingSchemeList = new ArrayList<CodingScheme>();
+		
+		if (codingSchemeRenderings != null) {
+			for (int i = 0; i < codingSchemeRenderings.length; i++) {
+				CodingScheme codingScheme = CommonCodingSchemeUtils.getCodingSchemeFromCodingSchemeRendering(lexBigService, codingSchemeRenderings[i]);
+				codingSchemeList.add(codingScheme);
+			}
+		}
+		return codingSchemeList;
+	}
 	
-	public static List<CodingScheme> filterByRenderingListAndMappingExtension(
+	/**
+	 * @param lexBigService
+	 * @param entitiesRestriction
+	 * @return
+	 */
+	public static List<CodingScheme> filterCodingSchemeListByEntitiesRestriction(
+			List<CodingScheme> codingSchemeList, 
+			EntitiesRestriction entitiesRestriction) {
+		
+		Set<EntityNameOrURI> entitiesSet = null;
+		MapRole mapRole = null;
+		CodingScheme codingScheme;
+		
+		if (entitiesRestriction != null) {
+			entitiesSet = entitiesRestriction.getEntities();
+			mapRole = entitiesRestriction.getMapRole();
+			if(haveMapRoleAndSetNotEmpty(mapRole, entitiesSet)){
+				for (CodingScheme scheme : codingSchemeList) {
+					Entities entities = scheme.getEntities();
+					// TODO: need to see if entity exists in given scheme?? if not remove scheme from codingSchemeList
+				} 
+			}
+		}
+		
+		return codingSchemeList;		
+	}
+	
+	public static List<CodingScheme> filterByRenderingListAndCodeSystemRestrictions(
 			LexBIGService lexBigService, 
 			CodingSchemeRendering[] codingSchemeRendering, 
-			CodeSystemRestriction mappingRestriction) {
+			CodeSystemRestriction codeSystemRestriction) {
 
 		List<CodingScheme> codingSchemeList = new ArrayList<CodingScheme>();
 
@@ -138,12 +181,10 @@ public class CommonSearchFilterUtils {
 		MapRole mapRole = null;
 		CodingScheme codingScheme;
 		
-		if (mappingRestriction != null) {
-			codeSystemSet = mappingRestriction.getCodeSystems();
-			if(haveMapRoleAndCodeSystems(mappingRestriction, codeSystemSet)){
-				mapRole = mappingRestriction.getMapRole();
-				// Get array of CodingSchemeRendering object and loop checking each item in array
-			//	CodingSchemeRendering[] csRendering = codingSchemeRendering.getCodingSchemeRendering();
+		if (codeSystemRestriction != null) {
+			codeSystemSet = codeSystemRestriction.getCodeSystems();
+			mapRole = codeSystemRestriction.getMapRole();
+			if(haveMapRoleAndSetNotEmpty(mapRole, codeSystemSet)){
 				for (CodingSchemeRendering render : codingSchemeRendering) {
 					codingScheme = CommonCodingSchemeUtils.getMappedCodingSchemeForCodeSystemRestriction(lexBigService, render, codeSystemSet, mapRole.value()); 
 					if (codingScheme != null) {
@@ -156,19 +197,21 @@ public class CommonSearchFilterUtils {
 		return codingSchemeList;		
 	}
 	
-	public static boolean haveMapRoleAndCodeSystems(CodeSystemRestriction mappingRestriction, Set<NameOrURI> codeSystemSet){
+	private static <T> boolean haveMapRoleAndSetNotEmpty(
+			MapRole mapRole,
+			Set<T> set) {
 		boolean answer = false;
 		String mapRoleValue = null;
-		MapRole mapRole = mappingRestriction.getMapRole();
 		if (mapRole != null) {
 			mapRoleValue = mapRole.value();
-			if (mapRoleValue != null && codeSystemSet != null && codeSystemSet.size() > 0) {
+			if (mapRoleValue != null && set != null && set.size() > 0) {
 				answer = true;
 			}
 		}
 		return answer;
 	}
-	
+
+
 	/**
 	 * Common filter routine needed for specialized CodingScheme name filtering that cannot leverage existing LexEVS filter extensions.
 	 * 
@@ -218,9 +261,5 @@ public class CommonSearchFilterUtils {
 		}		
 		return temp;		
 	}
-
-
-	
-
 
 }
