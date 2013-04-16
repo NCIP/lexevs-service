@@ -23,9 +23,11 @@ import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSetDirectoryEntry;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonPageUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResolvedValueSetUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 import edu.mayo.cts2.framework.service.profile.resolvedvalueset.ResolvedValueSetQuery;
@@ -37,6 +39,8 @@ public class LexEvsResolvedValueSetQueryService extends AbstractLexEvsService
 	private CommonResolvedValueSetUtils resolverUtils;
 	@Resource
 	private ResolvedCodingSchemeTransform transform;
+	@Resource
+	private VersionNameConverter nameConverter;
 
 
 	@Override
@@ -98,9 +102,9 @@ public class LexEvsResolvedValueSetQueryService extends AbstractLexEvsService
 		List<CodingScheme> csList= getLexEVSResolvedService().listAllResolvedValueSets();
 		// TODO Auto-generated method stub
 		List<CodingScheme> restrictedList= resolverUtils.restrictByQuery(csList, query);
+		List<CodingScheme> filteredList= CommonSearchFilterUtils.filterCodingSchemeList(query.getFilterComponent(), restrictedList, nameConverter);
 		
-		
-		List<ResolvedValueSetDirectoryEntry> results= transform.transform(restrictedList);
+		List<ResolvedValueSetDirectoryEntry> results= transform.transform(filteredList);
 		List<ResolvedValueSetDirectoryEntry> pagedResult =CommonPageUtils.getPaginatedList(results, page);
         boolean moreResults = results.size() > page.getEnd();
 		
