@@ -23,12 +23,15 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.map;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
+
+import java.io.StringWriter;
 
 import javax.annotation.Resource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContents;
@@ -36,6 +39,7 @@ import org.junit.Test;
 
 import edu.mayo.cts2.framework.core.xml.Cts2Marshaller;
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
+import edu.mayo.cts2.framework.model.map.MapCatalogEntry;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
@@ -159,6 +163,17 @@ public class LexEvsMapReadServiceTestIT extends AbstractTestITBase {
 		ResolvedReadContext readContext = null;
 		
 		assertNull(service.read(identifier, readContext));
+	}
+	
+	@Test
+	public void testReadValidXML() throws Exception {
+		
+		NameOrURI identifier = ModelUtils.nameOrUriFromUri("urn:oid:mapping:sample"); 
+		ResolvedReadContext readContext = null;
+		MapCatalogEntry mapCatalogEntry = this.service.read(identifier, readContext);
+		assertNotNull(mapCatalogEntry);		
+		
+		marshaller.marshal(mapCatalogEntry, new StreamResult(new StringWriter()));		
 	}
 	
 
