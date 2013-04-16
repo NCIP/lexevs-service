@@ -99,12 +99,8 @@ public class LexEvsResolvedValueSetQueryService extends AbstractLexEvsService
 	public DirectoryResult<ResolvedValueSetDirectoryEntry> getResourceSummaries(
 			ResolvedValueSetQuery query, SortCriteria sort, Page page)  {
 		try {
-		List<CodingScheme> csList= getLexEVSResolvedService().listAllResolvedValueSets();
-		// TODO Auto-generated method stub
-		List<CodingScheme> restrictedList= resolverUtils.restrictByQuery(csList, query);
-		List<CodingScheme> filteredList= CommonSearchFilterUtils.filterCodingSchemeList(query.getFilterComponent(), restrictedList, nameConverter);
-		
-		List<ResolvedValueSetDirectoryEntry> results= transform.transform(filteredList);
+		List<CodingScheme> restrictedList= processQuery(query);
+		List<ResolvedValueSetDirectoryEntry> results= transform.transform(restrictedList);
 		List<ResolvedValueSetDirectoryEntry> pagedResult =CommonPageUtils.getPaginatedList(results, page);
         boolean moreResults = results.size() > page.getEnd();
 		
@@ -119,8 +115,13 @@ public class LexEvsResolvedValueSetQueryService extends AbstractLexEvsService
 
 	@Override
 	public int count(ResolvedValueSetQuery query) {
-		// TODO Auto-generated method stub
-		return 0;
+		try {
+		List<CodingScheme> restrictedList= processQuery(query);
+		return restrictedList.size();
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+		
 	}
 
 	public CommonResolvedValueSetUtils getResolverUtils() {
@@ -129,6 +130,15 @@ public class LexEvsResolvedValueSetQueryService extends AbstractLexEvsService
 
 	public void setResolverUtils(CommonResolvedValueSetUtils resolverUtils) {
 		this.resolverUtils = resolverUtils;
+	}
+	
+	private List<CodingScheme>  processQuery(ResolvedValueSetQuery query) throws Exception{
+		List<CodingScheme> csList= getLexEVSResolvedService().listAllResolvedValueSets();
+		List<CodingScheme> restrictedList= resolverUtils.restrictByQuery(csList, query);
+		if (query!= null) {
+			restrictedList= CommonSearchFilterUtils.filterCodingSchemeList(query.getFilterComponent(), restrictedList, nameConverter);
+		}
+		return restrictedList;
 	}
 	
 }
