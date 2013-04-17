@@ -108,6 +108,68 @@ public class CommonSearchFilterUtils {
 		
 		return sourceValue;
 	}
+
+	
+	public static List<CodingScheme> filterCodingSchemeList(
+			Set<ResolvedFilter> filters, List<CodingScheme> codingSchemeList,
+			VersionNameConverter nameConverter) {
+		
+		if(codingSchemeList != null && filters != null){
+			Iterator<ResolvedFilter> filtersItr = filters.iterator();
+			while (filtersItr.hasNext() && (codingSchemeList.size() > 0)) {
+				ResolvedFilter resolvedFilter = filtersItr.next();
+				codingSchemeList = filterCodingSchemeList(resolvedFilter, 
+						codingSchemeList, nameConverter);
+			}
+		}
+		
+		return codingSchemeList;
+	}
+		
+	
+	public static List<CodingScheme> filterCodingSchemeList(ResolvedFilter resolvedFilter, 
+			List<CodingScheme> codingSchemeList,
+			VersionNameConverter nameConverter) {
+		
+		boolean caseSensitive = false;
+		List<CodingScheme> temp = new ArrayList<CodingScheme>();
+		
+		// Collect Property References
+		MatchAlgorithmReference matchAlgorithmReference = resolvedFilter.getMatchAlgorithmReference();
+		PropertyReference propertyReference = resolvedFilter.getPropertyReference();
+		String searchAttribute = propertyReference.getReferenceTarget().getName();
+		
+		String matchStr = resolvedFilter.getMatchValue();	
+		String sourceValue = null;
+		
+		for (CodingScheme codingScheme : codingSchemeList) {
+			sourceValue = CommonSearchFilterUtils.determineSourceValue(searchAttribute, codingScheme, nameConverter);
+			if (CommonStringUtils.executeMatchAlgorithm(sourceValue, matchStr, matchAlgorithmReference, caseSensitive)) {
+				temp.add(codingScheme);
+			} 
+		}  
+		
+		return temp;
+	}
+	
+	public static String determineSourceValue(String searchAttribute, CodingScheme codingScheme, VersionNameConverter nameConverter){
+		String sourceValue = null;
+		if(codingScheme == null){
+			return sourceValue;
+		}
+		if (searchAttribute.equals(Constants.ATTRIBUTE_NAME_ABOUT)) {
+			sourceValue = codingScheme.getCodingSchemeURI();
+		} else if (searchAttribute.equals(Constants.ATTRIBUTE_NAME_RESOURCE_SYNOPSIS)) {
+			sourceValue = codingScheme.getEntityDescription().getContent();
+		} else if (searchAttribute.equals(Constants.ATTRIBUTE_NAME_RESOURCE_NAME)) {
+			sourceValue = 
+				nameConverter.toCts2VersionName(
+					codingScheme.getCodingSchemeName(), 
+					codingScheme.getRepresentsVersion());
+		}
+		
+		return sourceValue;
+	}	
 	
 	public static <T extends ResourceQuery> void filterCodedNodeSet(CodedNodeSet codedNodeSet, QueryData<T> queryData){
 		if(codedNodeSet != null){

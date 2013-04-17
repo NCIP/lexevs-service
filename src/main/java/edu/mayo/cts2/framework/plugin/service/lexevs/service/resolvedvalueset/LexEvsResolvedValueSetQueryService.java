@@ -23,9 +23,11 @@ import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSetDirectoryEntry;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonPageUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResolvedValueSetUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 import edu.mayo.cts2.framework.service.profile.resolvedvalueset.ResolvedValueSetQuery;
@@ -37,6 +39,8 @@ public class LexEvsResolvedValueSetQueryService extends AbstractLexEvsService
 	private CommonResolvedValueSetUtils resolverUtils;
 	@Resource
 	private ResolvedCodingSchemeTransform transform;
+	@Resource
+	private VersionNameConverter nameConverter;
 
 
 	@Override
@@ -95,11 +99,7 @@ public class LexEvsResolvedValueSetQueryService extends AbstractLexEvsService
 	public DirectoryResult<ResolvedValueSetDirectoryEntry> getResourceSummaries(
 			ResolvedValueSetQuery query, SortCriteria sort, Page page)  {
 		try {
-		List<CodingScheme> csList= getLexEVSResolvedService().listAllResolvedValueSets();
-		// TODO Auto-generated method stub
-		List<CodingScheme> restrictedList= resolverUtils.restrictByQuery(csList, query);
-		
-		
+		List<CodingScheme> restrictedList= processQuery(query);
 		List<ResolvedValueSetDirectoryEntry> results= transform.transform(restrictedList);
 		List<ResolvedValueSetDirectoryEntry> pagedResult =CommonPageUtils.getPaginatedList(results, page);
         boolean moreResults = results.size() > page.getEnd();
@@ -115,8 +115,13 @@ public class LexEvsResolvedValueSetQueryService extends AbstractLexEvsService
 
 	@Override
 	public int count(ResolvedValueSetQuery query) {
-		// TODO Auto-generated method stub
-		return 0;
+		try {
+		List<CodingScheme> restrictedList= processQuery(query);
+		return restrictedList.size();
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+		
 	}
 
 	public CommonResolvedValueSetUtils getResolverUtils() {
@@ -125,6 +130,15 @@ public class LexEvsResolvedValueSetQueryService extends AbstractLexEvsService
 
 	public void setResolverUtils(CommonResolvedValueSetUtils resolverUtils) {
 		this.resolverUtils = resolverUtils;
+	}
+	
+	private List<CodingScheme>  processQuery(ResolvedValueSetQuery query) throws Exception{
+		List<CodingScheme> csList= getLexEVSResolvedService().listAllResolvedValueSets();
+		List<CodingScheme> restrictedList= resolverUtils.restrictByQuery(csList, query);
+		if (query!= null) {
+			restrictedList= CommonSearchFilterUtils.filterCodingSchemeList(query.getFilterComponent(), restrictedList, nameConverter);
+		}
+		return restrictedList;
 	}
 	
 }
