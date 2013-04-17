@@ -15,7 +15,6 @@ import edu.mayo.cts2.framework.filter.match.ExactMatcher;
 import edu.mayo.cts2.framework.filter.match.ResolvableMatchAlgorithmReference;
 import edu.mayo.cts2.framework.filter.match.StartsWithMatcher;
 import edu.mayo.cts2.framework.model.command.Page;
-import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
 import edu.mayo.cts2.framework.model.core.PropertyReference;
@@ -101,7 +100,7 @@ public class LexEvsResolvedValueSetQueryService extends AbstractLexEvsService
 		try {
 		List<CodingScheme> restrictedList= processQuery(query);
 		List<ResolvedValueSetDirectoryEntry> results= transform.transform(restrictedList);
-		List<ResolvedValueSetDirectoryEntry> pagedResult =CommonPageUtils.getPaginatedList(results, page);
+		List<ResolvedValueSetDirectoryEntry> pagedResult =CommonPageUtils.getPage(results, page);
         boolean moreResults = results.size() > page.getEnd();
 		
 		
@@ -136,7 +135,7 @@ public class LexEvsResolvedValueSetQueryService extends AbstractLexEvsService
 		List<CodingScheme> csList= getLexEVSResolvedService().listAllResolvedValueSets();
 		List<CodingScheme> restrictedList= resolverUtils.restrictByQuery(csList, query);
 		if (query!= null) {
-			restrictedList= CommonSearchFilterUtils.filterCodingSchemeList(query.getFilterComponent(), restrictedList, nameConverter);
+			restrictedList= CommonSearchFilterUtils.filterLexCodingSchemeList(restrictedList, query.getFilterComponent(), nameConverter);
 		}
 		return restrictedList;
 	}

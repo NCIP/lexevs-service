@@ -44,26 +44,27 @@ import edu.mayo.cts2.framework.service.profile.ResourceQuery;
  *
  */
 public class CommonPageUtils {
-	public static <T extends ResourceQuery> ResolvedConceptReferenceResults getResolvedConceptReferenceResultsPage(
+	public static <T extends ResourceQuery> ResolvedConceptReferenceResults getPage(
 			LexBIGService lexBigService, 
 			QueryData<T> queryData,
-			SortCriteria sortCriteria, 
+			SortCriteria cts2SortCriteria, 
 			Page page){
-		ResolvedConceptReferenceResults results = null;
-		ResolvedConceptReferencesIterator iterator;
-		CodedNodeSet codedNodeSet;
+		ResolvedConceptReferenceResults lexResolvedConceptResults = null;
+		ResolvedConceptReferencesIterator lexResolvedConceptIterator;
+		CodedNodeSet lexCodedNodeSet;
 		
-		codedNodeSet = CommonResourceUtils.getCodedNodeSet(lexBigService, queryData, sortCriteria);
+		lexCodedNodeSet = CommonResourceUtils.getLexCodedNodeSet(lexBigService, queryData, cts2SortCriteria);
 				
-		if(codedNodeSet != null){
-			iterator = CommonUtils.getResolvedConceptReferencesFromCodedNodeSet(codedNodeSet, sortCriteria);
-			results = CommonPageUtils.getPageFromIterator(iterator, page);
+		if(lexCodedNodeSet != null){
+			lexResolvedConceptIterator = CommonUtils.getLexResolvedConceptIterator(lexCodedNodeSet, cts2SortCriteria);
+			lexResolvedConceptResults = CommonPageUtils.getPage(lexResolvedConceptIterator, page);
 		}
 		
-		return results;
+		return lexResolvedConceptResults;
 	}
 	
-	public static ResolvedConceptReferenceResults getPageFromIterator(ResolvedConceptReferencesIterator iterator,
+	public static ResolvedConceptReferenceResults getPage(
+			ResolvedConceptReferencesIterator iterator,
 			Page page) {
 		boolean atEnd = false;
 		ResolvedConceptReference[] resolvedConceptReferences = null;
@@ -103,7 +104,7 @@ public class CommonPageUtils {
 	
 	
 	
-	public static  <T> List<T> getPaginatedList(List<T> list, Page page){
+	public static  <T> List<T> getPage(List<T> list, Page page){
 		int start = page.getStart();
 		int end = page.getEnd();
 		

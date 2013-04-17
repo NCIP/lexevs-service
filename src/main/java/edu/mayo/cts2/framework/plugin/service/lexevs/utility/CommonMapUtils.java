@@ -6,10 +6,10 @@ import org.LexGrid.LexBIG.Utility.Constructors;
 
 public class CommonMapUtils {
 
-	public static boolean validateMappingCodingScheme(String uri, String version, MappingExtension mappingExtension){
+	public static boolean validateMappingCodingScheme(String cts2URI, String version, MappingExtension lexMappingExtension){
 		try {
-			if(mappingExtension != null){
-				return mappingExtension.isMappingCodingScheme(uri, 
+			if(lexMappingExtension != null){
+				return lexMappingExtension.isMappingCodingScheme(cts2URI, 
 							Constructors.createCodingSchemeVersionOrTagFromVersion(version));
 			}
 			else {
@@ -20,19 +20,4 @@ public class CommonMapUtils {
 		}
 	}
 
-//	public static boolean validateMappingCodingScheme(MappingExtension mappingExtension, String uri, String version){
-//		try {
-//			if(mappingExtension != null){
-//				return mappingExtension.
-//					isMappingCodingScheme(
-//							uri, 
-//							Constructors.createCodingSchemeVersionOrTagFromVersion(version));
-//			}
-//			else {
-//				return false;
-//			}
-//		} catch (LBParameterException e) {
-//			throw new RuntimeException(e);
-//		}
-//	}
 }

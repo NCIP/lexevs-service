@@ -104,7 +104,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		LexBIGService lexBigService = this.getLexBigService();
 		QueryData<MapVersionQuery> queryData = new QueryData<MapVersionQuery>(query, null);
 		
-		CodingSchemeRendering[] renderings = CommonResourceUtils.getRenderingListForQuery(lexBigService, nameConverter, queryData, this.mappingExtension, null);
+		CodingSchemeRendering[] renderings = CommonResourceUtils.getLexCodingSchemeRenderings(lexBigService, nameConverter, queryData, this.mappingExtension, null);
 		return renderings.length;
 	}
 	
@@ -116,10 +116,10 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		LexBIGService lexBigService = this.getLexBigService();
 		QueryData<MapVersionQuery> queryData = new QueryData<MapVersionQuery>(query, null);
 		
-		CodingSchemeRendering[] csRendering = CommonResourceUtils.getRenderingListForQuery(lexBigService, nameConverter, queryData, this.mappingExtension, sortCriteria);
+		CodingSchemeRendering[] csRendering = CommonResourceUtils.getLexCodingSchemeRenderings(lexBigService, nameConverter, queryData, this.mappingExtension, sortCriteria);
 		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPageFromArray(csRendering, page);
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
-		return CommonResourceUtils.createDirectoryResultWithEntryDescriptions(this.transformer, csRenderingPage, atEnd, Constants.SUMMARY_DESCRIPTION);
+		return CommonResourceUtils.createDirectoryResultsWithSummaryDescriptions(this.transformer, csRenderingPage, atEnd, Constants.SUMMARY_DESCRIPTION);
 	}
 
 	@Override
@@ -129,7 +129,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		LexBIGService lexBigService = this.getLexBigService();
 		QueryData<MapVersionQuery> queryData = new QueryData<MapVersionQuery>(query, null);
 		
-		CodingSchemeRendering[] csRendering = CommonResourceUtils.getRenderingListForQuery(lexBigService, nameConverter, queryData, this.mappingExtension, sortCriteria);
+		CodingSchemeRendering[] csRendering = CommonResourceUtils.getLexCodingSchemeRenderings(lexBigService, nameConverter, queryData, this.mappingExtension, sortCriteria);
 		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPageFromArray(csRendering, page);
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
 		return CommonResourceUtils.createDirectoryResultWithEntryFullVersionDescriptions(lexBigService, this.transformer, csRenderingPage, atEnd);
@@ -137,12 +137,12 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 
 	@Override
 	public Set<? extends MatchAlgorithmReference> getSupportedMatchAlgorithms() {
-		return CommonSearchFilterUtils.createSupportedMatchAlgorithms();
+		return CommonSearchFilterUtils.getLexSupportedMatchAlgorithms();
 	}
 
 	@Override
 	public Set<? extends PropertyReference> getSupportedSearchReferences() {
-		return CommonSearchFilterUtils.createSupportedSearchReferences();
+		return CommonSearchFilterUtils.getLexSupportedSearchReferences();
 	}
 
 	// Not going to implement following methods
