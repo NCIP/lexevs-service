@@ -1,12 +1,19 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
 
+import java.util.List;
+
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
+import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
 import org.LexGrid.LexBIG.Exceptions.LBResourceUnavailableException;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
 import org.LexGrid.concepts.Entity;
 import org.LexGrid.concepts.Presentation;
+
+import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntry;
+import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntrySummary;
+import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 
 public class PrintUtility {
 	public static String createTabs(int tabCount){
@@ -215,6 +222,98 @@ public class PrintUtility {
 		results.append(tabs + "LocalName = " + codingSchemeSummary.getLocalName() + "\n");
 		results.append(tabs + "RepresentsVersion = " + codingSchemeSummary.getRepresentsVersion() + "\n");
 
+		return results.toString();
+	}
+
+	/**
+	 * @param dirResult
+	 * @return
+	 */
+	public static String createStringFromDirectoryResultWithEntrySummary(
+			DirectoryResult<CodeSystemVersionCatalogEntrySummary> dirResult) {
+		StringBuffer results = new StringBuffer();
+		
+		results.append("CodeSystemVersionCatalogEntrySummary Results: \n");
+
+		List<CodeSystemVersionCatalogEntrySummary> entries = dirResult.getEntries();
+		for(CodeSystemVersionCatalogEntrySummary summary : entries){
+			results.append("About = " + summary.getAbout() + "\n");
+			results.append("CodeSystemVersionName = " + summary.getCodeSystemVersionName() + "\n");
+			results.append("DocumentURI = " + summary.getDocumentURI() + "\n");
+			results.append("FormalName = " + summary.getFormalName() + "\n");
+			results.append("HREF = " + summary.getHref() + "\n");
+			results.append("OfficialResourceVersionId = " + summary.getOfficialResourceVersionId() + "\n");
+			results.append("ResourceName = " + summary.getResourceName() + "\n");
+			results.append("MatchStrength = " + summary.getMatchStrength() + "\n");
+			results.append("OfficialReleaseDate = " + summary.getOfficialReleaseDate() + "\n");
+			results.append("CodeSystemVersionTagCount = " + summary.getCodeSystemVersionTagCount() + "\n");
+			for(int i=0; i < summary.getCodeSystemVersionTagCount(); i++){
+				results.append("\tCodeSystemVersionTag = " + summary.getCodeSystemVersionTag(i) + "\n");
+			}
+			results.append("ResourceSynopsis.Schema = " + summary.getResourceSynopsis().getSchema() + "\n");
+			results.append("VersionOf.Uri = " + summary.getVersionOf().getUri() + "\n\n");
+		}
+		
+		return results.toString();
+	}
+
+	/**
+	 * @param dirResult
+	 * @return
+	 */
+	public static String createStringFromDirectoryResultWithEntry(
+			DirectoryResult<CodeSystemVersionCatalogEntry> dirResult) {
+		StringBuffer results = new StringBuffer();
+		
+		results.append("CodeSystemVersionCatalogEntry Results: \n");
+
+		List<CodeSystemVersionCatalogEntry> entries = dirResult.getEntries();
+		for(CodeSystemVersionCatalogEntry summary : entries){
+			results.append("About = " + summary.getAbout() + "\n");
+			results.append("Associations = " + summary.getAssociations() + "\n");
+			results.append("CodeSystemVersionName = " + summary.getCodeSystemVersionName() + "\n");
+			results.append("DocumentURI = " + summary.getDocumentURI() + "\n");
+			results.append("EntityDescriptions = " + summary.getEntityDescriptions() + "\n");
+			results.append("FormalName = " + summary.getFormalName() + "\n");
+
+			results.append("Individuals = " + summary.getIndividuals() + "\n");
+			results.append("OfficialResourceVersionId = " + summary.getOfficialResourceVersionId() + "\n");
+			results.append("Roles = " + summary.getRoles() + "\n");
+			results.append("SourceStatements = " + summary.getSourceStatements() + "\n");
+			results.append("DefaultLanguage = " + summary.getDefaultLanguage() + "\n");
+			results.append("EntryState = " + summary.getEntryState().value() + "\n");
+			results.append("State = " + summary.getState() + "\n");
+			results.append("OfficialReleaseDate = " + summary.getOfficialReleaseDate() + "\n");
+			results.append("NoteCount = " + summary.getNoteCount() + "\n");
+			results.append("AdditionalDocumentationCount = " + summary.getAdditionalDocumentationCount() + "\n");
+			results.append("AlternateIDCount = " + summary.getAlternateIDCount() + "\n");
+			results.append("ImportsCount = " + summary.getImportsCount() + "\n");
+			results.append("KeywordCount = " + summary.getKeywordCount() + "\n");
+			for(int i=0; i < summary.getKeywordCount(); i++){
+				results.append("\tKeyword = " + summary.getKeyword(i) + "\n");
+			}
+			results.append("PropertyCount = " + summary.getPropertyCount() + "\n");
+			for(int i=0; i < summary.getPropertyCount(); i++){
+				results.append("\tProperty = " + summary.getProperty(i) + "\n");
+			}
+			results.append("ResourceTypeCount = " + summary.getResourceTypeCount() + "\n");
+			results.append("SourceAndRoleCount = " + summary.getSourceAndRoleCount() + "\n");			
+			results.append("ResourceSynopsis.Schema = " + summary.getResourceSynopsis().getSchema() + "\n");
+			results.append("VersionOf.Uri = " + summary.getVersionOf().getUri() + "\n\n");
+		}
+		
+		return results.toString();
+	}
+
+	/**
+	 * @param csRenderingPage
+	 */
+	public static String createStringFromCodingSchemeRendering(
+			CodingSchemeRendering[] csRenderingPage) {
+		StringBuffer results = new StringBuffer();
+		
+		results.append("CodeSystemVersionCatalogEntry Results: \n");
+		
 		return results.toString();
 	}
 

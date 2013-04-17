@@ -131,6 +131,12 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		
 		CodedNodeSet codedNodeSet = CommonResourceUtils.getCodedNodeSet(lexBigService, queryData, sortCriteria);
 		
+		// CodedNodeSet still needs to be filtered by restrictions:
+		// restrictions.getEntities  --- completed in getCodedNodeSet method
+		// restrictions.getTaggedCodeSystem -- *** unclear how to handle this restriction ****
+		
+		
+		
 		ScopedEntityName entityName = nameOrUri.getEntityName();
 		String uri = nameOrUri.getUri();
 		

@@ -1,13 +1,10 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.Collections.LocalNameList;
-import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
@@ -23,7 +20,6 @@ import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
 import org.LexGrid.codingSchemes.CodingScheme;
 
 import edu.mayo.cts2.framework.model.command.Page;
-import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
@@ -138,80 +134,14 @@ public class CommonResourceUtils{
 			throw new RuntimeException();
 		}
 		
-		renderingList = CommonResourceUtils.restrictRenderingListBySchemeNameAndMapExtension(renderingList, codingSchemeName, mappingExtension);
-		renderingList = CommonResourceUtils.restrictRenderingListByQuery(renderingList, queryData.getFilters(), nameConverter);
+		renderingList = CommonSearchFilterUtils.filterRenderingListBySchemeNameAndMapExtension(renderingList, codingSchemeName, mappingExtension);
+		renderingList = CommonSearchFilterUtils.filterRenderingListByQuery(renderingList, queryData.getFilters(), nameConverter);
+		// TODO: Need to filter further for restrictions
 		
 		return renderingList.getCodingSchemeRendering();
 	}
 	
 	
-	public static CodingSchemeRenderingList restrictRenderingListBySchemeNameAndMapExtension(
-			CodingSchemeRenderingList renderingList, 
-			String codingSchemeName, 
-			MappingExtension mappingExtension) {
-		
-		if(renderingList == null){
-			return renderingList;
-		}
-
-		boolean restrictToBOTH = (codingSchemeName != null && mappingExtension != null);
-		boolean restrictToNAME = (!restrictToBOTH && codingSchemeName != null);
-		boolean restrictToMAP = (!restrictToBOTH && mappingExtension != null);
-		
-		CodingSchemeRenderingList temp = new CodingSchemeRenderingList();
-		
-		CodingSchemeRendering[] csRendering = renderingList.getCodingSchemeRendering();
-		for(CodingSchemeRendering render : csRendering) {
-			CodingSchemeSummary codingSchemeSummary = render.getCodingSchemeSummary();
-			String uri = codingSchemeSummary.getCodingSchemeURI();
-			String version = codingSchemeSummary.getRepresentsVersion();
-			
-			if(restrictToBOTH){
-				if (codingSchemeSummary.getLocalName().equals(codingSchemeName)) {
-					// Add if valid Mapping Coding Scheme
-					if (CommonMapUtils.validateMappingCodingScheme(uri, version, mappingExtension)) {
-						temp.addCodingSchemeRendering(render);
-					}
-				}
-			}
-			else if(restrictToNAME){
-				if (codingSchemeSummary.getLocalName().equals(codingSchemeName)) {
-					temp.addCodingSchemeRendering(render);
-				}
-			}
-			else if(restrictToMAP){
-				if (CommonMapUtils.validateMappingCodingScheme(uri, version, mappingExtension)) {
-					temp.addCodingSchemeRendering(render);
-				}
-			}
-			else{
-				temp.addCodingSchemeRendering(render);
-			}
-			
-		}
-		
-		return temp;
-	}
-
-	public static CodingSchemeRenderingList restrictRenderingListByQuery(
-			CodingSchemeRenderingList renderingList, 
-			Set<ResolvedFilter> filters,
-			VersionNameConverter nameConverter) {
-		
-		if(renderingList != null && filters != null){
-			Iterator<ResolvedFilter> filtersItr = filters.iterator();
-			while (filtersItr.hasNext() && (renderingList.getCodingSchemeRenderingCount() > 0)) {
-				ResolvedFilter resolvedFilter = filtersItr.next();
-				renderingList = CommonSearchFilterUtils.filterRenderingList(resolvedFilter, 
-						renderingList, nameConverter);
-			}
-		}
-		
-		return renderingList;
-	}
-	
-
-
 	public static <T extends ResourceQuery> List<CodingScheme> getCodingSchemeList(
 			LexBIGService lexBigService, 
 			VersionNameConverter nameConverter,
@@ -228,7 +158,7 @@ public class CommonResourceUtils{
 			CodeSystemRestriction codeSystemRestriction = queryData.getCodeSystemRestriction();
 			EntitiesRestriction entitiesRestriction = queryData.getEntitiesRestriction();
 			
-			codingSchemeList = CommonSearchFilterUtils.getCodingSchemeListFromCodeSchemeRenderings(lexBigService, codingSchemeRendering, codeSystemRestriction);
+			codingSchemeList = CommonSearchFilterUtils.filterCodingSchemeListByMapRoleRestrictedCodeSchemeRenderings(lexBigService, codingSchemeRendering, codeSystemRestriction);
 			
 			
 	//		if(entitiesRestriction != null && codingSchemeList != null){
@@ -255,14 +185,7 @@ public class CommonResourceUtils{
 				if(codingSchemeExists){
 					// Get Code Node Set from LexBIG service for given coding scheme
 					codedNodeSet = lexBigService.getNodeSet(queryData.getNameVersionPairName(), queryData.getVersionOrTag() , entityTypes);
-					
-					// Apply filters if they exist
-					Set<ResolvedFilter> filters = queryData.getFilters();
-					if(filters != null){
-						for(ResolvedFilter filter : filters){
-							CommonSearchFilterUtils.filterCodedNodeSetByResolvedFilter(filter, codedNodeSet);
-						}
-					}
+					CommonSearchFilterUtils.filterCodedNodeSet(codedNodeSet, queryData);
 				}
 			} catch (LBException e) {
 				throw new RuntimeException(e);
@@ -281,7 +204,7 @@ public class CommonResourceUtils{
 
 		queryData = new QueryData<MapEntryQuery>(query, nameConverter);
 		
-		String codingScheme = queryData.getCodeSystemVersionName();
+		String codingScheme = queryData.getVersionName();
 		CodingSchemeVersionOrTag versionOrTag = queryData.getVersionOrTag();
 		String relationsContainerName = null;
 		List<MappingSortOption> sortOptionList = null;

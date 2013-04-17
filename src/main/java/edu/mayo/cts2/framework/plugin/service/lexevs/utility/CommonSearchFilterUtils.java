@@ -3,14 +3,18 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
+import org.LexGrid.LexBIG.DataModel.Collections.ConceptReferenceList;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
+import org.LexGrid.LexBIG.DataModel.Core.ConceptReference;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
 import org.LexGrid.LexBIG.Exceptions.LBParameterException;
+import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet.SearchDesignationOption;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
@@ -28,6 +32,7 @@ import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestri
 import edu.mayo.cts2.framework.service.command.restriction.MapVersionQueryServiceRestrictions.EntitiesRestriction;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
+import edu.mayo.cts2.framework.service.profile.ResourceQuery;
 
 public class CommonSearchFilterUtils {
 
@@ -104,30 +109,146 @@ public class CommonSearchFilterUtils {
 		return sourceValue;
 	}
 	
-	public static void filterCodedNodeSetByResolvedFilter(ResolvedFilter filter, CodedNodeSet codedNodeSet){
+	public static <T extends ResourceQuery> void filterCodedNodeSet(CodedNodeSet codedNodeSet, QueryData<T> queryData){
 		if(codedNodeSet != null){
-			try {
-				String matchText = null;
-				String matchAlgorithm = null;
+			// Apply restrictions if they exists
+			Set<EntityNameOrURI> entities = queryData.getEntities();
+			CommonSearchFilterUtils.filterCodedNodeSetByEntityNameUriSet(entities, codedNodeSet);
 			
-				if(filter != null){
-					matchText = filter.getMatchValue();										// Value to search with 
-					matchAlgorithm = filter.getMatchAlgorithmReference().getContent();		// Extract from filter the match algorithm to use
-				}	
-				SearchDesignationOption option = SearchDesignationOption.ALL;					// Other options: PREFERRED_ONLY, NON_PREFERRED_ONLY, ALL 
-				String language = null;															// This field is not really used, uses default "en"
-				
-				codedNodeSet.restrictToMatchingDesignations(matchText, option, matchAlgorithm, language);
-			} catch (LBInvocationException e) {
-				throw new RuntimeException(e);
-			} catch (LBParameterException e) {
-				throw new RuntimeException(e);
+			
+			// Apply filters if they exist
+			Set<ResolvedFilter> filters = queryData.getFilters();
+			if(filters != null){
+				for(ResolvedFilter filter : filters){
+					CommonSearchFilterUtils.filterCodedNodeSetByResolvedFilter(filter, codedNodeSet);
+				}
 			}
 		}
 	}
 	
+	public static void filterCodedNodeSetByResolvedFilter(ResolvedFilter filter, CodedNodeSet codedNodeSet){
+		String matchText = null;
+		String matchAlgorithm = null;
 	
-	public static List<CodingScheme> getCodingSchemeListFromCodeSchemeRenderings(
+		if(filter != null){
+			matchText = filter.getMatchValue();										// Value to search with 
+			matchAlgorithm = filter.getMatchAlgorithmReference().getContent();		// Extract from filter the match algorithm to use
+		}	
+		SearchDesignationOption option = SearchDesignationOption.ALL;					// Other options: PREFERRED_ONLY, NON_PREFERRED_ONLY, ALL 
+		String language = null;															// This field is not really used, uses default "en"
+		
+		try {
+			codedNodeSet.restrictToMatchingDesignations(matchText, option, matchAlgorithm, language);
+		} catch (LBInvocationException e) {
+			throw new RuntimeException(e);
+		} catch (LBParameterException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public static void filterCodedNodeSetByEntityNameUriSet(
+			Set<EntityNameOrURI> entities, CodedNodeSet codedNodeSet) {
+		ConceptReferenceList codeList = new ConceptReferenceList();
+		ConceptReference reference = new ConceptReference();
+		String value;
+		
+		if(entities != null){
+			for(EntityNameOrURI entityName : entities){
+				value = entityName.getUri();
+				if(value == null){
+					if(entityName.getEntityName() != null){
+						value = entityName.getEntityName().getName();
+					}
+				}
+				
+				if(value != null){
+					reference = new ConceptReference();
+					reference.setCode(value);
+					codeList.addConceptReference(reference);
+				}					
+				
+			}
+		}
+		
+		try {
+			codedNodeSet.restrictToCodes(codeList);
+		} catch (LBInvocationException e) {
+			throw new RuntimeException(e);
+		} catch (LBParameterException e) {
+			throw new RuntimeException(e);
+		}		
+	}
+
+	public static CodingSchemeRenderingList filterRenderingListBySchemeNameAndMapExtension(
+			CodingSchemeRenderingList renderingList, 
+			String codingSchemeName, 
+			MappingExtension mappingExtension) {
+		
+		if(renderingList == null){
+			return renderingList;
+		}
+
+		boolean restrictToBOTH = (codingSchemeName != null && mappingExtension != null);
+		boolean restrictToNAME = (!restrictToBOTH && codingSchemeName != null);
+		boolean restrictToMAP = (!restrictToBOTH && mappingExtension != null);
+		
+		CodingSchemeRenderingList temp = new CodingSchemeRenderingList();
+		
+		CodingSchemeRendering[] csRendering = renderingList.getCodingSchemeRendering();
+		for(CodingSchemeRendering render : csRendering) {
+			CodingSchemeSummary codingSchemeSummary = render.getCodingSchemeSummary();
+			String uri = codingSchemeSummary.getCodingSchemeURI();
+			String version = codingSchemeSummary.getRepresentsVersion();
+			
+			if(restrictToBOTH){
+				if (codingSchemeSummary.getLocalName().equals(codingSchemeName)) {
+					// Add if valid Mapping Coding Scheme
+					if (CommonMapUtils.validateMappingCodingScheme(uri, version, mappingExtension)) {
+						temp.addCodingSchemeRendering(render);
+					}
+				}
+			}
+			else if(restrictToNAME){
+				if (codingSchemeSummary.getLocalName().equals(codingSchemeName)) {
+					temp.addCodingSchemeRendering(render);
+				}
+			}
+			else if(restrictToMAP){
+				if (CommonMapUtils.validateMappingCodingScheme(uri, version, mappingExtension)) {
+					temp.addCodingSchemeRendering(render);
+				}
+			}
+			else{
+				temp.addCodingSchemeRendering(render);
+			}
+			
+		}
+		
+		return temp;
+	}
+
+	public static CodingSchemeRenderingList filterRenderingListByQuery(
+			CodingSchemeRenderingList renderingList, 
+			Set<ResolvedFilter> filters,
+			VersionNameConverter nameConverter) {
+		
+		if(renderingList != null && filters != null){
+			Iterator<ResolvedFilter> filtersItr = filters.iterator();
+			while (filtersItr.hasNext() && (renderingList.getCodingSchemeRenderingCount() > 0)) {
+				ResolvedFilter resolvedFilter = filtersItr.next();
+				renderingList = CommonSearchFilterUtils.filterRenderingList(resolvedFilter, 
+						renderingList, nameConverter);
+			}
+		}
+		
+		return renderingList;
+	}
+	
+
+
+
+	
+	public static List<CodingScheme> filterCodingSchemeListByMapRoleRestrictedCodeSchemeRenderings(
 			LexBIGService lexBigService, 
 			CodingSchemeRendering[] codingSchemeRenderings, 
 			CodeSystemRestriction codeSystemRestriction) {
@@ -191,6 +312,8 @@ public class CommonSearchFilterUtils {
 		}
 		return answer;
 	}
+
+
 
 
 	
