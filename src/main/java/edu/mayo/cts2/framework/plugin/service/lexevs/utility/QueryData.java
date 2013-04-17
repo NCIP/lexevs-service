@@ -175,6 +175,8 @@ public class QueryData <Query extends ResourceQuery>{
 		
 	}
 
+	// Map Catalog (MapQueryService) (i.e. Eclipse "the idea of", or "Mapping Sample")
+	// -----------------------------------------------------------
 	private void extractMapQueryData(MapQuery query) {
 		MapQueryServiceRestrictions restrictions = query.getRestrictions();
 		this.restrictions = restrictions;
@@ -190,6 +192,8 @@ public class QueryData <Query extends ResourceQuery>{
 		this.isMapQuery = true;
 	}
 
+	// Map Version (MapVersionQueryService) (i.e. Eclipse Juno, or "Mapping Sample-1.0")
+	// ---------------------------------------------------------
 	private void extractMapVersionQueryData(MapVersionQuery query) {
 		MapVersionQueryServiceRestrictions restrictions = query.getRestrictions();
 		this.restrictions = restrictions;
@@ -201,9 +205,10 @@ public class QueryData <Query extends ResourceQuery>{
 		
 		
 		if(restrictions != null){
-			this.codeSystemRestriction = restrictions.getCodeSystemRestriction();
-			this.codeSystem = restrictions.getMap(); 
-			this.entitiesRestriction = restrictions.getEntitiesRestriction();
+			this.codeSystemRestriction = restrictions.getCodeSystemRestriction();  	// Restrict to source or target fields containing this value.
+			this.codeSystem = restrictions.getMap(); 								// Restrict to given map with this codeScheme Name
+			this.entitiesRestriction = restrictions.getEntitiesRestriction();		// Restrict to maps containing these entities in a relation.
+			
 			
 			if(this.codeSystem != null){
 				this.nameVersionPairName = (this.codeSystem.getUri() != null) ? this.codeSystem.getUri() : this.codeSystem.getName();

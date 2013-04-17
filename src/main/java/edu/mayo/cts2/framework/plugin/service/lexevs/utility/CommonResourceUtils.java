@@ -156,7 +156,7 @@ public class CommonResourceUtils{
 
 		if(codingSchemeRendering != null){
 			CodeSystemRestriction codeSystemRestriction = queryData.getCodeSystemRestriction();
-			EntitiesRestriction entitiesRestriction = queryData.getEntitiesRestriction();
+//			EntitiesRestriction entitiesRestriction = queryData.getEntitiesRestriction();
 			
 			codingSchemeList = CommonSearchFilterUtils.filterCodingSchemeListByMapRoleRestrictedCodeSchemeRenderings(lexBigService, codingSchemeRendering, codeSystemRestriction);
 			
