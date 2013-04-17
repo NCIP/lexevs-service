@@ -48,7 +48,7 @@ public class CommonUtils {
 			localName = codingSchemeSummary.getLocalName();
 			version = codingSchemeSummary.getRepresentsVersion();
 	
-			if(localName.equals(queryData.getNameVersionPairName()) && 
+			if(localName.equals(queryData.getSystemName()) && 
 				version.equals(queryData.getVersionOrTag().getVersion())){
 				found = true;
 			}

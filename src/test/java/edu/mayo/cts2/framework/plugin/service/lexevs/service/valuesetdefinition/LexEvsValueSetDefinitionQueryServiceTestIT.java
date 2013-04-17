@@ -25,24 +25,11 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service.valuesetdefinition
 
 import static org.junit.Assert.assertNotNull;
 
-import java.util.Set;
-
 import javax.annotation.Resource;
 
-import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.junit.Test;
 
-import edu.mayo.cts2.framework.model.command.Page;
-import edu.mayo.cts2.framework.model.command.ResolvedFilter;
-import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
-import edu.mayo.cts2.framework.model.core.SortCriteria;
-import edu.mayo.cts2.framework.model.directory.DirectoryResult;
-import edu.mayo.cts2.framework.model.service.core.NameOrURI;
-import edu.mayo.cts2.framework.model.service.core.Query;
-import edu.mayo.cts2.framework.model.util.ModelUtils;
-import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinitionDirectoryEntry;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
-import edu.mayo.cts2.framework.service.command.restriction.ValueSetDefinitionQueryServiceRestrictions;
 
 /**
  * @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
@@ -59,30 +46,30 @@ public class LexEvsValueSetDefinitionQueryServiceTestIT extends
 		assertNotNull(this.service);
 	}
 	
-	@Test
-	@LoadContent(contentPath="lexevs/test-content/VSDOnlyTest.xml")
-	public void testResourceSummaries() throws Exception {
-//		String uri = "SRITEST:AUTO:PropertyRefTest1-VSDONLY";
-		String name = "Automobiles";
-		//NameOrURI uriName = ModelUtils.nameOrUriFromUri(uri);
-		NameOrURI codeSystemName = ModelUtils.nameOrUriFromName(name);
-		
-		//uriName.setName("Automobiles");  // LexEVS defaultCodingScheme of ValueSetDefinition
-		
-		Query query = null;
-		Set<ResolvedFilter> filterComponent = null;
-		ResolvedReadContext readContext = null;		
-		ValueSetDefinitionQueryServiceRestrictions vsdQueryServiceRestrictions = new ValueSetDefinitionQueryServiceRestrictions();
-		vsdQueryServiceRestrictions.setValueSet(codeSystemName);
-		
-		ValueSetDefinitionQueryImpl vsdQuery = new ValueSetDefinitionQueryImpl(query,filterComponent,readContext,vsdQueryServiceRestrictions);
-						
-		SortCriteria sortCriteria = null;
-		Page page = new Page();
-		
-		DirectoryResult<ValueSetDefinitionDirectoryEntry> resourceSummaries = service.getResourceSummaries(vsdQuery, sortCriteria, page);
-		
-		assertNotNull(resourceSummaries);
-	}
+//	@Test
+//	@LoadContent(contentPath="lexevs/test-content/VSDOnlyTest.xml")
+//	public void testResourceSummaries() throws Exception {
+////		String uri = "SRITEST:AUTO:PropertyRefTest1-VSDONLY";
+//		String name = "Automobiles";
+//		//NameOrURI uriName = ModelUtils.nameOrUriFromUri(uri);
+//		NameOrURI codeSystemName = ModelUtils.nameOrUriFromName(name);
+//		
+//		//uriName.setName("Automobiles");  // LexEVS defaultCodingScheme of ValueSetDefinition
+//		
+//		Query query = null;
+//		Set<ResolvedFilter> filterComponent = null;
+//		ResolvedReadContext readContext = null;		
+//		ValueSetDefinitionQueryServiceRestrictions vsdQueryServiceRestrictions = new ValueSetDefinitionQueryServiceRestrictions();
+//		vsdQueryServiceRestrictions.setValueSet(codeSystemName);
+//		
+//		ValueSetDefinitionQueryImpl vsdQuery = new ValueSetDefinitionQueryImpl(query,filterComponent,readContext,vsdQueryServiceRestrictions);
+//						
+//		SortCriteria sortCriteria = null;
+//		Page page = new Page();
+//		
+//		DirectoryResult<ValueSetDefinitionDirectoryEntry> resourceSummaries = service.getResourceSummaries(vsdQuery, sortCriteria, page);
+//		
+//		assertNotNull(resourceSummaries);
+//	}
 
 }

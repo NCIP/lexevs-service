@@ -28,9 +28,18 @@ import edu.mayo.cts2.framework.service.profile.mapversion.MapVersionQuery;
 public class QueryData <Query extends ResourceQuery>{
 	private Set<ResolvedFilter> filters = null;							// Used by all
 	private Object restrictions = null;									// Used by all
-	private String nameVersionPairName = null;							// Used by CodeSystemVersionQuery, MapVersionQuery
-		
-	private boolean isMapQuery = false;									// Used by all Map Queries
+	
+	private boolean isMapQuery = false;									// Used by ALL Map Queries
+	
+	private NameOrURI map = null;										// Used by MapVersionQuery
+	private String mapName = null;										// Used by MapVersionQuery 
+	private EntitiesRestriction entitiesRestriction = null;				// Used in MapVersionQuery
+	
+	private NameOrURI codeSystem = null;								// Used by CodeSystemVersionQuery 
+	private String codeSystemName = null;								// Used by CodeSystemVersionQuery
+	private EntityRestriction entityRestriction = null;					// Used in CodeSystemVersionQuery
+	
+	private CodeSystemRestriction codeSystemRestriction = null;			// Used by MapQuery and MapVersionQuery
 	
 	// Following are set in setVersionOrTag method						// Used by EntityDescriptionQuery and MapEntryQuery
 	private NameOrURI nameOrURI = null;
@@ -38,18 +47,11 @@ public class QueryData <Query extends ResourceQuery>{
 	private CodingSchemeVersionOrTag versionOrTag = null;
 	private boolean hasNameAndVersion = false;
 	
-	
-	private CodeSystemRestriction codeSystemRestriction = null;			// Used by MapQuery and MapVersionQuery
-	private NameOrURI codeSystem = null;								// Used by CodeSystemVersionQuery and MapVersionQuery
-		
-	private EntitiesRestriction entitiesRestriction = null;				// Used in MapVersionQuery
-	private EntityRestriction entityRestriction = null;					// Used in CodeSystemVersionQuery
-	
+	private Set<EntityNameOrURI> entities = null;						// Used in EntityDescriptionQuery
+	private TaggedCodeSystemRestriction taggedCodeSystem = null;		// Used in EntityDescriptionQuery
 	
 	private Set<EntityNameOrURI> targetEntities = null;					// Used in MapEntryQuery
 	
-	private Set<EntityNameOrURI> entities = null;						// Used in EntityDescriptionQuery
-	private TaggedCodeSystemRestriction taggedCodeSystem = null;		// Used in EntityDescriptionQuery
 	
 	
 	
@@ -77,10 +79,21 @@ public class QueryData <Query extends ResourceQuery>{
 		return this.nameOrURI;
 	}
 	
-	public String getNameVersionPairName(){
-		return this.nameVersionPairName;
+	public String getSystemName(){
+		if(this.mapName == null){
+			return this.codeSystemName;
+		}
+		return this.mapName;
 	}
 	
+	public String getMapName(){
+		return this.mapName;
+	}
+	
+	public String getCodeSystemName() {
+		return codeSystemName;
+	}
+
 	public String getVersionName(){
 		return this.versionName;
 	}
@@ -206,15 +219,20 @@ public class QueryData <Query extends ResourceQuery>{
 		
 		if(restrictions != null){
 			this.codeSystemRestriction = restrictions.getCodeSystemRestriction();  	// Restrict to source or target fields containing this value.
-			this.codeSystem = restrictions.getMap(); 								// Restrict to given map with this codeScheme Name
 			this.entitiesRestriction = restrictions.getEntitiesRestriction();		// Restrict to maps containing these entities in a relation.
 			
-			
-			if(this.codeSystem != null){
-				this.nameVersionPairName = (this.codeSystem.getUri() != null) ? this.codeSystem.getUri() : this.codeSystem.getName();
-			}
+			this.map = restrictions.getMap(); 										// Restrict to given map with this codeScheme Name
+			this.mapName = this.getName(this.map);
 		}
 		this.isMapQuery = true;
+	}
+
+	private String getName(NameOrURI nameOrURI) {
+		String name = null;
+		if(nameOrURI != null){
+			name = (nameOrURI.getUri() != null) ? nameOrURI.getUri() : nameOrURI.getName();
+		}
+		return name;
 	}
 
 	private void extractCodeSystemVersionQueryData(CodeSystemVersionQuery query) {
@@ -225,14 +243,11 @@ public class QueryData <Query extends ResourceQuery>{
 		// Not needed?
 //		query.getReadContext();
 		
-		
 		if(restrictions != null){
-			this.codeSystem = restrictions.getCodeSystem();
 			this.entityRestriction = restrictions.getEntityRestriction();
 			
-			if(this.codeSystem != null){
-				this.nameVersionPairName = (this.codeSystem.getUri() != null) ? this.codeSystem.getUri() : this.codeSystem.getName();
-			}
+			this.codeSystem = restrictions.getCodeSystem();
+			this.codeSystemName = this.getName(this.codeSystem);
 		}
 	}
 
@@ -246,13 +261,13 @@ public class QueryData <Query extends ResourceQuery>{
 			this.versionOrTag.setTag(nameVersionPair.getVersion());
 			this.versionOrTag.setVersion(nameVersionPair.getVersion());
 			
-			this.nameVersionPairName = nameVersionPair.getName();
+			this.mapName = nameVersionPair.getName();
 			this.checkNameAndVersion();
 		}
 	}
 
 	private void checkNameAndVersion() {
-		if((nameVersionPairName != null) && (versionOrTag.getVersion() != null || versionOrTag.getTag() != null)){
+		if((mapName != null) && (versionOrTag.getVersion() != null || versionOrTag.getTag() != null)){
 			hasNameAndVersion = true;
 		}
 	}

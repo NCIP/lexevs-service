@@ -19,7 +19,6 @@ import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet.SearchDesignationOption;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.codingSchemes.CodingScheme;
-import org.LexGrid.concepts.Entities;
 
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
@@ -213,6 +212,7 @@ public class CommonSearchFilterUtils {
 		ConceptReferenceList codeList = new ConceptReferenceList();
 		ConceptReference reference = new ConceptReference();
 		String value;
+		boolean listEmpty = true;
 		
 		if(entities != null){
 			for(EntityNameOrURI entityName : entities){
@@ -227,31 +227,34 @@ public class CommonSearchFilterUtils {
 					reference = new ConceptReference();
 					reference.setCode(value);
 					codeList.addConceptReference(reference);
+					listEmpty = false;
 				}					
 				
 			}
 		}
 		
-		try {
-			codedNodeSet.restrictToCodes(codeList);
-		} catch (LBInvocationException e) {
-			throw new RuntimeException(e);
-		} catch (LBParameterException e) {
-			throw new RuntimeException(e);
-		}		
+		if(!listEmpty){
+			try {
+				codedNodeSet.restrictToCodes(codeList);
+			} catch (LBInvocationException e) {
+				throw new RuntimeException(e);
+			} catch (LBParameterException e) {
+				throw new RuntimeException(e);
+			}		
+		}
 	}
 
 	public static CodingSchemeRenderingList filterRenderingListBySchemeNameAndMapExtension(
 			CodingSchemeRenderingList renderingList, 
-			String codingSchemeName, 
+			String systemName, 
 			MappingExtension mappingExtension) {
 		
 		if(renderingList == null){
 			return renderingList;
 		}
 
-		boolean restrictToBOTH = (codingSchemeName != null && mappingExtension != null);
-		boolean restrictToNAME = (!restrictToBOTH && codingSchemeName != null);
+		boolean restrictToBOTH = (systemName != null && mappingExtension != null);
+		boolean restrictToNAME = (!restrictToBOTH && systemName != null);
 		boolean restrictToMAP = (!restrictToBOTH && mappingExtension != null);
 		
 		CodingSchemeRenderingList temp = new CodingSchemeRenderingList();
@@ -263,7 +266,7 @@ public class CommonSearchFilterUtils {
 			String version = codingSchemeSummary.getRepresentsVersion();
 			
 			if(restrictToBOTH){
-				if (codingSchemeSummary.getLocalName().equals(codingSchemeName)) {
+				if (codingSchemeSummary.getLocalName().equals(systemName)) {
 					// Add if valid Mapping Coding Scheme
 					if (CommonMapUtils.validateMappingCodingScheme(uri, version, mappingExtension)) {
 						temp.addCodingSchemeRendering(render);
@@ -271,7 +274,7 @@ public class CommonSearchFilterUtils {
 				}
 			}
 			else if(restrictToNAME){
-				if (codingSchemeSummary.getLocalName().equals(codingSchemeName)) {
+				if (codingSchemeSummary.getLocalName().equals(systemName)) {
 					temp.addCodingSchemeRendering(render);
 				}
 			}
@@ -352,10 +355,10 @@ public class CommonSearchFilterUtils {
 		entitiesSet = entitiesRestriction.getEntities();
 		mapRole = entitiesRestriction.getMapRole();
 		if(haveMapRoleAndSetNotEmpty(mapRole, entitiesSet)){
-			for (CodingScheme scheme : codingSchemeList) {
-				Entities entities = scheme.getEntities();
+			//for (CodingScheme scheme : codingSchemeList) {
+				//Entities entities = scheme.getEntities();
 				// TODO: need to see if entity exists in given scheme?? if not remove scheme from codingSchemeList
-			} 
+			//} 
 		}
 		
 		return codingSchemeList;		

@@ -25,7 +25,6 @@ import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.transform.LexEvsToCTS2Transformer;
 import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestrictions.CodeSystemRestriction;
-import edu.mayo.cts2.framework.service.command.restriction.MapVersionQueryServiceRestrictions.EntitiesRestriction;
 import edu.mayo.cts2.framework.service.profile.ResourceQuery;
 import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryQuery;
 
@@ -126,7 +125,7 @@ public class CommonResourceUtils{
 			SortCriteria sortCriteria){
 		
 		CodingSchemeRenderingList renderingList = null;
-		String codingSchemeName = queryData.getNameVersionPairName();
+		String systemName = queryData.getSystemName();
 		
 		try {
 			renderingList = lexBigService.getSupportedCodingSchemes();
@@ -134,7 +133,7 @@ public class CommonResourceUtils{
 			throw new RuntimeException();
 		}
 		
-		renderingList = CommonSearchFilterUtils.filterRenderingListBySchemeNameAndMapExtension(renderingList, codingSchemeName, mappingExtension);
+		renderingList = CommonSearchFilterUtils.filterRenderingListBySchemeNameAndMapExtension(renderingList, systemName, mappingExtension);
 		renderingList = CommonSearchFilterUtils.filterRenderingListByQuery(renderingList, queryData.getFilters(), nameConverter);
 		// TODO: Need to filter further for restrictions
 		
@@ -184,7 +183,7 @@ public class CommonResourceUtils{
 				codingSchemeExists = CommonUtils.queryContainsExistingCodingScheme(queryData, codingSchemeRenderingList);			
 				if(codingSchemeExists){
 					// Get Code Node Set from LexBIG service for given coding scheme
-					codedNodeSet = lexBigService.getNodeSet(queryData.getNameVersionPairName(), queryData.getVersionOrTag() , entityTypes);
+					codedNodeSet = lexBigService.getNodeSet(queryData.getSystemName(), queryData.getVersionOrTag() , entityTypes);
 					CommonSearchFilterUtils.filterCodedNodeSet(codedNodeSet, queryData);
 				}
 			} catch (LBException e) {
