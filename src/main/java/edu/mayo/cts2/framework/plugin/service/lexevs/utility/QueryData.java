@@ -17,6 +17,7 @@ import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestri
 import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestrictions.CodeSystemRestriction;
 import edu.mayo.cts2.framework.service.command.restriction.MapVersionQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.command.restriction.MapVersionQueryServiceRestrictions.EntitiesRestriction;
+import edu.mayo.cts2.framework.service.command.restriction.ResolvedValueSetQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.command.restriction.TaggedCodeSystemRestriction;
 import edu.mayo.cts2.framework.service.profile.ResourceQuery;
 import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersionQuery;
@@ -24,6 +25,7 @@ import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescripti
 import edu.mayo.cts2.framework.service.profile.map.MapQuery;
 import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryQuery;
 import edu.mayo.cts2.framework.service.profile.mapversion.MapVersionQuery;
+import edu.mayo.cts2.framework.service.profile.resolvedvalueset.ResolvedValueSetQuery;
 
 public class QueryData <Query extends ResourceQuery>{
 	private Set<ResolvedFilter> cts2Filters = null;							// Used by all
@@ -158,9 +160,34 @@ public class QueryData <Query extends ResourceQuery>{
 			else if(cts2Query instanceof MapEntryQuery){
 				this.extractMapEntryQueryData((MapEntryQuery) cts2Query, nameConverter);				
 			}
+			else if(cts2Query instanceof ResolvedValueSetQuery){
+				this.extractResolvedValueSetQuery((ResolvedValueSetQuery) cts2Query, nameConverter);
+			}
 		}
 	}
 	
+	/**
+	 * @param cts2Query
+	 * @param nameConverter
+	 */
+	private void extractResolvedValueSetQuery(ResolvedValueSetQuery cts2Query,
+			VersionNameConverter nameConverter) {
+		ResolvedValueSetQueryServiceRestrictions localCts2Restrictions = cts2Query.getResolvedValueSetQueryServiceRestrictions();
+		this.cts2Restrictions = localCts2Restrictions;
+		this.cts2Filters = cts2Query.getFilterComponent();
+		
+		if(localCts2Restrictions != null){
+			// Do we want to pull more data from the restrictions?
+//			localCts2Restrictions.getCodeSystems();
+//			localCts2Restrictions.getCodeSystemVersions();
+//			localCts2Restrictions.getEntities();
+//			localCts2Restrictions.getValueSetDefinitions();
+//			localCts2Restrictions.getValueSets();
+			//this.convertCts2Name(nameConverter);
+		}
+		
+	}
+
 	private void extractMapEntryQueryData(MapEntryQuery cts2Query,
 			VersionNameConverter nameConverter) {
 		MapEntryQueryServiceRestrictions localCts2Restrictions = cts2Query.getRestrictions();
