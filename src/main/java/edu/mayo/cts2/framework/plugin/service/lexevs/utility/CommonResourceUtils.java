@@ -23,6 +23,7 @@ import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
 import org.LexGrid.codingSchemes.CodingScheme;
 
 import edu.mayo.cts2.framework.model.command.Page;
+import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
@@ -36,8 +37,12 @@ import edu.mayo.cts2.framework.service.profile.ResourceQuery;
 import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryQuery;
 
 public class CommonResourceUtils{
-	private final static String UNCHECKED = "unchecked";
-	private final static String RAWTYPES = "rawtypes";
+	private static final String UNCHECKED = "unchecked";
+	private static final String RAWTYPES = "rawtypes";
+	
+	private CommonResourceUtils(){
+		
+	}
 	
 	@SuppressWarnings({ RAWTYPES, UNCHECKED })
 	public static <EntryType> DirectoryResult<EntryType> createDirectoryResults(
@@ -133,6 +138,7 @@ public class CommonResourceUtils{
 		
 		CodingSchemeRenderingList lexRenderingList = null;
 		String cts2SystemName = queryData.getCts2SystemName();
+		Set<ResolvedFilter> cts2Filters = queryData.getCts2Filters();
 		
 		try {
 			lexRenderingList = lexBigService.getSupportedCodingSchemes();
@@ -141,7 +147,8 @@ public class CommonResourceUtils{
 		}
 		
 		lexRenderingList = CommonSearchFilterUtils.filterLexCodingSchemeRenderingList(lexRenderingList, cts2SystemName, lexMappingExtension);
-		lexRenderingList = CommonSearchFilterUtils.filterLexCodingSchemeRenderingList(lexRenderingList, queryData.getCts2Filters(), nameConverter);
+		lexRenderingList = CommonSearchFilterUtils.filterLexCodingSchemeRenderingList(lexRenderingList, cts2Filters, nameConverter);
+		
 		// TODO: Need to filter further for restrictions
 		
 		return lexRenderingList.getCodingSchemeRendering();
@@ -187,7 +194,7 @@ public class CommonResourceUtils{
 					CommonSearchFilterUtils.filterLexCodedNodeSet(lexCodedNodeSet, queryData);
 				}
 			} catch (LBException e) {
-				throw new RuntimeException(e);
+				throw new RuntimeException();
 			}
 		}
 		
@@ -230,10 +237,9 @@ public class CommonResourceUtils{
 			lexResolvedConceptReferenceResults = CommonPageUtils.getPage(lexMapIterator, page);
 			
 		} catch (LBParameterException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException();
 		} catch (LBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException();
 		}
 
 		return lexResolvedConceptReferenceResults;			
@@ -330,7 +336,7 @@ public class CommonResourceUtils{
 			lexCodingScheme = lexBigService.resolveCodingScheme(lexCodingSchemeName, lexTagOrVersion);			
 			
 		} catch (LBException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException();
 		}
 		return lexCodingScheme;
 	}

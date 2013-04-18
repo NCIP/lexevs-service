@@ -44,6 +44,11 @@ import edu.mayo.cts2.framework.service.profile.ResourceQuery;
  *
  */
 public class CommonPageUtils {
+	
+	private CommonPageUtils(){
+		
+	}
+	
 	public static <T extends ResourceQuery> ResolvedConceptReferenceResults getPage(
 			LexBIGService lexBigService, 
 			QueryData<T> queryData,
@@ -92,11 +97,11 @@ public class CommonPageUtils {
 				}	
 			}
 		} catch (LBInvocationException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException();
 		} catch (LBParameterException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException();
 		} catch (LBResourceUnavailableException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException();
 		}
 		
 		return new ResolvedConceptReferenceResults(resolvedConceptReferences, atEnd);
@@ -122,8 +127,7 @@ public class CommonPageUtils {
 	
 	public static <T> Object[] getRenderingPage(List<T> list, Page page){
 		Object [] renderedArray = list.toArray(new CodingScheme[0]);
-		Object [] renderedPage = CommonPageUtils.getPage(renderedArray, page);		
-		return renderedPage;
+		return CommonPageUtils.getPage(renderedArray, page);
 	}
 	
 	public static <T> Object[] getPage(T[] data, Page page) {
