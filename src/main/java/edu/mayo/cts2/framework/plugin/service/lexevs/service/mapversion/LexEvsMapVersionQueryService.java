@@ -30,9 +30,12 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
+import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.LexGrid.codingSchemes.CodingScheme;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
@@ -90,7 +93,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	
 	public void setMappingExtension(MappingExtension extension){
 		this.mappingExtension = extension;
-	}
+	}	
 
 	// -------- Implemented methods ----------------
 	
@@ -116,7 +119,27 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		LexBIGService lexBigService = this.getLexBigService();
 		QueryData<MapVersionQuery> queryData = new QueryData<MapVersionQuery>(query, null);
 		
+		// CodingSchemeRenderingList csrList = new CodingSchemeRenderingList().setCodingSchemeRendering(vCodingSchemeRenderingArray);
+		// Not sure I need an array of CodingSchemeRending objects yet - looks like line above is a possible option 
 		CodingSchemeRendering[] csRendering = CommonResourceUtils.getRenderingListForQuery(lexBigService, nameConverter, queryData, this.mappingExtension, sortCriteria);
+		
+		// Algorithm:
+		//    1. Get all supported codingSchemes as a CodingSchemeRendingList object
+		//    2. Filter list from step 1 to only codingSchemes that are of type map and further filter on based on if the MapVersionQuery.restrictions.map 
+		//       is not a null value.  Return list as CodingSchemeRendingList object.
+		//    3. Filter list from step 2 for any defined ResolvedFilters.  Return list as CodingSchemeRendingList object.
+		//    4. Filter list from step 3 for any defined CodeSystemRestrictions.  Return list as CodingSchemeRendingList object ???
+		//    5. Filter list from step 4 for any defined EntitiesRestrictions.  Return list as CodingSchemeRendingList object ???
+		//    6. Convert list from step 5 into CodingSchemeRendering[] object
+		//    7. Using CommonPageUtils.getPageFromArray(CodingSchemeRendering[] csRendering, Page page) method create CodingSchemeRendering[]
+		//       object where CodingSchemeRendering[] object from step 6 is used as param to method call
+		//
+		//   Note:  try to minimize MappingExtensionImpl method invocations that return LexEVS CodingScheme objects for steps 4 and 5.  Use a method
+		//     that combines these two filtering checks so that the resolved CodingScheme object is only resolved once.
+		// 
+		//   
+		
+		
 		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPageFromArray(csRendering, page);
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
 		return CommonResourceUtils.createDirectoryResultWithEntryDescriptions(this.transformer, csRenderingPage, atEnd, Constants.SUMMARY_DESCRIPTION);
