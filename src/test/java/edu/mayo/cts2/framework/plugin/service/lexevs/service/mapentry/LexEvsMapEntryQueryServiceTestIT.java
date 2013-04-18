@@ -32,6 +32,7 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
+import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContents;
 import org.junit.Test;
 
 import edu.mayo.cts2.framework.core.xml.Cts2Marshaller;
@@ -51,7 +52,13 @@ import edu.mayo.cts2.framework.service.command.restriction.MapEntryQueryServiceR
  *  @author <a href="mailto:hardie.linda@mayo.edu">Linda Hardie</a>
  *
  */	
-@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
+@LoadContents(
+	{
+		@LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml"),
+		@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
+		@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
+	}
+)
 public class LexEvsMapEntryQueryServiceTestIT extends AbstractTestITBase {
 
 	@Resource

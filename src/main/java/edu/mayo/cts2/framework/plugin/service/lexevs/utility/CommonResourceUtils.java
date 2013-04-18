@@ -21,7 +21,6 @@ import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
 import org.LexGrid.codingSchemes.CodingScheme;
-import org.LexGrid.concepts.Entity;
 
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
@@ -212,11 +211,23 @@ public class CommonResourceUtils{
 		List<MappingSortOption> lexSortOptionList = null;
 		
 		try {
+			//TODO: If restrictions are present, you will most likely want to use the 'getMapping' method of the
+			//MappingExtension instead of the 'resolveMapping' method.
 			lexMapIterator = lexMappingExtension.resolveMapping(lexSchemeName, lexVersionOrTag, lexRelationsContainerName, lexSortOptionList);
 			MapEntryQueryServiceRestrictions cts2Restrictions = (MapEntryQueryServiceRestrictions) queryData.getCts2Restrictions();
 			
 			// If restrictions exist then results need to be filtered to restricted entities provided in restriction.
 			if(cts2Restrictions != null){
+				
+				//TODO: We'll want to move the logic in 'getLexEntityList' to a restriction on the MappingExtension.
+				/*
+				Mapping mapping = mappingExtension.getMapping(uri,version,"AutoToGMPMappings");
+				mapping = mapping.restrictToCodes(..., ...)
+				ResolvedConceptReferencesIterator itr = mapping.resolveMapping();
+				
+				See: https://github.com/lexevs/lexevs/blob/master/lbTest/src/test/java/org/LexGrid/LexBIG/Impl/Extensions/GenericExtensions/MappingExtensionImplTest.java
+				for examples, specifically, tests named *WithRestriction*.
+				*/
 				ResolvedConceptReference [] lexResolvedConceptReferences = getLexEntityList(cts2Restrictions, lexMapIterator);
 				boolean atEnd = (page.getEnd() >= lexResolvedConceptReferences.length) ? true : false;
 				
@@ -244,8 +255,7 @@ public class CommonResourceUtils{
 			while(lexMapIterator.hasNext()){
 				lexResolvedConceptReference  = lexMapIterator.next();
 				
-				Entity lexEntity = lexResolvedConceptReference.getEntity();
-				String lexEntityCode = lexEntity.getEntityCode();
+				String lexEntityCode = lexResolvedConceptReference.getCode();
 				for(EntityNameOrURI cts2Entity : cts2TargetEntitySet){
 					String cts2EntityName = cts2Entity.getEntityName().getName();
 					if(cts2EntityName.equals(lexEntityCode)){
