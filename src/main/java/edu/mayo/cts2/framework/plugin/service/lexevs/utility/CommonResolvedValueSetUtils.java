@@ -27,19 +27,19 @@ public class CommonResolvedValueSetUtils {
 	private VersionNameConverter nameConverter;
 
 
-	public  List<CodingScheme> restrictByQuery(List<CodingScheme> csList,
+	public  List<CodingScheme> restrictByQuery(List<CodingScheme> lexCodingSchemes,
 			ResolvedValueSetQuery query) throws Exception {
 		List<CodingScheme> temp = new ArrayList<CodingScheme>();
 		List<AbsoluteCodingSchemeVersionReference> inCodingSchemes=new ArrayList<AbsoluteCodingSchemeVersionReference>();
 		if (query == null || query.getResolvedValueSetQueryServiceRestrictions()==null) {
-			return csList;
+			return lexCodingSchemes;
 		}
 		ResolvedValueSetQueryServiceRestrictions restrictions = query
 				.getResolvedValueSetQueryServiceRestrictions();
 		inCodingSchemes.addAll(getAbsoluteCodingSchemeVersionReferenceList(restrictions.getCodeSystemVersions()));
 		inCodingSchemes.addAll(getAbsoluteCodingSchemeVersionReferenceList(restrictions.getCodeSystems()));
 		
-		for (CodingScheme cs : csList) {
+		for (CodingScheme cs : lexCodingSchemes) {
 			boolean keep = true;
 			keep = matchesValueSetDefinitions(cs,
 					restrictions.getValueSetDefinitions());

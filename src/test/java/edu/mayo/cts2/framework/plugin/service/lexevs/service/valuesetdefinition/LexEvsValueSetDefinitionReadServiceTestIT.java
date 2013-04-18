@@ -27,11 +27,8 @@ import static org.junit.Assert.assertNotNull;
 
 import javax.annotation.Resource;
 
-import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.junit.Test;
 
-import edu.mayo.cts2.framework.model.extension.LocalIdValueSetDefinition;
-import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
 
 /**
@@ -49,18 +46,18 @@ public class LexEvsValueSetDefinitionReadServiceTestIT extends
 		assertNotNull(this.service);
 	}
 	
-	@Test
-	@LoadContent(contentPath="lexevs/test-content/VSDOnlyTest.xml")
-	public void testReadByTag() {
-		
-		String uri = "SRITEST:AUTO:PropertyRefTest1-VSDONLY";
-		NameOrURI uriIdentifier = new NameOrURI();
-		uriIdentifier.setUri(uri);
-		
-		LocalIdValueSetDefinition liVSD = service.readByTag(uriIdentifier, null, null);
-		
-		assertNotNull(liVSD);
-	}
+//	@Test
+//	@LoadContent(contentPath="lexevs/test-content/VSDOnlyTest.xml")
+//	public void testReadByTag() {
+//		
+//		String uri = "SRITEST:AUTO:PropertyRefTest1-VSDONLY";
+//		NameOrURI uriIdentifier = new NameOrURI();
+//		uriIdentifier.setUri(uri);
+//		
+//		LocalIdValueSetDefinition liVSD = service.readByTag(uriIdentifier, null, null);
+//		
+//		assertNotNull(liVSD);
+//	}
 	
 
 }

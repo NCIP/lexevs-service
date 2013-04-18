@@ -105,10 +105,10 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		QueryData<EntityDescriptionQuery> queryData = new QueryData<EntityDescriptionQuery>(query, nameConverter);
 		
 		CodedNodeSet codedNodeSet;
-		codedNodeSet = CommonResourceUtils.getCodedNodeSet(lexBigService, queryData, null);
+		codedNodeSet = CommonResourceUtils.getLexCodedNodeSet(lexBigService, queryData, null);
 		
 		if(codedNodeSet != null){
-			ResolvedConceptReferencesIterator iterator = CommonUtils.getResolvedConceptReferencesFromCodedNodeSet(codedNodeSet, null);
+			ResolvedConceptReferencesIterator iterator = CommonUtils.getLexResolvedConceptIterator(codedNodeSet, null);
 			if(iterator != null){
 				try {
 					count = iterator.numberRemaining();
@@ -129,7 +129,13 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		LexBIGService lexBigService = this.getLexBigService();
 		QueryData<EntityDescriptionQuery> queryData = new QueryData<EntityDescriptionQuery>(query, nameConverter);
 		
-		CodedNodeSet codedNodeSet = CommonResourceUtils.getCodedNodeSet(lexBigService, queryData, sortCriteria);
+		CodedNodeSet codedNodeSet = CommonResourceUtils.getLexCodedNodeSet(lexBigService, queryData, sortCriteria);
+		
+		// CodedNodeSet still needs to be filtered by restrictions:
+		// restrictions.getEntities  --- completed in getCodedNodeSet method
+		// restrictions.getTaggedCodeSystem -- *** unclear how to handle this restriction ****
+		
+		
 		
 		ScopedEntityName entityName = nameOrUri.getEntityName();
 		String uri = nameOrUri.getUri();
@@ -166,10 +172,10 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		QueryData<EntityDescriptionQuery> queryData = new QueryData<EntityDescriptionQuery>(query, nameConverter);
 		
 		ResolvedConceptReferenceResults resolvedConceptReferenceResultsPage;
-		resolvedConceptReferenceResultsPage = CommonPageUtils.getResolvedConceptReferenceResultsPage(lexBigService, queryData, sortCriteria, page);
+		resolvedConceptReferenceResultsPage = CommonPageUtils.getPage(lexBigService, queryData, sortCriteria, page);
 
 		DirectoryResult<EntityDescription> directoryResult;
-		directoryResult = CommonResourceUtils.createDirectoryResultWithEntryDescriptions(this.transformer, resolvedConceptReferenceResultsPage, Constants.FULL_DESCRIPTION);
+		directoryResult = CommonResourceUtils.createDirectoryResults(this.transformer, resolvedConceptReferenceResultsPage, Constants.FULL_DESCRIPTION);
 
 		return directoryResult;
 	}
@@ -182,22 +188,22 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		QueryData<EntityDescriptionQuery> queryData = new QueryData<EntityDescriptionQuery>(query, nameConverter);
 		
 		ResolvedConceptReferenceResults resolvedConceptReferenceResults;
-		resolvedConceptReferenceResults = CommonPageUtils.getResolvedConceptReferenceResultsPage(lexBigService, queryData, sortCriteria, page);
+		resolvedConceptReferenceResults = CommonPageUtils.getPage(lexBigService, queryData, sortCriteria, page);
 		
 		DirectoryResult<EntityDirectoryEntry> directoryResult;
-		directoryResult = CommonResourceUtils.createDirectoryResultWithEntryDescriptions(this.transformer, resolvedConceptReferenceResults, Constants.SUMMARY_DESCRIPTION);
+		directoryResult = CommonResourceUtils.createDirectoryResults(this.transformer, resolvedConceptReferenceResults, Constants.SUMMARY_DESCRIPTION);
 			
 		return directoryResult;
 	}
 	
 	@Override
 	public Set<? extends MatchAlgorithmReference> getSupportedMatchAlgorithms() {
-		return CommonSearchFilterUtils.createSupportedMatchAlgorithms();
+		return CommonSearchFilterUtils.getLexSupportedMatchAlgorithms();
 	}
 	
 	@Override
 	public Set<? extends PropertyReference> getSupportedSearchReferences() {
-		return CommonSearchFilterUtils.createSupportedSearchReferences();
+		return CommonSearchFilterUtils.getLexSupportedSearchReferences();
 	}
 
 	@Override

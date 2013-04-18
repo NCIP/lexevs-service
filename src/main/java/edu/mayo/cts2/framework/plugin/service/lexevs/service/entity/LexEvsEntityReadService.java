@@ -85,7 +85,7 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 			EntityDescriptionReadId identifier,
 			ResolvedReadContext readContext) {
 		LexBIGService lexBigService = this.getLexBigService();
-		ResolvedConceptReference entity = CommonUtils.getResolvedConceptReference(lexBigService, nameConverter, identifier, readContext);
+		ResolvedConceptReference entity = CommonUtils.getLexResolvedConceptReference(lexBigService, nameConverter, identifier, readContext);
 		
 		if(entity == null){
 			return null;
@@ -99,7 +99,7 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 			ResolvedReadContext readContext) {
 		LexBIGService lexBigService = this.getLexBigService();
 		
-		ResolvedConceptReference entity = CommonUtils.getResolvedConceptReference(lexBigService, nameConverter, identifier,	readContext);
+		ResolvedConceptReference entity = CommonUtils.getLexResolvedConceptReference(lexBigService, nameConverter, identifier,	readContext);
 		return (entity == null) ? false : true;
 	}
 	

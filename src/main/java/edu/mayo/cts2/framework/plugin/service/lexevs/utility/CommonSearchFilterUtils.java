@@ -8,39 +8,31 @@ import java.util.List;
 import java.util.Set;
 
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
+import org.LexGrid.LexBIG.DataModel.Collections.ConceptReferenceList;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
+import org.LexGrid.LexBIG.DataModel.Core.ConceptReference;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
 import org.LexGrid.LexBIG.Exceptions.LBParameterException;
+import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet.SearchDesignationOption;
-import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.codingSchemes.CodingScheme;
-import org.LexGrid.concepts.Entities;
 
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PropertyReference;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
-import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.service.mapversion.types.MapRole;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
-import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestrictions.CodeSystemRestriction;
 import edu.mayo.cts2.framework.service.command.restriction.MapVersionQueryServiceRestrictions.EntitiesRestriction;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
+import edu.mayo.cts2.framework.service.profile.ResourceQuery;
 
 public class CommonSearchFilterUtils {
 
-	private CommonSearchFilterUtils() {
-		super();
-	}
-	
-
-	/**
-	 * @return
-	 */
-	public static Set<MatchAlgorithmReference> createSupportedMatchAlgorithms() {
+	public static Set<MatchAlgorithmReference> getLexSupportedMatchAlgorithms() {
 
 		MatchAlgorithmReference exactMatch = StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference();
 		MatchAlgorithmReference contains = StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference();
@@ -49,7 +41,7 @@ public class CommonSearchFilterUtils {
 		return new HashSet<MatchAlgorithmReference>(Arrays.asList(exactMatch,contains,startsWith));
 	}
 
-	public static Set<? extends PropertyReference> createSupportedSearchReferences() {
+	public static Set<? extends PropertyReference> getLexSupportedSearchReferences() {
 		
 		PropertyReference name = StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference();		
 		PropertyReference about = StandardModelAttributeReference.ABOUT.getPropertyReference();	
@@ -59,201 +51,323 @@ public class CommonSearchFilterUtils {
 	}
 
 
-	public static CodingSchemeRenderingList filterRenderingList(ResolvedFilter resolvedFilter, 
-			CodingSchemeRenderingList renderingList,
+	public static <T extends ResourceQuery> boolean queryReturnsData(
+			CodingSchemeRenderingList lexCodingSchemeRenderingList,
+			QueryData<T> queryData){
+		boolean found = false;
+		String lexRenderingLocalName, lexRenderingVersion;
+		CodingSchemeSummary lexRenderingSummary;
+		
+		int renderingCount = lexCodingSchemeRenderingList.getCodingSchemeRenderingCount();
+		
+		for(int index=0; index < renderingCount; index++){
+			lexRenderingSummary = lexCodingSchemeRenderingList.getCodingSchemeRendering(index).getCodingSchemeSummary();
+			lexRenderingLocalName = lexRenderingSummary.getLocalName();
+			lexRenderingVersion = lexRenderingSummary.getRepresentsVersion();
+	
+			if(lexRenderingLocalName.equals(queryData.getLexSchemeName()) && 
+				lexRenderingVersion.equals(queryData.getLexVersionOrTag().getVersion())){
+				found = true;
+			}
+		}		
+			
+		return found;
+	}
+
+
+
+	public static CodingSchemeRenderingList filterLexCodingSchemeRenderingList(
+			CodingSchemeRenderingList lexCodingSchemeRenderingList,
+			ResolvedFilter cts2ResolvedFilter, 
 			VersionNameConverter nameConverter) {
 		
 		boolean caseSensitive = false;
-		CodingSchemeRenderingList temp = new CodingSchemeRenderingList();
+		CodingSchemeRenderingList lexFilteredRendering = new CodingSchemeRenderingList();
 		
 		// Collect Property References
-		MatchAlgorithmReference matchAlgorithmReference = resolvedFilter.getMatchAlgorithmReference();
-		PropertyReference propertyReference = resolvedFilter.getPropertyReference();
-		String searchAttribute = propertyReference.getReferenceTarget().getName();
+		MatchAlgorithmReference cts2MatchAlgorithmReference = cts2ResolvedFilter.getMatchAlgorithmReference();
+		PropertyReference cts2PropertyReference = cts2ResolvedFilter.getPropertyReference();
+		String cts2SearchAttribute = cts2PropertyReference.getReferenceTarget().getName();
 		
-		String matchStr = resolvedFilter.getMatchValue();	
+		String cts2MatchValue = cts2ResolvedFilter.getMatchValue();	
 		String sourceValue = null;
 		
-		CodingSchemeRendering[] csRendering = renderingList.getCodingSchemeRendering();
-		for (CodingSchemeRendering render : csRendering) {
-			CodingSchemeSummary codingSchemeSummary = render.getCodingSchemeSummary();
-			sourceValue = CommonSearchFilterUtils.determineSourceValue(searchAttribute, codingSchemeSummary, nameConverter);
-			if (CommonStringUtils.executeMatchAlgorithm(sourceValue, matchStr, matchAlgorithmReference, caseSensitive)) {
-				temp.addCodingSchemeRendering(render);
+		CodingSchemeRendering[] lexCodingSchemeRenderings = lexCodingSchemeRenderingList.getCodingSchemeRendering();
+		for (CodingSchemeRendering lexCodingSchemeRendering : lexCodingSchemeRenderings) {
+			CodingSchemeSummary lexCodingSchemeSummary = lexCodingSchemeRendering.getCodingSchemeSummary();
+			sourceValue = CommonSearchFilterUtils.determineSourceValue(cts2SearchAttribute, lexCodingSchemeSummary, nameConverter);
+			if (CommonStringUtils.executeMatchAlgorithm(sourceValue, cts2MatchValue, cts2MatchAlgorithmReference, caseSensitive)) {
+				lexFilteredRendering.addCodingSchemeRendering(lexCodingSchemeRendering);
 			} 
 		}  
 		
-		return temp;
+		return lexFilteredRendering;
 	}
 	
-	public static String determineSourceValue(String searchAttribute, CodingSchemeSummary summary, VersionNameConverter nameConverter){
+	public static String determineSourceValue(String cts2SearchAttribute, CodingSchemeSummary lexSchemeSummary, VersionNameConverter nameConverter){
 		String sourceValue = null;
-		if(summary == null){
+		if(lexSchemeSummary == null){
 			return sourceValue;
 		}
-		if (searchAttribute.equals(Constants.ATTRIBUTE_NAME_ABOUT)) {
-			sourceValue = summary.getCodingSchemeURI();
-		} else if (searchAttribute.equals(Constants.ATTRIBUTE_NAME_RESOURCE_SYNOPSIS)) {
-			sourceValue = summary.getCodingSchemeDescription().getContent();
-		} else if (searchAttribute.equals(Constants.ATTRIBUTE_NAME_RESOURCE_NAME)) {
+		if (cts2SearchAttribute.equals(Constants.ATTRIBUTE_NAME_ABOUT)) {
+			sourceValue = lexSchemeSummary.getCodingSchemeURI();
+		} else if (cts2SearchAttribute.equals(Constants.ATTRIBUTE_NAME_RESOURCE_SYNOPSIS)) {
+			sourceValue = lexSchemeSummary.getCodingSchemeDescription().getContent();
+		} else if (cts2SearchAttribute.equals(Constants.ATTRIBUTE_NAME_RESOURCE_NAME)) {
 			sourceValue = 
 				nameConverter.toCts2VersionName(
-					summary.getLocalName(), 
-					summary.getRepresentsVersion());
+					lexSchemeSummary.getLocalName(), 
+					lexSchemeSummary.getRepresentsVersion());
 		}
 		
 		return sourceValue;
 	}
 
-	
-	public static List<CodingScheme> filterCodingSchemeList(
-			Set<ResolvedFilter> filters, List<CodingScheme> codingSchemeList,
-			VersionNameConverter nameConverter) {
-		
-		if(codingSchemeList != null && filters != null){
-			Iterator<ResolvedFilter> filtersItr = filters.iterator();
-			while (filtersItr.hasNext() && (codingSchemeList.size() > 0)) {
-				ResolvedFilter resolvedFilter = filtersItr.next();
-				codingSchemeList = filterCodingSchemeList(resolvedFilter, 
-						codingSchemeList, nameConverter);
-			}
-		}
-		
-		return codingSchemeList;
-	}
-		
-	
-	public static List<CodingScheme> filterCodingSchemeList(ResolvedFilter resolvedFilter, 
-			List<CodingScheme> codingSchemeList,
-			VersionNameConverter nameConverter) {
-		
-		boolean caseSensitive = false;
-		List<CodingScheme> temp = new ArrayList<CodingScheme>();
-		
-		// Collect Property References
-		MatchAlgorithmReference matchAlgorithmReference = resolvedFilter.getMatchAlgorithmReference();
-		PropertyReference propertyReference = resolvedFilter.getPropertyReference();
-		String searchAttribute = propertyReference.getReferenceTarget().getName();
-		
-		String matchStr = resolvedFilter.getMatchValue();	
+	public static String determineSourceValue(String cts2SearchAttribute, CodingScheme lexCodingScheme, VersionNameConverter nameConverter){
 		String sourceValue = null;
-		
-		for (CodingScheme codingScheme : codingSchemeList) {
-			sourceValue = CommonSearchFilterUtils.determineSourceValue(searchAttribute, codingScheme, nameConverter);
-			if (CommonStringUtils.executeMatchAlgorithm(sourceValue, matchStr, matchAlgorithmReference, caseSensitive)) {
-				temp.add(codingScheme);
-			} 
-		}  
-		
-		return temp;
-	}
-	
-	public static String determineSourceValue(String searchAttribute, CodingScheme codingScheme, VersionNameConverter nameConverter){
-		String sourceValue = null;
-		if(codingScheme == null){
+		if(lexCodingScheme == null){
 			return sourceValue;
 		}
-		if (searchAttribute.equals(Constants.ATTRIBUTE_NAME_ABOUT)) {
-			sourceValue = codingScheme.getCodingSchemeURI();
-		} else if (searchAttribute.equals(Constants.ATTRIBUTE_NAME_RESOURCE_SYNOPSIS)) {
-			sourceValue = codingScheme.getEntityDescription().getContent();
-		} else if (searchAttribute.equals(Constants.ATTRIBUTE_NAME_RESOURCE_NAME)) {
+		if (cts2SearchAttribute.equals(Constants.ATTRIBUTE_NAME_ABOUT)) {
+			sourceValue = lexCodingScheme.getCodingSchemeURI();
+		} else if (cts2SearchAttribute.equals(Constants.ATTRIBUTE_NAME_RESOURCE_SYNOPSIS)) {
+			sourceValue = lexCodingScheme.getEntityDescription().getContent();
+		} else if (cts2SearchAttribute.equals(Constants.ATTRIBUTE_NAME_RESOURCE_NAME)) {
 			sourceValue = 
 				nameConverter.toCts2VersionName(
-					codingScheme.getCodingSchemeName(), 
-					codingScheme.getRepresentsVersion());
+					lexCodingScheme.getCodingSchemeName(), 
+					lexCodingScheme.getRepresentsVersion());
 		}
 		
 		return sourceValue;
 	}	
 	
-	public static void filterCodedNodeSetByResolvedFilter(ResolvedFilter filter, CodedNodeSet codedNodeSet){
-		if(codedNodeSet != null){
-			try {
-				String matchText = null;
-				String matchAlgorithm = null;
+	
+	public static List<CodingScheme> filterLexCodingSchemeList(
+			List<CodingScheme> lexCodingSchemeList,
+			Set<ResolvedFilter> cts2Filters, 
+			VersionNameConverter nameConverter) {
+		
+		if(lexCodingSchemeList != null && cts2Filters != null){
+			Iterator<ResolvedFilter> cts2FilterIterator = cts2Filters.iterator();
+			while (cts2FilterIterator.hasNext() && (lexCodingSchemeList.size() > 0)) {
+				ResolvedFilter cts2ResolvedFilter = cts2FilterIterator.next();
+				lexCodingSchemeList = filterLexCodingSchemeList(lexCodingSchemeList, 
+						cts2ResolvedFilter, 
+						nameConverter);
+			}
+		}
+		
+		return lexCodingSchemeList;
+	}
+		
+	
+	public static List<CodingScheme> filterLexCodingSchemeList(
+			List<CodingScheme> lexCodingSchemeList,
+			ResolvedFilter cts2Filter, 
+			VersionNameConverter nameConverter) {
+		
+		boolean caseSensitive = false;
+		List<CodingScheme> filteredLexCodingSchemeList = new ArrayList<CodingScheme>();
+		
+		// Collect Property References
+		MatchAlgorithmReference cts2MatchAlgorithmReference = cts2Filter.getMatchAlgorithmReference();
+		PropertyReference cts2PropertyReference = cts2Filter.getPropertyReference();
+		String cts2SearchAttribute = cts2PropertyReference.getReferenceTarget().getName();
+		
+		String cts2MatchValue = cts2Filter.getMatchValue();	
+		String sourceValue = null;
+		
+		for (CodingScheme lexCodingScheme : lexCodingSchemeList) {
+			sourceValue = CommonSearchFilterUtils.determineSourceValue(cts2SearchAttribute, lexCodingScheme, nameConverter);
+			if (CommonStringUtils.executeMatchAlgorithm(sourceValue, cts2MatchValue, cts2MatchAlgorithmReference, caseSensitive)) {
+				filteredLexCodingSchemeList.add(lexCodingScheme);
+			} 
+		}  
+		
+		return filteredLexCodingSchemeList;
+	}
+	
+	public static <T extends ResourceQuery> void filterLexCodedNodeSet(CodedNodeSet lexCodedNodeSet, QueryData<T> queryData){
+		if(lexCodedNodeSet != null){
+			// Apply restrictions if they exists
+			Set<EntityNameOrURI> cts2Entities = queryData.getCts2Entities();
+			CommonSearchFilterUtils.filterLexCodedNodeSet(lexCodedNodeSet, cts2Entities);
 			
-				if(filter != null){
-					matchText = filter.getMatchValue();										// Value to search with 
-					matchAlgorithm = filter.getMatchAlgorithmReference().getContent();		// Extract from filter the match algorithm to use
-				}	
-				SearchDesignationOption option = SearchDesignationOption.ALL;					// Other options: PREFERRED_ONLY, NON_PREFERRED_ONLY, ALL 
-				String language = null;															// This field is not really used, uses default "en"
+			
+			// Apply filters if they exist
+			Set<ResolvedFilter> cts2Filters = queryData.getCts2Filters();
+			if(cts2Filters != null){
+				for(ResolvedFilter cts2Filter : cts2Filters){
+					CommonSearchFilterUtils.filterLexCodedNodeSet(lexCodedNodeSet, cts2Filter);
+				}
+			}
+		}
+	}
+	
+	public static void filterLexCodedNodeSet(
+			CodedNodeSet lexCodedNodeSet,
+			ResolvedFilter cts2Filter){
+		String cts2MatchValue = null;
+		String cts2MatchAlgorithm = null;
+	
+		if(cts2Filter != null){
+			cts2MatchValue = cts2Filter.getMatchValue();										// Value to search with 
+			cts2MatchAlgorithm = cts2Filter.getMatchAlgorithmReference().getContent();			// Extract from filter the match algorithm to use
+		}	
+		SearchDesignationOption lexSearchOption = SearchDesignationOption.ALL;					// Other options: PREFERRED_ONLY, NON_PREFERRED_ONLY, ALL 
+		String lexLanguage = null;																// This field is not really used, uses default "en"
+		
+		try {
+			lexCodedNodeSet.restrictToMatchingDesignations(cts2MatchValue, lexSearchOption, cts2MatchAlgorithm, lexLanguage);
+		} catch (LBInvocationException e) {
+			throw new RuntimeException(e);
+		} catch (LBParameterException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	
+	public static void filterLexCodedNodeSet(
+			CodedNodeSet lexCodedNodeSet,
+			Set<EntityNameOrURI> cts2EntitySet) {
+		ConceptReferenceList lexConceptReferenceList = new ConceptReferenceList();
+		ConceptReference lexConcpetReference = new ConceptReference();
+		String cts2EntityName;
+		boolean listEmpty = true;
+		
+		if(cts2EntitySet != null){
+			for(EntityNameOrURI cts2Entity : cts2EntitySet){
+				cts2EntityName = cts2Entity.getUri();
+				if(cts2EntityName == null){
+					if(cts2Entity.getEntityName() != null){
+						cts2EntityName = cts2Entity.getEntityName().getName();
+					}
+				}
 				
-				codedNodeSet.restrictToMatchingDesignations(matchText, option, matchAlgorithm, language);
+				if(cts2EntityName != null){
+					lexConcpetReference = new ConceptReference();
+					lexConcpetReference.setCode(cts2EntityName);
+					lexConceptReferenceList.addConceptReference(lexConcpetReference);
+					listEmpty = false;
+				}					
+				
+			}
+		}
+		
+		if(!listEmpty){
+			try {
+				lexCodedNodeSet.restrictToCodes(lexConceptReferenceList);
 			} catch (LBInvocationException e) {
 				throw new RuntimeException(e);
 			} catch (LBParameterException e) {
 				throw new RuntimeException(e);
-			}
+			}		
 		}
 	}
-	
-	
-	public static List<CodingScheme> getCodingSchemeListFromCodeSchemeRenderings(
-			LexBIGService lexBigService, 
-			CodingSchemeRendering[] codingSchemeRenderings, 
-			CodeSystemRestriction codeSystemRestriction) {
 
-		List<CodingScheme> codingSchemeList = new ArrayList<CodingScheme>();
-		Set<NameOrURI> codeSystemSet = null;
-		MapRole mapRole = null;
+	public static CodingSchemeRenderingList filterLexCodingSchemeRenderingList(
+			CodingSchemeRenderingList lexRenderingList, 
+			String cts2SystemName, 
+			MappingExtension lexMappingExtension) {
 		
-		CodingScheme codingScheme;
-
-		if(codeSystemRestriction != null){
-			codeSystemSet = codeSystemRestriction.getCodeSystems();
-			mapRole = codeSystemRestriction.getMapRole();
+		if(lexRenderingList == null){
+			return lexRenderingList;
 		}
+
+		boolean restrictToBOTH = (cts2SystemName != null && lexMappingExtension != null);
+		boolean restrictToNAME = (!restrictToBOTH && cts2SystemName != null);
+		boolean restrictToMAP = (!restrictToBOTH && lexMappingExtension != null);
 		
-		for (CodingSchemeRendering render : codingSchemeRenderings) {
-			codingScheme = CommonCodingSchemeUtils.getCodingSchemeFromRendering(lexBigService, render);
-			if(mapRole != null && codeSystemSet != null){
-				if(CommonCodingSchemeUtils.validateMapRole(codingScheme, codeSystemSet, mapRole.value())){
-					codingSchemeList.add(codingScheme);
-				}			
+		CodingSchemeRenderingList lexFilteredRenderingList = new CodingSchemeRenderingList();
+		
+		CodingSchemeRendering[] lexRenderings = lexRenderingList.getCodingSchemeRendering();
+		for(CodingSchemeRendering lexRendering : lexRenderings) {
+			CodingSchemeSummary lexCodingSchemeSummary = lexRendering.getCodingSchemeSummary();
+			String lexCodingSchemeURI = lexCodingSchemeSummary.getCodingSchemeURI();
+			String lexCodingSchemeVersion = lexCodingSchemeSummary.getRepresentsVersion();
+			
+			if(restrictToBOTH){
+				if (lexCodingSchemeSummary.getLocalName().equals(cts2SystemName)) {
+					// Add if valid Mapping Coding Scheme
+					if (CommonMapUtils.validateMappingCodingScheme(lexCodingSchemeURI, lexCodingSchemeVersion, lexMappingExtension)) {
+						lexFilteredRenderingList.addCodingSchemeRendering(lexRendering);
+					}
+				}
+			}
+			else if(restrictToNAME){
+				if (lexCodingSchemeSummary.getLocalName().equals(cts2SystemName)) {
+					lexFilteredRenderingList.addCodingSchemeRendering(lexRendering);
+				}
+			}
+			else if(restrictToMAP){
+				if (CommonMapUtils.validateMappingCodingScheme(lexCodingSchemeURI, lexCodingSchemeVersion, lexMappingExtension)) {
+					lexFilteredRenderingList.addCodingSchemeRendering(lexRendering);
+				}
 			}
 			else{
-				codingSchemeList.add(codingScheme);
+				lexFilteredRenderingList.addCodingSchemeRendering(lexRendering);
 			}
-		} 
+			
+		}
 		
-		return codingSchemeList;		
+		return lexFilteredRenderingList;
+	}
+
+	public static CodingSchemeRenderingList filterLexCodingSchemeRenderingList(
+			CodingSchemeRenderingList lexRenderingList, 
+			Set<ResolvedFilter> cts2Filters,
+			VersionNameConverter nameConverter) {
+		
+		if(lexRenderingList != null && cts2Filters != null){
+			Iterator<ResolvedFilter> filtersItr = cts2Filters.iterator();
+			while (filtersItr.hasNext() && (lexRenderingList.getCodingSchemeRenderingCount() > 0)) {
+				ResolvedFilter resolvedFilter = filtersItr.next();
+				lexRenderingList = CommonSearchFilterUtils.filterLexCodingSchemeRenderingList(lexRenderingList, resolvedFilter, nameConverter);
+			}
+		}
+		
+		return lexRenderingList;
 	}
 	
 
-	public static List<CodingScheme> filterCodingSchemeListByEntitiesRestriction(
-			List<CodingScheme> codingSchemeList, 
-			EntitiesRestriction entitiesRestriction) {
+
+
+	
+	public static List<CodingScheme> filterLexCodingSchemeList(
+			List<CodingScheme> lexCodingSchemeList, 
+			EntitiesRestriction cts2EntitiesRestriction) {
 		
-		Set<EntityNameOrURI> entitiesSet = null;
-		MapRole mapRole = null;
+		Set<EntityNameOrURI> cts2EntitySet = null;
+		MapRole cts2MapRole = null;
 		
-		entitiesSet = entitiesRestriction.getEntities();
-		mapRole = entitiesRestriction.getMapRole();
-		if(haveMapRoleAndSetNotEmpty(mapRole, entitiesSet)){
-			for (CodingScheme scheme : codingSchemeList) {
-				Entities entities = scheme.getEntities();
+		cts2EntitySet = cts2EntitiesRestriction.getEntities();
+		cts2MapRole = cts2EntitiesRestriction.getMapRole();
+		if(haveMapRoleAndSetNotEmpty(cts2MapRole, cts2EntitySet)){
+			//for (CodingScheme scheme : codingSchemeList) {
+				//Entities entities = scheme.getEntities();
 				// TODO: need to see if entity exists in given scheme?? if not remove scheme from codingSchemeList
-			} 
+			//} 
 		}
 		
-		return codingSchemeList;		
+		return lexCodingSchemeList;		
 	}
 	
 	private static <T> boolean haveMapRoleAndSetNotEmpty(
-			MapRole mapRole,
-			Set<T> set) {
+			MapRole cts2MapRole,
+			Set<T> cts2DataSet) {
 		boolean answer = false;
 		String mapRoleValue = null;
-		if (mapRole != null) {
-			mapRoleValue = mapRole.value();
-			if (mapRoleValue != null && set != null && set.size() > 0) {
+		if (cts2MapRole != null) {
+			mapRoleValue = cts2MapRole.value();
+			if (mapRoleValue != null && cts2DataSet != null && cts2DataSet.size() > 0) {
 				answer = true;
 			}
 		}
 		return answer;
 	}
+
+
 
 
 	

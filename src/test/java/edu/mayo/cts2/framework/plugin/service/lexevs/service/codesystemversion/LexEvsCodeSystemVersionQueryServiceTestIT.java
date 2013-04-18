@@ -26,6 +26,7 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -41,6 +42,7 @@ import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractQueryServiceTest;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonTestUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.PrintUtility;
 import edu.mayo.cts2.framework.service.command.restriction.CodeSystemVersionQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
@@ -209,6 +211,9 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		
 		// Test results, Automobiles has one entity
 		assertNotNull(dirResult);
+		
+		System.out.println(PrintUtility.createStringFromDirectoryResultWithEntrySummary(dirResult) + "\n");
+		
 		int expecting = 1;
 		int actual = dirResult.getEntries().size();
 		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
@@ -229,6 +234,8 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		
 		// Test results, doesn't exist so will return list with no elements.
 		assertNotNull(dirResult);
+		System.out.println(PrintUtility.createStringFromDirectoryResultWithEntrySummary(dirResult) + "\n");
+		
 		int expecting = 0;
 		int actual = dirResult.getEntries().size();
 		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
@@ -251,6 +258,8 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		
 		// Test results
 		assertNotNull(dirResult);
+		System.out.println(PrintUtility.createStringFromDirectoryResultWithEntrySummary(dirResult) + "\n");
+		
 		int expecting = 1;
 		int actual = dirResult.getEntries().size();
 		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
@@ -312,6 +321,8 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		
 		// Test results, should return one entity
 		assertNotNull(dirResult);
+		System.out.println(PrintUtility.createStringFromDirectoryResultWithEntrySummary(dirResult) + "\n");
+		
 		int expecting = 1;
 		int actual = dirResult.getEntries().size();
 		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
@@ -331,6 +342,8 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		
 		// Test results, should return one entity
 		assertNotNull(dirResult);
+		System.out.println(PrintUtility.createStringFromDirectoryResultWithEntrySummary(dirResult) + "\n");
+		
 		int expecting = 1;
 		int actual = dirResult.getEntries().size();
 		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
@@ -350,6 +363,8 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		
 		// Test results, should return one entity
 		assertNotNull(dirResult);
+		System.out.println(PrintUtility.createStringFromDirectoryResultWithEntrySummary(dirResult) + "\n");
+		
 		int expecting = 1;
 		int actual = dirResult.getEntries().size();
 		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
@@ -369,6 +384,8 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		
 		// Test results, should return one entity
 		assertNotNull(dirResult);
+		System.out.println(PrintUtility.createStringFromDirectoryResultWithEntrySummary(dirResult) + "\n");
+		
 		int expecting = 0;
 		int actual = dirResult.getEntries().size();
 		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
@@ -388,6 +405,8 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		
 		// Test results, should return one entity
 		assertNotNull(dirResult);
+		System.out.println(PrintUtility.createStringFromDirectoryResultWithEntrySummary(dirResult) + "\n");
+		
 		int expecting = 0;
 		int actual = dirResult.getEntries().size();
 		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
@@ -406,6 +425,8 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		DirectoryResult<CodeSystemVersionCatalogEntrySummary> dirResult = service.getResourceSummaries(query, null, new Page());
 		// Test results, should return one entity
 		assertNotNull(dirResult);
+		System.out.println(PrintUtility.createStringFromDirectoryResultWithEntrySummary(dirResult) + "\n");
+		
 		int expecting = 0;
 		int actual = dirResult.getEntries().size();
 		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
@@ -430,6 +451,8 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		
 		// Test results, Automobiles has one entity
 		assertNotNull(dirResult);
+		System.out.println(PrintUtility.createStringFromDirectoryResultWithEntry(dirResult) + "\n");
+		
 		int expecting = 1;
 		int actual = dirResult.getEntries().size();
 		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
@@ -450,6 +473,8 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		
 		// Test results, Automobiles has one entity
 		assertNotNull(dirResult);
+		System.out.println(PrintUtility.createStringFromDirectoryResultWithEntry(dirResult) + "\n");
+		
 		int expecting = 0;
 		int actual = dirResult.getEntries().size();
 		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);

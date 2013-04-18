@@ -26,76 +26,109 @@ import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryQuery;
 import edu.mayo.cts2.framework.service.profile.mapversion.MapVersionQuery;
 
 public class QueryData <Query extends ResourceQuery>{
-	private Set<ResolvedFilter> filters = null;
-	private Object restrictions = null;
+	private Set<ResolvedFilter> cts2Filters = null;							// Used by all
+	private Object cts2Restrictions = null;									// Used by all
 	
-	private CodingSchemeVersionOrTag versionOrTag = null;
-	private CodeSystemRestriction codeSystemRestriction = null;
-	private NameOrURI codeSystem = null;
-	private NameOrURI codeSystemVersion = null;
-	private String nameVersionPairName = null;
-	private String codeSystemVersionName = null;
+	private boolean isMapQuery = false;										// Used by ALL Map Queries
 	
-	private boolean isMapQuery = false;
+	private NameOrURI cts2Map = null;										// Used by MapVersionQuery
+	private String cts2MapName = null;											// Used by MapVersionQuery 
+	private EntitiesRestriction cts2EntitiesRestriction = null;				// Used in MapVersionQuery
+	
+	private NameOrURI cts2CodeSystem = null;								// Used by CodeSystemVersionQuery 
+	private String cts2CodeSystemName = null;									// Used by CodeSystemVersionQuery
+	private EntityRestriction cts2EntityRestriction = null;					// Used in CodeSystemVersionQuery
+	
+	private CodeSystemRestriction cts2CodeSystemRestriction = null;			// Used by MapQuery and MapVersionQuery
+	
+	// Following are set in setVersionOrTag method							// Used by EntityDescriptionQuery and MapEntryQuery
+	private NameOrURI cts2CodeSystemVersion = null;
+	private NameOrURI cts2MapVersion = null;
+	private String lexSchemeName = null;
+	private CodingSchemeVersionOrTag lexVersionOrTag = null;
 	private boolean hasNameAndVersion = false;
-
 	
-	private Set<EntityNameOrURI> targetEntities = null;
-	private Set<EntityNameOrURI> entities = null;
-	private TaggedCodeSystemRestriction taggedCodeSystem = null;
-	private EntitiesRestriction entitiesRestriction = null;
-	private EntityRestriction entityRestriction = null;
+	private Set<EntityNameOrURI> cts2Entities = null;								// Used in EntityDescriptionQuery
+	private TaggedCodeSystemRestriction cts2TaggedCodeSystemRestriction = null;		// Used in EntityDescriptionQuery
 	
-	public Set<ResolvedFilter> getFilters(){
-		return this.filters;
+	private Set<EntityNameOrURI> cts2TargetEntities = null;					// Used in MapEntryQuery
+	
+	
+	
+	
+	public Set<ResolvedFilter> getCts2Filters(){
+		return this.cts2Filters;
 	}
 	
-	public Object getRestrictions(){
-		return this.restrictions;
+	public Object getCts2Restrictions(){
+		return this.cts2Restrictions;
 	}
 	
-	public CodingSchemeVersionOrTag getVersionOrTag(){
-		return this.versionOrTag;
-	}
-
-	public CodeSystemRestriction getCodeSystemRestriction(){
-		return this.codeSystemRestriction;
-	}
-	
-	public NameOrURI getCodeSystem(){
-		return this.codeSystem;
-	}
-	
-	public NameOrURI getCodeSystemVersion(){
-		return this.codeSystemVersion;
-	}
-	
-	public String getNameVersionPairName(){
-		return this.nameVersionPairName;
-	}
-	
-	public String getCodeSystemVersionName(){
-		return this.codeSystemVersionName;
-	}
-	
-	public Set<EntityNameOrURI> getTargetEntities() {
-		return targetEntities;
+	public CodingSchemeVersionOrTag getLexVersionOrTag(){
+		return this.lexVersionOrTag;
 	}
 
-	public Set<EntityNameOrURI> getEntities() {
-		return entities;
+	public CodeSystemRestriction getCts2CodeSystemRestriction(){
+		return this.cts2CodeSystemRestriction;
+	}
+	
+	public NameOrURI getCts2CodeSystem(){
+		return this.cts2CodeSystem;
+	}
+	
+//	public NameOrURI getCts2CodeSystemVersion(){
+//		return this.cts2CodeSystemVersion;
+//	}
+//	
+//	public NameOrURI getCts2MapVersion(){
+//		return this.cts2MapVersion;
+//	}
+	
+	public NameOrURI getCts2SystemVersion(){
+		if(this.cts2MapVersion == null){
+			return this.cts2CodeSystemVersion;
+		}
+		
+		return this.cts2MapVersion;
+	}
+	
+	public String getCts2SystemName(){
+		if(this.cts2MapName == null){
+			return this.cts2CodeSystemName;
+		}
+		return this.cts2MapName;
+	}
+	
+//	public String getMapName(){
+//		return this.mapName;
+//	}
+//	
+//	public String getCodeSystemName() {
+//		return codeSystemName;
+//	}
+
+	public String getLexSchemeName(){
+		return this.lexSchemeName;
+	}
+	
+	public Set<EntityNameOrURI> getCts2TargetEntities() {
+		return cts2TargetEntities;
 	}
 
-	public TaggedCodeSystemRestriction getTaggedCodeSystem() {
-		return taggedCodeSystem;
+	public Set<EntityNameOrURI> getCts2Entities() {
+		return cts2Entities;
 	}
 
-	public EntitiesRestriction getEntitiesRestriction() {
-		return entitiesRestriction;
+	public TaggedCodeSystemRestriction getCts2TaggedCodeSystemRestriction() {
+		return cts2TaggedCodeSystemRestriction;
 	}
 
-	public EntityRestriction getEntityRestriction() {
-		return entityRestriction;
+	public EntitiesRestriction getCts2EntitiesRestriction() {
+		return cts2EntitiesRestriction;
+	}
+
+	public EntityRestriction getCts2EntityRestriction() {
+		return cts2EntityRestriction;
 	}
 
 	public boolean isMapQuery(){
@@ -107,143 +140,148 @@ public class QueryData <Query extends ResourceQuery>{
 	}
 
 	
-	public QueryData(Query query, VersionNameConverter nameConverter){
+	public QueryData(Query cts2Query, VersionNameConverter nameConverter){
 		super();
-		if (query != null) {
-			if(query instanceof CodeSystemVersionQuery){
-				this.extractCodeSystemVersionQueryData((CodeSystemVersionQuery) query);
+		if (cts2Query != null) {
+			if(cts2Query instanceof CodeSystemVersionQuery){
+				this.extractCodeSystemVersionQueryData((CodeSystemVersionQuery) cts2Query);
 			}
-			else if(query instanceof EntityDescriptionQuery){
-				this.extractEntityDescriptionQueryData((EntityDescriptionQuery) query, nameConverter);
+			else if(cts2Query instanceof EntityDescriptionQuery){
+				this.extractEntityDescriptionQueryData((EntityDescriptionQuery) cts2Query, nameConverter);
 			}
-			else if(query instanceof MapQuery){
-				this.extractMapQueryData((MapQuery) query);
+			else if(cts2Query instanceof MapQuery){
+				this.extractMapQueryData((MapQuery) cts2Query);
 			}
-			else if(query instanceof MapVersionQuery){
-				this.extractMapVersionQueryData((MapVersionQuery) query);
+			else if(cts2Query instanceof MapVersionQuery){
+				this.extractMapVersionQueryData((MapVersionQuery) cts2Query);
 			}
-			else if(query instanceof MapEntryQuery){
-				this.extractMapEntryQueryData((MapEntryQuery) query, nameConverter);				
+			else if(cts2Query instanceof MapEntryQuery){
+				this.extractMapEntryQueryData((MapEntryQuery) cts2Query, nameConverter);				
 			}
 		}
 	}
 	
-	private void extractMapEntryQueryData(MapEntryQuery query,
+	private void extractMapEntryQueryData(MapEntryQuery cts2Query,
 			VersionNameConverter nameConverter) {
-		MapEntryQueryServiceRestrictions restrictions = query.getRestrictions();
-		this.restrictions = restrictions;
-		this.filters = query.getFilterComponent();
+		MapEntryQueryServiceRestrictions localCts2Restrictions = cts2Query.getRestrictions();
+		this.cts2Restrictions = localCts2Restrictions;
+		this.cts2Filters = cts2Query.getFilterComponent();
 		
 
 		// Not needed?
 //		query.getReadContext();
 		
-		if(restrictions != null){
-			this.codeSystemVersion = restrictions.getMapVersion();
-			this.setVersionOrTag(nameConverter);
-			this.targetEntities = restrictions.getTargetEntities();
+		if(localCts2Restrictions != null){
+			this.cts2MapVersion = localCts2Restrictions.getMapVersion();
+			this.convertCts2Name(nameConverter);
+			this.cts2TargetEntities = localCts2Restrictions.getTargetEntities();
 		}
 		
 		
 		this.isMapQuery = true;		
 	}
 
-	private void extractEntityDescriptionQueryData(EntityDescriptionQuery query,
+	private void extractEntityDescriptionQueryData(EntityDescriptionQuery cts2Query,
 			VersionNameConverter nameConverter) {
-		EntityDescriptionQueryServiceRestrictions restrictions = query.getRestrictions();
-		this.restrictions = restrictions;
-		this.filters = query.getFilterComponent();
+		EntityDescriptionQueryServiceRestrictions localCts2Restrictions = cts2Query.getRestrictions();
+		this.cts2Restrictions = localCts2Restrictions;
+		this.cts2Filters = cts2Query.getFilterComponent();
 				
 		// Not needed?
 //		query.getEntitiesFromAssociationsQuery();
 //		restrictions.getHierarchyRestriction();
 //		query.getReadContext();
 		
-		
-		
-		
-		if(restrictions != null){
-			this.codeSystemVersion = restrictions.getCodeSystemVersion();
-			this.setVersionOrTag(nameConverter);
-			this.entities = restrictions.getEntities();
-			this.taggedCodeSystem = restrictions.getTaggedCodeSystem();
+		if(localCts2Restrictions != null){
+			this.cts2CodeSystemVersion = localCts2Restrictions.getCodeSystemVersion();
+			this.convertCts2Name(nameConverter);
+			this.cts2Entities = localCts2Restrictions.getEntities();
+			this.cts2TaggedCodeSystemRestriction = localCts2Restrictions.getTaggedCodeSystem();
 		}
+		
 	}
 
-	private void extractMapVersionQueryData(MapVersionQuery query) {
-		MapVersionQueryServiceRestrictions restrictions = query.getRestrictions();
-		this.restrictions = restrictions;
-		this.filters = query.getFilterComponent();
+	// Map Catalog (MapQueryService) (i.e. Eclipse "the idea of", or "Mapping Sample")
+	// -----------------------------------------------------------
+	private void extractMapQueryData(MapQuery cts2Query) {
+		MapQueryServiceRestrictions localCts2Restrictions = cts2Query.getRestrictions();
+		this.cts2Restrictions = localCts2Restrictions;
+		this.cts2Filters = cts2Query.getFilterComponent();
+
+		// Not needed?
+//		query.getReadContext();
+//		restrictions.getValueSetRestriction();
+		
+		if(localCts2Restrictions != null){
+			this.cts2CodeSystemRestriction = localCts2Restrictions.getCodeSystemRestriction();
+		}
+		this.isMapQuery = true;
+	}
+
+	// Map Version (MapVersionQueryService) (i.e. Eclipse Juno, or "Mapping Sample-1.0")
+	// ---------------------------------------------------------
+	private void extractMapVersionQueryData(MapVersionQuery cts2Query) {
+		MapVersionQueryServiceRestrictions localCts2Restrictions = cts2Query.getRestrictions();
+		this.cts2Restrictions = localCts2Restrictions;
+		this.cts2Filters = cts2Query.getFilterComponent();
 
 		// Not needed?
 //		query.getReadContext();
 //		restrictions.getValueSetRestriction();
 		
 		
-		if(restrictions != null){
-			this.codeSystemRestriction = restrictions.getCodeSystemRestriction();
-			this.codeSystem = restrictions.getMap(); 
-			this.entitiesRestriction = restrictions.getEntitiesRestriction();
+		if(localCts2Restrictions != null){
+			this.cts2CodeSystemRestriction = localCts2Restrictions.getCodeSystemRestriction();  	// Restrict to source or target fields containing this value.
+			this.cts2EntitiesRestriction = localCts2Restrictions.getEntitiesRestriction();		// Restrict to maps containing these entities in a relation.
 			
-			if(this.codeSystem != null){
-				this.nameVersionPairName = (this.codeSystem.getUri() != null) ? this.codeSystem.getUri() : this.codeSystem.getName();
-			}
+			this.cts2Map = localCts2Restrictions.getMap(); 										// Restrict to given map with this codeScheme Name
+			this.cts2MapName = this.getName(this.cts2Map);
 		}
 		this.isMapQuery = true;
 	}
 
-	private void extractMapQueryData(MapQuery query) {
-		MapQueryServiceRestrictions restrictions = query.getRestrictions();
-		this.restrictions = restrictions;
-		this.filters = query.getFilterComponent();
-
-		// Not needed?
-//		query.getReadContext();
-//		restrictions.getValueSetRestriction();
-		
-		if(restrictions != null){
-			this.codeSystemRestriction = restrictions.getCodeSystemRestriction();
+	private String getName(NameOrURI cts2NameOrURI) {
+		String cts2Name = null;
+		if(cts2NameOrURI != null){
+			cts2Name = (cts2NameOrURI.getUri() != null) ? cts2NameOrURI.getUri() : cts2NameOrURI.getName();
 		}
-		this.isMapQuery = true;
+		return cts2Name;
 	}
 
-	private void extractCodeSystemVersionQueryData(CodeSystemVersionQuery query) {
-		CodeSystemVersionQueryServiceRestrictions restrictions = query.getRestrictions();
-		this.restrictions = restrictions;
-		this.filters = query.getFilterComponent();
+	private void extractCodeSystemVersionQueryData(CodeSystemVersionQuery cts2Query) {
+		CodeSystemVersionQueryServiceRestrictions localCts2Restrictions = cts2Query.getRestrictions();
+		this.cts2Restrictions = localCts2Restrictions;
+		this.cts2Filters = cts2Query.getFilterComponent();
 
 		// Not needed?
 //		query.getReadContext();
 		
-		
-		if(restrictions != null){
-			this.codeSystem = restrictions.getCodeSystem();
-			this.entityRestriction = restrictions.getEntityRestriction();
+		if(localCts2Restrictions != null){
+			this.cts2EntityRestriction = localCts2Restrictions.getEntityRestriction();
 			
-			if(this.codeSystem != null){
-				this.nameVersionPairName = (this.codeSystem.getUri() != null) ? this.codeSystem.getUri() : this.codeSystem.getName();
-			}
+			this.cts2CodeSystem = localCts2Restrictions.getCodeSystem();
+			this.cts2CodeSystemName = this.getName(this.cts2CodeSystem);
 		}
 	}
 
-	private void setVersionOrTag(VersionNameConverter nameConverter){
+	private void convertCts2Name(VersionNameConverter nameConverter){
 		NameVersionPair nameVersionPair;
-		if(this.codeSystemVersion != null){
-//			this.codeSystemVersionName = this.codeSystemVersion.getName();
-//			if(this.codeSystemVersionName != null){
-				nameVersionPair = nameConverter.fromCts2VersionName(this.codeSystemVersion.getName());	
-				this.codeSystemVersionName = nameVersionPair.getName();
-				this.versionOrTag = new CodingSchemeVersionOrTag();
-				this.nameVersionPairName = nameVersionPair.getName();
-				this.versionOrTag.setTag(nameVersionPair.getVersion());
-				this.versionOrTag.setVersion(nameVersionPair.getVersion());
-				this.checkNameAndVersion();
-//			}
+		NameOrURI cts2SystemVersion = this.getCts2SystemVersion();
+		
+		if(cts2SystemVersion != null){
+			nameVersionPair = nameConverter.fromCts2VersionName(cts2SystemVersion.getName());	
+			this.lexSchemeName = nameVersionPair.getName();
+			
+			this.lexVersionOrTag = new CodingSchemeVersionOrTag();
+			this.lexVersionOrTag.setTag(nameVersionPair.getVersion());
+			this.lexVersionOrTag.setVersion(nameVersionPair.getVersion());
+			
+			this.checkNameAndVersion();
 		}
 	}
 
 	private void checkNameAndVersion() {
-		if((nameVersionPairName != null) && (versionOrTag.getVersion() != null || versionOrTag.getTag() != null)){
+		if((this.lexSchemeName != null) && (lexVersionOrTag.getVersion() != null || lexVersionOrTag.getTag() != null)){
 			hasNameAndVersion = true;
 		}
 	}
