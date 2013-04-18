@@ -68,11 +68,9 @@ public class LexEvsResolvedValueSetQueryService extends AbstractLexEvsService
 	public Set<? extends PropertyReference> getSupportedSearchReferences() {
 		PropertyReference name = StandardModelAttributeReference.RESOURCE_NAME
 				.getPropertyReference();
-		PropertyReference about = StandardModelAttributeReference.ABOUT
-				.getPropertyReference();
 		PropertyReference description = StandardModelAttributeReference.RESOURCE_SYNOPSIS
 				.getPropertyReference();
-		return new HashSet<PropertyReference>(Arrays.asList(name, about,
+		return new HashSet<PropertyReference>(Arrays.asList(name,
 				description));
 
 	}

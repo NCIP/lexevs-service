@@ -22,12 +22,15 @@ import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSetDirectoryEntry;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSetHeader;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResolvedValueSetUtils;
 
 @Component
 public class ResolvedCodingSchemeTransform {
 
 	@Resource
 	private UriHandler uriHandler;
+	@Resource
+	private CommonResolvedValueSetUtils resolvedValueSetUtils;
 
 	List<ResolvedValueSetDirectoryEntry> transform(List<CodingScheme> listcs) {
 		List<ResolvedValueSetDirectoryEntry> rvsde_list = new ArrayList<ResolvedValueSetDirectoryEntry>();
@@ -41,8 +44,7 @@ public class ResolvedCodingSchemeTransform {
 	ResolvedValueSetDirectoryEntry transform(CodingScheme cs) {
 		ResolvedValueSetDirectoryEntry entry = new ResolvedValueSetDirectoryEntry();
 		entry.setResolvedValueSetURI(cs.getCodingSchemeURI());
-
-		entry.setResourceName("");
+		entry.setResourceName(resolvedValueSetUtils.getName(cs));
 		entry.setHref("");
 		ResolvedValueSetHeader header = new ResolvedValueSetHeader();
 		List<CodeSystemVersionReference> resolvedReferences = getResolvedUsingCodeSystemList(cs);
