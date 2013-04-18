@@ -122,11 +122,11 @@ public class CommonPageUtils {
 	
 	public static <T> Object[] getRenderingPage(List<T> list, Page page){
 		Object [] renderedArray = list.toArray(new CodingScheme[0]);
-		Object [] renderedPage = CommonPageUtils.getPageFromArray(renderedArray, page);		
+		Object [] renderedPage = CommonPageUtils.getPage(renderedArray, page);		
 		return renderedPage;
 	}
 	
-	public static <T> Object[] getPageFromArray(T[] data, Page page) {
+	public static <T> Object[] getPage(T[] data, Page page) {
 		int start = page.getStart();
 		int end = page.getEnd();
 		Object [] csPage = null;

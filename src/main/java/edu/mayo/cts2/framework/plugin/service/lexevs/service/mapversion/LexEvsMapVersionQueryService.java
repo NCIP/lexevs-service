@@ -117,7 +117,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		QueryData<MapVersionQuery> queryData = new QueryData<MapVersionQuery>(query, null);
 		
 		CodingSchemeRendering[] csRendering = CommonResourceUtils.getLexCodingSchemeRenderings(lexBigService, nameConverter, queryData, this.mappingExtension, sortCriteria);
-		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPageFromArray(csRendering, page);
+		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPage(csRendering, page);
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
 		return CommonResourceUtils.createDirectoryResultsWithSummaryDescriptions(this.transformer, csRenderingPage, atEnd, Constants.SUMMARY_DESCRIPTION);
 	}
@@ -130,7 +130,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		QueryData<MapVersionQuery> queryData = new QueryData<MapVersionQuery>(query, null);
 		
 		CodingSchemeRendering[] csRendering = CommonResourceUtils.getLexCodingSchemeRenderings(lexBigService, nameConverter, queryData, this.mappingExtension, sortCriteria);
-		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPageFromArray(csRendering, page);
+		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPage(csRendering, page);
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
 		return CommonResourceUtils.createDirectoryResultWithEntryFullVersionDescriptions(lexBigService, this.transformer, csRenderingPage, atEnd);
 	}

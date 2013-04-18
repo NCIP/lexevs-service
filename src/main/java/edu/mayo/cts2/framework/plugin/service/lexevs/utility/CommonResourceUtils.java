@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.Collections.LocalNameList;
+import org.LexGrid.LexBIG.DataModel.Collections.ResolvedConceptReferenceList;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
@@ -198,68 +199,67 @@ public class CommonResourceUtils{
 			MapEntryQuery cts2Query, SortCriteria cts2SortCriteria, Page page,
 			VersionNameConverter nameConverter, MappingExtension lexMappingExtension) {
 		
+		ResolvedConceptReferenceResults lexResolvedConceptReferenceResults = null;
 		ResolvedConceptReferencesIterator lexMapIterator;
 		QueryData<MapEntryQuery> queryData;
 
 		queryData = new QueryData<MapEntryQuery>(cts2Query, nameConverter);
 		
-		String cts2CodeSystemName = queryData.getLexSchemeName();
+		String lexSchemeName = queryData.getLexSchemeName();  // Will get codeSchemeName or mapName depending on query type
+	
 		CodingSchemeVersionOrTag lexVersionOrTag = queryData.getLexVersionOrTag();
 		String lexRelationsContainerName = null;
 		List<MappingSortOption> lexSortOptionList = null;
 		
 		try {
-			lexMapIterator = lexMappingExtension.resolveMapping(cts2CodeSystemName, lexVersionOrTag, lexRelationsContainerName, lexSortOptionList);
+			lexMapIterator = lexMappingExtension.resolveMapping(lexSchemeName, lexVersionOrTag, lexRelationsContainerName, lexSortOptionList);
 			MapEntryQueryServiceRestrictions cts2Restrictions = (MapEntryQueryServiceRestrictions) queryData.getCts2Restrictions();
+			
+			// If restrictions exist then results need to be filtered to restricted entities provided in restriction.
 			if(cts2Restrictions != null){
-				Set<EntityNameOrURI> cts2TargetEntitySet = cts2Restrictions.getTargetEntities();
-				while(lexMapIterator.hasNext()){
-					ResolvedConceptReference lexResolvedConceptReference  = lexMapIterator.next();
-					Entity lexEntity = lexResolvedConceptReference.getEntity();
-					String lexEntityCode = lexEntity.getEntityCode();
-					for(EntityNameOrURI cts2Entity : cts2TargetEntitySet){
-//						String name = (entityName.getEntityName() == null) ? entityName.getUri() : entityName.getEntityName();
-						
-					}
-				}
+				ResolvedConceptReference [] lexResolvedConceptReferences = getLexEntityList(cts2Restrictions, lexMapIterator);
+				boolean atEnd = (page.getEnd() >= lexResolvedConceptReferences.length) ? true : false;
+				
+				lexResolvedConceptReferences = (ResolvedConceptReference[]) CommonPageUtils.getPage(lexResolvedConceptReferences, page);
+				lexResolvedConceptReferenceResults = new ResolvedConceptReferenceResults(lexResolvedConceptReferences, atEnd);
+			}
+			else{
+				lexResolvedConceptReferenceResults = CommonPageUtils.getPage(lexMapIterator, page);
 			}
 		} catch (LBParameterException e) {
 			throw new RuntimeException(e);
+		}
+
+		return lexResolvedConceptReferenceResults;			
+	}
+
+	public static ResolvedConceptReference [] getLexEntityList(
+			MapEntryQueryServiceRestrictions cts2Restrictions,
+			ResolvedConceptReferencesIterator lexMapIterator) {
+		ResolvedConceptReferenceList lexResolvedConceptReferenceList = new ResolvedConceptReferenceList();
+		ResolvedConceptReference lexResolvedConceptReference;
+		Set<EntityNameOrURI> cts2TargetEntitySet = cts2Restrictions.getTargetEntities();
+	
+		try {
+			while(lexMapIterator.hasNext()){
+				lexResolvedConceptReference  = lexMapIterator.next();
+				
+				Entity lexEntity = lexResolvedConceptReference.getEntity();
+				String lexEntityCode = lexEntity.getEntityCode();
+				for(EntityNameOrURI cts2Entity : cts2TargetEntitySet){
+					String cts2EntityName = cts2Entity.getEntityName().getName();
+					if(cts2EntityName.equals(lexEntityCode)){
+						lexResolvedConceptReferenceList.addResolvedConceptReference(lexResolvedConceptReference);
+					}
+				}
+			}
 		} catch (LBResourceUnavailableException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException();
 		} catch (LBInvocationException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException();
 		}
 		
-		// TODO: Should be able to remove when reference class implements "get" method, then just need following return method
-		return CommonPageUtils.getPage(lexMapIterator, page);	
-		
-		
-//		ArrayList<ResolvedConceptReference> referenceList = new ArrayList<ResolvedConceptReference>();
-//		boolean atEnd = true;
-//		int start = page.getStart();
-//		int end = page.getEnd();
-//		int index = 0;
-//		try {
-//			// Move iterator to start index
-//			while((index < start) && (iterator.numberRemaining() > 0)){
-//				index++;
-//				iterator.next();
-//			}
-//			
-//			// Collect page references
-//			while((start < end) && (iterator.numberRemaining() > 0)){
-//				ResolvedConceptReference ref = iterator.next();
-//				referenceList.add(ref);
-//			}
-//		} catch (LBResourceUnavailableException e) {
-//			throw new RuntimeException(e);
-//		} catch (LBInvocationException e) {
-//			throw new RuntimeException(e);
-//		}
-//		
-//		ResolvedConceptReference [] resolvedConceptReference = (ResolvedConceptReference[]) referenceList.toArray();
-//		return new ResolvedConceptReferenceResults(resolvedConceptReference, atEnd);
+		return lexResolvedConceptReferenceList.getResolvedConceptReference();
 	}
 
 	public static CodingScheme getMappedCodingScheme(
