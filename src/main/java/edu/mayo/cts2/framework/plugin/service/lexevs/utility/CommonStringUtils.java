@@ -4,6 +4,18 @@ import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 
 public class CommonStringUtils {
 	
+	public static boolean compareStrings(String compareTo, String match1, String match2){
+		boolean matches = false;
+		if (compareTo != null){
+			if ((compareTo.equals(match1) || compareTo.equals(match2))) {
+				matches = true;
+			}
+		}
+		
+		return matches;
+	}
+	
+
 	public static boolean executeMatchAlgorithm(
 			String sourceValue, 
 			String searchValue, 

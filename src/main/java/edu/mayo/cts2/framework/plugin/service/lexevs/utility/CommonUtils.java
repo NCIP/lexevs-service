@@ -1,10 +1,8 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
 
-import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.Collections.ConceptReferenceList;
 import org.LexGrid.LexBIG.DataModel.Collections.LocalNameList;
 import org.LexGrid.LexBIG.DataModel.Collections.SortOptionList;
-import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.LexBIG.Exceptions.LBException;
@@ -22,9 +20,8 @@ import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
-import edu.mayo.cts2.framework.service.profile.ResourceQuery;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.service.profile.entitydescription.name.EntityDescriptionReadId;
 
 public class CommonUtils {
@@ -34,60 +31,36 @@ public class CommonUtils {
 		super();
 	}
 
-	public static <T extends ResourceQuery> boolean queryContainsExistingCodingScheme(
-			QueryData<T> queryData,
-			CodingSchemeRenderingList codingSchemeRenderingList){
-		boolean found = false;
-		String localName, version;
-		CodingSchemeSummary codingSchemeSummary;
-		
-		int count = codingSchemeRenderingList.getCodingSchemeRenderingCount();
-		
-		for(int index=0; index < count; index++){
-			codingSchemeSummary = codingSchemeRenderingList.getCodingSchemeRendering(index).getCodingSchemeSummary();
-			localName = codingSchemeSummary.getLocalName();
-			version = codingSchemeSummary.getRepresentsVersion();
-	
-			if(localName.equals(queryData.getSystemName()) && 
-				version.equals(queryData.getVersionOrTag().getVersion())){
-				found = true;
-			}
-		}		
-			
-		return found;
-	}
-
-
-	public static ResolvedConceptReference getResolvedConceptReference(
+	public static ResolvedConceptReference getLexResolvedConceptReference(
 			LexBIGService lexBigService, 
 			VersionNameConverter nameConverter, 
-			EntityDescriptionReadId identifier,
+			EntityDescriptionReadId cts2EntityDescriptionReadId,
 			ResolvedReadContext readContext) {
 
 		NameVersionPair codingSchemeName;
 		CodingSchemeVersionOrTag versionOrTag;
 		ConceptReferenceList referenceList;
-		CodedNodeSet codedNodeSet;
-		String versionName;
+		CodedNodeSet lexCodedNodeSet;
+		String cts2VersionName;
 		
-		versionName = identifier.getCodeSystemVersion().getName();
+		cts2VersionName = cts2EntityDescriptionReadId.getCodeSystemVersion().getName();
 		
-		codingSchemeName = nameConverter.fromCts2VersionName(versionName);
+		codingSchemeName = nameConverter.fromCts2VersionName(cts2VersionName);
 		
-		ScopedEntityName entityName = identifier.getEntityName();
+		ScopedEntityName entityName = cts2EntityDescriptionReadId.getEntityName();
 		versionOrTag = Constructors.createCodingSchemeVersionOrTagFromVersion(codingSchemeName.getVersion());
 		referenceList = Constructors.createConceptReferenceList(entityName.getName(), entityName.getNamespace(), codingSchemeName.getName());
 		
 		try {
-			codedNodeSet = lexBigService.getNodeSet(codingSchemeName.getName(), versionOrTag, null);
-			codedNodeSet = codedNodeSet.restrictToCodes(referenceList);
+			lexCodedNodeSet = lexBigService.getNodeSet(codingSchemeName.getName(), versionOrTag, null);
+			lexCodedNodeSet = lexCodedNodeSet.restrictToCodes(referenceList);
 			
-			ResolvedConceptReferencesIterator iterator = codedNodeSet.resolve(null, null, null);
+			ResolvedConceptReferencesIterator lexResolvedConceptReferencesIterator = lexCodedNodeSet.resolve(null, null, null);
 			
-			if(! iterator.hasNext()){
+			if(! lexResolvedConceptReferencesIterator.hasNext()){
 				return null;
 			} else {
-				return iterator.next();
+				return lexResolvedConceptReferencesIterator.next();
 			}
 		} catch (LBException e) {
 			throw new RuntimeException(e);
@@ -99,44 +72,44 @@ public class CommonUtils {
 	
 	
 
-	public static ResolvedConceptReferencesIterator getResolvedConceptReferencesFromCodedNodeSet(CodedNodeSet codedNodeSet, SortCriteria sortCriteria){
-		ResolvedConceptReferencesIterator iterator = null;
-		if(codedNodeSet != null){
+	public static ResolvedConceptReferencesIterator getLexResolvedConceptIterator(CodedNodeSet lexCodedNodeSet, SortCriteria cts2SortCriteria){
+		ResolvedConceptReferencesIterator lexResolvedConceptReferencesIterator = null;
+		if(lexCodedNodeSet != null){
 			try {
 				// With all null arguments the iterator will access the entire codeNodeSet
 				// This call will execute the set of filters determined in loop above
-				SortOptionList sortOptions = null;
-				LocalNameList propertyNames = null;
-				PropertyType [] propertyTypes = null; 
+				SortOptionList lexSortOptions = null;
+				LocalNameList lexPropertyNames = null;
+				PropertyType [] lexPropertyTypes = null; 
 				
-				iterator = codedNodeSet.resolve(sortOptions, propertyNames, propertyTypes);
+				lexResolvedConceptReferencesIterator = lexCodedNodeSet.resolve(lexSortOptions, lexPropertyNames, lexPropertyTypes);
 			} catch (LBInvocationException e) {
 				throw new RuntimeException(e);
 			} catch (LBParameterException e) {
 				throw new RuntimeException(e);
 			}
 		}		
-		return iterator;
+		return lexResolvedConceptReferencesIterator;
 	}
 
 
 	public static NameVersionPair getNamePair(
 			VersionNameConverter nameConverter, 
-			NameOrURI identifier,
-			ResolvedReadContext readContext) {
-		if(identifier == null){
+			NameOrURI cts2NameOrURI,
+			ResolvedReadContext cts2ReadContext) {
+		if(cts2NameOrURI == null){
 			return null;
 		}
-		String name;
+		String cts2Name;
 		NameVersionPair namePair;
 		
-		if (identifier.getName() != null) {
-			name = identifier.getName();
-			if (!nameConverter.isValidVersionName(name)) {
+		if (cts2NameOrURI.getName() != null) {
+			cts2Name = cts2NameOrURI.getName();
+			if (!nameConverter.isValidVersionName(cts2Name)) {
 				namePair = null;
 			}
 			else{
-				namePair = nameConverter.fromCts2VersionName(name);		
+				namePair = nameConverter.fromCts2VersionName(cts2Name);		
 			}
 		} else {
 			throw new UnsupportedOperationException(
@@ -148,12 +121,14 @@ public class CommonUtils {
 	
 	
 	public static CodingSchemeVersionOrTag convertTag(VersionTagReference tag){
+		CodingSchemeVersionOrTag lexVersionOrTag = Constants.CURRENT_LEXEVS_TAG;
 		String tagValue = tag.getContent();
-		if(StringUtils.equals(tagValue, Constants.CURRENT_TAG.getContent())){
-			return Constants.CURRENT_LEXEVS_TAG;
-		} else {
-			return Constructors.createCodingSchemeVersionOrTagFromTag(tagValue);
+		
+		if(!StringUtils.equals(tagValue, Constants.CURRENT_TAG.getContent())){
+			lexVersionOrTag = Constructors.createCodingSchemeVersionOrTagFromTag(tagValue);
 		}
+		
+		return lexVersionOrTag;
 	}
 		
 }

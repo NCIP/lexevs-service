@@ -67,7 +67,7 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	@Resource
 	private MappingToMapEntryTransform transformer;
 		
-	private MappingExtension mappingExtension;
+	private MappingExtension lexMappingExtension;
 	
 	public static final String MAPPING_EXTENSION = "MappingExtension";	
 	
@@ -83,7 +83,7 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	}
 	
 	public void setMappingExtension(MappingExtension extension){
-		this.mappingExtension = extension;
+		this.lexMappingExtension = extension;
 	}
 
 
@@ -91,7 +91,7 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	// -------- Implemented methods ----------------	
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(MAPPING_EXTENSION);
+		this.lexMappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(MAPPING_EXTENSION);
 	}
 		
 
@@ -103,11 +103,11 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	public DirectoryResult<MapEntryDirectoryEntry> getResourceSummaries(
 			MapEntryQuery query, SortCriteria sortCriteria, Page page) {
 		
-		DirectoryResult<MapEntryDirectoryEntry> directoryResult;
-		ResolvedConceptReferenceResults referenceResults = CommonResourceUtils.getMapReferenceResults(query, sortCriteria, page, this.nameConverter, this.mappingExtension);
-		directoryResult = CommonResourceUtils.createDirectoryResultWithEntryDescriptions(this.transformer, referenceResults, Constants.SUMMARY_DESCRIPTION);
+		DirectoryResult<MapEntryDirectoryEntry> cts2DirectoryResult;
+		ResolvedConceptReferenceResults lexReferenceResults = CommonResourceUtils.getLexMapReferenceResults(query, sortCriteria, page, this.nameConverter, this.lexMappingExtension);
+		cts2DirectoryResult = CommonResourceUtils.createDirectoryResults(this.transformer, lexReferenceResults, Constants.SUMMARY_DESCRIPTION);
 		
-		return directoryResult;
+		return cts2DirectoryResult;
 	}
 
 	/* (non-Javadoc)
@@ -117,11 +117,11 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	public DirectoryResult<MapEntry> getResourceList(MapEntryQuery query,
 			SortCriteria sortCriteria, Page page) {
 				
-		DirectoryResult<MapEntry> directoryResult = null;
-		ResolvedConceptReferenceResults referenceResults = CommonResourceUtils.getMapReferenceResults(query, sortCriteria, page, this.nameConverter, this.mappingExtension);
-		directoryResult = CommonResourceUtils.createDirectoryResultWithEntryDescriptions(this.transformer, referenceResults, Constants.FULL_DESCRIPTION);
+		DirectoryResult<MapEntry> cts2DirectoryResult = null;
+		ResolvedConceptReferenceResults lexReferenceResults = CommonResourceUtils.getLexMapReferenceResults(query, sortCriteria, page, this.nameConverter, this.lexMappingExtension);
+		cts2DirectoryResult = CommonResourceUtils.createDirectoryResults(this.transformer, lexReferenceResults, Constants.FULL_DESCRIPTION);
 
-		return directoryResult;
+		return cts2DirectoryResult;
 	}
 
 	/* (non-Javadoc)
@@ -129,8 +129,8 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	 */
 	@Override
 	public int count(MapEntryQuery query) {		
-		ResolvedConceptReferenceResults referenceResults = CommonResourceUtils.getMapReferenceResults(query, null, null, this.nameConverter, this.mappingExtension);
-		return referenceResults.getResolvedConceptReference().length;
+		ResolvedConceptReferenceResults lexReferenceResults = CommonResourceUtils.getLexMapReferenceResults(query, null, null, this.nameConverter, this.lexMappingExtension);
+		return lexReferenceResults.getLexResolvedConceptReference().length;
 	}
 
 	/* (non-Javadoc)
@@ -138,7 +138,7 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	 */
 	@Override
 	public Set<? extends MatchAlgorithmReference> getSupportedMatchAlgorithms() {
-		return CommonSearchFilterUtils.createSupportedMatchAlgorithms();
+		return CommonSearchFilterUtils.getLexSupportedMatchAlgorithms();
 	}
 
 	/* (non-Javadoc)
@@ -146,7 +146,7 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	 */
 	@Override
 	public Set<? extends PropertyReference> getSupportedSearchReferences() {
-		return CommonSearchFilterUtils.createSupportedSearchReferences();
+		return CommonSearchFilterUtils.getLexSupportedSearchReferences();
 	}
 
 	

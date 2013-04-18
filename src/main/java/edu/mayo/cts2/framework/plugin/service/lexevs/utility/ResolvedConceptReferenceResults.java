@@ -4,12 +4,12 @@ import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 
 public class ResolvedConceptReferenceResults {
 	private boolean atEnd;
-	private ResolvedConceptReference [] resolvedConceptReference;
+	private ResolvedConceptReference [] lexResolvedConceptReference;
 	
-	public ResolvedConceptReferenceResults(ResolvedConceptReference [] resolvedConceptReference, boolean atEnd){	
-		this.resolvedConceptReference = null;
-		if(resolvedConceptReference != null){
-			this.resolvedConceptReference = resolvedConceptReference.clone();
+	public ResolvedConceptReferenceResults(ResolvedConceptReference [] lexResolvedConceptReference, boolean atEnd){	
+		this.lexResolvedConceptReference = null;
+		if(lexResolvedConceptReference != null){
+			this.lexResolvedConceptReference = lexResolvedConceptReference.clone();
 		}
 		this.atEnd = atEnd;
 	}
@@ -22,13 +22,13 @@ public class ResolvedConceptReferenceResults {
 		this.atEnd = atEnd;
 	}
 
-	public ResolvedConceptReference[] getResolvedConceptReference() {
-		return resolvedConceptReference;
+	public ResolvedConceptReference[] getLexResolvedConceptReference() {
+		return lexResolvedConceptReference;
 	}
 
-	public void setResolvedConceptReference(
+	public void setLexResolvedConceptReference(
 			ResolvedConceptReference[] resolvedConceptReference) {
-		this.resolvedConceptReference = resolvedConceptReference.clone();
+		this.lexResolvedConceptReference = resolvedConceptReference.clone();
 	}
 	
 }
