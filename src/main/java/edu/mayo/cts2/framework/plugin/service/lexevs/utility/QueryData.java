@@ -3,6 +3,8 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
 import java.util.Set;
 
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.util.Assert;
 
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
@@ -174,7 +176,7 @@ public class QueryData <Query extends ResourceQuery>{
 				this.extractCodeSystemVersionQueryData((CodeSystemVersionQuery) cts2Query);
 			}
 			else if(cts2Query instanceof EntityDescriptionQuery){
-				this.extractEntityDescriptionQueryData((EntityDescriptionQuery) cts2Query, nameConverter);
+				this.extractEntityDescriptionQueryData((EntityDescriptionQuery) cts2Query);
 			}
 			else if(cts2Query instanceof MapQuery){
 				this.extractMapQueryData((MapQuery) cts2Query);
@@ -183,10 +185,10 @@ public class QueryData <Query extends ResourceQuery>{
 				this.extractMapVersionQueryData((MapVersionQuery) cts2Query);
 			}
 			else if(cts2Query instanceof MapEntryQuery){
-				this.extractMapEntryQueryData((MapEntryQuery) cts2Query, nameConverter);				
+				this.extractMapEntryQueryData((MapEntryQuery) cts2Query);				
 			}
 			else if(cts2Query instanceof ResolvedValueSetQuery){
-				this.extractResolvedValueSetQuery((ResolvedValueSetQuery) cts2Query, nameConverter);
+				this.extractResolvedValueSetQuery((ResolvedValueSetQuery) cts2Query);
 			}
 		}
 	}
@@ -195,13 +197,12 @@ public class QueryData <Query extends ResourceQuery>{
 	 * @param cts2Query
 	 * @param nameConverter
 	 */
-	private final void extractResolvedValueSetQuery(ResolvedValueSetQuery cts2Query,
-			VersionNameConverter nameConverter) {
+	private void extractResolvedValueSetQuery(ResolvedValueSetQuery cts2Query) {
 		ResolvedValueSetQueryServiceRestrictions localCts2Restrictions = cts2Query.getResolvedValueSetQueryServiceRestrictions();
 		this.cts2Restrictions = localCts2Restrictions;
 		this.cts2Filters = cts2Query.getFilterComponent();
 		
-		if(localCts2Restrictions != null){
+//		if(localCts2Restrictions != null){
 			// Do we want to pull more data from the restrictions?
 //			localCts2Restrictions.getCodeSystems();
 //			localCts2Restrictions.getCodeSystemVersions();
@@ -209,12 +210,11 @@ public class QueryData <Query extends ResourceQuery>{
 //			localCts2Restrictions.getValueSetDefinitions();
 //			localCts2Restrictions.getValueSets();
 			//this.convertCts2Name(nameConverter);
-		}
+//		}
 		
 	}
 
-	private final void extractMapEntryQueryData(MapEntryQuery cts2Query,
-			VersionNameConverter nameConverter) {
+	private void extractMapEntryQueryData(MapEntryQuery cts2Query) {
 		MapEntryQueryServiceRestrictions localCts2Restrictions = cts2Query.getRestrictions();
 		this.cts2Restrictions = localCts2Restrictions;
 		this.cts2Filters = cts2Query.getFilterComponent();
@@ -225,7 +225,7 @@ public class QueryData <Query extends ResourceQuery>{
 		
 		if(localCts2Restrictions != null){
 			this.cts2MapVersion = localCts2Restrictions.getMapVersion();
-			this.convertCts2Name(nameConverter);
+			this.convertCts2Name();
 			this.cts2TargetEntities = localCts2Restrictions.getTargetEntities();
 		}
 		
@@ -233,8 +233,7 @@ public class QueryData <Query extends ResourceQuery>{
 		this.isMapQuery = true;		
 	}
 
-	private final void extractEntityDescriptionQueryData(EntityDescriptionQuery cts2Query,
-			VersionNameConverter nameConverter) {
+	private void extractEntityDescriptionQueryData(EntityDescriptionQuery cts2Query) {
 		EntityDescriptionQueryServiceRestrictions localCts2Restrictions = cts2Query.getRestrictions();
 		this.cts2Restrictions = localCts2Restrictions;
 		this.cts2Filters = cts2Query.getFilterComponent();
@@ -246,7 +245,7 @@ public class QueryData <Query extends ResourceQuery>{
 		
 		if(localCts2Restrictions != null){
 			this.cts2CodeSystemVersion = localCts2Restrictions.getCodeSystemVersion();
-			this.convertCts2Name(nameConverter);
+			this.convertCts2Name();
 			this.cts2Entities = localCts2Restrictions.getEntities();
 			this.cts2TaggedCodeSystemRestriction = localCts2Restrictions.getTaggedCodeSystem();
 		}
@@ -255,7 +254,7 @@ public class QueryData <Query extends ResourceQuery>{
 
 	// Map Catalog (MapQueryService) (i.e. Eclipse "the idea of", or "Mapping Sample")
 	// -----------------------------------------------------------
-	private final void extractMapQueryData(MapQuery cts2Query) {
+	private void extractMapQueryData(MapQuery cts2Query) {
 		MapQueryServiceRestrictions localCts2Restrictions = cts2Query.getRestrictions();
 		this.cts2Restrictions = localCts2Restrictions;
 		this.cts2Filters = cts2Query.getFilterComponent();
@@ -272,7 +271,7 @@ public class QueryData <Query extends ResourceQuery>{
 
 	// Map Version (MapVersionQueryService) (i.e. Eclipse Juno, or "Mapping Sample-1.0")
 	// ---------------------------------------------------------
-	private final void extractMapVersionQueryData(MapVersionQuery cts2Query) {
+	private void extractMapVersionQueryData(MapVersionQuery cts2Query) {
 		MapVersionQueryServiceRestrictions localCts2Restrictions = cts2Query.getRestrictions();
 		this.cts2Restrictions = localCts2Restrictions;
 		this.cts2Filters = cts2Query.getFilterComponent();
@@ -292,7 +291,7 @@ public class QueryData <Query extends ResourceQuery>{
 		this.isMapQuery = true;
 	}
 
-	private final String getName(NameOrURI cts2NameOrURI) {
+	private String getName(NameOrURI cts2NameOrURI) {
 		String cts2Name = null;
 		if(cts2NameOrURI != null){
 			cts2Name = (cts2NameOrURI.getUri() != null) ? cts2NameOrURI.getUri() : cts2NameOrURI.getName();
@@ -300,7 +299,7 @@ public class QueryData <Query extends ResourceQuery>{
 		return cts2Name;
 	}
 
-	private final void extractCodeSystemVersionQueryData(CodeSystemVersionQuery cts2Query) {
+	private void extractCodeSystemVersionQueryData(CodeSystemVersionQuery cts2Query) {
 		CodeSystemVersionQueryServiceRestrictions localCts2Restrictions = cts2Query.getRestrictions();
 		this.cts2Restrictions = localCts2Restrictions;
 		this.cts2Filters = cts2Query.getFilterComponent();
@@ -316,12 +315,12 @@ public class QueryData <Query extends ResourceQuery>{
 		}
 	}
 
-	private final void convertCts2Name(VersionNameConverter nameConverter){
+	private void convertCts2Name(){
 		NameVersionPair nameVersionPair;
 		NameOrURI cts2SystemVersion = this.getCts2SystemVersion();
 		
 		if(cts2SystemVersion != null){
-			nameVersionPair = nameConverter.fromCts2VersionName(cts2SystemVersion.getName());	
+			nameVersionPair = this.fromCts2VersionName(cts2SystemVersion.getName());	
 			this.lexSchemeName = nameVersionPair.getName();
 			
 			this.lexVersionOrTag = new CodingSchemeVersionOrTag();
@@ -332,10 +331,19 @@ public class QueryData <Query extends ResourceQuery>{
 		}
 	}
 
-	private final void checkNameAndVersion() {
+	private void checkNameAndVersion() {
 		if((this.lexSchemeName != null) && (lexVersionOrTag.getVersion() != null || lexVersionOrTag.getTag() != null)){
 			hasNameAndVersion = true;
 		}
 	}
+	
+	public NameVersionPair fromCts2VersionName(String cts2CodeSystemVersionName){
+		String[] nameParts = StringUtils.split(cts2CodeSystemVersionName, "-");
+		
+		Assert.isTrue(nameParts.length == 2);
+		
+		return new NameVersionPair(nameParts[0], nameParts[1]);
+	}
+	
 }
 
