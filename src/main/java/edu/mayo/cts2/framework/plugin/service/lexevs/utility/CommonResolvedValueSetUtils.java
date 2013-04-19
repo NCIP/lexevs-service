@@ -21,11 +21,14 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.service.command.restriction.ResolvedValueSetQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.profile.resolvedvalueset.ResolvedValueSetQuery;
 @Component
-public class CommonResolvedValueSetUtils {
+public final class CommonResolvedValueSetUtils {
 
 	@Resource
 	private VersionNameConverter nameConverter;
 
+	private CommonResolvedValueSetUtils(){
+		super();
+	}
 
 	public  List<CodingScheme> restrictByQuery(List<CodingScheme> lexCodingSchemes,
 			ResolvedValueSetQuery query) throws Exception {

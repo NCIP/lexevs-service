@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
+import org.LexGrid.LexBIG.DataModel.Collections.ConceptReferenceList;
 import org.LexGrid.LexBIG.DataModel.Collections.LocalNameList;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
@@ -36,12 +37,12 @@ import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestri
 import edu.mayo.cts2.framework.service.profile.ResourceQuery;
 import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryQuery;
 
-public class CommonResourceUtils{
+public final class CommonResourceUtils{
 	private static final String UNCHECKED = "unchecked";
 	private static final String RAWTYPES = "rawtypes";
 	
 	private CommonResourceUtils(){
-		
+		super();
 	}
 	
 	@SuppressWarnings({ RAWTYPES, UNCHECKED })
@@ -143,7 +144,7 @@ public class CommonResourceUtils{
 		try {
 			lexRenderingList = lexBigService.getSupportedCodingSchemes();
 		} catch (LBInvocationException e) {
-			throw new RuntimeException();
+			throw new RuntimeException(e);
 		}
 		
 		lexRenderingList = CommonSearchFilterUtils.filterLexCodingSchemeRenderingList(lexRenderingList, cts2SystemName, lexMappingExtension);
@@ -194,7 +195,7 @@ public class CommonResourceUtils{
 					CommonSearchFilterUtils.filterLexCodedNodeSet(lexCodedNodeSet, queryData);
 				}
 			} catch (LBException e) {
-				throw new RuntimeException();
+				throw new RuntimeException(e);
 			}
 		}
 		
@@ -224,7 +225,9 @@ public class CommonResourceUtils{
 				Set<EntityNameOrURI> cts2TargetEntities = cts2Restrictions.getTargetEntities();
 				for(EntityNameOrURI cts2EntityNameOrURI : cts2TargetEntities){
 					String cts2EntityName = cts2EntityNameOrURI.getEntityName().getName();
-					lexMapping = lexMapping.restrictToCodes(Constructors.createConceptReferenceList(cts2EntityName), SearchContext.SOURCE_OR_TARGET_CODES);
+					String cts2EntityNamespace = cts2EntityNameOrURI.getEntityName().getNamespace();
+					ConceptReferenceList reference = Constructors.createConceptReferenceList(cts2EntityName, cts2EntityNamespace, lexSchemeName);
+					lexMapping = lexMapping.restrictToCodes(reference, SearchContext.SOURCE_OR_TARGET_CODES);
 				}
 				
 				lexMapIterator = lexMapping.resolveMapping();
@@ -237,9 +240,9 @@ public class CommonResourceUtils{
 			lexResolvedConceptReferenceResults = CommonPageUtils.getPage(lexMapIterator, page);
 			
 		} catch (LBParameterException e) {
-			throw new RuntimeException();
+			throw new RuntimeException(e);
 		} catch (LBException e) {
-			throw new RuntimeException();
+			throw new RuntimeException(e);
 		}
 
 		return lexResolvedConceptReferenceResults;			
@@ -336,7 +339,7 @@ public class CommonResourceUtils{
 			lexCodingScheme = lexBigService.resolveCodingScheme(lexCodingSchemeName, lexTagOrVersion);			
 			
 		} catch (LBException e) {
-			throw new RuntimeException();
+			throw new RuntimeException(e);
 		}
 		return lexCodingScheme;
 	}
