@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
+import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContents;
 import org.junit.Test;
 
 import edu.mayo.cts2.framework.model.command.Page;
@@ -25,7 +26,13 @@ import edu.mayo.cts2.framework.service.command.restriction.ResolvedValueSetQuery
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 
-@LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosAndGM.xml")
+@LoadContents(
+		{
+			@LoadContent(contentPath="lexevs/test-content/valueset/ResolvedAllDomesticAutosAndGM.xml"),
+			@LoadContent(contentPath="lexevs/test-content/valueset/ResolvedAllDomesticAutosButGM.xml"),
+		}
+	)
+
 public class LexEVSResolvedValuesetQueryServiceTestIT extends
 		AbstractTestITBase {
 
@@ -47,7 +54,7 @@ public class LexEVSResolvedValuesetQueryServiceTestIT extends
 				.getResourceSummaries(null, null, new Page());
 
 		assertNotNull(dirResult);
-		int expecting = 1;
+		int expecting = 2;
 		int actual = dirResult.getEntries().size();
 		assertEquals("Expecting " + expecting + " but got " + actual,
 				expecting, actual);
@@ -96,7 +103,7 @@ public class LexEVSResolvedValuesetQueryServiceTestIT extends
 				.getResourceSummaries(query, null, new Page());
 
 		assertNotNull(dirResult);
-		int expecting = 1;
+		int expecting = 2;
 		int actual = dirResult.getEntries().size();
 		assertEquals("Expecting " + expecting + " but got " + actual,
 				expecting, actual);
@@ -125,32 +132,16 @@ public class LexEVSResolvedValuesetQueryServiceTestIT extends
 				expecting, actual);
 	}
 
-	// -----------------------------
-	// Count with All valid filters
-	// -----------------------------
-	@Test
-	public void testCountWithValidFilterSet() throws Exception {
-		// Call local method to create set of all filters
-		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet("About", "synopsis", "resource");
-		
-		// Build query using filters
-		ResolvedValueSetQueryImpl query = new ResolvedValueSetQueryImpl(null, filter, null);
-
-		int expecting = 1;
-		int actual = this.service.count(query);
-		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
-	}
 		
 	// -------------------------
 	// Count with valid filters
 	// -------------------------
 	@Test
 	public void testGetCountWithValidFilterOnAbout() throws Exception {
-
 		// Build query using filters
 		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.ABOUT.getPropertyReference(), 
 												  		  StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), 
-												  		"About");
+												  		"SRITEST:AUTO:AllDomesticButGM");
 
 		// Build query using filters
 		ResolvedValueSetQueryImpl query = new ResolvedValueSetQueryImpl(null, filter, null);
@@ -159,5 +150,24 @@ public class LexEVSResolvedValuesetQueryServiceTestIT extends
 		int actual = this.service.count(query);
 		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
 	}	
+
 	
+// -------------------------
+// Count with valid filters
+// -------------------------
+@Test
+public void testGetCountWithValidFilterOnResourceName() throws Exception {
+	// Build query using filters
+	Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
+											  		  StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), 
+											  		"All");
+
+	// Build query using filters
+	ResolvedValueSetQueryImpl query = new ResolvedValueSetQueryImpl(null, filter, null);
+
+	int expecting = 2;
+	int actual = this.service.count(query);
+	assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
+}	
+
 }
