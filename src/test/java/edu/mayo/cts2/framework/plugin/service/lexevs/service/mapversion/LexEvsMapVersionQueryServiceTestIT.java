@@ -23,6 +23,7 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.mapversion;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.HashSet;
@@ -31,17 +32,25 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
+import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContents;
 import org.junit.Test;
 
 import edu.mayo.cts2.framework.core.xml.Cts2Marshaller;
+import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.core.ScopedEntityName;
+import edu.mayo.cts2.framework.model.core.SortCriteria;
+import edu.mayo.cts2.framework.model.directory.DirectoryResult;
+import edu.mayo.cts2.framework.model.mapversion.MapVersion;
+import edu.mayo.cts2.framework.model.mapversion.MapVersionDirectoryEntry;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
+import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.service.core.types.RestrictionType;
 import edu.mayo.cts2.framework.model.service.mapversion.types.MapRole;
 import edu.mayo.cts2.framework.model.service.mapversion.types.MapStatus;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
-import edu.mayo.cts2.framework.service.command.restriction.CodeSystemVersionQueryServiceRestrictions.EntityRestriction;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
+import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestrictions.CodeSystemRestriction;
 import edu.mayo.cts2.framework.service.command.restriction.MapVersionQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.command.restriction.MapVersionQueryServiceRestrictions.EntitiesRestriction;
 
@@ -49,7 +58,12 @@ import edu.mayo.cts2.framework.service.command.restriction.MapVersionQueryServic
  * @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
  *
  */
-@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
+@LoadContents(
+		{
+			@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
+			@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
+		}
+)
 public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 
 	@Resource
@@ -63,13 +77,9 @@ public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 		assertNotNull(this.service);
 	}
 	
-	// TODO Uncomment or delete CodeSystemRestrictions test cases below after we determine if its use is valid
-	//    and if valid the LexEvsMapVersionQueryService's code has been implemented for CodeSystemRestrictions
-	
-	// Test cases using CodeSystemRestriction as the only service restrictions
-/*	
+	// Test cases using CTS2 CodeSystemRestriction as the only service restrictions
 	@Test
-	public void testGetResourceListMapToRoleFound() {
+	public void testGetResourceListMapToRoleFoundUsingCts2CodeSystemRestrictionOnly() {
 		
 		MapVersionQueryServiceRestrictions restrictions = new MapVersionQueryServiceRestrictions();
 		NameOrURI codeSchemeName = ModelUtils.nameOrUriFromName("GermanMadeParts");
@@ -92,7 +102,7 @@ public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	public void testGetResourceSummariesMapToRoleFound() {
+	public void testGetResourceSummariesMapToRoleFoundUsingCts2CodeSystemRestrictionOnly() {
 		
 		MapVersionQueryServiceRestrictions restrictions = new MapVersionQueryServiceRestrictions();
 		NameOrURI codeSchemeName = ModelUtils.nameOrUriFromName("GermanMadeParts");
@@ -115,7 +125,7 @@ public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	public void testMapToRoleFoundForMultipleCodeSchemes() {
+	public void testMapToRoleFoundForMultipleCodeSchemesUsingCts2CodeSystemRestrictionOnly() {
 		
 		MapVersionQueryServiceRestrictions restrictions = new MapVersionQueryServiceRestrictions();
 		NameOrURI codeSchemeName1 = ModelUtils.nameOrUriFromName("DeutchMadeParts");
@@ -142,7 +152,7 @@ public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	public void testMapToRoleNotFoundForMultipleCodeSchemes() {
+	public void testMapToRoleNotFoundForMultipleCodeSchemesUsingCts2CodeSystemRestrictionOnly() {
 		
 		MapVersionQueryServiceRestrictions restrictions = new MapVersionQueryServiceRestrictions();
 		NameOrURI codeSchemeName1 = ModelUtils.nameOrUriFromName("DeutchMadeParts");
@@ -169,7 +179,7 @@ public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 	}
 	
 	@Test
-	public void testGetResourceListMapToRoleNotFound() {
+	public void testGetResourceListMapToRoleNotFoundUsingCts2CodeSystemRestrictionOnly() {
 		
 		MapVersionQueryServiceRestrictions restrictions = new MapVersionQueryServiceRestrictions();
 		NameOrURI codeSchemeName = ModelUtils.nameOrUriFromName("Automobiles");
@@ -192,7 +202,7 @@ public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 	}
 	
 	@Test
-	public void testGetResourceSummariesMapToRoleNotFound() {
+	public void testGetResourceSummariesMapToRoleNotFoundUsingCts2CodeSystemRestrictionOnly() {
 		
 		MapVersionQueryServiceRestrictions restrictions = new MapVersionQueryServiceRestrictions();
 		NameOrURI codeSchemeName = ModelUtils.nameOrUriFromName("Automobiles");
@@ -215,7 +225,7 @@ public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	public void testMapFromRoleFound() {
+	public void testMapFromRoleFoundUsingCts2CodeSystemRestrictionOnly() {
 		
 		MapVersionQueryServiceRestrictions restrictions = new MapVersionQueryServiceRestrictions();
 		NameOrURI codeSchemeName = ModelUtils.nameOrUriFromName("Automobiles");
@@ -238,7 +248,7 @@ public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	public void testMapFromRoleNotFound() {
+	public void testMapFromRoleNotFoundUsingCts2CodeSystemRestrictionOnly() {
 		
 		MapVersionQueryServiceRestrictions restrictions = new MapVersionQueryServiceRestrictions();
 		NameOrURI codeSchemeName = ModelUtils.nameOrUriFromName("GermanMadeParts");
@@ -262,7 +272,7 @@ public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 
 
 	@Test
-	public void testBothMapRolesFoundViaMapTo() {
+	public void testBothMapRolesFoundViaMapToUsingCts2CodeSystemRestrictionOnly() {
 		
 		MapVersionQueryServiceRestrictions restrictions = new MapVersionQueryServiceRestrictions();
 		NameOrURI codeSchemeName1 = ModelUtils.nameOrUriFromName("ItalianMadeParts");
@@ -289,7 +299,7 @@ public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	public void testBothMapRolesFoundViaMapFrom() {
+	public void testBothMapRolesFoundViaMapFromUsingCts2CodeSystemRestrictionOnly() {
 		
 		MapVersionQueryServiceRestrictions restrictions = new MapVersionQueryServiceRestrictions();
 		NameOrURI codeSchemeName1 = ModelUtils.nameOrUriFromName("ItalianMadeParts");
@@ -317,7 +327,7 @@ public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 
 
 	@Test
-	public void testBothMapRolesNotFound() {
+	public void testBothMapRolesNotFoundUsingCts2CodeSystemRestrictionOnly() {
 		
 		MapVersionQueryServiceRestrictions restrictions = new MapVersionQueryServiceRestrictions();
 		NameOrURI codeSchemeName1 = ModelUtils.nameOrUriFromName("ItalianMadeParts");
@@ -345,7 +355,7 @@ public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 
 
 	@Test
-	public void testCountUsingMapFromRoleRestrictionOneFound() {
+	public void testCountUsingMapFromRoleRestrictionOneFoundUsingCts2CodeSystemRestrictionOnly() {
 		
 		MapVersionQueryServiceRestrictions restrictions = new MapVersionQueryServiceRestrictions();
 		NameOrURI codeSchemeName = ModelUtils.nameOrUriFromName("Automobiles");
@@ -363,7 +373,7 @@ public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	public void testCountUsingNoMapFromRoleRestrictionsOneFound() {
+	public void testCountUsingNoMapFromRoleRestrictionsOneFoundUsingCts2CodeSystemRestrictionOnly() {
 		
 		MapVersionQueryServiceRestrictions restrictions = new MapVersionQueryServiceRestrictions();
 		NameOrURI codeSchemeName = ModelUtils.nameOrUriFromName("GermanMadeParts");
@@ -377,8 +387,6 @@ public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 		
 		assertEquals(1,this.service.count(null));
 	}
-	
-*/	
 
 	// TODO Test data and case scenarios for MapVersionQueryServiceRestrictions.EntityRestriction assuming MapVersionQueryService
 	//    will be implemented to filter on MapVersionQueryServiceRestrictions.EntityRestriction object. Test cases will need
@@ -394,14 +402,22 @@ public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 		entitiesRestriction.setMapRole(MapRole.MAP_TO_ROLE);
 		
 		
-		// MapStatus test values to consider
-		entitiesRestriction.setMapStatus(MapStatus.ALLMAPENTRIES);		
+		// MapStatus test values to consider:
+		// ALLMAPENTRIES: The union of UNMAPPED and MAPPED entities - any entity that is a source or target of a map 
+		// whether mentioned or not.
+		entitiesRestriction.setMapStatus(MapStatus.ALLMAPENTRIES);	
+		// MAPPED: An entity is included in the "from" part of the map and appears in a MapEntry or it appears in the "to" 
+		// part of the map and appears in one or more MapRules. MAPPED includes NOMAP entities.
 		entitiesRestriction.setMapStatus(MapStatus.MAPPED);		
+		// NOMAP: An entity is included in the "from" part of the map and there is a MapEntry that references it but there 
+		// the target set is empty. NOMAP references entities that have been explicitly declared to have no mapping
 		entitiesRestriction.setMapStatus(MapStatus.NOMAP);		
+		// UNMAPPED: An entity is included in the "from" part of the map but does not appear in an MapEntry or it appears 
+		// in the "to" part of the map but does not appear in the output of a MapRule
 		entitiesRestriction.setMapStatus(MapStatus.UNMAPPED);		
 		
 		
-		// Set<EntityNameOrURI> entities test values to consider
+		// Set<EntityNameOrURI> entities test values to consider:
 		Set<EntityNameOrURI> entities = entitiesRestriction.getEntities();
 		Set<EntityNameOrURI> entitiesSet = new HashSet<EntityNameOrURI>();
 		// Valid sourceEntity (MapRole.MAP_FROM_ROLE) examples
@@ -420,8 +436,13 @@ public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 		ScopedEntityName scopedEntityName_P0001 = ModelUtils.createScopedEntityName("P0001", "GermanMadePartsNamespace");
 		EntityNameOrURI entityNameOrURI = ModelUtils.entityNameOrUriFromName(scopedEntityName_A0001);
 		
-		// RestrictionType test values to consider
+		// RestrictionType test values to consider:
+		// A parameter used in queries where multiple elements are provided. It determines whether a candidate element 
+		// must satisfy all restrictions or just one or more restriction in order to be considered as satisfying the 
+		// restriction composite
+		// ALL - a match is only considered valid if all defined restrictions are met
 		entitiesRestriction.setAllOrSome(RestrictionType.ALL);
+		// AT_LEAST_ONE - a match is considered valid if one or more restrictions are met
 		entitiesRestriction.setAllOrSome(RestrictionType.AT_LEAST_ONE);
 		
 	}
