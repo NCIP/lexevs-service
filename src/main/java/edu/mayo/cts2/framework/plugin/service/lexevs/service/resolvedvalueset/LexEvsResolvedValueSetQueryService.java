@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.codingSchemes.CodingScheme;
 import org.springframework.stereotype.Component;
 
@@ -129,7 +130,7 @@ public class LexEvsResolvedValueSetQueryService extends AbstractLexEvsService
 		this.resolverUtils = resolverUtils;
 	}
 	
-	private List<CodingScheme>  processQuery(ResolvedValueSetQuery query) throws Exception{
+	private List<CodingScheme>  processQuery(ResolvedValueSetQuery query) throws LBException{
 		List<CodingScheme> csList= getLexEVSResolvedService().listAllResolvedValueSets();
 		List<CodingScheme> restrictedList= resolverUtils.restrictByQuery(csList, query);
 		if (query!= null) {
