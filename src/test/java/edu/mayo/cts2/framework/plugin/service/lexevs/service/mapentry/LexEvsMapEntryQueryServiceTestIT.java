@@ -73,7 +73,58 @@ public class LexEvsMapEntryQueryServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	public void testGetResourceListMapFound() {
+	public void testGetResourceListValidMapNoRestrictions() {
+		
+		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
+		NameOrURI mapVersion = ModelUtils.nameOrUriFromName("MappingSample-1.0");
+		restrictions.setMapVersion(mapVersion);
+				
+		MapEntryQueryImpl mapEntryQueryImpl = new MapEntryQueryImpl(null,null,null,restrictions);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<MapEntry> resourceList = this.service.getResourceList(mapEntryQueryImpl, sortCriteria, page);
+		assertNotNull(resourceList);
+		assertEquals(6,resourceList.getEntries().size());
+	}
+
+	@Test
+	public void testGetResourceListInvalidMapVersionNoRestrictions() {
+		
+		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
+		NameOrURI mapVersion = ModelUtils.nameOrUriFromName("MappingSample-2.2");
+		restrictions.setMapVersion(mapVersion);
+				
+		MapEntryQueryImpl mapEntryQueryImpl = new MapEntryQueryImpl(null,null,null,restrictions);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<MapEntry> resourceList = this.service.getResourceList(mapEntryQueryImpl, sortCriteria, page);
+		assertNotNull(resourceList);
+		assertEquals(0,resourceList.getEntries().size());
+	}
+
+	@Test
+	public void testGetResourceListInvalidMapNameNoRestrictions() {
+		
+		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
+		NameOrURI mapVersion = ModelUtils.nameOrUriFromName("MappingSampleFOO-1.0");
+		restrictions.setMapVersion(mapVersion);
+				
+		MapEntryQueryImpl mapEntryQueryImpl = new MapEntryQueryImpl(null,null,null,restrictions);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<MapEntry> resourceList = this.service.getResourceList(mapEntryQueryImpl, sortCriteria, page);
+		assertNotNull(resourceList);
+		assertEquals(0,resourceList.getEntries().size());
+	}
+
+	@Test
+	public void testGetResourceListMapAndRestrictedToOneValidEntity() {
 		
 		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
 		NameOrURI mapVersion = ModelUtils.nameOrUriFromName("MappingSample-1.0");
@@ -101,6 +152,66 @@ public class LexEvsMapEntryQueryServiceTestIT extends AbstractTestITBase {
 		assertEquals(1,resourceList.getEntries().size());
 	}
 
+	@Test
+	public void testGetResourceListMapAndRestrictedToOneInvalidEntityName() {
+		
+		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
+		NameOrURI mapVersion = ModelUtils.nameOrUriFromName("MappingSample-1.0");
+		restrictions.setMapVersion(mapVersion);
+		Set<EntityNameOrURI> targetEntities = new HashSet<EntityNameOrURI>();
+		
+		EntityNameOrURI entityNameOrURI = new EntityNameOrURI();
+		ScopedEntityName entityName = new ScopedEntityName(); //"A0001";
+		entityName.setName("A0001FOO");
+		entityName.setNamespace("Automobiles");
+		entityNameOrURI.setEntityName(entityName);
+//		String uri;
+//		entityNameOrURI.setUri(uri);
+		targetEntities.add(entityNameOrURI);
+		
+		restrictions.setTargetEntities(targetEntities );
+		
+		MapEntryQueryImpl mapEntryQueryImpl = new MapEntryQueryImpl(null,null,null,restrictions);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<MapEntry> resourceList = this.service.getResourceList(mapEntryQueryImpl, sortCriteria, page);
+		assertNotNull(resourceList);
+		assertEquals(0,resourceList.getEntries().size());
+	}
+
+	@Test
+	public void testGetResourceListMapAndRestrictedToOneInvalidEntityNamespace() {
+		
+		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
+		NameOrURI mapVersion = ModelUtils.nameOrUriFromName("MappingSample-1.0");
+		restrictions.setMapVersion(mapVersion);
+		Set<EntityNameOrURI> targetEntities = new HashSet<EntityNameOrURI>();
+		
+		EntityNameOrURI entityNameOrURI = new EntityNameOrURI();
+		ScopedEntityName entityName = new ScopedEntityName(); //"A0001";
+		entityName.setName("A0001");
+		entityName.setNamespace("AutomobilesFOO");
+		entityNameOrURI.setEntityName(entityName);
+	
+//		String uri;
+//		entityNameOrURI.setUri(uri);
+		targetEntities.add(entityNameOrURI);
+		
+		restrictions.setTargetEntities(targetEntities );
+		
+		MapEntryQueryImpl mapEntryQueryImpl = new MapEntryQueryImpl(null,null,null,restrictions);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<MapEntry> resourceList = this.service.getResourceList(mapEntryQueryImpl, sortCriteria, page);
+		assertNotNull(resourceList);
+		assertEquals(0,resourceList.getEntries().size());
+	}
+
+	
 //	@Test
 //	public void testGetResourceSummariesMapToRoleFound() {
 //		

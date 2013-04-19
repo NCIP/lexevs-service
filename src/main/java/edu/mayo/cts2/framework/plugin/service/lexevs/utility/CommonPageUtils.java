@@ -43,10 +43,10 @@ import edu.mayo.cts2.framework.service.profile.ResourceQuery;
  * @author <a href="mailto:hardie.linda@mayo.edu">Linda Hardie</a>
  *
  */
-public class CommonPageUtils {
+public final class CommonPageUtils {
 	
 	private CommonPageUtils(){
-		
+		super();
 	}
 	
 	public static <T extends ResourceQuery> ResolvedConceptReferenceResults getPage(
@@ -97,11 +97,11 @@ public class CommonPageUtils {
 				}	
 			}
 		} catch (LBInvocationException e) {
-			throw new RuntimeException();
+			throw new RuntimeException(e);
 		} catch (LBParameterException e) {
-			throw new RuntimeException();
+			throw new RuntimeException(e);
 		} catch (LBResourceUnavailableException e) {
-			throw new RuntimeException();
+			throw new RuntimeException(e);
 		}
 		
 		return new ResolvedConceptReferenceResults(resolvedConceptReferences, atEnd);

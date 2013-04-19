@@ -29,7 +29,7 @@ import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryQuery;
 import edu.mayo.cts2.framework.service.profile.mapversion.MapVersionQuery;
 import edu.mayo.cts2.framework.service.profile.resolvedvalueset.ResolvedValueSetQuery;
 
-public class QueryData <Query extends ResourceQuery>{
+public final class QueryData <Query extends ResourceQuery>{
 	private Set<ResolvedFilter> cts2Filters = null;							// Used by all
 	private Object cts2Restrictions = null;									// Used by all
 	

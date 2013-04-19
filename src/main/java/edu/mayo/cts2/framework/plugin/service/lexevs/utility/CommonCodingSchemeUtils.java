@@ -8,8 +8,11 @@ import org.LexGrid.relations.Relations;
 
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 
-public class CommonCodingSchemeUtils {
+public final class CommonCodingSchemeUtils {
 
+	private CommonCodingSchemeUtils(){
+		super();
+	}
 
 	public static boolean lexCodingSchemeExistsInCts2CodeSystemSet(String codeSystemNameOne, String codeSystemNameTwo, Set<NameOrURI> cts2CodeSystemSet) {
 

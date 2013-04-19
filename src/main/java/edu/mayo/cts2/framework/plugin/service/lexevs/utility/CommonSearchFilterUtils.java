@@ -28,9 +28,10 @@ import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 import edu.mayo.cts2.framework.service.profile.ResourceQuery;
 
-public class CommonSearchFilterUtils {
+public final class CommonSearchFilterUtils {
+	
 	private CommonSearchFilterUtils(){
-		
+		super();
 	}
 	
 	public static Set<MatchAlgorithmReference> getLexSupportedMatchAlgorithms() {
@@ -196,9 +197,9 @@ public class CommonSearchFilterUtils {
 		try {
 			lexCodedNodeSet.restrictToMatchingDesignations(cts2MatchValue, lexSearchOption, cts2MatchAlgorithm, lexLanguage);
 		} catch (LBInvocationException e) {
-			throw new RuntimeException();
+			throw new RuntimeException(e);
 		} catch (LBParameterException e) {
-			throw new RuntimeException();
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -232,9 +233,9 @@ public class CommonSearchFilterUtils {
 			try {
 				lexCodedNodeSet.restrictToCodes(lexConceptReferenceList);
 			} catch (LBInvocationException e) {
-				throw new RuntimeException();
+				throw new RuntimeException(e);
 			} catch (LBParameterException e) {
-				throw new RuntimeException();
+				throw new RuntimeException(e);
 			}		
 		}
 	}

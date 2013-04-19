@@ -24,7 +24,7 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.service.profile.entitydescription.name.EntityDescriptionReadId;
 
-public class CommonUtils {
+public final class CommonUtils {
 
 	// Private constructor - case where every method in class is static
 	private CommonUtils() {
