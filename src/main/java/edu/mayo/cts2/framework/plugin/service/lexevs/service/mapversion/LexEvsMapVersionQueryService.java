@@ -360,18 +360,69 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	
 	protected boolean checkIfMatchForAtLeastOneCts2EntitiesRestriction(CodingScheme lexCodingScheme, EntitiesRestriction cts2EntitiesRestriction) {
 
-		Set<EntityNameOrURI> restrictedEntitiesSet = cts2EntitiesRestriction.getEntities();
-		MapRole mapRole = cts2EntitiesRestriction.getMapRole();
 		MapStatus mapStatus = cts2EntitiesRestriction.getMapStatus();
 		if (mapStatus == null) {
 			// Set default status to 
 			mapStatus = MapStatus.MAPPED;  // ??? Use MAPPED
 		}
+				
+		if (mapStatus == MapStatus.ALLMAPENTRIES) {
+			throw new UnsupportedOperationException("MapStatus.ALLMAPENTRIES is currently not a supported option in respect " +
+					"to EntitiesRestriction for MapVersionQuery");	
+		}
+		if (mapStatus == MapStatus.UNMAPPED) {
+			throw new UnsupportedOperationException("MapStatus.UNMAPPED is currently not a supported option in respect " +
+					"to EntitiesRestriction for MapVersionQuery");	
+		}
 		
-		// TODO Under construction
+		Set<EntityNameOrURI> cts2RestrictedEntitiesSet = cts2EntitiesRestriction.getEntities();
+		MapRole mapRole = cts2EntitiesRestriction.getMapRole();
+
+		boolean matchFound = false;
 		
+		Relations relations = lexCodingScheme.getRelations(0);
+		List<AssociationPredicate> lexAssociationPredicatesList = relations.getAssociationPredicateAsReference();
+
+		if (mapStatus == MapStatus.MAPPED) {
+			// TODO Not sure what "MAPPED includes NOMAP entities." means (especially if the set of entities to restrict is not empty). If
+			//   the set of entities to restrict is empty then what's the point of having EntitiesRestriction?  Maybe its just a stmt to 
+			//   be sure not to discard the NOMAP conditions found.
+			if (mapRole == MapRole.MAP_FROM_ROLE) {
+				while (!matchFound) {
+					for (EntityNameOrURI cts2RestrictedEntity : cts2RestrictedEntitiesSet) {
+						ScopedEntityName cts2EntityName = cts2RestrictedEntity.getEntityName();
+						matchFound = isEntityFoundForMapFromRole(cts2EntityName, lexAssociationPredicatesList);
+					}
+				}
+			} else if (mapRole == MapRole.MAP_TO_ROLE) {
+				while (!matchFound) {
+					for (EntityNameOrURI cts2RestrictedEntity : cts2RestrictedEntitiesSet) {
+						ScopedEntityName cts2EntityName = cts2RestrictedEntity.getEntityName();
+						matchFound = isEntityFoundForMapToRole(cts2EntityName, lexAssociationPredicatesList);
+					}
+				}				
+			} else if (mapRole == MapRole.BOTH_MAP_ROLES) {
+				while (!matchFound) {
+					for (EntityNameOrURI cts2RestrictedEntity : cts2RestrictedEntitiesSet) {
+						ScopedEntityName cts2EntityName = cts2RestrictedEntity.getEntityName();
+						matchFound = isEntityFoundForBothMapRoles(cts2EntityName, lexAssociationPredicatesList);
+					}
+				}								
+			} else {
+				// TODO Throw an UnsupportedOperationException here?
+			}		
+		}
 		
-		return false;
+		if (mapStatus == MapStatus.NOMAP) {
+			// TODO Note the MapRoles MAP_TO_ROLE and BOTH_MAP_ROLE rules defined does not make sense with this MapStatus. Ignore MapRole or 
+			// throw an UnsupportedOperationException?
+			
+			// Treat all CTS2 Entities in the restriction list as LexEvs source entities (i.e. map from)
+			
+			
+		}
+		
+		return matchFound;
 	}
 	
 	
