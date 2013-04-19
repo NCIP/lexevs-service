@@ -63,10 +63,10 @@ public class CommonResolvedValueSetUtils {
 	}
 
 	
-	public List<CodingScheme> filterOnCodingSchemes(List<CodingScheme> cs_list,
+	public List<CodingScheme> filterOnCodingSchemes(List<CodingScheme> csList,
 			List<AbsoluteCodingSchemeVersionReference> codingSchemeVersionList)  {
 		List<CodingScheme> temp = new ArrayList<CodingScheme>();
-		for (CodingScheme cs : cs_list ){
+		for (CodingScheme cs : csList ){
 			if( matchesAbsoluteCodingSchemeVersionReferences(cs, codingSchemeVersionList)){
 				temp.add(cs);
 			}
@@ -120,10 +120,10 @@ public class CommonResolvedValueSetUtils {
     
     
     
-	public List<CodingScheme> filterOnDefinitions(List<CodingScheme> cs_list,
+	public List<CodingScheme> filterOnDefinitions(List<CodingScheme> csList,
 			Set<NameOrURI> definitions)  {
 		List<CodingScheme> temp = new ArrayList<CodingScheme>();
-		for (CodingScheme cs : cs_list) {
+		for (CodingScheme cs : csList) {
 			if( matchesValueSetDefinitions(cs, definitions)){
 				temp.add(cs);
 			}
@@ -133,11 +133,11 @@ public class CommonResolvedValueSetUtils {
 	}
 	
 	
-	public List<CodingScheme> filterOnEntities(List<CodingScheme> cs_list,
+	public List<CodingScheme> filterOnEntities(List<CodingScheme> csList,
 			Set<EntityNameOrURI> entities)  throws LBException {
 		List<CodingScheme> temp = new ArrayList<CodingScheme>();
-		if (cs_list != null) {
-			for (CodingScheme cs : cs_list) {
+		if (csList != null) {
+			for (CodingScheme cs : csList) {
 				if (matchesEntities(cs, entities)) {
 					temp.add(cs);
 				}
