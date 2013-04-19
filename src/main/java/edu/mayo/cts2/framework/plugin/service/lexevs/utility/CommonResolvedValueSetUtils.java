@@ -40,7 +40,7 @@ public class CommonResolvedValueSetUtils {
 
 	public List<CodingScheme> restrictByQuery(
 			List<CodingScheme> lexCodingSchemes, ResolvedValueSetQuery query)
-			throws Exception {
+			throws LBException {
 		List<CodingScheme> temp = new ArrayList<CodingScheme>();
 		List<AbsoluteCodingSchemeVersionReference> inCodingSchemes = new ArrayList<AbsoluteCodingSchemeVersionReference>();
 		if (query == null
@@ -64,7 +64,7 @@ public class CommonResolvedValueSetUtils {
 
 	
 	public List<CodingScheme> filterOnCodingSchemes(List<CodingScheme> cs_list,
-			List<AbsoluteCodingSchemeVersionReference> codingSchemeVersionList) throws Exception {
+			List<AbsoluteCodingSchemeVersionReference> codingSchemeVersionList)  {
 		List<CodingScheme> temp = new ArrayList<CodingScheme>();
 		for (CodingScheme cs : cs_list ){
 			if( matchesAbsoluteCodingSchemeVersionReferences(cs, codingSchemeVersionList)){
@@ -121,7 +121,7 @@ public class CommonResolvedValueSetUtils {
     
     
 	public List<CodingScheme> filterOnDefinitions(List<CodingScheme> cs_list,
-			Set<NameOrURI> definitions) throws Exception {
+			Set<NameOrURI> definitions)  {
 		List<CodingScheme> temp = new ArrayList<CodingScheme>();
 		for (CodingScheme cs : cs_list) {
 			if( matchesValueSetDefinitions(cs, definitions)){
@@ -134,7 +134,7 @@ public class CommonResolvedValueSetUtils {
 	
 	
 	public List<CodingScheme> filterOnEntities(List<CodingScheme> cs_list,
-			Set<EntityNameOrURI> entities) throws Exception {
+			Set<EntityNameOrURI> entities)  throws LBException {
 		List<CodingScheme> temp = new ArrayList<CodingScheme>();
 		if (cs_list != null) {
 			for (CodingScheme cs : cs_list) {
@@ -162,7 +162,7 @@ public class CommonResolvedValueSetUtils {
 	}
 
 	public boolean matchesEntities(CodingScheme cs,
-			Set<EntityNameOrURI> entities) throws Exception {
+			Set<EntityNameOrURI> entities) throws LBException {
 		if (entities == null || entities.isEmpty()) {
 			return true;
 		}
@@ -195,8 +195,9 @@ public class CommonResolvedValueSetUtils {
 	public List<AbsoluteCodingSchemeVersionReference> getAbsoluteCodingSchemeVersionReferenceList(
 			Set<NameOrURI> codingSchemes) throws LBException {
 		List<AbsoluteCodingSchemeVersionReference> list = new ArrayList<AbsoluteCodingSchemeVersionReference>();
-		if (codingSchemes == null || codingSchemes.isEmpty())
+		if (codingSchemes == null || codingSchemes.isEmpty()) {
 			return list;
+		}
 		for (NameOrURI nameURI : codingSchemes) {
 			NameVersionPair nameVersion = null;
 			AbsoluteCodingSchemeVersionReference ref = null;
