@@ -42,8 +42,9 @@ public final class CommonResolvedValueSetUtils {
 		super();
 	}
 
-	public  List<CodingScheme> restrictByQuery(List<CodingScheme> lexCodingSchemes,
-			ResolvedValueSetQuery query) throws Exception {
+	public List<CodingScheme> restrictByQuery(
+			List<CodingScheme> lexCodingSchemes, ResolvedValueSetQuery query)
+			throws LBException {
 		List<CodingScheme> temp = new ArrayList<CodingScheme>();
 		List<AbsoluteCodingSchemeVersionReference> inCodingSchemes = new ArrayList<AbsoluteCodingSchemeVersionReference>();
 		if (query == null
@@ -66,10 +67,10 @@ public final class CommonResolvedValueSetUtils {
 	}
 
 	
-	public List<CodingScheme> filterOnCodingSchemes(List<CodingScheme> cs_list,
-			List<AbsoluteCodingSchemeVersionReference> codingSchemeVersionList) throws Exception {
+	public List<CodingScheme> filterOnCodingSchemes(List<CodingScheme> csList,
+			List<AbsoluteCodingSchemeVersionReference> codingSchemeVersionList)  {
 		List<CodingScheme> temp = new ArrayList<CodingScheme>();
-		for (CodingScheme cs : cs_list ){
+		for (CodingScheme cs : csList ){
 			if( matchesAbsoluteCodingSchemeVersionReferences(cs, codingSchemeVersionList)){
 				temp.add(cs);
 			}
@@ -123,10 +124,10 @@ public final class CommonResolvedValueSetUtils {
     
     
     
-	public List<CodingScheme> filterOnDefinitions(List<CodingScheme> cs_list,
-			Set<NameOrURI> definitions) throws Exception {
+	public List<CodingScheme> filterOnDefinitions(List<CodingScheme> csList,
+			Set<NameOrURI> definitions)  {
 		List<CodingScheme> temp = new ArrayList<CodingScheme>();
-		for (CodingScheme cs : cs_list) {
+		for (CodingScheme cs : csList) {
 			if( matchesValueSetDefinitions(cs, definitions)){
 				temp.add(cs);
 			}
@@ -136,11 +137,11 @@ public final class CommonResolvedValueSetUtils {
 	}
 	
 	
-	public List<CodingScheme> filterOnEntities(List<CodingScheme> cs_list,
-			Set<EntityNameOrURI> entities) throws Exception {
+	public List<CodingScheme> filterOnEntities(List<CodingScheme> csList,
+			Set<EntityNameOrURI> entities)  throws LBException {
 		List<CodingScheme> temp = new ArrayList<CodingScheme>();
-		if (cs_list != null) {
-			for (CodingScheme cs : cs_list) {
+		if (csList != null) {
+			for (CodingScheme cs : csList) {
 				if (matchesEntities(cs, entities)) {
 					temp.add(cs);
 				}
@@ -165,7 +166,7 @@ public final class CommonResolvedValueSetUtils {
 	}
 
 	public boolean matchesEntities(CodingScheme cs,
-			Set<EntityNameOrURI> entities) throws Exception {
+			Set<EntityNameOrURI> entities) throws LBException {
 		if (entities == null || entities.isEmpty()) {
 			return true;
 		}
@@ -198,8 +199,9 @@ public final class CommonResolvedValueSetUtils {
 	public List<AbsoluteCodingSchemeVersionReference> getAbsoluteCodingSchemeVersionReferenceList(
 			Set<NameOrURI> codingSchemes) throws LBException {
 		List<AbsoluteCodingSchemeVersionReference> list = new ArrayList<AbsoluteCodingSchemeVersionReference>();
-		if (codingSchemes == null || codingSchemes.isEmpty())
+		if (codingSchemes == null || codingSchemes.isEmpty()) {
 			return list;
+		}
 		for (NameOrURI nameURI : codingSchemes) {
 			NameVersionPair nameVersion = null;
 			AbsoluteCodingSchemeVersionReference ref = null;

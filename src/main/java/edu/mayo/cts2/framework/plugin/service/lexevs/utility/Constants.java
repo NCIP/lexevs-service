@@ -27,10 +27,10 @@ public final class Constants {
 	public static final String ATTRIBUTE_NAME_RESOURCE_NAME = "resourceName";
 
 	// MapRole values
-	public static final String MAP_TO_ROLE = "MAP_TO_ROLE"; // represents source mapping
-	public static final String MAP_FROM_ROLE = "MAP_FROM_ROLE"; // represents target mapping
+	public static final String MAP_TO_ROLE = "MAP_TO_ROLE"; // represents target mapping
+	public static final String MAP_FROM_ROLE = "MAP_FROM_ROLE"; // represents source mapping
 	public static final String BOTH_MAP_ROLES = "BOTH_MAP_ROLES"; // represents source or target mapping
-	
+		
 	public static final String MAPPING_EXTENSION = "MappingExtension";
 
 	public static final String FULL_DESCRIPTION = "FULL_DESCRIPTIONS";

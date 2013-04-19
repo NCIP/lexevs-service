@@ -122,7 +122,7 @@ public final class CommonSearchFilterUtils {
 			Set<ResolvedFilter> cts2Filters, 
 			VersionNameConverter nameConverter) {
 		
-		List<CodingScheme> lexFilteredCodingSchemeList = null;
+		List<CodingScheme> lexFilteredCodingSchemeList = lexCodingSchemeList;
 		
 		if(lexCodingSchemeList != null && cts2Filters != null){
 			Iterator<ResolvedFilter> cts2FilterIterator = cts2Filters.iterator();
