@@ -15,6 +15,9 @@ public class ResolvedConceptReferenceResults {
 				this.lexResolvedConceptReference[i] = lexResolvedConceptReference[i];
 			}
 		}
+		else{
+			this.lexResolvedConceptReference = new ResolvedConceptReference[0];
+		}
 		this.atEnd = atEnd;
 	}
 
