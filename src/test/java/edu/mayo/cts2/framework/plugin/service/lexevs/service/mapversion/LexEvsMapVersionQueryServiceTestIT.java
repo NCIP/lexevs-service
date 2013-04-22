@@ -61,6 +61,7 @@ import edu.mayo.cts2.framework.service.command.restriction.MapVersionQueryServic
 @LoadContents(
 		{
 			@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
+			@LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml"),
 			@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
 		}
 )
@@ -446,4 +447,251 @@ public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 		entitiesRestriction.setAllOrSome(RestrictionType.AT_LEAST_ONE);
 		
 	}
+	
+	// Test cases using CTS2 EntitiesRestriction as the only service restrictions
+	@Test
+	public void testGetResourceListMapToRoleFoundUsingCts2EntitiesRestrictionOnlyAllMappedAndOneEntity() {
+		
+		MapVersionQueryServiceRestrictions restrictions = new MapVersionQueryServiceRestrictions();
+		EntitiesRestriction entitiesRestriction = new EntitiesRestriction();
+		entitiesRestriction.setMapRole(MapRole.MAP_FROM_ROLE);
+		entitiesRestriction.setAllOrSome(RestrictionType.ALL);
+		// MAPPED: An entity is included in the "from" part of the map and appears in a MapEntry or it appears in the "to" 
+		// part of the map and appears in one or more MapRules. MAPPED includes NOMAP entities.
+		entitiesRestriction.setMapStatus(MapStatus.MAPPED);		
+		Set<EntityNameOrURI> entitiesSet = new HashSet<EntityNameOrURI>();
+		ScopedEntityName scopedEntityName_A0001 = ModelUtils.createScopedEntityName("A0001", "Automobiles");
+//		ScopedEntityName scopedEntityName_A0001 = ModelUtils.createScopedEntityName("zzxx002", "Automobiles");
+		EntityNameOrURI entityNameOrURI_A0001 = ModelUtils.entityNameOrUriFromName(scopedEntityName_A0001);
+		entitiesSet.add(entityNameOrURI_A0001);
+		entitiesRestriction.setEntities(entitiesSet);
+		restrictions.setEntitiesRestriction(entitiesRestriction);
+		
+		MapVersionQueryImpl MapVersionQueryImpl = new MapVersionQueryImpl(null,null,null,restrictions);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<MapVersion> resourceList = this.service.getResourceList(MapVersionQueryImpl, sortCriteria, page);
+		assertNotNull(resourceList);
+		assertEquals(1,resourceList.getEntries().size());
+	}
+	
+	@Test
+	public void testGetResourceListMapToRoleFoundUsingCts2EntitiesRestrictionOnlyAllMappedAndMultipleEntities() {
+		
+		MapVersionQueryServiceRestrictions restrictions = new MapVersionQueryServiceRestrictions();
+		EntitiesRestriction entitiesRestriction = new EntitiesRestriction();
+		entitiesRestriction.setMapRole(MapRole.MAP_FROM_ROLE);
+		entitiesRestriction.setAllOrSome(RestrictionType.ALL);
+		// MAPPED: An entity is included in the "from" part of the map and appears in a MapEntry or it appears in the "to" 
+		// part of the map and appears in one or more MapRules. MAPPED includes NOMAP entities.
+		entitiesRestriction.setMapStatus(MapStatus.MAPPED);		
+		Set<EntityNameOrURI> entitiesSet = new HashSet<EntityNameOrURI>();
+		ScopedEntityName scopedEntityName_A0001 = ModelUtils.createScopedEntityName("A0001", "Automobiles");
+		EntityNameOrURI entityNameOrURI_A0001 = ModelUtils.entityNameOrUriFromName(scopedEntityName_A0001);
+		entitiesSet.add(entityNameOrURI_A0001);
+		ScopedEntityName scopedEntityName_005 = ModelUtils.createScopedEntityName("005", "Automobiles");
+		EntityNameOrURI entityNameOrURI_005 = ModelUtils.entityNameOrUriFromName(scopedEntityName_005);
+		entitiesSet.add(entityNameOrURI_005);
+		ScopedEntityName scopedEntityName_Ford = ModelUtils.createScopedEntityName("Ford", "Automobiles");
+		EntityNameOrURI entityNameOrURI_Ford = ModelUtils.entityNameOrUriFromName(scopedEntityName_Ford);
+		entitiesSet.add(entityNameOrURI_Ford);
+		entitiesRestriction.setEntities(entitiesSet);
+		restrictions.setEntitiesRestriction(entitiesRestriction);
+		
+		MapVersionQueryImpl MapVersionQueryImpl = new MapVersionQueryImpl(null,null,null,restrictions);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<MapVersion> resourceList = this.service.getResourceList(MapVersionQueryImpl, sortCriteria, page);
+		assertNotNull(resourceList);
+		assertEquals(1,resourceList.getEntries().size());
+	}
+	
+	@Test
+	public void testGetResourceListMapToRoleNotFoundUsingCts2EntitiesRestrictionOnlyAllMappedAndOneEntity() {
+		
+		MapVersionQueryServiceRestrictions restrictions = new MapVersionQueryServiceRestrictions();
+		EntitiesRestriction entitiesRestriction = new EntitiesRestriction();
+		entitiesRestriction.setMapRole(MapRole.MAP_FROM_ROLE);
+		entitiesRestriction.setAllOrSome(RestrictionType.ALL);
+		// MAPPED: An entity is included in the "from" part of the map and appears in a MapEntry or it appears in the "to" 
+		// part of the map and appears in one or more MapRules. MAPPED includes NOMAP entities.
+		entitiesRestriction.setMapStatus(MapStatus.MAPPED);		
+		Set<EntityNameOrURI> entitiesSet = new HashSet<EntityNameOrURI>();
+		ScopedEntityName scopedEntityName_BOGUS = ModelUtils.createScopedEntityName("BOGUS", "Automobiles");
+		EntityNameOrURI entityNameOrURI_BOGUS = ModelUtils.entityNameOrUriFromName(scopedEntityName_BOGUS);
+		entitiesSet.add(entityNameOrURI_BOGUS);
+		entitiesRestriction.setEntities(entitiesSet);
+		restrictions.setEntitiesRestriction(entitiesRestriction);
+		
+		MapVersionQueryImpl MapVersionQueryImpl = new MapVersionQueryImpl(null,null,null,restrictions);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<MapVersion> resourceList = this.service.getResourceList(MapVersionQueryImpl, sortCriteria, page);
+		assertNotNull(resourceList);
+		assertEquals(0,resourceList.getEntries().size());
+	}
+	
+	@Test
+	public void testGetResourceListMapToRoleNotFoundUsingCts2EntitiesRestrictionOnlyAllMappedAndMultipleEntities() {
+		
+		MapVersionQueryServiceRestrictions restrictions = new MapVersionQueryServiceRestrictions();
+		EntitiesRestriction entitiesRestriction = new EntitiesRestriction();
+		entitiesRestriction.setMapRole(MapRole.MAP_FROM_ROLE);
+		entitiesRestriction.setAllOrSome(RestrictionType.ALL);
+		// MAPPED: An entity is included in the "from" part of the map and appears in a MapEntry or it appears in the "to" 
+		// part of the map and appears in one or more MapRules. MAPPED includes NOMAP entities.
+		entitiesRestriction.setMapStatus(MapStatus.MAPPED);		
+		Set<EntityNameOrURI> entitiesSet = new HashSet<EntityNameOrURI>();
+		ScopedEntityName scopedEntityName_A0001 = ModelUtils.createScopedEntityName("A0001", "Automobiles");
+		EntityNameOrURI entityNameOrURI_A0001 = ModelUtils.entityNameOrUriFromName(scopedEntityName_A0001);
+		entitiesSet.add(entityNameOrURI_A0001);
+		// DAWG does not exist in Map 
+		ScopedEntityName scopedEntityName_Dawg = ModelUtils.createScopedEntityName("Dawgie", "Automobiles");
+		EntityNameOrURI entityNameOrURI_Dawg = ModelUtils.entityNameOrUriFromName(scopedEntityName_Dawg);
+		entitiesSet.add(entityNameOrURI_Dawg);
+		ScopedEntityName scopedEntityName_Ford = ModelUtils.createScopedEntityName("Ford", "Automobiles");
+		EntityNameOrURI entityNameOrURI_Ford = ModelUtils.entityNameOrUriFromName(scopedEntityName_Ford);
+		entitiesSet.add(entityNameOrURI_Ford);
+		entitiesRestriction.setEntities(entitiesSet);
+		restrictions.setEntitiesRestriction(entitiesRestriction);
+		
+		MapVersionQueryImpl MapVersionQueryImpl = new MapVersionQueryImpl(null,null,null,restrictions);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<MapVersion> resourceList = this.service.getResourceList(MapVersionQueryImpl, sortCriteria, page);
+		assertNotNull(resourceList);
+		assertEquals(0,resourceList.getEntries().size());
+	}
+
+	@Test
+	public void testGetResourceListMapToRoleFoundUsingCts2EntitiesRestrictionOnlyAtLeastOneMappedAndOneEntity() {
+		
+		MapVersionQueryServiceRestrictions restrictions = new MapVersionQueryServiceRestrictions();
+		EntitiesRestriction entitiesRestriction = new EntitiesRestriction();
+		entitiesRestriction.setMapRole(MapRole.MAP_FROM_ROLE);
+		entitiesRestriction.setAllOrSome(RestrictionType.AT_LEAST_ONE);
+		// MAPPED: An entity is included in the "from" part of the map and appears in a MapEntry or it appears in the "to" 
+		// part of the map and appears in one or more MapRules. MAPPED includes NOMAP entities.
+		entitiesRestriction.setMapStatus(MapStatus.MAPPED);		
+		Set<EntityNameOrURI> entitiesSet = new HashSet<EntityNameOrURI>();
+		ScopedEntityName scopedEntityName_A0001 = ModelUtils.createScopedEntityName("A0001", "Automobiles");
+//		ScopedEntityName scopedEntityName_A0001 = ModelUtils.createScopedEntityName("zzxx002", "Automobiles");
+		EntityNameOrURI entityNameOrURI_A0001 = ModelUtils.entityNameOrUriFromName(scopedEntityName_A0001);
+		entitiesSet.add(entityNameOrURI_A0001);
+		entitiesRestriction.setEntities(entitiesSet);
+		restrictions.setEntitiesRestriction(entitiesRestriction);
+		
+		MapVersionQueryImpl MapVersionQueryImpl = new MapVersionQueryImpl(null,null,null,restrictions);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<MapVersion> resourceList = this.service.getResourceList(MapVersionQueryImpl, sortCriteria, page);
+		assertNotNull(resourceList);
+		assertEquals(1,resourceList.getEntries().size());
+	}
+	
+	@Test
+	public void testGetResourceListMapToRoleFoundUsingCts2EntitiesRestrictionOnlyAtLeastOneMappedAnd3Entities() {
+		
+		MapVersionQueryServiceRestrictions restrictions = new MapVersionQueryServiceRestrictions();
+		EntitiesRestriction entitiesRestriction = new EntitiesRestriction();
+		entitiesRestriction.setMapRole(MapRole.MAP_FROM_ROLE);
+		entitiesRestriction.setAllOrSome(RestrictionType.AT_LEAST_ONE);
+		// MAPPED: An entity is included in the "from" part of the map and appears in a MapEntry or it appears in the "to" 
+		// part of the map and appears in one or more MapRules. MAPPED includes NOMAP entities.
+		entitiesRestriction.setMapStatus(MapStatus.MAPPED);		
+		Set<EntityNameOrURI> entitiesSet = new HashSet<EntityNameOrURI>();
+		ScopedEntityName scopedEntityName_A0001 = ModelUtils.createScopedEntityName("A0001", "Automobiles");
+		EntityNameOrURI entityNameOrURI_A0001 = ModelUtils.entityNameOrUriFromName(scopedEntityName_A0001);
+		entitiesSet.add(entityNameOrURI_A0001);
+		ScopedEntityName scopedEntityName_005 = ModelUtils.createScopedEntityName("005", "Automobiles");
+		EntityNameOrURI entityNameOrURI_005 = ModelUtils.entityNameOrUriFromName(scopedEntityName_005);
+		entitiesSet.add(entityNameOrURI_005);
+		ScopedEntityName scopedEntityName_Ford = ModelUtils.createScopedEntityName("Ford", "Automobiles");
+		EntityNameOrURI entityNameOrURI_Ford = ModelUtils.entityNameOrUriFromName(scopedEntityName_Ford);
+		entitiesSet.add(entityNameOrURI_Ford);
+		entitiesRestriction.setEntities(entitiesSet);
+		restrictions.setEntitiesRestriction(entitiesRestriction);
+		
+		MapVersionQueryImpl MapVersionQueryImpl = new MapVersionQueryImpl(null,null,null,restrictions);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<MapVersion> resourceList = this.service.getResourceList(MapVersionQueryImpl, sortCriteria, page);
+		assertNotNull(resourceList);
+		assertEquals(1,resourceList.getEntries().size());
+	}
+	
+	@Test
+	public void testGetResourceListMapToRoleNotFoundUsingCts2EntitiesRestrictionOnlyAtLeastOneMappedAndOneEntity() {
+		
+		MapVersionQueryServiceRestrictions restrictions = new MapVersionQueryServiceRestrictions();
+		EntitiesRestriction entitiesRestriction = new EntitiesRestriction();
+		entitiesRestriction.setMapRole(MapRole.MAP_FROM_ROLE);
+		entitiesRestriction.setAllOrSome(RestrictionType.AT_LEAST_ONE);
+		// MAPPED: An entity is included in the "from" part of the map and appears in a MapEntry or it appears in the "to" 
+		// part of the map and appears in one or more MapRules. MAPPED includes NOMAP entities.
+		entitiesRestriction.setMapStatus(MapStatus.MAPPED);		
+		Set<EntityNameOrURI> entitiesSet = new HashSet<EntityNameOrURI>();
+		ScopedEntityName scopedEntityName_BOGUS = ModelUtils.createScopedEntityName("BOGUS", "Automobiles");
+		EntityNameOrURI entityNameOrURI_BOGUS = ModelUtils.entityNameOrUriFromName(scopedEntityName_BOGUS);
+		entitiesSet.add(entityNameOrURI_BOGUS);
+		entitiesRestriction.setEntities(entitiesSet);
+		restrictions.setEntitiesRestriction(entitiesRestriction);
+		
+		MapVersionQueryImpl MapVersionQueryImpl = new MapVersionQueryImpl(null,null,null,restrictions);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<MapVersion> resourceList = this.service.getResourceList(MapVersionQueryImpl, sortCriteria, page);
+		assertNotNull(resourceList);
+		assertEquals(0,resourceList.getEntries().size());
+	}
+	
+	@Test
+	public void testGetResourceListMapToRoleFoundUsingCts2EntitiesRestrictionOnlyAtLeastOneMappedAndMultipleEntities() {
+		
+		MapVersionQueryServiceRestrictions restrictions = new MapVersionQueryServiceRestrictions();
+		EntitiesRestriction entitiesRestriction = new EntitiesRestriction();
+		entitiesRestriction.setMapRole(MapRole.MAP_FROM_ROLE);
+		entitiesRestriction.setAllOrSome(RestrictionType.AT_LEAST_ONE);
+		// MAPPED: An entity is included in the "from" part of the map and appears in a MapEntry or it appears in the "to" 
+		// part of the map and appears in one or more MapRules. MAPPED includes NOMAP entities.
+		entitiesRestriction.setMapStatus(MapStatus.MAPPED);		
+		Set<EntityNameOrURI> entitiesSet = new HashSet<EntityNameOrURI>();
+		ScopedEntityName scopedEntityName_A0001 = ModelUtils.createScopedEntityName("A0001", "Automobiles");
+		EntityNameOrURI entityNameOrURI_A0001 = ModelUtils.entityNameOrUriFromName(scopedEntityName_A0001);
+		entitiesSet.add(entityNameOrURI_A0001);
+		// Dawgie does not exist in Map 
+		ScopedEntityName scopedEntityName_Dawg = ModelUtils.createScopedEntityName("Dawgie", "Automobiles");
+		EntityNameOrURI entityNameOrURI_Dawg = ModelUtils.entityNameOrUriFromName(scopedEntityName_Dawg);
+		entitiesSet.add(entityNameOrURI_Dawg);
+		// Fordzilla does not exist in Map
+		ScopedEntityName scopedEntityName_Ford = ModelUtils.createScopedEntityName("Fordzilla", "Automobiles");
+		EntityNameOrURI entityNameOrURI_Ford = ModelUtils.entityNameOrUriFromName(scopedEntityName_Ford);
+		entitiesSet.add(entityNameOrURI_Ford);
+		entitiesRestriction.setEntities(entitiesSet);
+		restrictions.setEntitiesRestriction(entitiesRestriction);
+		
+		MapVersionQueryImpl MapVersionQueryImpl = new MapVersionQueryImpl(null,null,null,restrictions);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<MapVersion> resourceList = this.service.getResourceList(MapVersionQueryImpl, sortCriteria, page);
+		assertNotNull(resourceList);
+		assertEquals(1,resourceList.getEntries().size());
+	}
+
 }
