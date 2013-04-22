@@ -206,7 +206,7 @@ public final class CommonResourceUtils{
 			MapEntryQuery cts2Query, SortCriteria cts2SortCriteria, Page page,
 			VersionNameConverter nameConverter, MappingExtension lexMappingExtension) {
 		
-		ResolvedConceptReferenceResults lexResolvedConceptReferenceResults = null;
+		ResolvedConceptReferenceResults lexResolvedConceptReferenceResults = new ResolvedConceptReferenceResults(null, true);
 		ResolvedConceptReferencesIterator lexMapIterator;
 		QueryData<MapEntryQuery> queryData;
 
@@ -240,7 +240,10 @@ public final class CommonResourceUtils{
 			lexResolvedConceptReferenceResults = CommonPageUtils.getPage(lexMapIterator, page);
 			
 		} catch (LBParameterException e) {
-			throw new RuntimeException(e);
+			// Mapping Extension throws this error if the map is not found.  
+			// Catch and return null
+//			throw new RuntimeException(e);
+			return lexResolvedConceptReferenceResults;
 		} catch (LBException e) {
 			throw new RuntimeException(e);
 		}
