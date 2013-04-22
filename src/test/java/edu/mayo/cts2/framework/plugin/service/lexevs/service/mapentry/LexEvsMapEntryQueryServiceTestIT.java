@@ -72,84 +72,199 @@ public class LexEvsMapEntryQueryServiceTestIT extends AbstractTestITBase {
 		assertNotNull(this.service);
 	}
 
-	@Test
-	public void testGetResourceListValidMapNoRestrictions() {
-		
-		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
-		NameOrURI mapVersion = ModelUtils.nameOrUriFromName("MappingSample-1.0");
-		restrictions.setMapVersion(mapVersion);
+	// Data to match values present in testMapping.xml
+	String [] lexSchemeNames = {"Mapping Sample", "MappingSample", "Mapping:sample", "Mappings", "MappingSample"};
+	String [] lexSchemeVersions = {"1.0"};
+	String [] lexSchemeURIs = {"urn:oid:mapping:sample"};
+
+	String [] lexAssociationNames = {"hasPart", "mapsTo"};
+	
+	String [] lexSourceNameSpaces = {"Automobiles", "Automobiles", "Automobiles", "Automobiles", "Automobiles", "Automobiles_Different_NS"};
+	String [] lexTargetNameSpaces = {"GermanMadePartsNamespace", "GermanMadePartsNamespace",  "GermanMadePartsNamespace",  
+			"GermanMadePartsNamespace",  "GermanMadePartsNamespace", "GermanMadePartsNamespace_Different_NS"};
+	String [] lexSourceEntityCodes = {"Jaguar", "A0001", "C0001", "005", "Ford", "C0002"};
+	String [] lexTargetEntityCodes = {"E0001", "R0001", "E0001", "P0001", "E0001", "P0001"};
+	
+	
+	private void compareAllVersions(
+			MapEntryQueryServiceRestrictions restrictions, 
+			String lexSchemeName, 
+			boolean compareNamespaces, 
+			boolean compareEntities) {
+		String cts2Name;
+		for(int versionIndex = 0; versionIndex < lexSchemeVersions.length; versionIndex++){
+			cts2Name = lexSchemeName + "-" + lexSchemeVersions[versionIndex];
+			
+			NameOrURI mapVersion = ModelUtils.nameOrUriFromName(cts2Name);
+			restrictions.setMapVersion(mapVersion);
+			
+			if(compareNamespaces){
+				this.compareAllNamespaces(restrictions, compareEntities);
+			}
+			else if(compareEntities){
+				this.compareAllSourceEntities(restrictions, null);
+			}
+			else{			
+				MapEntryQueryImpl mapEntryQueryImpl = new MapEntryQueryImpl(null,null,null,restrictions);
 				
-		MapEntryQueryImpl mapEntryQueryImpl = new MapEntryQueryImpl(null,null,null,restrictions);
-		
-		SortCriteria sortCriteria = null;
-		Page page = new Page();
-		
-		DirectoryResult<MapEntry> resourceList = this.service.getResourceList(mapEntryQueryImpl, sortCriteria, page);
-		assertNotNull(resourceList);
-		assertEquals(6,resourceList.getEntries().size());
+				SortCriteria sortCriteria = null;
+				Page page = new Page();
+				
+				DirectoryResult<MapEntry> resourceList = this.service.getResourceList(mapEntryQueryImpl, sortCriteria, page);
+				assertNotNull(resourceList);
+				int expecting = lexSourceEntityCodes.length;
+				int actual = resourceList.getEntries().size();
+				assertEquals("Unexpected results using CTS2 Name (" + cts2Name + ")" + actual, expecting, actual);
+			}
+		}
+	}
+	
+	private void compareAllNamespaces(
+			MapEntryQueryServiceRestrictions restrictions,
+			boolean compareEntities) {
+		String namespace;
+		for(int namespaceIndex = 0; namespaceIndex < lexSourceNameSpaces.length; namespaceIndex++){
+			ScopedEntityName scopedEntityName = new ScopedEntityName();
+			namespace = lexSourceNameSpaces[namespaceIndex];
+			scopedEntityName.setNamespace(namespace);
+			
+			Set<EntityNameOrURI> targetEntities = new HashSet<EntityNameOrURI>();
+			EntityNameOrURI entityNameOrURI = new EntityNameOrURI();
+			String entityName = "";
+			int expecting = 0;
+			
+			if(compareEntities){
+				entityName = lexSourceEntityCodes[namespaceIndex];
+				scopedEntityName.setName(entityName);
+				entityNameOrURI.setEntityName(scopedEntityName);
+				expecting = 1;
+			}
+
+			targetEntities.add(entityNameOrURI);
+			restrictions.setTargetEntities(targetEntities);
+				
+			MapEntryQueryImpl mapEntryQueryImpl = new MapEntryQueryImpl(null,null,null,restrictions);
+				
+			SortCriteria sortCriteria = null;
+			Page page = new Page();
+			
+			DirectoryResult<MapEntry> resourceList = this.service.getResourceList(mapEntryQueryImpl, sortCriteria, page);
+			assertNotNull(resourceList);
+			
+			int actual = resourceList.getEntries().size();
+			assertEquals("Unexpected results using: " + restrictions.getMapVersion().getName() + ", " +
+					  scopedEntityName.getNamespace() + ", " + entityName, expecting, actual);
+			
+		}
 	}
 
-	@Test
-	public void testGetResourceListInvalidMapVersionNoRestrictions() {
+	private void compareAllSourceEntities(MapEntryQueryServiceRestrictions restrictions, ScopedEntityName entityName) {
+		ScopedEntityName scopedEntityName = (entityName != null) ? entityName : new ScopedEntityName();
+		for(int entityIndex = 0; entityIndex < lexSourceEntityCodes.length; entityIndex++){		
+			Set<EntityNameOrURI> targetEntities = new HashSet<EntityNameOrURI>();
+			EntityNameOrURI entityNameOrURI = new EntityNameOrURI();
+			scopedEntityName.setName(lexSourceEntityCodes[entityIndex]);
+			entityNameOrURI.setEntityName(scopedEntityName);
+			//		String uri;
+			//		entityNameOrURI.setUri(uri);
+			targetEntities.add(entityNameOrURI);
 		
-		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
-		NameOrURI mapVersion = ModelUtils.nameOrUriFromName("MappingSample-2.2");
-		restrictions.setMapVersion(mapVersion);
-				
-		MapEntryQueryImpl mapEntryQueryImpl = new MapEntryQueryImpl(null,null,null,restrictions);
+			restrictions.setTargetEntities(targetEntities);
 		
-		SortCriteria sortCriteria = null;
-		Page page = new Page();
+			MapEntryQueryImpl mapEntryQueryImpl = new MapEntryQueryImpl(null,null,null,restrictions);
 		
-		DirectoryResult<MapEntry> resourceList = this.service.getResourceList(mapEntryQueryImpl, sortCriteria, page);
-		assertNotNull(resourceList);
-		assertEquals(0,resourceList.getEntries().size());
+			SortCriteria sortCriteria = null;
+			Page page = new Page();
+			
+			DirectoryResult<MapEntry> resourceList = this.service.getResourceList(mapEntryQueryImpl, sortCriteria, page);
+			assertNotNull(resourceList);
+			int expecting = 1;
+			int actual = resourceList.getEntries().size();
+			assertEquals("Unexpected results using: " + restrictions.getMapVersion().getName() + ", " +
+					scopedEntityName.getNamespace() + ", " + lexSourceEntityCodes[entityIndex], expecting, actual);
+		}
 	}
 
-	@Test
-	public void testGetResourceListInvalidMapNameNoRestrictions() {
-		
-		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
-		NameOrURI mapVersion = ModelUtils.nameOrUriFromName("MappingSampleFOO-1.0");
-		restrictions.setMapVersion(mapVersion);
-				
-		MapEntryQueryImpl mapEntryQueryImpl = new MapEntryQueryImpl(null,null,null,restrictions);
-		
-		SortCriteria sortCriteria = null;
-		Page page = new Page();
-		
-		DirectoryResult<MapEntry> resourceList = this.service.getResourceList(mapEntryQueryImpl, sortCriteria, page);
-		assertNotNull(resourceList);
-		assertEquals(0,resourceList.getEntries().size());
+	private void compareAllSchemeNames(MapEntryQueryServiceRestrictions restrictions, boolean compareNamespaces, boolean compareEntities){
+		for(int nameIndex = 0; nameIndex < lexSchemeNames.length; nameIndex++){
+			this.compareAllVersions(restrictions, lexSchemeNames[nameIndex], compareNamespaces, compareEntities);
+		}				
 	}
+	
+	@Test
+	public void testGetResourceListCodeSchemeNameNoRestrictionsValid() {
+		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
+		this.compareAllSchemeNames(restrictions, false, false);
+	}
+
 
 	@Test
 	public void testGetResourceListMapAndRestrictedToOneValidEntity() {
+		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
+		
+		// Call local method to compare all CodeSchemeNames, NameSpaces, and Entities for given Namespace
+		this.compareAllSchemeNames(restrictions, true, true);
+	}
+
+	@Test
+	public void testGetResourceListMapAndRestrictedToOneValidEntityNoNamespace() {
+		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
+		this.compareAllSchemeNames(restrictions, false, true);
+	}
+
+	@Test
+	public void testGetResourceListMapAndRestrictedToOneValidNamespaceNoEntities() {
+		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
+		this.compareAllSchemeNames(restrictions, true, false);
+	}
+
+
+	@Test
+	public void testGetResourceListCodeSchemeNameNoRestrictionsSchemeNameInvalid() {
 		
 		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
-		NameOrURI mapVersion = ModelUtils.nameOrUriFromName("MappingSample-1.0");
-		restrictions.setMapVersion(mapVersion);
-		Set<EntityNameOrURI> targetEntities = new HashSet<EntityNameOrURI>();
+		String cts2Name;
+		for(int nameIndex = 0; nameIndex < lexSchemeNames.length; nameIndex++){
+			for(int versionIndex = 0; versionIndex < lexSchemeVersions.length; versionIndex++){
+				cts2Name = lexSchemeNames[nameIndex] + "FOO-" + lexSchemeVersions[versionIndex];
+				NameOrURI mapVersion = ModelUtils.nameOrUriFromName(cts2Name);
+				restrictions.setMapVersion(mapVersion);
+				MapEntryQueryImpl mapEntryQueryImpl = new MapEntryQueryImpl(null,null,null,restrictions);
+				
+				SortCriteria sortCriteria = null;
+				Page page = new Page();
+				
+				DirectoryResult<MapEntry> resourceList = this.service.getResourceList(mapEntryQueryImpl, sortCriteria, page);
+				assertNotNull(resourceList);
+				int expecting = 0;
+				int actual = resourceList.getEntries().size();
+				assertEquals("Unexpected results using CTS2 Name (" + cts2Name + ")" + actual, expecting, actual);
+			}
+		}				
+	}
+
+	@Test
+	public void testGetResourceListCodeSchemeNameNoRestrictionsVersionInvalid() {
 		
-		EntityNameOrURI entityNameOrURI = new EntityNameOrURI();
-		ScopedEntityName entityName = new ScopedEntityName(); //"A0001";
-		entityName.setName("A0001");
-		entityName.setNamespace("Automobiles");
-		entityNameOrURI.setEntityName(entityName);
-//		String uri;
-//		entityNameOrURI.setUri(uri);
-		targetEntities.add(entityNameOrURI);
-		
-		restrictions.setTargetEntities(targetEntities );
-		
-		MapEntryQueryImpl mapEntryQueryImpl = new MapEntryQueryImpl(null,null,null,restrictions);
-		
-		SortCriteria sortCriteria = null;
-		Page page = new Page();
-		
-		DirectoryResult<MapEntry> resourceList = this.service.getResourceList(mapEntryQueryImpl, sortCriteria, page);
-		assertNotNull(resourceList);
-		assertEquals(1,resourceList.getEntries().size());
+		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
+		String cts2Name;
+		for(int nameIndex = 0; nameIndex < lexSchemeNames.length; nameIndex++){
+			for(int versionIndex = 0; versionIndex < lexSchemeVersions.length; versionIndex++){
+				cts2Name = lexSchemeNames[nameIndex] + "-" + lexSchemeVersions[versionIndex] + "999";
+				NameOrURI mapVersion = ModelUtils.nameOrUriFromName(cts2Name);
+				restrictions.setMapVersion(mapVersion);
+				MapEntryQueryImpl mapEntryQueryImpl = new MapEntryQueryImpl(null,null,null,restrictions);
+				
+				SortCriteria sortCriteria = null;
+				Page page = new Page();
+				
+				DirectoryResult<MapEntry> resourceList = this.service.getResourceList(mapEntryQueryImpl, sortCriteria, page);
+				assertNotNull(resourceList);
+				int expecting = 0;
+				int actual = resourceList.getEntries().size();
+				assertEquals("Unexpected results using CTS2 Name (" + cts2Name + ")" + actual, expecting, actual);
+			}
+		}				
 	}
 
 	@Test
