@@ -224,9 +224,13 @@ public final class CommonResourceUtils{
 				Mapping lexMapping = lexMappingExtension.getMapping(lexSchemeName, lexVersionOrTag, lexRelationsContainerName);
 				Set<EntityNameOrURI> cts2TargetEntities = cts2Restrictions.getTargetEntities();
 				for(EntityNameOrURI cts2EntityNameOrURI : cts2TargetEntities){
-					String cts2EntityName = cts2EntityNameOrURI.getEntityName().getName();
-					String cts2EntityNamespace = cts2EntityNameOrURI.getEntityName().getNamespace();
-					ConceptReferenceList reference = Constructors.createConceptReferenceList(cts2EntityName, cts2EntityNamespace, lexSchemeName);
+					String cts2EntityName = null;
+					String cts2EntityNamespace = null;
+					if(cts2EntityNameOrURI.getEntityName() != null){
+						cts2EntityName = cts2EntityNameOrURI.getEntityName().getName();
+						cts2EntityNamespace = cts2EntityNameOrURI.getEntityName().getNamespace();
+					}
+					ConceptReferenceList reference = Constructors.createConceptReferenceList(cts2EntityName, cts2EntityNamespace, null);
 					lexMapping = lexMapping.restrictToCodes(reference, SearchContext.SOURCE_OR_TARGET_CODES);
 				}
 				
