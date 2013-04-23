@@ -193,8 +193,8 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 
 		MapStatus mapStatus = cts2EntitiesRestriction.getMapStatus();
 		if (mapStatus == null) {
-			// Set default status to 
-			mapStatus = MapStatus.MAPPED;  // ??? Use MAPPED
+			// Set default status 
+			mapStatus = MapStatus.MAPPED;  
 		}
 		
 		// MapStatus values to consider via notes from CTS2 specification:
@@ -215,6 +215,10 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 			throw new UnsupportedOperationException("MapStatus.UNMAPPED is currently not a supported option in respect " +
 					"to EntitiesRestriction for MapVersionQuery");	
 		}
+		if (mapStatus == MapStatus.NOMAP) {
+			throw new UnsupportedOperationException("MapStatus.NOMAP is currently not a supported option in respect " +
+					"to EntitiesRestriction for MapVersionQuery");	
+		}
 		
 		Set<EntityNameOrURI> cts2RestrictedEntitiesSet = cts2EntitiesRestriction.getEntities();
 		MapRole mapRole = cts2EntitiesRestriction.getMapRole();
@@ -224,23 +228,8 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		lexCodingSchemeVersionOrTag.setVersion(lexCodingScheme.getRepresentsVersion());
 		lexCodingSchemeVersionOrTag.setTag(lexCodingScheme.getCodingSchemeName());
 		
-//      Cannot reuse Mapping object - it gets trampled on when restrict method runs on it later
-//		Mapping lexMapping = null;
-//		try {
-//			lexMapping = mappingExtension.getMapping(lexCodingScheme.getCodingSchemeName(), 
-//					lexCodingSchemeVersionOrTag, 
-//					lexRelationsContainerName);
-//		} catch (LBParameterException e) {
-//			throw new RuntimeException(e);
-//		} catch (LBException e) {
-//			throw new RuntimeException(e);
-//		}
-		
 		boolean matchFound = true;		
 		if (mapStatus == MapStatus.MAPPED) {
-			// TODO Not sure what "MAPPED includes NOMAP entities." means (especially if the set of entities to restrict is not empty). If
-			//   the set of entities to restrict is empty then what's the point of having EntitiesRestriction?  Maybe its just a stmt to 
-			//   be sure not to discard the NOMAP conditions found.
 			if (mapRole == MapRole.MAP_FROM_ROLE) {
 				for (EntityNameOrURI cts2RestrictedEntity : cts2RestrictedEntitiesSet) {
 					ScopedEntityName cts2EntityName = cts2RestrictedEntity.getEntityName();
@@ -278,15 +267,6 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 				throw new UnsupportedOperationException("The EntitiesRestriction for MapVersionQuery must have a MapRole defined " +
 						"when the MapStatus is defined as MapStatus.MAPPED");
 			}		
-		}
-		
-		if (mapStatus == MapStatus.NOMAP) {
-			// TODO Note the MapRoles MAP_TO_ROLE and BOTH_MAP_ROLE rules defined does not make sense with this MapStatus. Ignore MapRole or 
-			// throw an UnsupportedOperationException?
-			
-			// Treat all CTS2 Entities in the restriction list as LexEvs source entities (i.e. map from)
-			
-			
 		}
 		
 		return matchFound;
@@ -395,6 +375,10 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 			throw new UnsupportedOperationException("MapStatus.UNMAPPED is currently not a supported option in respect " +
 					"to EntitiesRestriction for MapVersionQuery");	
 		}
+		if (mapStatus == MapStatus.NOMAP) {
+			throw new UnsupportedOperationException("MapStatus.NOMAP is currently not a supported option in respect " +
+					"to EntitiesRestriction for MapVersionQuery");	
+		}
 		
 		Set<EntityNameOrURI> cts2RestrictedEntitiesSet = cts2EntitiesRestriction.getEntities();
 		MapRole mapRole = cts2EntitiesRestriction.getMapRole();
@@ -443,15 +427,6 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 				throw new UnsupportedOperationException("The EntitiesRestriction for MapVersionQuery must have a MapRole defined " +
 						"when the MapStatus is defined as MapStatus.MAPPED");
 			}		
-		}
-		
-		if (mapStatus == MapStatus.NOMAP) {
-			// TODO Note the MapRoles MAP_TO_ROLE and BOTH_MAP_ROLE rules defined does not make sense with this MapStatus. Ignore MapRole or 
-			// throw an UnsupportedOperationException?
-			
-			// Treat all CTS2 Entities in the restriction list as LexEvs source entities (i.e. map from)
-			
-			
 		}
 		
 		return matchFound;
