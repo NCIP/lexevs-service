@@ -26,6 +26,8 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service.valuesetdefinition
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.command.Page;
@@ -49,8 +51,9 @@ import edu.mayo.cts2.framework.service.profile.valuesetdefinition.ValueSetDefini
 public class LexEvsValueSetDefinitionQueryService extends AbstractLexEvsService
 		implements ValueSetDefinitionQueryService {
 
-	private LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform transformer = new LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform();
-
+	@Resource
+	private LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform transformer;
+	
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.service.profile.QueryService#getResourceSummaries(edu.mayo.cts2.framework.service.profile.ResourceQuery, edu.mayo.cts2.framework.model.core.SortCriteria, edu.mayo.cts2.framework.model.command.Page)
 	 */

@@ -98,7 +98,7 @@ public class LexEvsValueSetDefinitionReadService extends AbstractLexEvsService
 		//   construct a CTS2 LocalIdValueSetDefinition object	
 		ValueSetDefinition valueSetDefinition = null;
 		if (lexGridValueSetDefinition != null) {
-			valueSetDefinition = vsdTransformer.transformToValueSetDefinition(lexGridValueSetDefinition);			
+			valueSetDefinition = vsdTransformer.transformFullDescription(lexGridValueSetDefinition);			
 		} else {
 			valueSetDefinition = new ValueSetDefinition();
 		}
