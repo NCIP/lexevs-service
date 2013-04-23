@@ -26,6 +26,7 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service.mapentry;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,8 +35,6 @@ import javax.annotation.Resource;
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContents;
 import org.junit.Test;
-
-import com.hp.hpl.jena.rdf.model.Model;
 
 import edu.mayo.cts2.framework.core.xml.Cts2Marshaller;
 import edu.mayo.cts2.framework.model.command.Page;
@@ -102,70 +101,89 @@ public class LexEvsMapEntryQueryServiceTestIT extends AbstractTestITBase {
 		return results;
 	}
 	
-	private void compareAllSchemeNames(MapEntryQueryServiceRestrictions restrictions, boolean [] fieldsValid){
-		String schemeName;
+	private void compareAllSchemeNames(MapEntryQueryServiceRestrictions restrictions, int [] fieldCount, boolean[] fieldValid){
+		String schemeName = "";
 		for(int nameIndex = 0; nameIndex < lexSchemeNames.length; nameIndex++){
-			schemeName = this.getTestValue(lexSchemeNames[nameIndex], fieldsValid[0]);
-			this.compareAllVersions(restrictions, schemeName, fieldsValid);
+			if(fieldCount[0] > 0){
+				schemeName = this.getTestValue(lexSchemeNames[nameIndex], fieldValid[0]);
+			}
+			this.compareAllVersions(restrictions, schemeName, fieldCount, fieldValid);
 		}				
 	}
 	
 	private void compareAllVersions(
 			MapEntryQueryServiceRestrictions restrictions, 
 			String lexSchemeName,
-			boolean [] fieldsValid) {
+			int [] fieldCount,
+			boolean [] fieldValid) {
 		String cts2Name;
 		String version;
 		for(int versionIndex = 0; versionIndex < lexSchemeVersions.length; versionIndex++){
-			version = this.getTestValue(lexSchemeVersions[versionIndex], fieldsValid[1]);
-			cts2Name = lexSchemeName + "-" + version;
+			version = this.getTestValue(lexSchemeVersions[versionIndex], fieldValid[1]);
 			
-			NameOrURI mapVersion = ModelUtils.nameOrUriFromName(cts2Name);
-			restrictions.setMapVersion(mapVersion);
+			if(fieldCount[1] > 0){
+				cts2Name = lexSchemeName + "-" + version;			
+				NameOrURI mapVersion = ModelUtils.nameOrUriFromName(cts2Name);
+				restrictions.setMapVersion(mapVersion);
+			}
 			
-			this.compareAllNamespaces(restrictions, fieldsValid);
-//			}
-//			else if(compareEntities){
-//				this.compareAllSourceEntities(restrictions, null);
-//			}
-//			else{			
-//				MapEntryQueryImpl mapEntryQueryImpl = new MapEntryQueryImpl(null,null,null,restrictions);
-//				
-//				SortCriteria sortCriteria = null;
-//				Page page = new Page();
-//				
-//				DirectoryResult<MapEntry> resourceList = this.service.getResourceList(mapEntryQueryImpl, sortCriteria, page);
-//				assertNotNull(resourceList);
-//				int expecting = lexSourceEntityCodes.length;
-//				int actual = resourceList.getEntries().size();
-//				assertEquals("Unexpected results using CTS2 Name (" + cts2Name + ")" + actual, expecting, actual);
-//			}
+			this.compareAllNamespaces(restrictions, fieldCount, fieldValid);
 		}
 	}
 	
 	private void compareAllNamespaces(
 			MapEntryQueryServiceRestrictions restrictions,
-			boolean [] fieldsValid) {
+			int [] fieldCount,
+			boolean [] fieldValid) {
 		String namespace, name;
+		
+		Set<EntityNameOrURI> targetEntities = new HashSet<EntityNameOrURI>();
+		
+
 		for(int namespaceIndex = 0; namespaceIndex < lexSourceNameSpaces.length; namespaceIndex++){
-			namespace = this.getTestValue(lexSourceNameSpaces[namespaceIndex], fieldsValid[2]);
 			ScopedEntityName scopedEntityName = new ScopedEntityName();
-			scopedEntityName.setNamespace(namespace);
-			name = this.getTestValue(lexSourceEntityCodes[namespaceIndex], fieldsValid[3]);
-			scopedEntityName.setName(name);
+			EntityNameOrURI entityNameOrURI = new EntityNameOrURI();
+
+			namespace = "";
+			if(fieldCount[2] > 0){
+				namespace = this.getTestValue(lexSourceNameSpaces[namespaceIndex], fieldValid[2]);
+			}			
 			
-			this.compareEntity(restrictions, scopedEntityName);			
+			scopedEntityName.setNamespace(namespace);
+
+			ArrayList<String> namespaceEntities = this.collectEntities(namespace, fieldCount[3]);
+			
+			for(int entityIndex = 0; entityIndex < namespaceEntities.size(); entityIndex++){
+				
+				name = this.getTestValue(namespaceEntities.get(entityIndex), fieldValid[3]);
+				scopedEntityName.setName(name);
+				entityNameOrURI.setEntityName(scopedEntityName);
+				targetEntities.add(entityNameOrURI);
+			}
+			
+			restrictions.setTargetEntities(targetEntities);
+			
 		}
+	}
+
+	private ArrayList<String> collectEntities(String namespace, int entityCount) {
+		ArrayList<String> entityList = new ArrayList<String>();
+		for(int i=0; i < lexSourceNameSpaces.length; i++){
+			if(namespace.equals(lexSourceNameSpaces[i])){
+				entityList.add(lexSourceEntityCodes[i]);
+			}
+		}
+		return entityList;
 	}
 
 	private void compareAllSourceEntities(
 			MapEntryQueryServiceRestrictions restrictions, 
 			ScopedEntityName entityName,
-			boolean [] fieldsValid) {
+			boolean [] fieldValid) {
 		ScopedEntityName scopedEntityName = (entityName != null) ? entityName : new ScopedEntityName();
 		String name;
 		for(int entityIndex = 0; entityIndex < lexSourceEntityCodes.length; entityIndex++){		
-			name = this.getTestValue(lexSourceEntityCodes[entityIndex], fieldsValid[3]);
+			name = this.getTestValue(lexSourceEntityCodes[entityIndex], fieldValid[3]);
 			scopedEntityName.setName(name);
 			
 			this.compareEntity(restrictions, scopedEntityName);			
@@ -263,39 +281,52 @@ public class LexEvsMapEntryQueryServiceTestIT extends AbstractTestITBase {
 	}
 
 	@Test
-	public void testGetResourceListAllValid() {
+	public void testGetResourceListOneEntityAllValid() {
 		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
-		boolean [] fieldsValid = {true, true, true, true};
-		this.compareAllSchemeNames(restrictions, fieldsValid);
+		int [] fieldCount = {1, 1, 1, 1};
+		boolean [] fieldValid = {true, true, true, true};
+		this.compareAllSchemeNames(restrictions, fieldCount, fieldValid);
+	}
+
+	@Test
+	public void testGetResourceListMultipleEntitiesAllValid() {
+		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
+		int [] fieldCount = {1, 1, 1, 10};
+		boolean [] fieldValid = {true, true, true, true};
+		this.compareAllSchemeNames(restrictions, fieldCount, fieldValid);
 	}
 
 
 	@Test
 	public void testGetResourceListMapNameInvalid() {
 		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
-		boolean [] fieldsValid = {false, true, true, true};
-		this.compareAllSchemeNames(restrictions, fieldsValid);
+		int [] fieldCount = {1, 1, 1, 1};
+		boolean [] fieldValid = {false, true, true, true};
+		this.compareAllSchemeNames(restrictions, fieldCount, fieldValid);
 	}
 
 	@Test
 	public void testGetResourceListVersionInvalid() {
 		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
-		boolean [] fieldsValid = {true, false, true, true};
-		this.compareAllSchemeNames(restrictions, fieldsValid);
+		int [] fieldCount = {1, 1, 1, 1};
+		boolean [] fieldValid = {true, false, true, true};
+		this.compareAllSchemeNames(restrictions, fieldCount, fieldValid);
 	}
 
 	@Test
 	public void testGetResourceListNamespaceInvalid() {
 		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
-		boolean [] fieldsValid = {true, true, false, true};
-		this.compareAllSchemeNames(restrictions, fieldsValid);
+		int [] fieldCount = {1, 1, 1, 1};
+		boolean [] fieldValid = {true, true, false, true};
+		this.compareAllSchemeNames(restrictions, fieldCount, fieldValid);
 	}
 
 	@Test
 	public void testGetResourceListEntityInvalid() {
 		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
-		boolean [] fieldsValid = {true, true, true, false};
-		this.compareAllSchemeNames(restrictions, fieldsValid);
+		int [] fieldCount = {1, 1, 1, 1};
+		boolean [] fieldValid = {true, true, true, false};
+		this.compareAllSchemeNames(restrictions, fieldCount, fieldValid);
 	}
 
 //
