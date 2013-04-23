@@ -19,7 +19,7 @@ public class PrintUtility {
 	public static String createTabs(int tabCount){
 		StringBuffer results = new StringBuffer();
 		for(int i=0; i < tabCount; i++){
-			results.append("\t");
+			appendLine(results, "", "\t");
 		}
 		return results.toString();
 	}
@@ -30,30 +30,35 @@ public class PrintUtility {
 		while(iterator.hasNext()){
 			String objectData = createStringFromResolvedConceptReferenceObject(iterator.next(), 0); 
 			if(objectData != null){
-				results.append(objectData + "\n=============\n\n");
+				appendLine(results, "", objectData + "\n=============\n\n");
 			}
 		}
 		
 		return results.toString();
 	}
 	
+	public static void appendLine(StringBuffer results, String tabs, String value){
+		results.append(tabs);
+		results.append(value);
+		results.append("\n");
+	}
 	
 	public static String createStringFromResolvedConceptReferenceObject(ResolvedConceptReference reference, int tabCount){
 		StringBuffer results = new StringBuffer();
 		String tabs = createTabs(tabCount);
 		
-		results.append(tabs + " Code: " + reference.getCode() + "\n");
-		results.append(tabs + " CodeNamespace: " + reference.getCodeNamespace() + "\n");
-		results.append(tabs + " CodingSchemeName: " + reference.getCodingSchemeName() + "\n");
-		results.append(tabs + " CodingSchemeURI: " + reference.getCodingSchemeURI() + "\n");
-		results.append(tabs + " CodingSchemeVersion: " + reference.getCodingSchemeVersion() + "\n");
-		results.append(tabs + " ConceptCode: " + reference.getConceptCode() + "\n");
+		appendLine(results, tabs, " Code: " + reference.getCode());
+		appendLine(results, tabs, " CodeNamespace: " + reference.getCodeNamespace());
+		appendLine(results, tabs, " CodingSchemeName: " + reference.getCodingSchemeName());
+		appendLine(results, tabs, " CodingSchemeURI: " + reference.getCodingSchemeURI());
+		appendLine(results, tabs, " CodingSchemeVersion: " + reference.getCodingSchemeVersion());
+		appendLine(results, tabs, " ConceptCode: " + reference.getConceptCode());
 
-		results.append(tabs + " EntityDescription: " + reference.getEntityDescription().getContent() + "\n");
-		results.append(tabs + " Entities: \n");
-		results.append(createStringFromEntityObject(reference.getEntity(), tabCount + 1) + "\n");
-		results.append(tabs + " SourceOf: " + reference.getSourceOf() + "\n");
-		results.append(tabs + " TargetOf: " + reference.getTargetOf() + "\n");
+		appendLine(results, tabs, " EntityDescription: " + reference.getEntityDescription().getContent());
+		appendLine(results, tabs, " Entities: \n");
+		appendLine(results, "", createStringFromEntityObject(reference.getEntity(), tabCount + 1));
+		appendLine(results, tabs, " SourceOf: " + reference.getSourceOf());
+		appendLine(results, tabs, " TargetOf: " + reference.getTargetOf());
 		
 		return results.toString();
 	}
@@ -66,36 +71,36 @@ public class PrintUtility {
 			return "";
 		}
 		
-		results.append(tabs + " EntityCode = " + entity.getEntityCode() + "\n");
+		appendLine(results, tabs, " EntityCode = " + entity.getEntityCode());
 		
-		results.append(tabs + " EntityDescription = " + entity.getEntityDescription().getContent() + "\n");;
-		results.append(tabs + " EntityCodeNamespace = " + entity.getEntityCodeNamespace() + "\n");;
-		results.append(tabs + " Owner = " + entity.getOwner() + "\n");
-		results.append(tabs + " Status = " + entity.getStatus() + "\n");
+		appendLine(results, tabs, " EntityDescription = " + entity.getEntityDescription().getContent());
+		appendLine(results, tabs, " EntityCodeNamespace = " + entity.getEntityCodeNamespace());
+		appendLine(results, tabs, " Owner = " + entity.getOwner());
+		appendLine(results, tabs, " Status = " + entity.getStatus());
 
-		results.append(tabs + " EntityTypeCount = " + entity.getEntityTypeCount() + "\n");
-		results.append(tabs + " EntityTypes:\n");
-		results.append(createStringFromEntityTypesInEntityObject(entity, tabCount + 1));
+		appendLine(results, tabs, " EntityTypeCount = " + entity.getEntityTypeCount());
+		appendLine(results, tabs, " EntityTypes:\n");
+		appendLine(results, "", createStringFromEntityTypesInEntityObject(entity, tabCount + 1));
 		
-		results.append(tabs + " CommentCount = " + entity.getCommentCount() + "\n");
-		results.append(tabs + " Comments:\n");
-		results.append(createStringFromCommentsInEntityObject(entity, tabCount + 1));
+		appendLine(results, tabs, " CommentCount = " + entity.getCommentCount());
+		appendLine(results, tabs, " Comments:\n");
+		appendLine(results, "", createStringFromCommentsInEntityObject(entity, tabCount + 1));
 		
-		results.append(tabs + " DefinitionCount = " + entity.getDefinitionCount() + "\n");
-		results.append(tabs + " Definitions:\n");
-		results.append(createStringFromDefinitionsInEntityObject(entity, tabCount + 1));
+		appendLine(results, tabs, " DefinitionCount = " + entity.getDefinitionCount());
+		appendLine(results, tabs, " Definitions:\n");
+		appendLine(results, "", createStringFromDefinitionsInEntityObject(entity, tabCount + 1));
 		
-		results.append(tabs + " PresentationCount = " + entity.getPresentationCount() + "\n");
-		results.append(tabs + " Presentations:\n");
-		results.append(createStringFromPresentationsInEntityObject(entity, tabCount + 1));
+		appendLine(results, tabs, " PresentationCount = " + entity.getPresentationCount());
+		appendLine(results, tabs, " Presentations:\n");
+		appendLine(results, "", createStringFromPresentationsInEntityObject(entity, tabCount + 1));
 		
-		results.append(tabs + " PropertyCount = " + entity.getPropertyCount() + "\n");
-		results.append(tabs + " Properties:\n");
-		results.append(createStringFromPropertiesInEntityObject(entity, tabCount + 1));
+		appendLine(results, tabs, " PropertyCount = " + entity.getPropertyCount());
+		appendLine(results, tabs, " Properties:\n");
+		appendLine(results, "", createStringFromPropertiesInEntityObject(entity, tabCount + 1));
 		
-		results.append(tabs + " PropertyLinkCount = " + entity.getPropertyLinkCount() + "\n");
-		results.append(tabs + " PropertyLinks:\n");
-		results.append(createStringFromPropertyLinksInEntityObject(entity, tabCount + 1));
+		appendLine(results, tabs, " PropertyLinkCount = " + entity.getPropertyLinkCount());
+		appendLine(results, tabs, " PropertyLinks:\n");
+		appendLine(results, "", createStringFromPropertyLinksInEntityObject(entity, tabCount + 1));
 		
 		
 		return results.toString();
@@ -108,27 +113,27 @@ public class PrintUtility {
 		int count = entity.getPresentationCount();
 		for(int i=0; i < count; i++){
 			presentation = entity.getPresentation(i);
-			results.append(tabs + "Value = " + presentation.getValue().getContent() + "\n");
-			results.append(tabs + "--DegreeOfFidelity = " + presentation.getDegreeOfFidelity() + "\n");
-			results.append(tabs + "--Language = " + presentation.getLanguage() + "\n");
-			results.append(tabs + "--Owner = " + presentation.getOwner() + "\n");
-			results.append(tabs + "--PropertyID = " + presentation.getPropertyId() + "\n");
-			results.append(tabs + "--PropertyName = " + presentation.getPropertyName() + "\n");
-			results.append(tabs + "--PropertyType = " + presentation.getPropertyType() + "\n");
-			results.append(tabs + "--RepresentationalForm = " + presentation.getRepresentationalForm() + "\n");
-			results.append(tabs + "--Status = " + presentation.getStatus() + "\n");
+			appendLine(results, tabs, "Value = " + presentation.getValue().getContent());
+			appendLine(results, tabs, "--DegreeOfFidelity = " + presentation.getDegreeOfFidelity());
+			appendLine(results, tabs, "--Language = " + presentation.getLanguage());
+			appendLine(results, tabs, "--Owner = " + presentation.getOwner());
+			appendLine(results, tabs, "--PropertyID = " + presentation.getPropertyId());
+			appendLine(results, tabs, "--PropertyName = " + presentation.getPropertyName());
+			appendLine(results, tabs, "--PropertyType = " + presentation.getPropertyType());
+			appendLine(results, tabs, "--RepresentationalForm = " + presentation.getRepresentationalForm());
+			appendLine(results, tabs, "--Status = " + presentation.getStatus());
 			
-			results.append(tabs + "--SourceCount = " + presentation.getSourceCount() + "\n");
-			results.append(tabs + "--Sources:\n");
-			results.append(createStringFromSourceInPresentationObject(presentation, tabCount + 1));
+			appendLine(results, tabs, "--SourceCount = " + presentation.getSourceCount());
+			appendLine(results, tabs, "--Sources:\n");
+			appendLine(results, "", createStringFromSourceInPresentationObject(presentation, tabCount + 1));
 			
-			results.append(tabs + "--PropertyQualifierCount = " + presentation.getPropertyQualifierCount() + "\n");
-			results.append(tabs + "--PropertyQualifiers:\n");
-			results.append(createStringFromPropertyQualifiersInPresentationObject(presentation, tabCount + 1));
+			appendLine(results, tabs, "--PropertyQualifierCount = " + presentation.getPropertyQualifierCount());
+			appendLine(results, tabs, "--PropertyQualifiers:\n");
+			appendLine(results, "", createStringFromPropertyQualifiersInPresentationObject(presentation, tabCount + 1));
 			
-			results.append(tabs + "--UsageContextCount = " + presentation.getUsageContextCount() + "\n");
-			results.append(tabs + "--UsageContexts:\n");
-			results.append(createStringFromUsageContextsInPresentationObject(presentation, tabCount + 1));			
+			appendLine(results, tabs, "--UsageContextCount = " + presentation.getUsageContextCount());
+			appendLine(results, tabs, "--UsageContexts:\n");
+			appendLine(results, "", createStringFromUsageContextsInPresentationObject(presentation, tabCount + 1));			
 		}
 		return results.toString();
 	}
@@ -138,7 +143,7 @@ public class PrintUtility {
 		String tabs = createTabs(tabCount);
 		int count = presentation.getSourceCount();
 		for(int i=0; i < count; i++){
-			results.append(tabs + " " + presentation.getSource(i).getContent() + "\n");
+			appendLine(results, tabs, " " + presentation.getSource(i).getContent());
 		}
 		return results.toString();
 	}
@@ -148,7 +153,7 @@ public class PrintUtility {
 		String tabs = createTabs(tabCount);
 		int count = presentation.getPropertyQualifierCount();
 		for(int i=0; i < count; i++){
-			results.append(tabs + " " + presentation.getPropertyQualifier(i) + "\n");
+			appendLine(results, tabs, " " + presentation.getPropertyQualifier(i));
 		}
 		return results.toString();
 	}
@@ -158,7 +163,7 @@ public class PrintUtility {
 		String tabs = createTabs(tabCount);
 		int count = presentation.getUsageContextCount();
 		for(int i=0; i < count; i++){
-			results.append(tabs + " " + presentation.getUsageContext(i) + "\n");
+			appendLine(results, tabs, " " + presentation.getUsageContext(i));
 		}
 		return results.toString();
 	}
@@ -168,7 +173,7 @@ public class PrintUtility {
 		String tabs = createTabs(tabCount);
 		int count = entity.getPropertyCount();
 		for(int i=0; i < count; i++){
-			results.append(tabs + " " + entity.getProperty(i) + "\n");
+			appendLine(results, tabs, " " + entity.getProperty(i));
 		}
 		return results.toString();
 	}
@@ -178,7 +183,7 @@ public class PrintUtility {
 		String tabs = createTabs(tabCount);
 		int count = entity.getPropertyLinkCount();
 		for(int i=0; i < count; i++){
-			results.append(tabs + " " + entity.getPropertyLink(i) + "\n");
+			appendLine(results, tabs, " " + entity.getPropertyLink(i));
 		}
 		return results.toString();
 	}
@@ -188,7 +193,7 @@ public class PrintUtility {
 		String tabs = createTabs(tabCount);
 		int count = entity.getDefinitionCount();
 		for(int i=0; i < count; i++){
-			results.append(tabs + " " + entity.getDefinition(i) + "\n");
+			appendLine(results, tabs, " " + entity.getDefinition(i));
 		}
 		return results.toString();
 	}
@@ -198,7 +203,7 @@ public class PrintUtility {
 		String tabs = createTabs(tabCount);
 		int count = entity.getCommentCount();
 		for(int i=0; i < count; i++){
-			results.append(tabs + " " + entity.getComment(i) + "\n");
+			appendLine(results, tabs, " " + entity.getComment(i));
 		}
 		return results.toString();
 	}
@@ -208,7 +213,7 @@ public class PrintUtility {
 		String tabs = createTabs(tabCount);
 		int count = entity.getEntityTypeCount();
 		for(int i=0; i < count; i++){
-			results.append(tabs + " " + entity.getEntityType(i) + "\n");
+			appendLine(results, tabs, " " + entity.getEntityType(i));
 		}
 		return results.toString();
 	}
@@ -217,10 +222,10 @@ public class PrintUtility {
 		StringBuffer results = new StringBuffer();
 		String tabs = createTabs(tabCount);
 
-		results.append(tabs + "CodingSchemeURI = " + codingSchemeSummary.getCodingSchemeURI() + "\n");
-		results.append(tabs + "FormalName = " + codingSchemeSummary.getFormalName() + "\n");
-		results.append(tabs + "LocalName = " + codingSchemeSummary.getLocalName() + "\n");
-		results.append(tabs + "RepresentsVersion = " + codingSchemeSummary.getRepresentsVersion() + "\n");
+		appendLine(results, tabs, "CodingSchemeURI = " + codingSchemeSummary.getCodingSchemeURI());
+		appendLine(results, tabs, "FormalName = " + codingSchemeSummary.getFormalName());
+		appendLine(results, tabs, "LocalName = " + codingSchemeSummary.getLocalName());
+		appendLine(results, tabs, "RepresentsVersion = " + codingSchemeSummary.getRepresentsVersion());
 
 		return results.toString();
 	}
@@ -233,25 +238,25 @@ public class PrintUtility {
 			DirectoryResult<CodeSystemVersionCatalogEntrySummary> dirResult) {
 		StringBuffer results = new StringBuffer();
 		
-		results.append("CodeSystemVersionCatalogEntrySummary Results: \n");
+		appendLine(results, "", "CodeSystemVersionCatalogEntrySummary Results: \n");
 
 		List<CodeSystemVersionCatalogEntrySummary> entries = dirResult.getEntries();
 		for(CodeSystemVersionCatalogEntrySummary summary : entries){
-			results.append("About = " + summary.getAbout() + "\n");
-			results.append("CodeSystemVersionName = " + summary.getCodeSystemVersionName() + "\n");
-			results.append("DocumentURI = " + summary.getDocumentURI() + "\n");
-			results.append("FormalName = " + summary.getFormalName() + "\n");
-			results.append("HREF = " + summary.getHref() + "\n");
-			results.append("OfficialResourceVersionId = " + summary.getOfficialResourceVersionId() + "\n");
-			results.append("ResourceName = " + summary.getResourceName() + "\n");
-			results.append("MatchStrength = " + summary.getMatchStrength() + "\n");
-			results.append("OfficialReleaseDate = " + summary.getOfficialReleaseDate() + "\n");
-			results.append("CodeSystemVersionTagCount = " + summary.getCodeSystemVersionTagCount() + "\n");
+			appendLine(results, "", "About = " + summary.getAbout());
+			appendLine(results, "", "CodeSystemVersionName = " + summary.getCodeSystemVersionName());
+			appendLine(results, "", "DocumentURI = " + summary.getDocumentURI());
+			appendLine(results, "", "FormalName = " + summary.getFormalName());
+			appendLine(results, "", "HREF = " + summary.getHref());
+			appendLine(results, "", "OfficialResourceVersionId = " + summary.getOfficialResourceVersionId());
+			appendLine(results, "", "ResourceName = " + summary.getResourceName());
+			appendLine(results, "", "MatchStrength = " + summary.getMatchStrength());
+			appendLine(results, "", "OfficialReleaseDate = " + summary.getOfficialReleaseDate());
+			appendLine(results, "", "CodeSystemVersionTagCount = " + summary.getCodeSystemVersionTagCount());
 			for(int i=0; i < summary.getCodeSystemVersionTagCount(); i++){
-				results.append("\tCodeSystemVersionTag = " + summary.getCodeSystemVersionTag(i) + "\n");
+				appendLine(results, "", "\tCodeSystemVersionTag = " + summary.getCodeSystemVersionTag(i));
 			}
-			results.append("ResourceSynopsis.Schema = " + summary.getResourceSynopsis().getSchema() + "\n");
-			results.append("VersionOf.Uri = " + summary.getVersionOf().getUri() + "\n\n");
+			appendLine(results, "", "ResourceSynopsis.Schema = " + summary.getResourceSynopsis().getSchema());
+			appendLine(results, "", "VersionOf.Uri = " + summary.getVersionOf().getUri() + "\n\n");
 		}
 		
 		return results.toString();
@@ -265,41 +270,41 @@ public class PrintUtility {
 			DirectoryResult<CodeSystemVersionCatalogEntry> dirResult) {
 		StringBuffer results = new StringBuffer();
 		
-		results.append("CodeSystemVersionCatalogEntry Results: \n");
+		appendLine(results, "", "CodeSystemVersionCatalogEntry Results: \n");
 
 		List<CodeSystemVersionCatalogEntry> entries = dirResult.getEntries();
 		for(CodeSystemVersionCatalogEntry summary : entries){
-			results.append("About = " + summary.getAbout() + "\n");
-			results.append("Associations = " + summary.getAssociations() + "\n");
-			results.append("CodeSystemVersionName = " + summary.getCodeSystemVersionName() + "\n");
-			results.append("DocumentURI = " + summary.getDocumentURI() + "\n");
-			results.append("EntityDescriptions = " + summary.getEntityDescriptions() + "\n");
-			results.append("FormalName = " + summary.getFormalName() + "\n");
+			appendLine(results, "", "About = " + summary.getAbout());
+			appendLine(results, "", "Associations = " + summary.getAssociations());
+			appendLine(results, "", "CodeSystemVersionName = " + summary.getCodeSystemVersionName());
+			appendLine(results, "", "DocumentURI = " + summary.getDocumentURI());
+			appendLine(results, "", "EntityDescriptions = " + summary.getEntityDescriptions());
+			appendLine(results, "", "FormalName = " + summary.getFormalName());
 
-			results.append("Individuals = " + summary.getIndividuals() + "\n");
-			results.append("OfficialResourceVersionId = " + summary.getOfficialResourceVersionId() + "\n");
-			results.append("Roles = " + summary.getRoles() + "\n");
-			results.append("SourceStatements = " + summary.getSourceStatements() + "\n");
-			results.append("DefaultLanguage = " + summary.getDefaultLanguage() + "\n");
-			results.append("EntryState = " + summary.getEntryState().value() + "\n");
-			results.append("State = " + summary.getState() + "\n");
-			results.append("OfficialReleaseDate = " + summary.getOfficialReleaseDate() + "\n");
-			results.append("NoteCount = " + summary.getNoteCount() + "\n");
-			results.append("AdditionalDocumentationCount = " + summary.getAdditionalDocumentationCount() + "\n");
-			results.append("AlternateIDCount = " + summary.getAlternateIDCount() + "\n");
-			results.append("ImportsCount = " + summary.getImportsCount() + "\n");
-			results.append("KeywordCount = " + summary.getKeywordCount() + "\n");
+			appendLine(results, "", "Individuals = " + summary.getIndividuals());
+			appendLine(results, "", "OfficialResourceVersionId = " + summary.getOfficialResourceVersionId());
+			appendLine(results, "", "Roles = " + summary.getRoles());
+			appendLine(results, "", "SourceStatements = " + summary.getSourceStatements());
+			appendLine(results, "", "DefaultLanguage = " + summary.getDefaultLanguage());
+			appendLine(results, "", "EntryState = " + summary.getEntryState().value());
+			appendLine(results, "", "State = " + summary.getState());
+			appendLine(results, "", "OfficialReleaseDate = " + summary.getOfficialReleaseDate());
+			appendLine(results, "", "NoteCount = " + summary.getNoteCount());
+			appendLine(results, "", "AdditionalDocumentationCount = " + summary.getAdditionalDocumentationCount());
+			appendLine(results, "", "AlternateIDCount = " + summary.getAlternateIDCount());
+			appendLine(results, "", "ImportsCount = " + summary.getImportsCount());
+			appendLine(results, "", "KeywordCount = " + summary.getKeywordCount());
 			for(int i=0; i < summary.getKeywordCount(); i++){
-				results.append("\tKeyword = " + summary.getKeyword(i) + "\n");
+				appendLine(results, "", "\tKeyword = " + summary.getKeyword(i));
 			}
-			results.append("PropertyCount = " + summary.getPropertyCount() + "\n");
+			appendLine(results, "", "PropertyCount = " + summary.getPropertyCount());
 			for(int i=0; i < summary.getPropertyCount(); i++){
-				results.append("\tProperty = " + summary.getProperty(i) + "\n");
+				appendLine(results, "", "\tProperty = " + summary.getProperty(i));
 			}
-			results.append("ResourceTypeCount = " + summary.getResourceTypeCount() + "\n");
-			results.append("SourceAndRoleCount = " + summary.getSourceAndRoleCount() + "\n");			
-			results.append("ResourceSynopsis.Schema = " + summary.getResourceSynopsis().getSchema() + "\n");
-			results.append("VersionOf.Uri = " + summary.getVersionOf().getUri() + "\n\n");
+			appendLine(results, "", "ResourceTypeCount = " + summary.getResourceTypeCount());
+			appendLine(results, "", "SourceAndRoleCount = " + summary.getSourceAndRoleCount());			
+			appendLine(results, "", "ResourceSynopsis.Schema = " + summary.getResourceSynopsis().getSchema());
+			appendLine(results, "", "VersionOf.Uri = " + summary.getVersionOf().getUri() + "\n\n");
 		}
 		
 		return results.toString();
@@ -312,7 +317,7 @@ public class PrintUtility {
 			CodingSchemeRendering[] csRenderingPage) {
 		StringBuffer results = new StringBuffer();
 		
-		results.append("CodeSystemVersionCatalogEntry Results: \n");
+		appendLine(results, "", "CodeSystemVersionCatalogEntry Results: \n");
 		
 		return results.toString();
 	}

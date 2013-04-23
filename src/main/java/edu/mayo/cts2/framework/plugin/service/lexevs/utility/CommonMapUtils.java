@@ -4,8 +4,11 @@ import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.Utility.Constructors;
 
-public class CommonMapUtils {
-
+public final class CommonMapUtils {
+	private CommonMapUtils(){
+		super();
+	}
+	
 	public static boolean validateMappingCodingScheme(String cts2URI, String version, MappingExtension lexMappingExtension){
 		try {
 			if(lexMappingExtension != null){

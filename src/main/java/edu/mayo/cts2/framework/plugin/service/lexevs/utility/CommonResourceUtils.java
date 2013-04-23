@@ -5,16 +5,17 @@ import java.util.List;
 import java.util.Set;
 
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
+import org.LexGrid.LexBIG.DataModel.Collections.ConceptReferenceList;
 import org.LexGrid.LexBIG.DataModel.Collections.LocalNameList;
-import org.LexGrid.LexBIG.DataModel.Collections.ResolvedConceptReferenceList;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
 import org.LexGrid.LexBIG.Exceptions.LBParameterException;
-import org.LexGrid.LexBIG.Exceptions.LBResourceUnavailableException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
+import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension.Mapping;
+import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension.Mapping.SearchContext;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension.MappingSortOption;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
@@ -23,6 +24,7 @@ import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
 import org.LexGrid.codingSchemes.CodingScheme;
 
 import edu.mayo.cts2.framework.model.command.Page;
+import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
@@ -35,9 +37,13 @@ import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestri
 import edu.mayo.cts2.framework.service.profile.ResourceQuery;
 import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryQuery;
 
-public class CommonResourceUtils{
-	private final static String UNCHECKED = "unchecked";
-	private final static String RAWTYPES = "rawtypes";
+public final class CommonResourceUtils{
+	private static final String UNCHECKED = "unchecked";
+	private static final String RAWTYPES = "rawtypes";
+	
+	private CommonResourceUtils(){
+		super();
+	}
 	
 	@SuppressWarnings({ RAWTYPES, UNCHECKED })
 	public static <EntryType> DirectoryResult<EntryType> createDirectoryResults(
@@ -133,15 +139,17 @@ public class CommonResourceUtils{
 		
 		CodingSchemeRenderingList lexRenderingList = null;
 		String cts2SystemName = queryData.getCts2SystemName();
+		Set<ResolvedFilter> cts2Filters = queryData.getCts2Filters();
 		
 		try {
 			lexRenderingList = lexBigService.getSupportedCodingSchemes();
 		} catch (LBInvocationException e) {
-			throw new RuntimeException();
+			throw new RuntimeException(e);
 		}
 		
 		lexRenderingList = CommonSearchFilterUtils.filterLexCodingSchemeRenderingList(lexRenderingList, cts2SystemName, lexMappingExtension);
-		lexRenderingList = CommonSearchFilterUtils.filterLexCodingSchemeRenderingList(lexRenderingList, queryData.getCts2Filters(), nameConverter);
+		lexRenderingList = CommonSearchFilterUtils.filterLexCodingSchemeRenderingList(lexRenderingList, cts2Filters, nameConverter);
+		
 		// TODO: Need to filter further for restrictions
 		
 		return lexRenderingList.getCodingSchemeRendering();
@@ -198,7 +206,7 @@ public class CommonResourceUtils{
 			MapEntryQuery cts2Query, SortCriteria cts2SortCriteria, Page page,
 			VersionNameConverter nameConverter, MappingExtension lexMappingExtension) {
 		
-		ResolvedConceptReferenceResults lexResolvedConceptReferenceResults = null;
+		ResolvedConceptReferenceResults lexResolvedConceptReferenceResults = new ResolvedConceptReferenceResults(null, true);
 		ResolvedConceptReferencesIterator lexMapIterator;
 		QueryData<MapEntryQuery> queryData;
 
@@ -209,68 +217,71 @@ public class CommonResourceUtils{
 		CodingSchemeVersionOrTag lexVersionOrTag = queryData.getLexVersionOrTag();
 		String lexRelationsContainerName = null;
 		List<MappingSortOption> lexSortOptionList = null;
+		MapEntryQueryServiceRestrictions cts2Restrictions = (MapEntryQueryServiceRestrictions) queryData.getCts2Restrictions();
 		
 		try {
-			//TODO: If restrictions are present, you will most likely want to use the 'getMapping' method of the
-			//MappingExtension instead of the 'resolveMapping' method.
-			lexMapIterator = lexMappingExtension.resolveMapping(lexSchemeName, lexVersionOrTag, lexRelationsContainerName, lexSortOptionList);
-			MapEntryQueryServiceRestrictions cts2Restrictions = (MapEntryQueryServiceRestrictions) queryData.getCts2Restrictions();
-			
-			// If restrictions exist then results need to be filtered to restricted entities provided in restriction.
 			if(cts2Restrictions != null){
+				Mapping lexMapping = lexMappingExtension.getMapping(lexSchemeName, lexVersionOrTag, lexRelationsContainerName);
+				Set<EntityNameOrURI> cts2TargetEntities = cts2Restrictions.getTargetEntities();
+				for(EntityNameOrURI cts2EntityNameOrURI : cts2TargetEntities){
+					String cts2EntityName = null;
+					String cts2EntityNamespace = null;
+					if(cts2EntityNameOrURI.getEntityName() != null){
+						cts2EntityName = cts2EntityNameOrURI.getEntityName().getName();
+						cts2EntityNamespace = cts2EntityNameOrURI.getEntityName().getNamespace();
+					}
+					ConceptReferenceList reference = Constructors.createConceptReferenceList(cts2EntityName, cts2EntityNamespace, null);
+					lexMapping = lexMapping.restrictToCodes(reference, SearchContext.SOURCE_OR_TARGET_CODES);
+				}
 				
-				//TODO: We'll want to move the logic in 'getLexEntityList' to a restriction on the MappingExtension.
-				/*
-				Mapping mapping = mappingExtension.getMapping(uri,version,"AutoToGMPMappings");
-				mapping = mapping.restrictToCodes(..., ...)
-				ResolvedConceptReferencesIterator itr = mapping.resolveMapping();
-				
-				See: https://github.com/lexevs/lexevs/blob/master/lbTest/src/test/java/org/LexGrid/LexBIG/Impl/Extensions/GenericExtensions/MappingExtensionImplTest.java
-				for examples, specifically, tests named *WithRestriction*.
-				*/
-				ResolvedConceptReference [] lexResolvedConceptReferences = getLexEntityList(cts2Restrictions, lexMapIterator);
-				boolean atEnd = (page.getEnd() >= lexResolvedConceptReferences.length) ? true : false;
-				
-				lexResolvedConceptReferences = (ResolvedConceptReference[]) CommonPageUtils.getPage(lexResolvedConceptReferences, page);
-				lexResolvedConceptReferenceResults = new ResolvedConceptReferenceResults(lexResolvedConceptReferences, atEnd);
+				lexMapIterator = lexMapping.resolveMapping();
 			}
 			else{
-				lexResolvedConceptReferenceResults = CommonPageUtils.getPage(lexMapIterator, page);
+				lexMapIterator = lexMappingExtension.resolveMapping(lexSchemeName, lexVersionOrTag, lexRelationsContainerName, lexSortOptionList);
+				
 			}
+			
+			lexResolvedConceptReferenceResults = CommonPageUtils.getPage(lexMapIterator, page);
+			
 		} catch (LBParameterException e) {
+			// Mapping Extension throws this error if the map is not found.  
+			// Catch and return null
+//			throw new RuntimeException(e);
+			return lexResolvedConceptReferenceResults;
+		} catch (LBException e) {
 			throw new RuntimeException(e);
 		}
 
 		return lexResolvedConceptReferenceResults;			
 	}
 
-	public static ResolvedConceptReference [] getLexEntityList(
-			MapEntryQueryServiceRestrictions cts2Restrictions,
-			ResolvedConceptReferencesIterator lexMapIterator) {
-		ResolvedConceptReferenceList lexResolvedConceptReferenceList = new ResolvedConceptReferenceList();
-		ResolvedConceptReference lexResolvedConceptReference;
-		Set<EntityNameOrURI> cts2TargetEntitySet = cts2Restrictions.getTargetEntities();
-	
-		try {
-			while(lexMapIterator.hasNext()){
-				lexResolvedConceptReference  = lexMapIterator.next();
-				
-				String lexEntityCode = lexResolvedConceptReference.getCode();
-				for(EntityNameOrURI cts2Entity : cts2TargetEntitySet){
-					String cts2EntityName = cts2Entity.getEntityName().getName();
-					if(cts2EntityName.equals(lexEntityCode)){
-						lexResolvedConceptReferenceList.addResolvedConceptReference(lexResolvedConceptReference);
-					}
-				}
-			}
-		} catch (LBResourceUnavailableException e) {
-			throw new RuntimeException();
-		} catch (LBInvocationException e) {
-			throw new RuntimeException();
-		}
-		
-		return lexResolvedConceptReferenceList.getResolvedConceptReference();
-	}
+//	public static ResolvedConceptReference [] getLexEntityList(
+//			MapEntryQueryServiceRestrictions cts2Restrictions,
+//			ResolvedConceptReferencesIterator lexMapIterator) {
+//		ResolvedConceptReferenceList lexResolvedConceptReferenceList = new ResolvedConceptReferenceList();
+//		ResolvedConceptReference lexResolvedConceptReference;
+//		Set<EntityNameOrURI> cts2TargetEntitySet = cts2Restrictions.getTargetEntities();
+//	
+//		try {
+//			while(lexMapIterator.hasNext()){
+//				lexResolvedConceptReference  = lexMapIterator.next();
+//				
+//				String lexEntityCode = lexResolvedConceptReference.getCode();
+//				for(EntityNameOrURI cts2Entity : cts2TargetEntitySet){
+//					String cts2EntityName = cts2Entity.getEntityName().getName();
+//					if(cts2EntityName.equals(lexEntityCode)){
+//						lexResolvedConceptReferenceList.addResolvedConceptReference(lexResolvedConceptReference);
+//					}
+//				}
+//			}
+//		} catch (LBResourceUnavailableException e) {
+//			throw new RuntimeException();
+//		} catch (LBInvocationException e) {
+//			throw new RuntimeException();
+//		}
+//		
+//		return lexResolvedConceptReferenceList.getResolvedConceptReference();
+//	}
 
 	public static CodingScheme getMappedCodingScheme(
 			LexBIGService lexBigService, CodingSchemeRendering render,

@@ -34,9 +34,11 @@ public class ResolvedCodingSchemeTransform {
 
 	List<ResolvedValueSetDirectoryEntry> transform(List<CodingScheme> listcs) {
 		List<ResolvedValueSetDirectoryEntry> rvsde_list = new ArrayList<ResolvedValueSetDirectoryEntry>();
-		for (CodingScheme cs : listcs) {
-			ResolvedValueSetDirectoryEntry rvsde = transform(cs);
-			rvsde_list.add(rvsde);
+		if (listcs != null) {
+			for (CodingScheme cs : listcs) {
+				ResolvedValueSetDirectoryEntry rvsde = transform(cs);
+				rvsde_list.add(rvsde);
+			}
 		}
 		return rvsde_list;
 	}

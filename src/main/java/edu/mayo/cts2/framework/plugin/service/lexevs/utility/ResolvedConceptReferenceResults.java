@@ -6,10 +6,17 @@ public class ResolvedConceptReferenceResults {
 	private boolean atEnd;
 	private ResolvedConceptReference [] lexResolvedConceptReference;
 	
-	public ResolvedConceptReferenceResults(ResolvedConceptReference [] lexResolvedConceptReference, boolean atEnd){	
-		this.lexResolvedConceptReference = null;
+	public ResolvedConceptReferenceResults(ResolvedConceptReference [] lexResolvedConceptReference, boolean atEnd){
 		if(lexResolvedConceptReference != null){
-			this.lexResolvedConceptReference = lexResolvedConceptReference.clone();
+			int length = lexResolvedConceptReference.length;
+			this.lexResolvedConceptReference = new ResolvedConceptReference[length];
+			for(int i=0; i < length; i++){
+				// Shallow copy ok?
+				this.lexResolvedConceptReference[i] = lexResolvedConceptReference[i];
+			}
+		}
+		else{
+			this.lexResolvedConceptReference = new ResolvedConceptReference[0];
 		}
 		this.atEnd = atEnd;
 	}

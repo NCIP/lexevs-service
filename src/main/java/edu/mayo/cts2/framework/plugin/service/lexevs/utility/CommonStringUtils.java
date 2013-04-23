@@ -2,7 +2,11 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
 
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 
-public class CommonStringUtils {
+public final class CommonStringUtils {
+	
+	private CommonStringUtils(){
+		super();
+	}
 	
 	public static boolean compareStrings(String compareTo, String match1, String match2){
 		boolean matches = false;

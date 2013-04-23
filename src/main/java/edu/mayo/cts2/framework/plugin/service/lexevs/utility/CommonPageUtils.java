@@ -43,7 +43,12 @@ import edu.mayo.cts2.framework.service.profile.ResourceQuery;
  * @author <a href="mailto:hardie.linda@mayo.edu">Linda Hardie</a>
  *
  */
-public class CommonPageUtils {
+public final class CommonPageUtils {
+	
+	private CommonPageUtils(){
+		super();
+	}
+	
 	public static <T extends ResourceQuery> ResolvedConceptReferenceResults getPage(
 			LexBIGService lexBigService, 
 			QueryData<T> queryData,
@@ -122,8 +127,7 @@ public class CommonPageUtils {
 	
 	public static <T> Object[] getRenderingPage(List<T> list, Page page){
 		Object [] renderedArray = list.toArray(new CodingScheme[0]);
-		Object [] renderedPage = CommonPageUtils.getPage(renderedArray, page);		
-		return renderedPage;
+		return CommonPageUtils.getPage(renderedArray, page);
 	}
 	
 	public static <T> Object[] getPage(T[] data, Page page) {
