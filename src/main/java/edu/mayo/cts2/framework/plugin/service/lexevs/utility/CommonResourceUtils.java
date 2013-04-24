@@ -202,7 +202,7 @@ public final class CommonResourceUtils{
 		return lexCodedNodeSet;
 	}
 	
-	public static ResolvedConceptReferenceResults getLexMapReferenceResults(
+	public static MapResolvedConceptReferenceResults getLexMapReferenceResults(
 			MapEntryQuery cts2Query, SortCriteria cts2SortCriteria, Page page,
 			VersionNameConverter nameConverter, MappingExtension lexMappingExtension) {
 		
@@ -211,7 +211,7 @@ public final class CommonResourceUtils{
 		QueryData<MapEntryQuery> queryData;
 
 		queryData = new QueryData<MapEntryQuery>(cts2Query, nameConverter);
-		
+
 		String lexSchemeName = queryData.getLexSchemeName();  // Will get codeSchemeName or mapName depending on query type
 	
 		CodingSchemeVersionOrTag lexVersionOrTag = queryData.getLexVersionOrTag();
@@ -247,12 +247,12 @@ public final class CommonResourceUtils{
 			// Mapping Extension throws this error if the map is not found.  
 			// Catch and return null
 //			throw new RuntimeException(e);
-			return lexResolvedConceptReferenceResults;
+			return new MapResolvedConceptReferenceResults(null,true);
 		} catch (LBException e) {
 			throw new RuntimeException(e);
 		}
 
-		return lexResolvedConceptReferenceResults;			
+		return new MapResolvedConceptReferenceResults(null, lexResolvedConceptReferenceResults);			
 	}
 
 //	public static ResolvedConceptReference [] getLexEntityList(

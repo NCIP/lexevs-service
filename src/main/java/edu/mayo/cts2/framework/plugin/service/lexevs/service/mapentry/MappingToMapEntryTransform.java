@@ -37,16 +37,19 @@ import edu.mayo.cts2.framework.model.mapversion.MapSet;
 import edu.mayo.cts2.framework.model.mapversion.MapTarget;
 import edu.mayo.cts2.framework.model.mapversion.types.MapProcessingRule;
 import edu.mayo.cts2.framework.plugin.service.lexevs.transform.AbstractBaseTransform;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.MapResolvedConceptReference;
 
 @Component
 public class MappingToMapEntryTransform 
-	extends AbstractBaseTransform<MapEntry, ResolvedConceptReference, MapEntryDirectoryEntry, ResolvedConceptReference>  {
+	extends AbstractBaseTransform<MapEntry, MapResolvedConceptReference, MapEntryDirectoryEntry, MapResolvedConceptReference>  {
 
 	@Override
-	public MapEntry transformFullDescription(ResolvedConceptReference resolvedConceptReference) {
-		if(resolvedConceptReference == null){
+	public MapEntry transformFullDescription(MapResolvedConceptReference mapReference) {
+		if(mapReference == null || mapReference.getResolvedConceptReference() == null){
 			return null;
 		}
+		
+		ResolvedConceptReference resolvedConceptReference = mapReference.getResolvedConceptReference();
 		
 		MapEntry mapEntry = new MapEntry();
 		mapEntry.setMapFrom(this.getTransformUtils().toUriAndEntityName(resolvedConceptReference));
@@ -54,9 +57,9 @@ public class MappingToMapEntryTransform
 		
 		mapEntry.setAssertedBy(this.getTransformUtils().
 			toMapVersionReference(
-					resolvedConceptReference.getCodingSchemeName(), 
-					resolvedConceptReference.getCodingSchemeVersion(), 
-					resolvedConceptReference.getCodingSchemeURI()));
+					mapReference.getMapName().getName(), 
+					mapReference.getMapName().getVersion(), 
+					null));
 		
 		MapSet mapSet = new MapSet();
 		mapSet.setEntryOrder(1L);
@@ -80,27 +83,25 @@ public class MappingToMapEntryTransform
 	}
 	
 	@Override
-	public MapEntryDirectoryEntry transformSummaryDescription(ResolvedConceptReference resolvedConceptReference) {
-		if(resolvedConceptReference == null){
+	public MapEntryDirectoryEntry transformSummaryDescription(MapResolvedConceptReference mapReference) {
+		if(mapReference == null || mapReference.getResolvedConceptReference() == null){
 			return null;
 		}
 		
+		ResolvedConceptReference resolvedConceptReference = mapReference.getResolvedConceptReference();
+
 		MapEntryDirectoryEntry mapEntryDirectoryEntry = new MapEntryDirectoryEntry();
 		
 		URIAndEntityName fromName = this.getTransformUtils().toUriAndEntityName(resolvedConceptReference);
 		
 		mapEntryDirectoryEntry.setMapFrom(fromName);
 		
-		String mapName = resolvedConceptReference.getCodingSchemeName();
-		String versionName = this.getVersionNameConverter().
-			toCts2VersionName(mapName, resolvedConceptReference.getCodingSchemeVersion());
-		
 		String encodedName = EncodingUtils.encodeScopedEntityName(fromName);
 		
 		mapEntryDirectoryEntry.setHref(
 			this.getUrlConstructor().createMapEntryUrl(
-					mapName, 
-					versionName, 
+					mapReference.getMapName().getName(), 
+					mapReference.getMapName().getVersion(), 
 					encodedName));
 		
 		mapEntryDirectoryEntry.setResourceName(encodedName);

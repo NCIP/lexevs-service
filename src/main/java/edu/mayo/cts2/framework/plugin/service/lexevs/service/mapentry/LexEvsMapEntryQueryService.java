@@ -48,6 +48,7 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsServi
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.MapResolvedConceptReferenceResults;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.ResolvedConceptReferenceResults;
 import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryQuery;
 import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryQueryService;
@@ -102,10 +103,11 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	@Override
 	public DirectoryResult<MapEntryDirectoryEntry> getResourceSummaries(
 			MapEntryQuery query, SortCriteria sortCriteria, Page page) {
+
+		MapResolvedConceptReferenceResults lexReferenceResults = CommonResourceUtils.getLexMapReferenceResults(query, sortCriteria, page, this.nameConverter, this.lexMappingExtension);
 		
-		DirectoryResult<MapEntryDirectoryEntry> cts2DirectoryResult;
-		ResolvedConceptReferenceResults lexReferenceResults = CommonResourceUtils.getLexMapReferenceResults(query, sortCriteria, page, this.nameConverter, this.lexMappingExtension);
-		cts2DirectoryResult = CommonResourceUtils.createDirectoryResults(this.transformer, lexReferenceResults, Constants.SUMMARY_DESCRIPTION);
+		DirectoryResult<MapEntryDirectoryEntry> cts2DirectoryResult = 
+			CommonResourceUtils.createDirectoryResults(this.transformer, lexReferenceResults, Constants.SUMMARY_DESCRIPTION);
 		
 		return cts2DirectoryResult;
 	}
@@ -116,10 +118,9 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	@Override
 	public DirectoryResult<MapEntry> getResourceList(MapEntryQuery query,
 			SortCriteria sortCriteria, Page page) {
-				
-		DirectoryResult<MapEntry> cts2DirectoryResult = null;
-		ResolvedConceptReferenceResults lexReferenceResults = CommonResourceUtils.getLexMapReferenceResults(query, sortCriteria, page, this.nameConverter, this.lexMappingExtension);
-		cts2DirectoryResult = CommonResourceUtils.createDirectoryResults(this.transformer, lexReferenceResults, Constants.FULL_DESCRIPTION);
+
+		MapResolvedConceptReferenceResults lexReferenceResults = CommonResourceUtils.getLexMapReferenceResults(query, sortCriteria, page, this.nameConverter, this.lexMappingExtension);
+		DirectoryResult<MapEntry> cts2DirectoryResult = CommonResourceUtils.createDirectoryResults(this.transformer, lexReferenceResults, Constants.FULL_DESCRIPTION);
 
 		return cts2DirectoryResult;
 	}

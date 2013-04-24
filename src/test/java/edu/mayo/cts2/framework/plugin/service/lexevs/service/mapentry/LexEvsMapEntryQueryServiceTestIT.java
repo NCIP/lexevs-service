@@ -42,6 +42,7 @@ import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.mapversion.MapEntry;
+import edu.mayo.cts2.framework.model.mapversion.MapEntryDirectoryEntry;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
@@ -438,21 +439,38 @@ public class LexEvsMapEntryQueryServiceTestIT extends AbstractTestITBase {
 //	}
 //
 //	
-//	@Test
-//	public void testGetResourceSummariesMapToRoleFound() {
-//		
-//		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
-//		NameOrURI mapVersion = ModelUtils.nameOrUriFromName("MappingSample-1.0");
-//		restrictions.setMapVersion(mapVersion);
-//		
-//		MapEntryQueryImpl mapEntryQueryImpl = new MapEntryQueryImpl(null,null,null,restrictions);
-//		
-//		SortCriteria sortCriteria = null;
-//		Page page = new Page();
-//		
-//		DirectoryResult<MapEntryDirectoryEntry> list = this.service.getResourceSummaries(mapEntryQueryImpl, sortCriteria, page);
-//		assertNotNull(list);
-//		assertEquals(1,list.getEntries().size());
-//	}
-//
+	@Test
+	public void testGetResourceSummaries() {
+		
+		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
+		NameOrURI mapVersion = ModelUtils.nameOrUriFromName("MappingSample-1.0");
+		restrictions.setMapVersion(mapVersion);
+		
+		MapEntryQueryImpl mapEntryQueryImpl = new MapEntryQueryImpl(null,null,null,restrictions);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<MapEntryDirectoryEntry> list = this.service.getResourceSummaries(mapEntryQueryImpl, sortCriteria, page);
+		assertNotNull(list);
+		assertEquals(6,list.getEntries().size());
+	}
+	
+	@Test
+	public void testGetResourceSummariesInvalidMap() {
+		
+		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
+		NameOrURI mapVersion = ModelUtils.nameOrUriFromName("MappingSample-1.0-BAD");
+		restrictions.setMapVersion(mapVersion);
+		
+		MapEntryQueryImpl mapEntryQueryImpl = new MapEntryQueryImpl(null,null,null,restrictions);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<MapEntryDirectoryEntry> list = this.service.getResourceSummaries(mapEntryQueryImpl, sortCriteria, page);
+		assertNotNull(list);
+		assertEquals(0,list.getEntries().size());
+	}
+
 }

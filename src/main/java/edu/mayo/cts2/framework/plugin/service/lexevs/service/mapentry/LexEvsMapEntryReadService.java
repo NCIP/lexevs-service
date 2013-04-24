@@ -48,6 +48,7 @@ import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.MapResolvedConceptReference;
 import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryReadService;
 import edu.mayo.cts2.framework.service.profile.mapentry.name.MapEntryReadId;
 
@@ -141,7 +142,9 @@ public class LexEvsMapEntryReadService extends AbstractLexEvsService implements 
 			ResolvedReadContext readContext) {
 		
 		ResolvedConceptReference resolvedConceptReference = getResolvedConceptReference(identifier, readContext);		
-		return this.mappingToMapEntryTransform.transformFullDescription(resolvedConceptReference);
+		return this.mappingToMapEntryTransform.transformFullDescription(
+			new MapResolvedConceptReference(
+				this.nameConverter.fromCts2VersionName(identifier.getMapVersion().getName()), resolvedConceptReference));
 	}
 
 	@Override
