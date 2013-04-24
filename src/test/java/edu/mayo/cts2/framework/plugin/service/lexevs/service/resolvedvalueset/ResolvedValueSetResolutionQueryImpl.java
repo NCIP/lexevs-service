@@ -32,7 +32,7 @@ public class ResolvedValueSetResolutionQueryImpl implements ResolvedValueSetReso
 
 
 
-	public void setgetResolvedValueSetResolutionEntityRestrictions(
+	public void setResolvedValueSetResolutionEntityRestrictions(
 			ResolvedValueSetResolutionEntityRestrictions restrictions) {
 		this.restrictions = restrictions;
 	}

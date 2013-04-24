@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.StringWriter;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -17,16 +18,18 @@ import edu.mayo.cts2.framework.core.xml.Cts2Marshaller;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.EntitySynopsis;
+import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
+import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonTestUtils;
+import edu.mayo.cts2.framework.service.command.restriction.ResolvedValueSetResolutionEntityRestrictions;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 import edu.mayo.cts2.framework.service.profile.resolvedvalueset.ResolvedValueSetResolutionService;
 import edu.mayo.cts2.framework.service.profile.resolvedvalueset.name.ResolvedValueSetReadId;
-import edu.mayo.cts2.framework.service.profile.valuesetdefinition.ResolvedValueSetResolutionEntityQuery;
 
 @LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosAndGM.xml")
 public class LexEVSResolvedValuesetResolutionServiceTestIT extends
@@ -87,6 +90,34 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT extends
 		assertTrue(dirResult.getEntries().size() > 0);
 
 	}	
+	
+	
+	
+	@Test
+	public void testGetResolutionEntitiesWithEntityRestriction() {
+		ResolvedValueSetReadId identifier = new ResolvedValueSetReadId("SRITEST:AUTO:AllDomesticANDGM-06736a30878a0f8bd0ea83196732380a",
+				ModelUtils.nameOrUriFromName("SRITEST:AUTO:AllDomesticANDGM"),
+				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM-06736a30878a0f8bd0ea83196732380a"));
+		
+		ResolvedValueSetResolutionQueryImpl query= new ResolvedValueSetResolutionQueryImpl();
+		ResolvedValueSetResolutionEntityRestrictions entityRestriction= new ResolvedValueSetResolutionEntityRestrictions();
+		EntityNameOrURI entity = new EntityNameOrURI();
+		ScopedEntityName scopedEntityName = new ScopedEntityName();
+		//scopedEntityName.setNamespace("Automobiles");
+		scopedEntityName.setName("GM");
+		entity.setEntityName(scopedEntityName);
+		Set<EntityNameOrURI> entities= new HashSet<EntityNameOrURI>();
+		entities.add(entity);
+		entityRestriction.setEntities(entities);
+		query.setResolvedValueSetResolutionEntityRestrictions(entityRestriction);
+		query.setResolvedValueSetResolutionEntityRestrictions(entityRestriction);
+		DirectoryResult<EntityDirectoryEntry> dirResult = service.getEntities(
+				identifier, query, null, new Page());
+		assertTrue(dirResult.getEntries().size() > 0);
+
+	}	
+	
+	
 	@Test
 	public void testGetResolutionValidXML() throws Exception {
 		ResolvedValueSetReadId identifier = new ResolvedValueSetReadId("SRITEST:AUTO:AllDomesticANDGM-06736a30878a0f8bd0ea83196732380a",
