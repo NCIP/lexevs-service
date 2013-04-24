@@ -30,14 +30,18 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.LexGrid.LexBIG.DataModel.Collections.ConceptReferenceList;
+import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
+import org.LexGrid.LexBIG.Exceptions.LBException;
+import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
+import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension.Mapping;
+import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension.Mapping.SearchContext;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.LexGrid.LexBIG.Utility.Constructors;
+import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
 import org.LexGrid.codingSchemes.CodingScheme;
-import org.LexGrid.relations.AssociationPredicate;
-import org.LexGrid.relations.AssociationSource;
-import org.LexGrid.relations.AssociationTarget;
-import org.LexGrid.relations.Relations;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
@@ -130,11 +134,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 			cts2CodeSystemRestrictionMapRole = cts2CodeSystemRestriction.getMapRole();
 		}
 		
-		// Initialize items for CTS2 EntitiesRestrictions
-		if (cts2EntitiesRestriction != null) {
-			
-		}
-		
+
 		CodingScheme lexCodingScheme;
 		for (CodingSchemeRendering lexCodingSchemeRendering : lexCodingSchemeRenderingArray) {
 			
@@ -181,11 +181,11 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 			restrictionType = RestrictionType.ALL;
 		}
 		
-		if (restrictionType.value().equals("AT_LEAST_ONE")) {
-			return checkIfMatchForAllCts2EntitiesRestriction(lexCodingScheme, cts2EntitiesRestriction);			
+		if (restrictionType.value().equals(RestrictionType.AT_LEAST_ONE.value())) {
+			return checkIfMatchForAtLeastOneCts2EntitiesRestriction(lexCodingScheme, cts2EntitiesRestriction);			
 		} else {
 			// Process as ALL RestrictionType
-			return checkIfMatchForAtLeastOneCts2EntitiesRestriction(lexCodingScheme, cts2EntitiesRestriction);
+			return checkIfMatchForAllCts2EntitiesRestriction(lexCodingScheme, cts2EntitiesRestriction);
 		}
 	}
 	
@@ -193,11 +193,9 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 
 		MapStatus mapStatus = cts2EntitiesRestriction.getMapStatus();
 		if (mapStatus == null) {
-			// Set default status to 
-			mapStatus = MapStatus.MAPPED;  // ??? Use MAPPED
+			// Set default status 
+			mapStatus = MapStatus.MAPPED;  
 		}
-		
-		// TODO Under construction
 		
 		// MapStatus values to consider via notes from CTS2 specification:
 		//   ALLMAPENTRIES: The union of UNMAPPED and MAPPED entities - any entity that is a source or target of a map 
@@ -209,11 +207,6 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		//   UNMAPPED: An entity is included in the "from" part of the map but does not appear in an MapEntry or it appears 
 		//    in the "to" part of the map but does not appear in the output of a MapRule.
 		
-		// TODO For MapStatus.NOMAP scenario, it is not clear if an AssociateSource object would represent its List<AssociationTarget> as
-		//   an empty list or as null. Assume both null and empty list are valid?
-		
-		// TODO For MapStatus.UNMAPPED and MapStatus.ALLMAPENTRIES scenarios, throw UnsupportedOperationException for now.
-		
 		if (mapStatus == MapStatus.ALLMAPENTRIES) {
 			throw new UnsupportedOperationException("MapStatus.ALLMAPENTRIES is currently not a supported option in respect " +
 					"to EntitiesRestriction for MapVersionQuery");	
@@ -222,148 +215,156 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 			throw new UnsupportedOperationException("MapStatus.UNMAPPED is currently not a supported option in respect " +
 					"to EntitiesRestriction for MapVersionQuery");	
 		}
+		if (mapStatus == MapStatus.NOMAP) {
+			throw new UnsupportedOperationException("MapStatus.NOMAP is currently not a supported option in respect " +
+					"to EntitiesRestriction for MapVersionQuery");	
+		}
 		
 		Set<EntityNameOrURI> cts2RestrictedEntitiesSet = cts2EntitiesRestriction.getEntities();
 		MapRole mapRole = cts2EntitiesRestriction.getMapRole();
 
-		boolean matchFound = true;
+		String lexRelationsContainerName = null;
+		CodingSchemeVersionOrTag lexCodingSchemeVersionOrTag = new CodingSchemeVersionOrTag();
+		lexCodingSchemeVersionOrTag.setVersion(lexCodingScheme.getRepresentsVersion());
+		lexCodingSchemeVersionOrTag.setTag(lexCodingScheme.getCodingSchemeName());
 		
-		Relations relations = lexCodingScheme.getRelations(0);
-		List<AssociationPredicate> lexAssociationPredicatesList = relations.getAssociationPredicateAsReference();
-
+		boolean matchFound = true;		
 		if (mapStatus == MapStatus.MAPPED) {
-			// TODO Not sure what "MAPPED includes NOMAP entities." means (especially if the set of entities to restrict is not empty). If
-			//   the set of entities to restrict is empty then what's the point of having EntitiesRestriction?  Maybe its just a stmt to 
-			//   be sure not to discard the NOMAP conditions found.
 			if (mapRole == MapRole.MAP_FROM_ROLE) {
-				while (matchFound) {
-					for (EntityNameOrURI cts2RestrictedEntity : cts2RestrictedEntitiesSet) {
-						ScopedEntityName cts2EntityName = cts2RestrictedEntity.getEntityName();
-						matchFound = isEntityFoundForMapFromRole(cts2EntityName, lexAssociationPredicatesList);
-					}
+				for (EntityNameOrURI cts2RestrictedEntity : cts2RestrictedEntitiesSet) {
+					ScopedEntityName cts2EntityName = cts2RestrictedEntity.getEntityName();
+					matchFound = isEntityFoundForMapFromRole(cts2EntityName, 
+							lexCodingScheme, 
+							lexCodingSchemeVersionOrTag, 
+							lexRelationsContainerName);
+					if (!matchFound) {
+						break;
+					} 
 				}
 			} else if (mapRole == MapRole.MAP_TO_ROLE) {
-				while (matchFound) {
-					for (EntityNameOrURI cts2RestrictedEntity : cts2RestrictedEntitiesSet) {
-						ScopedEntityName cts2EntityName = cts2RestrictedEntity.getEntityName();
-						matchFound = isEntityFoundForMapToRole(cts2EntityName, lexAssociationPredicatesList);
-					}
-				}				
+				for (EntityNameOrURI cts2RestrictedEntity : cts2RestrictedEntitiesSet) {
+					ScopedEntityName cts2EntityName = cts2RestrictedEntity.getEntityName();
+					matchFound = isEntityFoundForMapToRole(cts2EntityName, 
+							lexCodingScheme, 
+							lexCodingSchemeVersionOrTag, 
+							lexRelationsContainerName);
+					if (!matchFound) {
+						break;
+					} 
+				}
 			} else if (mapRole == MapRole.BOTH_MAP_ROLES) {
-				while (matchFound) {
-					for (EntityNameOrURI cts2RestrictedEntity : cts2RestrictedEntitiesSet) {
-						ScopedEntityName cts2EntityName = cts2RestrictedEntity.getEntityName();
-						matchFound = isEntityFoundForBothMapRoles(cts2EntityName, lexAssociationPredicatesList);
-					}
-				}								
+				for (EntityNameOrURI cts2RestrictedEntity : cts2RestrictedEntitiesSet) {
+					ScopedEntityName cts2EntityName = cts2RestrictedEntity.getEntityName();
+					matchFound = isEntityFoundForBothMapRoles(cts2EntityName, 
+							lexCodingScheme, 
+							lexCodingSchemeVersionOrTag, 
+							lexRelationsContainerName);
+					if (!matchFound) {
+						break;
+					} 
+				}
 			} else {
-				// TODO Throw an UnsupportedOperationException here?
+				throw new UnsupportedOperationException("The EntitiesRestriction for MapVersionQuery must have a MapRole defined " +
+						"when the MapStatus is defined as MapStatus.MAPPED");
 			}		
 		}
 		
-		if (mapStatus == MapStatus.NOMAP) {
-			// TODO Note the MapRoles MAP_TO_ROLE and BOTH_MAP_ROLE rules defined does not make sense with this MapStatus. Ignore MapRole or 
-			// throw an UnsupportedOperationException?
-			
-			// Treat all CTS2 Entities in the restriction list as LexEvs source entities (i.e. map from)
-			
-			
-		}
-		
-		// If MapRole is  defined as MapRole.MAP_FROM_ROLE then only need to dive to AssociationSource level below
-		// If MapRole is defined as MapRole.MAP_TO_ROLE then must dive to the AssociationTarget level below
-		// If MapRole is defined as MapRole.BOTH_MAP_ROLES then will need to dive to the AssociationTarget level if entity info 
-		//   not found at AssociationSource level below
-//		Relations relations = lexCodingScheme.getRelations(0);
-//		List<AssociationPredicate> lexAssociationPredicatesList = relations.getAssociationPredicateAsReference();
-		// Think about using while loop with conditional flag to indicated match found or not 
-//		for (AssociationPredicate lexAssociationPredicate : lexAssociationPredicatesList) {
-//			List<AssociationSource> lexAssociationSourceList = lexAssociationPredicate.getSourceAsReference();
-//			for (AssociationSource lexAssociationSource : lexAssociationSourceList) {
-//				lexAssociationSource.getSourceEntityCode();
-//				lexAssociationSource.getSourceEntityCodeNamespace();
-//				List<AssociationTarget> lexAssociationTargetList = lexAssociationSource.getTargetAsReference();
-//				for (AssociationTarget lexAssociationTarget : lexAssociationTargetList) {
-//					lexAssociationTarget.getTargetEntityCode();
-//					lexAssociationTarget.getTargetEntityCodeNamespace();
-//				}
-//			}
-//		}
-		
-
 		return matchFound;
 	}
 	
-	protected boolean isEntityFoundForMapFromRole(ScopedEntityName cts2EntityName, List<AssociationPredicate> lexAssociationPredicatesList) {
+	protected boolean isEntityFoundForMapFromRole(ScopedEntityName cts2EntityName, 
+			CodingScheme lexCodingScheme, 
+			CodingSchemeVersionOrTag lexCodingSchemeVersionOrTag, 
+			String lexRelationsContainerName) {
 		
-		boolean matchFound = false;
-
-		while (!matchFound) {
-			for (AssociationPredicate lexAssociationPredicate : lexAssociationPredicatesList) {
-				List<AssociationSource> lexAssociationSourceList = lexAssociationPredicate.getSourceAsReference();
-				for (AssociationSource lexAssociationSource : lexAssociationSourceList) {
-					if (cts2EntityName.getName().equals(lexAssociationSource.getSourceEntityCode()) &&
-							cts2EntityName.getNamespace().equals(lexAssociationSource.getSourceEntityCodeNamespace())) {
-						matchFound = true;
-					}
-				}
-			}
+		ResolvedConceptReferencesIterator resolvedConceptReferencesIterator;
+		Mapping lexMapping = null;
+		try {
+			lexMapping = mappingExtension.getMapping(lexCodingScheme.getCodingSchemeName(), 
+					lexCodingSchemeVersionOrTag, 
+					lexRelationsContainerName);
+			String cts2SourceEntityName = cts2EntityName.getName();
+			String cts2SourceEntityNamespace = cts2EntityName.getNamespace();
+			ConceptReferenceList reference = Constructors.createConceptReferenceList(cts2SourceEntityName, 
+					cts2SourceEntityNamespace, 
+					lexCodingScheme.getCodingSchemeName());
+			lexMapping = lexMapping.restrictToCodes(reference, SearchContext.SOURCE_CODES);
+			
+			resolvedConceptReferencesIterator = lexMapping.resolveMapping();
+			return (resolvedConceptReferencesIterator != null && resolvedConceptReferencesIterator.hasNext());	
+		
+		} catch (LBParameterException e) {
+			throw new RuntimeException(e);
+		} catch (LBException e) {
+			throw new RuntimeException(e);
 		}
-		return matchFound;
+		
 	}
 	
-	protected boolean isEntityFoundForMapToRole(ScopedEntityName cts2EntityName, List<AssociationPredicate> lexAssociationPredicatesList) {
+	protected boolean isEntityFoundForMapToRole(ScopedEntityName cts2EntityName, 
+			CodingScheme lexCodingScheme, 
+			CodingSchemeVersionOrTag lexCodingSchemeVersionOrTag, 
+			String lexRelationsContainerName) {
 		
-		boolean matchFound = false;
-
-		while (!matchFound) {
-			for (AssociationPredicate lexAssociationPredicate : lexAssociationPredicatesList) {
-				List<AssociationSource> lexAssociationSourceList = lexAssociationPredicate.getSourceAsReference();
-				for (AssociationSource lexAssociationSource : lexAssociationSourceList) {
-					List<AssociationTarget> lexAssociationTargetList = lexAssociationSource.getTargetAsReference();
-					for (AssociationTarget lexAssociationTarget : lexAssociationTargetList) {
-						if (cts2EntityName.getName().equals(lexAssociationTarget.getTargetEntityCode()) &&
-								cts2EntityName.getNamespace().equals(lexAssociationTarget.getTargetEntityCodeNamespace())) {
-							matchFound = true;
-						}
-					}
-				}
-			}
+		ResolvedConceptReferencesIterator resolvedConceptReferencesIterator;
+		Mapping lexMapping = null;
+		try {
+			lexMapping = mappingExtension.getMapping(lexCodingScheme.getCodingSchemeName(), 
+					lexCodingSchemeVersionOrTag, 
+					lexRelationsContainerName);
+			String cts2SourceEntityName = cts2EntityName.getName();
+			String cts2SourceEntityNamespace = cts2EntityName.getNamespace();
+			ConceptReferenceList reference = Constructors.createConceptReferenceList(cts2SourceEntityName, 
+					cts2SourceEntityNamespace, 
+					lexCodingScheme.getCodingSchemeName());
+			lexMapping = lexMapping.restrictToCodes(reference, SearchContext.TARGET_CODES);
+			
+			resolvedConceptReferencesIterator = lexMapping.resolveMapping();
+			return (resolvedConceptReferencesIterator != null && resolvedConceptReferencesIterator.hasNext());	
+		
+		} catch (LBParameterException e) {
+			throw new RuntimeException(e);
+		} catch (LBException e) {
+			throw new RuntimeException(e);
 		}
-		return matchFound;
+		
 	}
 	
-	protected boolean isEntityFoundForBothMapRoles(ScopedEntityName cts2EntityName, List<AssociationPredicate> lexAssociationPredicatesList) {
+	protected boolean isEntityFoundForBothMapRoles(ScopedEntityName cts2EntityName, 
+			CodingScheme lexCodingScheme, 
+			CodingSchemeVersionOrTag lexCodingSchemeVersionOrTag, 
+			String lexRelationsContainerName) {
 		
-		boolean matchFound = false;
-
-		while (!matchFound) {
-			for (AssociationPredicate lexAssociationPredicate : lexAssociationPredicatesList) {
-				List<AssociationSource> lexAssociationSourceList = lexAssociationPredicate.getSourceAsReference();
-				for (AssociationSource lexAssociationSource : lexAssociationSourceList) {
-					if (cts2EntityName.getName().equals(lexAssociationSource.getSourceEntityCode()) &&
-							cts2EntityName.getNamespace().equals(lexAssociationSource.getSourceEntityCodeNamespace())) {
-						matchFound = true;
-					}
-					List<AssociationTarget> lexAssociationTargetList = lexAssociationSource.getTargetAsReference();
-					for (AssociationTarget lexAssociationTarget : lexAssociationTargetList) {
-						if (cts2EntityName.getName().equals(lexAssociationTarget.getTargetEntityCode()) &&
-								cts2EntityName.getNamespace().equals(lexAssociationTarget.getTargetEntityCodeNamespace())) {
-							matchFound = true;
-						}
-					}
-				}
-			}
+		ResolvedConceptReferencesIterator resolvedConceptReferencesIterator;
+		Mapping lexMapping = null;
+		try {
+			lexMapping = mappingExtension.getMapping(lexCodingScheme.getCodingSchemeName(), 
+					lexCodingSchemeVersionOrTag, 
+					lexRelationsContainerName);
+			String cts2SourceEntityName = cts2EntityName.getName();
+			String cts2SourceEntityNamespace = cts2EntityName.getNamespace();
+			ConceptReferenceList reference = Constructors.createConceptReferenceList(cts2SourceEntityName, 
+					cts2SourceEntityNamespace, 
+					lexCodingScheme.getCodingSchemeName());
+			lexMapping = lexMapping.restrictToCodes(reference, SearchContext.SOURCE_OR_TARGET_CODES);
+			
+			resolvedConceptReferencesIterator = lexMapping.resolveMapping();
+			return (resolvedConceptReferencesIterator != null && resolvedConceptReferencesIterator.hasNext());	
+		
+		} catch (LBParameterException e) {
+			throw new RuntimeException(e);
+		} catch (LBException e) {
+			throw new RuntimeException(e);
 		}
-		return matchFound;
+		
 	}
 	
 	protected boolean checkIfMatchForAtLeastOneCts2EntitiesRestriction(CodingScheme lexCodingScheme, EntitiesRestriction cts2EntitiesRestriction) {
 
 		MapStatus mapStatus = cts2EntitiesRestriction.getMapStatus();
 		if (mapStatus == null) {
-			// Set default status to 
-			mapStatus = MapStatus.MAPPED;  // ??? Use MAPPED
+			// Set default status
+			mapStatus = MapStatus.MAPPED;  
 		}
 				
 		if (mapStatus == MapStatus.ALLMAPENTRIES) {
@@ -374,52 +375,58 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 			throw new UnsupportedOperationException("MapStatus.UNMAPPED is currently not a supported option in respect " +
 					"to EntitiesRestriction for MapVersionQuery");	
 		}
+		if (mapStatus == MapStatus.NOMAP) {
+			throw new UnsupportedOperationException("MapStatus.NOMAP is currently not a supported option in respect " +
+					"to EntitiesRestriction for MapVersionQuery");	
+		}
 		
 		Set<EntityNameOrURI> cts2RestrictedEntitiesSet = cts2EntitiesRestriction.getEntities();
 		MapRole mapRole = cts2EntitiesRestriction.getMapRole();
-
-		boolean matchFound = false;
 		
-		Relations relations = lexCodingScheme.getRelations(0);
-		List<AssociationPredicate> lexAssociationPredicatesList = relations.getAssociationPredicateAsReference();
-
+		String lexRelationsContainerName = null;
+		CodingSchemeVersionOrTag lexCodingSchemeVersionOrTag = new CodingSchemeVersionOrTag();
+		lexCodingSchemeVersionOrTag.setVersion(lexCodingScheme.getRepresentsVersion());
+		lexCodingSchemeVersionOrTag.setTag(lexCodingScheme.getCodingSchemeName());
+		
+		boolean matchFound = false;
 		if (mapStatus == MapStatus.MAPPED) {
-			// TODO Not sure what "MAPPED includes NOMAP entities." means (especially if the set of entities to restrict is not empty). If
-			//   the set of entities to restrict is empty then what's the point of having EntitiesRestriction?  Maybe its just a stmt to 
-			//   be sure not to discard the NOMAP conditions found.
 			if (mapRole == MapRole.MAP_FROM_ROLE) {
-				while (!matchFound) {
-					for (EntityNameOrURI cts2RestrictedEntity : cts2RestrictedEntitiesSet) {
-						ScopedEntityName cts2EntityName = cts2RestrictedEntity.getEntityName();
-						matchFound = isEntityFoundForMapFromRole(cts2EntityName, lexAssociationPredicatesList);
-					}
+				for (EntityNameOrURI cts2RestrictedEntity : cts2RestrictedEntitiesSet) {
+					ScopedEntityName cts2EntityName = cts2RestrictedEntity.getEntityName();
+					matchFound = isEntityFoundForMapFromRole(cts2EntityName, 
+							lexCodingScheme, 
+							lexCodingSchemeVersionOrTag, 
+							lexRelationsContainerName);
+					if (matchFound) {
+						break;
+					} 
 				}
 			} else if (mapRole == MapRole.MAP_TO_ROLE) {
-				while (!matchFound) {
-					for (EntityNameOrURI cts2RestrictedEntity : cts2RestrictedEntitiesSet) {
-						ScopedEntityName cts2EntityName = cts2RestrictedEntity.getEntityName();
-						matchFound = isEntityFoundForMapToRole(cts2EntityName, lexAssociationPredicatesList);
-					}
-				}				
+				for (EntityNameOrURI cts2RestrictedEntity : cts2RestrictedEntitiesSet) {
+					ScopedEntityName cts2EntityName = cts2RestrictedEntity.getEntityName();
+					matchFound = isEntityFoundForMapToRole(cts2EntityName, 
+							lexCodingScheme, 
+							lexCodingSchemeVersionOrTag, 
+							lexRelationsContainerName);
+					if (matchFound) {
+						break;
+					} 
+				}
 			} else if (mapRole == MapRole.BOTH_MAP_ROLES) {
-				while (!matchFound) {
 					for (EntityNameOrURI cts2RestrictedEntity : cts2RestrictedEntitiesSet) {
 						ScopedEntityName cts2EntityName = cts2RestrictedEntity.getEntityName();
-						matchFound = isEntityFoundForBothMapRoles(cts2EntityName, lexAssociationPredicatesList);
+						matchFound = isEntityFoundForBothMapRoles(cts2EntityName, 
+								lexCodingScheme, 
+								lexCodingSchemeVersionOrTag, 
+								lexRelationsContainerName);
+						if (matchFound) {
+							break;
+						} 
 					}
-				}								
 			} else {
-				// TODO Throw an UnsupportedOperationException here?
+				throw new UnsupportedOperationException("The EntitiesRestriction for MapVersionQuery must have a MapRole defined " +
+						"when the MapStatus is defined as MapStatus.MAPPED");
 			}		
-		}
-		
-		if (mapStatus == MapStatus.NOMAP) {
-			// TODO Note the MapRoles MAP_TO_ROLE and BOTH_MAP_ROLE rules defined does not make sense with this MapStatus. Ignore MapRole or 
-			// throw an UnsupportedOperationException?
-			
-			// Treat all CTS2 Entities in the restriction list as LexEvs source entities (i.e. map from)
-			
-			
 		}
 		
 		return matchFound;
@@ -459,8 +466,8 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 		//    3. Filter list from step 2 for any defined ResolvedFilters.  Return list as CodingSchemeRendingList object.
 		CodingSchemeRendering[] lexCodingSchemeRendering = CommonResourceUtils.getLexCodingSchemeRenderings(lexBigService, nameConverter, queryData, this.mappingExtension, sortCriteria);
 
-		//    4. Filter list from step 3 for any defined CodeSystemRestrictions.  Return list as CodingSchemeRendingList object ???
-		//    5. Filter list from step 4 for any defined EntitiesRestrictions.  Return list as CodingSchemeRendingList object ???
+		//    4. Filter list from step 3 for any defined CodeSystemRestrictions.  Return list as CodingSchemeRendingList object.
+		//    5. Filter list from step 4 for any defined EntitiesRestrictions.  Return list as CodingSchemeRendingList object.
 		lexCodingSchemeRendering = filterByMapVersionQueryRestrictions(lexCodingSchemeRendering, queryData);		
 	
 		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPage(lexCodingSchemeRendering, page);

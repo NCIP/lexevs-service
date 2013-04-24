@@ -206,7 +206,7 @@ public final class CommonResourceUtils{
 			MapEntryQuery cts2Query, SortCriteria cts2SortCriteria, Page page,
 			VersionNameConverter nameConverter, MappingExtension lexMappingExtension) {
 		
-		ResolvedConceptReferenceResults lexResolvedConceptReferenceResults = null;
+		ResolvedConceptReferenceResults lexResolvedConceptReferenceResults = new ResolvedConceptReferenceResults(null, true);
 		ResolvedConceptReferencesIterator lexMapIterator;
 		QueryData<MapEntryQuery> queryData;
 
@@ -224,9 +224,13 @@ public final class CommonResourceUtils{
 				Mapping lexMapping = lexMappingExtension.getMapping(lexSchemeName, lexVersionOrTag, lexRelationsContainerName);
 				Set<EntityNameOrURI> cts2TargetEntities = cts2Restrictions.getTargetEntities();
 				for(EntityNameOrURI cts2EntityNameOrURI : cts2TargetEntities){
-					String cts2EntityName = cts2EntityNameOrURI.getEntityName().getName();
-					String cts2EntityNamespace = cts2EntityNameOrURI.getEntityName().getNamespace();
-					ConceptReferenceList reference = Constructors.createConceptReferenceList(cts2EntityName, cts2EntityNamespace, lexSchemeName);
+					String cts2EntityName = null;
+					String cts2EntityNamespace = null;
+					if(cts2EntityNameOrURI.getEntityName() != null){
+						cts2EntityName = cts2EntityNameOrURI.getEntityName().getName();
+						cts2EntityNamespace = cts2EntityNameOrURI.getEntityName().getNamespace();
+					}
+					ConceptReferenceList reference = Constructors.createConceptReferenceList(cts2EntityName, cts2EntityNamespace, null);
 					lexMapping = lexMapping.restrictToCodes(reference, SearchContext.SOURCE_OR_TARGET_CODES);
 				}
 				
@@ -240,7 +244,10 @@ public final class CommonResourceUtils{
 			lexResolvedConceptReferenceResults = CommonPageUtils.getPage(lexMapIterator, page);
 			
 		} catch (LBParameterException e) {
-			throw new RuntimeException(e);
+			// Mapping Extension throws this error if the map is not found.  
+			// Catch and return null
+//			throw new RuntimeException(e);
+			return lexResolvedConceptReferenceResults;
 		} catch (LBException e) {
 			throw new RuntimeException(e);
 		}

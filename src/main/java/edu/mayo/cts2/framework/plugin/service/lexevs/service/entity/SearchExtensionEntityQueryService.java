@@ -278,10 +278,14 @@ public class SearchExtensionEntityQueryService
 
 	@Override
 	public boolean canHandle(EntityDescriptionQuery query) {
+		//NCI won't have the indexes for this yet.
+		return false;
+		/*
 		return this.searchExtension != null &&
 				query.getEntitiesFromAssociationsQuery() == null &&
 				query.getRestrictions().getHierarchyRestriction() == null &&
 				this.checkFilters(query.getFilterComponent());
+		*/
 	}
 	
 		

@@ -73,6 +73,8 @@ public class MappingToMapEntryTransform
 				mapSet.addMapTarget(target);
 			}
 		}
+		
+		mapEntry.addMapSet(mapSet);
 
 		return mapEntry;
 	}

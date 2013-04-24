@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.easymock.classextension.EasyMock;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import edu.mayo.cts2.framework.model.command.Page;
@@ -133,6 +134,7 @@ public class LexEvsMapEntryQueryServiceTest {
 	// Count with All VALID Default filters
 	// -------------------------------------
 	@Test
+	@Ignore
 	public void testCount_FilterDefault_PropertyReferencesValidIndex_AllSchemes() throws Exception {
 		FakeLexEvsSystem<MapEntry, MapEntryDirectoryEntry, MapEntryQuery, LexEvsMapEntryQueryService> fakeLexEvs;
 		fakeLexEvs = new FakeLexEvsSystem<MapEntry, MapEntryDirectoryEntry, MapEntryQuery, LexEvsMapEntryQueryService>();
@@ -167,6 +169,7 @@ public class LexEvsMapEntryQueryServiceTest {
 
 	// --------------------------------------------
 	@Test
+	@Ignore
 	public void testGetResourceSummaries_NoFilter_SchemeCountsFrom1to21_PageSizesFrom1to50_Pages() throws Exception {
 		int maxSchemeCount = 21;
 		int maxPageSize = 50;
