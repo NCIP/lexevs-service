@@ -154,7 +154,7 @@ public class CodingSchemeToCodeSystemTransform
 		
 		summary.setHref(
 				this.getUrlConstructor().
-					createEntitiesOfCodeSystemVersionUrl(
+					createCodeSystemVersionUrl(
 							codingSchemeSummary.getLocalName(), 
 							codingSchemeSummary.getRepresentsVersion()));
 		
