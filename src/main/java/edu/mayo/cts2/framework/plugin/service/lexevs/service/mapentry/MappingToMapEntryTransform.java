@@ -74,7 +74,7 @@ public class MappingToMapEntryTransform
 			}
 		}
 		
-		mapEntry.setMapSet(0, mapSet);
+		mapEntry.addMapSet(mapSet);
 
 		return mapEntry;
 	}
