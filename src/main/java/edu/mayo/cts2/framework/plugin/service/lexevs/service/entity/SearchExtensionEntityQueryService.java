@@ -10,7 +10,8 @@ import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.Collections.ResolvedConceptReferenceList;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
-import org.LexGrid.LexBIG.Exceptions.LBResourceUnavailableException;
+import org.LexGrid.LexBIG.Exceptions.LBException;
+import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Extensions.Generic.CodeSystemReference;
 import org.LexGrid.LexBIG.Extensions.Generic.SearchExtension;
 import org.LexGrid.LexBIG.Utility.Constructors;
@@ -83,8 +84,12 @@ public class SearchExtensionEntityQueryService
 				String state, 
 				int start,
 				int maxResults) {
-			ResolvedConceptReferencesIterator iterator = 
-				searchExtension.search(state, toCodeSystemReference(this.codeSystemVersions));
+			ResolvedConceptReferencesIterator iterator;
+			try {
+				iterator = searchExtension.search(state, toCodeSystemReference(this.codeSystemVersions));
+			} catch (LBParameterException e) {
+				throw new RuntimeException(e);
+			}
 			
 			ResolvedConceptReferenceList list;
 			boolean atEnd;
@@ -108,7 +113,7 @@ public class SearchExtensionEntityQueryService
 			try {
 				return 
 					searchExtension.search(state, toCodeSystemReference(this.codeSystemVersions)).numberRemaining();
-			} catch (LBResourceUnavailableException e) {
+			} catch (LBException e) {
 				throw new RuntimeException(e);
 			}
 		}
