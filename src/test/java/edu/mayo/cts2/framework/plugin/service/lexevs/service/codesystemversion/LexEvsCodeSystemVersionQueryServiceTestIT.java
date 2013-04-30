@@ -31,6 +31,7 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
+import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContents;
 import org.junit.Test;
 
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntry;
@@ -53,7 +54,9 @@ import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersi
  *  @author <a href="mailto:hardie.linda@mayo.edu">Linda Hardie</a>
  *
  */
-@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+@LoadContents({
+@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
+@LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml")})
 public class LexEvsCodeSystemVersionQueryServiceTestIT
 	extends AbstractQueryServiceTest<CodeSystemVersionCatalogEntry, 
 		CodeSystemVersionCatalogEntrySummary, 
@@ -213,6 +216,48 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		
 //		System.out.println(PrintUtility.createStringFromDirectoryResultWithEntrySummary(dirResult) + "\n");
 		
+		int expecting = 1;
+		int actual = dirResult.getEntries().size();
+		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
+	}
+	
+	@Test
+	public void testGetResourceSummariesPageLimit() throws Exception {
+
+		// Restrict to given codeSystem
+		CodeSystemVersionQueryServiceRestrictions restrictions = new CodeSystemVersionQueryServiceRestrictions();
+		restrictions.setCodeSystem(ModelUtils.nameOrUriFromName("Automobiles"));
+		
+		// Create query with restriction
+		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, null, null, restrictions);
+
+		Page page = new Page();
+		page.setMaxToReturn(1);
+		page.setPage(0);
+		DirectoryResult<CodeSystemVersionCatalogEntrySummary> dirResult = service.getResourceSummaries(query, null, page);
+		
+		// Test results, Automobiles has one entity
+		assertNotNull(dirResult);
+
+		int expecting = 1;
+		int actual = dirResult.getEntries().size();
+		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
+	}
+	
+	@Test
+	public void testGetResourceSummariesPageLimitNoRestrictions() throws Exception {
+
+		// Create query with restriction
+		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, null, null, null);
+
+		Page page = new Page();
+		page.setMaxToReturn(1);
+		page.setPage(0);
+		DirectoryResult<CodeSystemVersionCatalogEntrySummary> dirResult = service.getResourceSummaries(query, null, page);
+		
+		// Test results, Automobiles has one entity
+		assertNotNull(dirResult);
+
 		int expecting = 1;
 		int actual = dirResult.getEntries().size();
 		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
