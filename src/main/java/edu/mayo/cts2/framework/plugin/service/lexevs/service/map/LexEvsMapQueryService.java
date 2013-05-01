@@ -103,7 +103,7 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		List<CodingScheme> codingSchemeList;
 		
 		codingSchemeList = CommonResourceUtils.getLexCodingSchemeList(lexBigService, this.nameConverter, mappingExtension, queryData, sortCriteria);
-		CodingScheme[] codingSchemePage = (CodingScheme[]) CommonPageUtils.getRenderingPage(codingSchemeList, page);
+		CodingScheme[] codingSchemePage = (CodingScheme[]) CommonPageUtils.getPage(codingSchemeList.toArray(new CodingScheme[0]), page);
 		
 		boolean atEnd = (page.getEnd() >= codingSchemeList.size()) ? true : false;
 			
@@ -120,7 +120,7 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		
 		QueryData<MapQuery> queryData = new QueryData<MapQuery>(query, null);
 		codingSchemeList = CommonResourceUtils.getLexCodingSchemeList(lexBigService, this.nameConverter, mappingExtension, queryData, sortCriteria);		
-		CodingScheme[] codingSchemePage = (CodingScheme[]) CommonPageUtils.getRenderingPage(codingSchemeList, page);
+		CodingScheme[] codingSchemePage = (CodingScheme[]) CommonPageUtils.getPage(codingSchemeList.toArray(new CodingScheme[0]), page);
 		
 		boolean atEnd = (page.getEnd() >= codingSchemeList.size()) ? true : false;
 		

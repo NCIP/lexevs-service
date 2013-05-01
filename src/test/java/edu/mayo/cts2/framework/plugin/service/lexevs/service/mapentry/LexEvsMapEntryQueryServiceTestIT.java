@@ -225,14 +225,16 @@ public class LexEvsMapEntryQueryServiceTestIT extends AbstractTestITBase {
 	 */
 	private int calculateExpecting(MapEntryQueryServiceRestrictions restrictions) {
 		int count = 0;
-		String cts2CodeSystemName = restrictions.getMapVersion().getName();
-		NameVersionPair nameVersion = this.versionNameConverter.fromCts2VersionName(cts2CodeSystemName);
-		String lexCodeSchemeName = nameVersion.getName();
-		String lexCodeSchemeVersion = nameVersion.getVersion();
+		String lexCodeSchemeName = null;
+		String lexCodeSchemeVersion = null;
 		String namespace = null;
 		String entity = null;
 		
 		if(restrictions != null){		
+			String cts2CodeSystemName = restrictions.getMapVersion().getName();
+			NameVersionPair nameVersion = this.versionNameConverter.fromCts2VersionName(cts2CodeSystemName);
+			lexCodeSchemeName = nameVersion.getName();
+			lexCodeSchemeVersion = nameVersion.getVersion();
 			Set<EntityNameOrURI> targetEntities = restrictions.getTargetEntities();
 			for(EntityNameOrURI targetEntity : targetEntities){
 				namespace = targetEntity.getEntityName().getNamespace();
@@ -456,10 +458,11 @@ public class LexEvsMapEntryQueryServiceTestIT extends AbstractTestITBase {
 		assertEquals(6,list.getEntries().size());
 	}
 	
-	@Test
+	@Test (expected = IllegalArgumentException.class )
 	public void testGetResourceSummariesInvalidMap() {
 		
 		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
+		// Note:  a bad map version name having more than one "-" will cause an exception to be thrown
 		NameOrURI mapVersion = ModelUtils.nameOrUriFromName("MappingSample-1.0-BAD");
 		restrictions.setMapVersion(mapVersion);
 		
@@ -468,9 +471,7 @@ public class LexEvsMapEntryQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		
-		DirectoryResult<MapEntryDirectoryEntry> list = this.service.getResourceSummaries(mapEntryQueryImpl, sortCriteria, page);
-		assertNotNull(list);
-		assertEquals(0,list.getEntries().size());
+		service.getResourceSummaries(mapEntryQueryImpl, sortCriteria, page);
 	}
 
 }
