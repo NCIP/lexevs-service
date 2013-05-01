@@ -35,7 +35,6 @@ import org.LexGrid.LexBIG.Exceptions.LBResourceUnavailableException;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
-import org.LexGrid.codingSchemes.CodingScheme;
 
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
@@ -126,14 +125,8 @@ public final class CommonPageUtils {
 	}
 	
 
-	
-	public static <T> Object[] getRenderingPage(List<T> list, Page page){
-		Object [] renderedArray = list.toArray(new CodingScheme[0]);
-		return CommonPageUtils.getPage(renderedArray, page);
-	}
-	
 	@SuppressWarnings("unchecked")
-	public static <T> Object[] getPage(T[] data, Page page) {
+	public static <T> T[] getPage(T[] data, Page page) {
 		int start = page.getStart();
 		int end = page.getEnd();
 	    T typeVar = null;
