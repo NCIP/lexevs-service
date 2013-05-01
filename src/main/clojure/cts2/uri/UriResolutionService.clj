@@ -10,9 +10,12 @@
        (:body 
          (client/get url {:throw-exceptions false :accept :json :as :json :insecure? true})) (keyword response) ))))
 
+(defn- encode [string]
+  (URLEncoder/encode string "UTF-8"))
+
 (defn- doGetId 
  [baseuri type id resource]
-    (call (str baseuri "/id/" type "?id=" (URLEncoder/encode id "UTF-8")) resource))
+    (call (str baseuri "/id/" type "?id=" (encode id)) resource))
 
 (defn getUri 
  [baseuri type id]
@@ -28,7 +31,7 @@
 
 (defn- doGetVersion
  [baseuri type identifier id resource]
-    (call (str baseuri "/version/" type "/" identifier "/" id) resource))
+    (call (str baseuri "/version/" type "/" (encode identifier) "/" (encode id)) resource))
 
 (defn getVersionName 
   [url type identifier id]

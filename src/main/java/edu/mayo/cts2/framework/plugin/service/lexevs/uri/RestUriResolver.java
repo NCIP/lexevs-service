@@ -23,15 +23,12 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.uri;
 
-import javax.annotation.Resource;
-
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import clojure.lang.RT;
 import clojure.lang.Var;
-import edu.mayo.cts2.framework.plugin.service.lexevs.LexEvsOsgiClassLoader;
 
 /**
  * Client service based on an external URI Resolver JSON Service.
@@ -43,9 +40,6 @@ public class RestUriResolver implements UriResolver, InitializingBean {
 
 	@Value("${uriResolutionServiceUrl}")
 	private String uriResolutionServiceUrl;
-	
-	@Resource
-	private LexEvsOsgiClassLoader lexEvsOsgiClassLoader;
 	
 	Var getUri;
 	Var getName;
@@ -154,15 +148,11 @@ public class RestUriResolver implements UriResolver, InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		Thread.currentThread().setContextClassLoader(lexEvsOsgiClassLoader.getOsgiClassLoader());
 		try {
 			this.loadClojureScripts();
 		} catch (Exception e) {
 			throw new RuntimeException("Error starting Clojure.", e);
-		} finally {
-			Thread.currentThread().setContextClassLoader(classLoader);
-		}
+		} 
 	}
 	
 	protected void loadClojureScripts() throws Exception {

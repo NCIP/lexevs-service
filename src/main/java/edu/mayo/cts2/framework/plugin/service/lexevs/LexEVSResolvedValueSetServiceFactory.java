@@ -23,9 +23,8 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs;
 
-import javax.annotation.Resource;
-
 import org.lexgrid.resolvedvalueset.LexEVSResolvedValueSetService;
+import org.lexgrid.resolvedvalueset.impl.LexEVSResolvedValueSetServiceImpl;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.stereotype.Component;
 
@@ -36,14 +35,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class LexEVSResolvedValueSetServiceFactory implements
 		FactoryBean<LexEVSResolvedValueSetService> {
-	
-	@Resource
-	private LexEvsOsgiClassLoader lexEvsOsgiClassLoader;
 
 	@Override
 	public LexEVSResolvedValueSetService getObject() throws Exception {
-		return (LexEVSResolvedValueSetService) this.lexEvsOsgiClassLoader.
-			getServiceClass("org.lexgrid.resolvedvalueset.impl.LexEVSResolvedValueSetServiceImpl", true);
+		return new LexEVSResolvedValueSetServiceImpl();	
 	}
 
 	@Override

@@ -23,42 +23,55 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs;
 
-import java.lang.reflect.Method;
+import gov.nih.nci.system.client.ApplicationServiceProvider;
 
-import javax.annotation.Resource;
-
+import org.LexGrid.LexBIG.Impl.LexBIGServiceImpl;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.LexGrid.LexBIG.caCore.interfaces.LexEVSApplicationService;
+import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * A factory for creating LexBigService objects.
  */
 public class LexBigServiceFactory implements FactoryBean<LexBIGService>, DisposableBean {
 
+	private static final String LG_CONFIG_FILE_ENV = "LG_CONFIG_FILE";
+	
 	protected Logger log = Logger.getLogger(this.getClass());
-	
-	@Resource
-	private LexEvsOsgiClassLoader lexEvsOsgiClassLoader;
-	
+
 	private LexBIGService lexBIGService;
+	
+	@Value("#{props.lexevsRemoteApiUrl}")
+	private String lexevsRemoteApiUrl;
+
+	@Value("#{props.useRemoteApi}")
+	private Boolean useRemoteApi;
+	
+	@Value("#{props."+LG_CONFIG_FILE_ENV+"}")
+	private String lgConfigFile;
 
 	/* (non-Javadoc)
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */
 	@Override
 	public LexBIGService getObject() throws Exception {
-
-		Method method = this.lexEvsOsgiClassLoader.
-			loadClass("org.LexGrid.LexBIG.Impl.LexBIGServiceImpl").
-				getDeclaredMethod("defaultInstance");
-		
-		method.setAccessible(true);
-		
-		this.lexBIGService = (LexBIGService) method.invoke(null);
-
-		return lexBIGService;
+		if (BooleanUtils.toBoolean(this.useRemoteApi) && StringUtils.isNotBlank(this.lexevsRemoteApiUrl)) {
+			return (LexEVSApplicationService) ApplicationServiceProvider
+					.getApplicationServiceFromUrl(this.lexevsRemoteApiUrl, "EvsServiceInfo");
+		} else {
+			if(StringUtils.isBlank(this.lgConfigFile)){
+				throw new IllegalStateException(LG_CONFIG_FILE_ENV + " value is empty.");
+			}
+			System.setProperty(LG_CONFIG_FILE_ENV, this.lgConfigFile);
+			
+			this.lexBIGService = LexBIGServiceImpl.defaultInstance();
+			return this.lexBIGService;
+		}
 	}
 
 	/* (non-Javadoc)
@@ -79,7 +92,9 @@ public class LexBigServiceFactory implements FactoryBean<LexBIGService>, Disposa
 	
 	@Override
 	public void destroy() throws Exception {
-		log.info("Shutting down LexEVS.");
-		this.lexBIGService.getServiceManager(null).shutdown();
+		if(this.lexBIGService != null){
+			log.info("Shutting down local LexEVS.");
+			this.lexBIGService.getServiceManager(null).shutdown();
+		}
 	}
 }
