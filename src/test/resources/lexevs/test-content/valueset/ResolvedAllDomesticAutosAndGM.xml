@@ -55,6 +55,9 @@
         <lgCommon:property
             propertyName="resolvedAgainstCodingSchemeVersion"
             propertyId="@_76bd9328-06b3-4719-83ac-c04fc2712fe8" propertyType="generic">
+             <lgCommon:propertyQualifier propertyQualifierName="version">
+                <lgCommon:value>1.0</lgCommon:value>
+            </lgCommon:propertyQualifier>
             <lgCommon:value>urn:oid:11.11.0.1</lgCommon:value>
         </lgCommon:property>
         <lgCommon:property propertyName="textualPresentation"
