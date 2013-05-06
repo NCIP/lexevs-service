@@ -153,7 +153,11 @@ public class SearchExtensionEntityQueryService
 		return new BasicEntityDirectoryBuilder<EntityDirectoryEntry>(
 				new SearchExtensionCallback(query.getRestrictions().getCodeSystemVersion()), 
 				this.getSupportedMatchAlgorithms(), 
-				this.getSupportedSearchReferences()).restrict(query.getFilterComponent()).resolve();
+				this.getSupportedSearchReferences()).
+				restrict(query.getFilterComponent()).
+				addMaxToReturn(page.getMaxToReturn()).
+				addStart(page.getStart()).
+				resolve();
 	}
 
 	@Override
@@ -167,8 +171,10 @@ public class SearchExtensionEntityQueryService
 
 	@Override
 	public int count(EntityDescriptionQuery query) {
-		// TODO Auto-generated method stub
-		return 0;
+		return new BasicEntityDirectoryBuilder<EntityDirectoryEntry>(
+				new SearchExtensionCallback(query.getRestrictions().getCodeSystemVersion()), 
+				this.getSupportedMatchAlgorithms(), 
+				this.getSupportedSearchReferences()).restrict(query.getFilterComponent()).count();
 	}
 	
 	@Override
@@ -283,16 +289,11 @@ public class SearchExtensionEntityQueryService
 
 	@Override
 	public boolean canHandle(EntityDescriptionQuery query) {
-		//NCI won't have the indexes for this yet.
-		return false;
-		/*
 		return this.searchExtension != null &&
 				query.getEntitiesFromAssociationsQuery() == null &&
 				query.getRestrictions().getHierarchyRestriction() == null &&
 				this.checkFilters(query.getFilterComponent());
-		*/
 	}
-	
 		
 	private boolean checkFilters(Set<ResolvedFilter> filters) {
 		 for(ResolvedFilter filter : filters){

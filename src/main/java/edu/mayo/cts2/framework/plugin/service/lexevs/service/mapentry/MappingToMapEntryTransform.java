@@ -45,11 +45,11 @@ public class MappingToMapEntryTransform
 
 	@Override
 	public MapEntry transformFullDescription(MapResolvedConceptReference mapReference) {
-		if(mapReference == null || mapReference.getResolvedConceptReference() == null){
+		if(mapReference == null){
 			return null;
 		}
 		
-		ResolvedConceptReference resolvedConceptReference = mapReference.getResolvedConceptReference();
+		ResolvedConceptReference resolvedConceptReference = mapReference;
 		
 		MapEntry mapEntry = new MapEntry();
 		mapEntry.setMapFrom(this.getTransformUtils().toUriAndEntityName(resolvedConceptReference));
@@ -84,11 +84,11 @@ public class MappingToMapEntryTransform
 	
 	@Override
 	public MapEntryDirectoryEntry transformSummaryDescription(MapResolvedConceptReference mapReference) {
-		if(mapReference == null || mapReference.getResolvedConceptReference() == null){
+		if(mapReference == null){
 			return null;
 		}
 		
-		ResolvedConceptReference resolvedConceptReference = mapReference.getResolvedConceptReference();
+		ResolvedConceptReference resolvedConceptReference = mapReference;
 
 		MapEntryDirectoryEntry mapEntryDirectoryEntry = new MapEntryDirectoryEntry();
 		

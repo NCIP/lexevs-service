@@ -25,6 +25,8 @@ package edu.mayo.cts2.framework.plugin.service.lexevs;
 
 import gov.nih.nci.system.client.ApplicationServiceProvider;
 
+import java.util.Map;
+
 import org.LexGrid.LexBIG.Impl.LexBIGServiceImpl;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.caCore.interfaces.LexEVSApplicationService;
@@ -33,7 +35,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.annotation.Value;
 
 /**
  * A factory for creating LexBigService objects.
@@ -45,14 +46,11 @@ public class LexBigServiceFactory implements FactoryBean<LexBIGService>, Disposa
 	protected Logger log = Logger.getLogger(this.getClass());
 
 	private LexBIGService lexBIGService;
-	
-	@Value("#{props.lexevsRemoteApiUrl}")
+
 	private String lexevsRemoteApiUrl;
 
-	@Value("#{props.useRemoteApi}")
 	private Boolean useRemoteApi;
 	
-	@Value("#{props."+LG_CONFIG_FILE_ENV+"}")
 	private String lgConfigFile;
 
 	/* (non-Javadoc)
@@ -97,4 +95,35 @@ public class LexBigServiceFactory implements FactoryBean<LexBIGService>, Disposa
 			this.lexBIGService.getServiceManager(null).shutdown();
 		}
 	}
+	
+	public void updateCallback(Map<String,?> properties){
+		this.lexevsRemoteApiUrl = (String)properties.get("lexevsRemoteApiUrl");
+		this.lgConfigFile = (String)properties.get(LG_CONFIG_FILE_ENV);
+		this.useRemoteApi = BooleanUtils.toBoolean(properties.get("useRemoteApi").toString());
+	}
+
+	public String getLexevsRemoteApiUrl() {
+		return lexevsRemoteApiUrl;
+	}
+
+	public void setLexevsRemoteApiUrl(String lexevsRemoteApiUrl) {
+		this.lexevsRemoteApiUrl = lexevsRemoteApiUrl;
+	}
+
+	public Boolean getUseRemoteApi() {
+		return useRemoteApi;
+	}
+
+	public void setUseRemoteApi(Boolean useRemoteApi) {
+		this.useRemoteApi = useRemoteApi;
+	}
+
+	public String getLgConfigFile() {
+		return lgConfigFile;
+	}
+
+	public void setLgConfigFile(String lgConfigFile) {
+		this.lgConfigFile = lgConfigFile;
+	}
+
 }

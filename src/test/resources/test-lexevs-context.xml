@@ -6,7 +6,9 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-	<import resource="META-INF/spring/lexevs-context.xml" />
+	<context:component-scan base-package="edu.mayo.cts2.framework.plugin.service.lexevs" />
+	
+	<util:properties id="buildProperties" location="classpath:build-info.properties" />
 	
 	<context:property-placeholder
         location="classpath:lexevs-service.properties"

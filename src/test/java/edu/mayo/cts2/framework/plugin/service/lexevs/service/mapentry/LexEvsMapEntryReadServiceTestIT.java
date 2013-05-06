@@ -144,8 +144,9 @@ public class LexEvsMapEntryReadServiceTestIT
 		String sourceEntityCode = "A0001";
 		ScopedEntityName mapFromName = new ScopedEntityName();
 		mapFromName.setName(sourceEntityCode);
+		mapFromName.setNamespace("Automobiles");
 
-		NameOrURI mapVersion = ModelUtils.nameOrUriFromUri("MappingSample-1.0");
+		NameOrURI mapVersion = ModelUtils.nameOrUriFromName("MappingSample-1.0");
 		
 		return new MapEntryReadId(mapFromName, mapVersion);
 	}
@@ -156,7 +157,7 @@ public class LexEvsMapEntryReadServiceTestIT
 		ScopedEntityName mapFromName = new ScopedEntityName();
 		mapFromName.setName(sourceEntityCode);
 
-		NameOrURI mapVersion = ModelUtils.nameOrUriFromUri("MappingSample-1.99999");
+		NameOrURI mapVersion = ModelUtils.nameOrUriFromName("MappingSample-1.99999");
 		
 		return new MapEntryReadId(mapFromName, mapVersion);
 	}

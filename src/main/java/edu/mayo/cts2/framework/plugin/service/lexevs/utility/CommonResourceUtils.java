@@ -252,51 +252,11 @@ public final class CommonResourceUtils{
 			throw new RuntimeException(e);
 		}
 
-		return new MapResolvedConceptReferenceResults(null, lexResolvedConceptReferenceResults);			
+		return new MapResolvedConceptReferenceResults(
+				nameConverter.fromCts2VersionName(queryData.getCts2SystemVersion().getName()), 
+				lexResolvedConceptReferenceResults);			
 	}
 
-//	public static ResolvedConceptReference [] getLexEntityList(
-//			MapEntryQueryServiceRestrictions cts2Restrictions,
-//			ResolvedConceptReferencesIterator lexMapIterator) {
-//		ResolvedConceptReferenceList lexResolvedConceptReferenceList = new ResolvedConceptReferenceList();
-//		ResolvedConceptReference lexResolvedConceptReference;
-//		Set<EntityNameOrURI> cts2TargetEntitySet = cts2Restrictions.getTargetEntities();
-//	
-//		try {
-//			while(lexMapIterator.hasNext()){
-//				lexResolvedConceptReference  = lexMapIterator.next();
-//				
-//				String lexEntityCode = lexResolvedConceptReference.getCode();
-//				for(EntityNameOrURI cts2Entity : cts2TargetEntitySet){
-//					String cts2EntityName = cts2Entity.getEntityName().getName();
-//					if(cts2EntityName.equals(lexEntityCode)){
-//						lexResolvedConceptReferenceList.addResolvedConceptReference(lexResolvedConceptReference);
-//					}
-//				}
-//			}
-//		} catch (LBResourceUnavailableException e) {
-//			throw new RuntimeException();
-//		} catch (LBInvocationException e) {
-//			throw new RuntimeException();
-//		}
-//		
-//		return lexResolvedConceptReferenceList.getResolvedConceptReference();
-//	}
-
-	public static CodingScheme getMappedCodingScheme(
-			LexBIGService lexBigService, CodingSchemeRendering render,
-			Set<EntityNameOrURI> entitiesSet, String value) {
-
-		
-//		Iterator<EntityNameOrURI> iterator = entitiesSet.iterator();
-//		while(iterator.hasNext()){
-//			EntityNameOrURI entity = iterator.next();
-//			entity.getEntityName();
-//			entity.getUri();
-//		}
-		return null;
-	}
-	
 	public static List<CodingScheme> getLexCodingSchemeList(
 			LexBIGService lexBigService, 
 			CodingSchemeRendering[] lexCodingSchemeRenderings, 
