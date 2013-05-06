@@ -1,6 +1,6 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.uri;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -29,6 +29,22 @@ public class RestUriResolverTest {
 	public void TestIdToUri() {
 		assertEquals("http://id.nlm.nih.gov/cui/C1136323",
 				resolver.idToUri("LNC", IdType.CODE_SYSTEM));
+	}
+	
+	@Test
+	public void TestIdToUriWithSpaceNoException() {
+		assertNull(resolver.idToUri("LN C", IdType.CODE_SYSTEM));
+	}
+	
+	@Test
+	public void TestIdToUriWithNonEscapedCharNoException() {
+		assertNull(resolver.idToUri("HL7 Vocabulary (V3 02-36)", IdType.CODE_SYSTEM));
+	}
+	
+	@Test
+	public void TestIdAndVersionToVersionNameWithURLNoException() {
+		assertNull(resolver.idAndVersionToVersionName(
+				"http://www.hl7.org/Library/data-model/RIM/V3 R2", "36", IdType.CODE_SYSTEM));
 	}
 
 	@Test

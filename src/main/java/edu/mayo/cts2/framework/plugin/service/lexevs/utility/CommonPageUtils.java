@@ -23,6 +23,8 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.LexGrid.LexBIG.DataModel.Collections.ResolvedConceptReferenceList;
@@ -33,7 +35,6 @@ import org.LexGrid.LexBIG.Exceptions.LBResourceUnavailableException;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
-import org.LexGrid.codingSchemes.CodingScheme;
 
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
@@ -124,16 +125,11 @@ public final class CommonPageUtils {
 	}
 	
 
-	
-	public static <T> Object[] getRenderingPage(List<T> list, Page page){
-		Object [] renderedArray = list.toArray(new CodingScheme[0]);
-		return CommonPageUtils.getPage(renderedArray, page);
-	}
-	
-	public static <T> Object[] getPage(T[] data, Page page) {
+	public static <T> T[] getPage(T[] data, Page page) {
 		int start = page.getStart();
 		int end = page.getEnd();
-		Object [] csPage = null;
+	    T typeVar = null;
+	    T[] csPage = null;
 		
 		if(end > data.length){
 			end = data.length;
@@ -145,11 +141,12 @@ public final class CommonPageUtils {
 		else if(start < end){
 			
 			int size = end - start;
-			csPage = new Object [size];
-			
-			for (int i = 0; i < csPage.length; i++) {
-				csPage[i] = data[start + i];
-			}
+			List<T> arrayList = new ArrayList<T>(); 
+			for (int i = 0; i < size; i++) {
+				typeVar = data[start + i];
+				arrayList.add(typeVar);
+			}		
+			csPage = arrayList.toArray((T[]) Array.newInstance(typeVar.getClass(),0));
 		}
 	
 		return csPage;

@@ -27,7 +27,5 @@
 
 	<bean id="configInitializer"
 		class="edu.mayo.cts2.framework.core.config.TestConfigInitializerSpringFactory" />
-		
-	<bean id="lexBigServiceFactory" class="edu.mayo.cts2.framework.plugins.service.LocalClasspathLexBigServiceFactory" />
 	
 </beans>

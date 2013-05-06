@@ -27,16 +27,21 @@ import static org.junit.Assert.assertNotNull;
 
 import javax.annotation.Resource;
 
+import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.junit.Test;
 
-import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
+import edu.mayo.cts2.framework.model.extension.LocalIdValueSetDefinition;
+import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractReadServiceTest;
+import edu.mayo.cts2.framework.service.profile.ReadService;
+import edu.mayo.cts2.framework.service.profile.valuesetdefinition.name.ValueSetDefinitionReadId;
 
 /**
  * @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
  *
  */
-public class LexEvsValueSetDefinitionReadServiceTestIT extends
-		AbstractTestITBase {
+@LoadContent(contentPath="lexevs/test-content/VSDOnlyTest.xml")
+public class LexEvsValueSetDefinitionReadServiceTestIT
+	extends AbstractReadServiceTest<LocalIdValueSetDefinition, ValueSetDefinitionReadId> {
 
 	@Resource
 	private LexEvsValueSetDefinitionReadService service;
@@ -45,20 +50,25 @@ public class LexEvsValueSetDefinitionReadServiceTestIT extends
 	public void testSetUp() {
 		assertNotNull(this.service);
 	}
-	
-//	@Test
-//	@LoadContent(contentPath="lexevs/test-content/VSDOnlyTest.xml")
-//	public void testReadByTag() {
-//		
-//		String uri = "SRITEST:AUTO:PropertyRefTest1-VSDONLY";
-//		NameOrURI uriIdentifier = new NameOrURI();
-//		uriIdentifier.setUri(uri);
-//		
-//		LocalIdValueSetDefinition liVSD = service.readByTag(uriIdentifier, null, null);
-//		
-//		assertNotNull(liVSD);
-//	}
-	
+
+	@Override
+	protected ReadService<LocalIdValueSetDefinition, ValueSetDefinitionReadId> getService() {
+		return this.service;
+	}
+
+	@Override
+	protected ValueSetDefinitionReadId getGoodIdentifier() {
+		String uri = "SRITEST:AUTO:PropertyRefTest1-VSDONLY";
+
+		return new ValueSetDefinitionReadId(uri);
+	}
+
+	@Override
+	protected ValueSetDefinitionReadId getBadIdentifier() {
+		String uri = "__INVALID__";
+
+		return new ValueSetDefinitionReadId(uri);
+	}
 
 }
 

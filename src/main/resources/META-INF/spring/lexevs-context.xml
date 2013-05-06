@@ -18,8 +18,6 @@
 	
 	<bean id="lexBigServiceFactory" class="edu.mayo.cts2.framework.plugin.service.lexevs.LexBigServiceFactory" />
 
-	<bean id="lexEvsOsgiClassLoader" class="edu.mayo.cts2.framework.plugin.service.lexevs.LexEvsOsgiClassLoader" />
-	
 	<util:properties id="buildProperties" location="classpath:build-info.properties" />
 
 </beans>
