@@ -112,9 +112,9 @@ public final class CommonResolvedValueSetUtils {
     private boolean matchFoundInAbsoluteCodingSchemeVersionReferenceList(String csURI, String version, List<AbsoluteCodingSchemeVersionReference> codingSchemeVersionList) {
     	for (AbsoluteCodingSchemeVersionReference acsvr: codingSchemeVersionList) {
     		if (csURI != null && csURI.equalsIgnoreCase(acsvr.getCodingSchemeURN())) {
-    			if (version != null && version.equalsIgnoreCase(acsvr.getCodingSchemeVersion())) {
+    			if (version != null &&  version.equalsIgnoreCase(acsvr.getCodingSchemeVersion())) {
     				return true;
-    			} else if (version == null && acsvr.getCodingSchemeVersion()== null) {
+    			} else  if (acsvr.getCodingSchemeVersion()== null) {
     				return true;
     			}
     		}
