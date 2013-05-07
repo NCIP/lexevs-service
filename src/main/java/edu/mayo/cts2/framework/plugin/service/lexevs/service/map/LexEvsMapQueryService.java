@@ -107,7 +107,7 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		
 		boolean atEnd = (page.getEnd() >= codingSchemeList.size()) ? true : false;
 			
-		return CommonResourceUtils.createDirectoryResultsWithSummaryDescriptions(this.transformer, codingSchemePage, atEnd, Constants.SUMMARY_DESCRIPTION);		
+		return CommonResourceUtils.createDirectoryResultsWithSummary(this.transformer, codingSchemePage, atEnd);		
 	}
 
 
@@ -124,7 +124,7 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 		
 		boolean atEnd = (page.getEnd() >= codingSchemeList.size()) ? true : false;
 		
-		return CommonResourceUtils.createDirectoryResultsWithSummaryDescriptions(transformer, codingSchemePage, atEnd, Constants.FULL_DESCRIPTION);
+		return CommonResourceUtils.createDirectoryResultsWithList(transformer, codingSchemePage, atEnd);
 	}
 
 

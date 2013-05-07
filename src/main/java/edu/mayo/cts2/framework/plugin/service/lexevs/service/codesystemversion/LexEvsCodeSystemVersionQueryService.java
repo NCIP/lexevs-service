@@ -49,7 +49,6 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsServi
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonPageUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.QueryData;
 import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersionQuery;
 import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersionQueryService;
@@ -117,7 +116,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		CodingSchemeRendering[] csRendering = CommonResourceUtils.getLexCodingSchemeRenderings(lexBigService, nameConverter, queryData, null, sortCriteria);
 		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPage(csRendering, page);
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
-		return CommonResourceUtils.createDirectoryResultsWithSummaryDescriptions(this.transformer, csRenderingPage, atEnd, Constants.SUMMARY_DESCRIPTION);
+		return CommonResourceUtils.createDirectoryResultsWithSummary(this.transformer, csRenderingPage, atEnd);
 	}
 
 	@Override

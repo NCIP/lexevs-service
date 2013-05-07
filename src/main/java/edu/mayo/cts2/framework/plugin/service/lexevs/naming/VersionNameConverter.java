@@ -25,7 +25,6 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.naming;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 /**
  * CTS2 CodeSystemVersionNames will generally be in the form:
@@ -58,11 +57,14 @@ public class VersionNameConverter {
 	 *
 	 * @param cts2CodeSystemVersionName the cts2 code system version name
 	 * @return the name version pair
+	 * @throws InvaildVersionNameException 
 	 */
-	public NameVersionPair fromCts2VersionName(String cts2CodeSystemVersionName){
+	public NameVersionPair fromCts2VersionName(String cts2CodeSystemVersionName) throws InvaildVersionNameException{
 		String[] nameParts = StringUtils.split(cts2CodeSystemVersionName, SEPARATOR);
 		
-		Assert.isTrue(nameParts.length == 2);
+		if(nameParts.length != 2){
+			throw new InvaildVersionNameException(cts2CodeSystemVersionName);
+		}
 		
 		return new NameVersionPair(nameParts[0], nameParts[1]);
 	}

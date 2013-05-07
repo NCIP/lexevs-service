@@ -104,12 +104,27 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	public DirectoryResult<MapEntryDirectoryEntry> getResourceSummaries(
 			MapEntryQuery query, SortCriteria sortCriteria, Page page) {
 
-		MapResolvedConceptReferenceResults lexReferenceResults = CommonResourceUtils.getLexMapReferenceResults(query, sortCriteria, page, this.nameConverter, this.lexMappingExtension);
-		
-		DirectoryResult<MapEntryDirectoryEntry> cts2DirectoryResult = 
-			CommonResourceUtils.createDirectoryResults(this.transformer, lexReferenceResults, Constants.SUMMARY_DESCRIPTION);
+		DirectoryResult<MapEntryDirectoryEntry> cts2DirectoryResult;
+		if(this.validateMapEntryQuery(query)){
+			MapResolvedConceptReferenceResults lexReferenceResults = CommonResourceUtils.getLexMapReferenceResults(query, sortCriteria, page, this.nameConverter, this.lexMappingExtension);
+			
+			cts2DirectoryResult = 
+				CommonResourceUtils.createDirectoryResults(this.transformer, lexReferenceResults, Constants.SUMMARY_DESCRIPTION);
+		} else {
+			cts2DirectoryResult = 
+				new DirectoryResult<MapEntryDirectoryEntry>(new ArrayList<MapEntryDirectoryEntry>(),true);
+		}
 		
 		return cts2DirectoryResult;
+	}
+	
+	protected boolean validateMapEntryQuery(MapEntryQuery query){
+		if(query == null || 
+				query.getRestrictions() == null|| 
+				query.getRestrictions().getMapVersion() == null){
+			throw new UnsupportedOperationException("MapEntry Queries without a MapVersion restriction are not supported.");
+		}
+		return this.nameConverter.isValidVersionName(query.getRestrictions().getMapVersion().getName());
 	}
 
 	/* (non-Javadoc)
@@ -118,11 +133,21 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	@Override
 	public DirectoryResult<MapEntry> getResourceList(MapEntryQuery query,
 			SortCriteria sortCriteria, Page page) {
-
-		MapResolvedConceptReferenceResults lexReferenceResults = CommonResourceUtils.getLexMapReferenceResults(query, sortCriteria, page, this.nameConverter, this.lexMappingExtension);
-		DirectoryResult<MapEntry> cts2DirectoryResult = CommonResourceUtils.createDirectoryResults(this.transformer, lexReferenceResults, Constants.FULL_DESCRIPTION);
+		DirectoryResult<MapEntry> cts2DirectoryResult;
+		if (this.validateMapEntryQuery(query)) {
+			MapResolvedConceptReferenceResults lexReferenceResults = CommonResourceUtils
+					.getLexMapReferenceResults(query, sortCriteria, page,
+							this.nameConverter, this.lexMappingExtension);
+			cts2DirectoryResult = CommonResourceUtils.createDirectoryResults(
+					this.transformer, lexReferenceResults,
+					Constants.FULL_DESCRIPTION);
+		} else {
+			cts2DirectoryResult = new DirectoryResult<MapEntry>(
+					new ArrayList<MapEntry>(), true);
+		}
 
 		return cts2DirectoryResult;
+
 	}
 
 	/* (non-Javadoc)

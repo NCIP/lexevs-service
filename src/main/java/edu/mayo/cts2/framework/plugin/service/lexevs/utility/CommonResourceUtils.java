@@ -73,57 +73,70 @@ public final class CommonResourceUtils{
 		return cts2DirectoryResult;
 	}	
 
-	@SuppressWarnings({ UNCHECKED, RAWTYPES })
-	public static <EntryType, LexData> DirectoryResult<EntryType> createDirectoryResultsWithSummaryDescriptions(
-			LexEvsToCTS2Transformer transformer,
-			LexData[] lexData, 
-			boolean atEnd,
-			String transformerType) {
-		List<EntryType> cts2EntryList = new ArrayList<EntryType>();
-		DirectoryResult<EntryType> cts2DirectoryResult = new DirectoryResult<EntryType>(cts2EntryList, true);
-		EntryType cts2Entry = null;
-		
-		if(lexData != null){
-			for (LexData lexDataItem : lexData) {
-				if(transformerType.equals(Constants.FULL_DESCRIPTION)){
-					cts2Entry = (EntryType) transformer.transformFullDescription(lexDataItem);
-				}
-				else if(transformerType.equals(Constants.SUMMARY_DESCRIPTION)){
-					cts2Entry = (EntryType) transformer.transformSummaryDescription(lexDataItem);
-				}
-				
-				cts2EntryList.add(cts2Entry);
+	public static <I,O> DirectoryResult<O> createDirectoryResultsWithSummary(
+			final LexEvsToCTS2Transformer<?,?,O,I> transformer,
+			I[] lexData, 
+			boolean atEnd) {
+		List<O> results = doInLoop(lexData,new Closure<I,O>(){
+			@Override
+			public O forEach(I in) {
+				return transformer.transformSummaryDescription(in);
 			}
-			cts2DirectoryResult = new DirectoryResult<EntryType>(cts2EntryList, atEnd);
-		}
-		
-		return cts2DirectoryResult;
+		});
+
+		return new DirectoryResult<O>(results, atEnd);
 	}
 	
-	@SuppressWarnings({ RAWTYPES, UNCHECKED })
-	public static <EntryType> DirectoryResult<EntryType> createDirectoryResultWithEntryFullVersionDescriptions(
+	public static <I,O> DirectoryResult<O> createDirectoryResultsWithList(
+			final LexEvsToCTS2Transformer<O,I,?,?> transformer,
+			I[] lexData, 
+			boolean atEnd) {
+		List<O> results = doInLoop(lexData,new Closure<I,O>(){
+			@Override
+			public O forEach(I in) {
+				return transformer.transformFullDescription(in);
+			}
+		});
+
+		return new DirectoryResult<O>(results, atEnd);
+	}
+	
+	private interface Closure<I,O>{
+		O forEach(I in);
+	}
+	
+	protected static <I,O> List<O> doInLoop(I[] lexData, Closure<I,O> closure){
+		List<O> output = new ArrayList<O>();
+		if(lexData != null){
+			for (I in : lexData) {
+				output.add(closure.forEach(in));
+			}
+		}
+		return output;
+	}
+
+	public static <T> DirectoryResult<T> createDirectoryResultWithEntryFullVersionDescriptions(
 			LexBIGService lexBigService, 
-			LexEvsToCTS2Transformer transformer, 
+			LexEvsToCTS2Transformer<T,CodingScheme,?,?> transformer, 
 			CodingSchemeRendering[] lexCodeSchemeRenderings, 
 			boolean atEnd2){
-		List<EntryType> cts2EntryList = new ArrayList<EntryType>();
+		List<T> cts2EntryList = new ArrayList<T>();
 		boolean atEnd = true;
-		DirectoryResult<EntryType> cts2DirectoryResult = new DirectoryResult<EntryType>(cts2EntryList, atEnd);
+		DirectoryResult<T> cts2DirectoryResult = new DirectoryResult<T>(cts2EntryList, atEnd);
 		
 		if(lexCodeSchemeRenderings != null){
 			for (CodingSchemeRendering lexCodingSchemeRendering : lexCodeSchemeRenderings) {
 				String lexCodingSchemeName = lexCodingSchemeRendering.getCodingSchemeSummary().getCodingSchemeURI();			
 				String lexCodingSchemeVersion = lexCodingSchemeRendering.getCodingSchemeSummary().getRepresentsVersion();
 				CodingSchemeVersionOrTag lexTagOrVersion = Constructors.createCodingSchemeVersionOrTagFromVersion(lexCodingSchemeVersion);
-				CodingScheme lexCodingScheme;
 				try {
-					lexCodingScheme = lexBigService.resolveCodingScheme(lexCodingSchemeName, lexTagOrVersion);
-					cts2EntryList.add((EntryType) transformer.transformFullDescription(lexCodingScheme));
+					CodingScheme lexCodingScheme = lexBigService.resolveCodingScheme(lexCodingSchemeName, lexTagOrVersion);
+					cts2EntryList.add(transformer.transformFullDescription(lexCodingScheme));
 				} catch (LBException e) {
 					throw new RuntimeException(e);
 				}
 			}
-			cts2DirectoryResult = new DirectoryResult<EntryType>(cts2EntryList, atEnd);
+			cts2DirectoryResult = new DirectoryResult<T>(cts2EntryList, atEnd);
 		}
 		
 		return cts2DirectoryResult;
@@ -244,9 +257,6 @@ public final class CommonResourceUtils{
 			lexResolvedConceptReferenceResults = CommonPageUtils.getPage(lexMapIterator, page);
 			
 		} catch (LBParameterException e) {
-			// Mapping Extension throws this error if the map is not found.  
-			// Catch and return null
-//			throw new RuntimeException(e);
 			return new MapResolvedConceptReferenceResults(null,true);
 		} catch (LBException e) {
 			throw new RuntimeException(e);

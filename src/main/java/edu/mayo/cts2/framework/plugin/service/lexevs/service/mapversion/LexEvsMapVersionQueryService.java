@@ -472,7 +472,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	
 		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPage(lexCodingSchemeRendering, page);
 		boolean atEnd = (page.getEnd() >= lexCodingSchemeRendering.length) ? true : false;
-		return CommonResourceUtils.createDirectoryResultsWithSummaryDescriptions(this.transformer, csRenderingPage, atEnd, Constants.SUMMARY_DESCRIPTION);
+		return CommonResourceUtils.createDirectoryResultsWithSummary(this.transformer, csRenderingPage, atEnd);
 	}
 
 	@Override

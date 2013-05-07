@@ -125,6 +125,7 @@ public final class CommonPageUtils {
 	}
 	
 
+	@SuppressWarnings("unchecked")
 	public static <T> T[] getPage(T[] data, Page page) {
 		int start = page.getStart();
 		int end = page.getEnd();

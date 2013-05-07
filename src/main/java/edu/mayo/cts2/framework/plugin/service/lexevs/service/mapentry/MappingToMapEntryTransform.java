@@ -105,6 +105,12 @@ public class MappingToMapEntryTransform
 					encodedName));
 		
 		mapEntryDirectoryEntry.setResourceName(encodedName);
+		
+		mapEntryDirectoryEntry.setAssertedBy(this.getTransformUtils().
+				toMapVersionReference(
+						mapReference.getMapName().getName(), 
+						mapReference.getMapName().getVersion(), 
+						null));
 
 		return mapEntryDirectoryEntry;
 	}

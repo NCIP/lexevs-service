@@ -30,6 +30,8 @@ import edu.mayo.cts2.framework.service.profile.mapversion.MapVersionQuery;
 import edu.mayo.cts2.framework.service.profile.resolvedvalueset.ResolvedValueSetQuery;
 
 public final class QueryData <Query extends ResourceQuery>{
+	private VersionNameConverter nameConverter;
+	
 	private Set<ResolvedFilter> cts2Filters = null;							// Used by all
 	private Object cts2Restrictions = null;									// Used by all
 	
@@ -56,10 +58,7 @@ public final class QueryData <Query extends ResourceQuery>{
 	private TaggedCodeSystemRestriction cts2TaggedCodeSystemRestriction = null;		// Used in EntityDescriptionQuery
 	
 	private Set<EntityNameOrURI> cts2TargetEntities = null;					// Used in MapEntryQuery
-	
-	
-	
-	
+
 	public Set<ResolvedFilter> getCts2Filters(){
 		return this.cts2Filters;
 	}
@@ -80,14 +79,6 @@ public final class QueryData <Query extends ResourceQuery>{
 		return this.cts2CodeSystem;
 	}
 	
-//	public NameOrURI getCts2CodeSystemVersion(){
-//		return this.cts2CodeSystemVersion;
-//	}
-//	
-//	public NameOrURI getCts2MapVersion(){
-//		return this.cts2MapVersion;
-//	}
-	
 	public NameOrURI getCts2SystemVersion(){
 		if(this.cts2MapVersion == null){
 			return this.cts2CodeSystemVersion;
@@ -102,14 +93,6 @@ public final class QueryData <Query extends ResourceQuery>{
 		}
 		return this.cts2MapName;
 	}
-	
-//	public String getMapName(){
-//		return this.mapName;
-//	}
-//	
-//	public String getCodeSystemName() {
-//		return codeSystemName;
-//	}
 
 	public String getLexSchemeName(){
 		return this.lexSchemeName;
@@ -165,11 +148,17 @@ public final class QueryData <Query extends ResourceQuery>{
 	}
 	
 	
-	public QueryData(){
+	public QueryData(VersionNameConverter nameConverter){
+		super();
+		this.nameConverter = nameConverter;
+		
 		this.initializeClassMemberFields();
 	}
 	
 	public QueryData(Query cts2Query, VersionNameConverter nameConverter){
+		super();
+		this.nameConverter = nameConverter;
+		
 		this.initializeClassMemberFields();
 		if (cts2Query != null) {
 			if(cts2Query instanceof CodeSystemVersionQuery){
@@ -338,11 +327,7 @@ public final class QueryData <Query extends ResourceQuery>{
 	}
 	
 	public NameVersionPair fromCts2VersionName(String cts2CodeSystemVersionName){
-		String[] nameParts = StringUtils.split(cts2CodeSystemVersionName, "-");
-		
-		Assert.isTrue(nameParts.length == 2);
-		
-		return new NameVersionPair(nameParts[0], nameParts[1]);
+		return this.nameConverter.fromCts2VersionName(cts2CodeSystemVersionName);
 	}
 	
 }
