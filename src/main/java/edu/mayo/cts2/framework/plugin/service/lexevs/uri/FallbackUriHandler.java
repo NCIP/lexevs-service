@@ -80,6 +80,12 @@ public class FallbackUriHandler implements DelegateUriHandler {
 	public String getCodeSystemVersionUri(CodingSchemeSummary codingSchemeSummary) {
 		return codingSchemeSummary.getCodingSchemeURI() + "/" + codingSchemeSummary.getRepresentsVersion();
 	}
+
+	@Override
+	public String getPredicateUri(String codingSchemeUri,
+			String codingSchemeVersion, String associationName) {
+		return codingSchemeUri + "/" + associationName;
+	}
 	
 	@Override
 	public int getOrder() {

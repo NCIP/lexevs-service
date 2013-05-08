@@ -113,6 +113,22 @@ public class DelegatingUriHandler implements UriHandler, InitializingBean {
 			}			
 		});
 	}
+
+	@Override
+	public String getPredicateUri(
+			final String codingSchemeUri,
+			final String codingSchemeVersion, 
+			final String associationName) {
+		return this.doIn(new DoInDelegates(){
+			@Override
+			public String f(UriHandler uriHandler) {
+				return uriHandler.getPredicateUri(
+						codingSchemeUri, 
+						codingSchemeVersion, 
+						associationName);
+			}			
+		});
+	}
 	
 	private interface DoInDelegates {
 		public String f(UriHandler uriHandler);
@@ -137,5 +153,6 @@ public class DelegatingUriHandler implements UriHandler, InitializingBean {
 	public void setDelegateUriHandlers(List<DelegateUriHandler> delegateUriHandlers) {
 		this.delegateUriHandlers = delegateUriHandlers;
 	}
+
 
 }

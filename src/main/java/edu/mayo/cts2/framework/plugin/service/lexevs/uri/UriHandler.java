@@ -61,5 +61,8 @@ public interface UriHandler {
 	public String getCodeSystemVersionUri(CodingScheme codingScheme);
 
 	public String getCodeSystemVersionUri(CodingSchemeSummary codingSchemeSummary);
+
+	public String getPredicateUri(String codingSchemeUri,
+			String codingSchemeVersion, String associationName);
 	
 }

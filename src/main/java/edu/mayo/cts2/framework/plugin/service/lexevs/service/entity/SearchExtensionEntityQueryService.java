@@ -12,7 +12,7 @@ import org.LexGrid.LexBIG.DataModel.Collections.ResolvedConceptReferenceList;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Exceptions.LBParameterException;
-import org.LexGrid.LexBIG.Extensions.Generic.CodeSystemReference;
+import org.LexGrid.LexBIG.Extensions.Generic.CodingSchemeReference;
 import org.LexGrid.LexBIG.Extensions.Generic.SearchExtension;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
@@ -86,7 +86,7 @@ public class SearchExtensionEntityQueryService
 				int maxResults) {
 			ResolvedConceptReferencesIterator iterator;
 			try {
-				iterator = searchExtension.search(state, toCodeSystemReference(this.codeSystemVersions));
+				iterator = searchExtension.search(state, toCodingSchemeReference(this.codeSystemVersions));
 			} catch (LBParameterException e) {
 				throw new RuntimeException(e);
 			}
@@ -112,21 +112,21 @@ public class SearchExtensionEntityQueryService
 		public int executeCount(String state) {
 			try {
 				return 
-					searchExtension.search(state, toCodeSystemReference(this.codeSystemVersions)).numberRemaining();
+					searchExtension.search(state, toCodingSchemeReference(this.codeSystemVersions)).numberRemaining();
 			} catch (LBException e) {
 				throw new RuntimeException(e);
 			}
 		}
 	}
 	
-	private Set<CodeSystemReference> toCodeSystemReference(Iterable<NameOrURI> codeSystemVersions){
-		Set<CodeSystemReference> returnSet = new HashSet<CodeSystemReference>();
+	private Set<CodingSchemeReference> toCodingSchemeReference(Iterable<NameOrURI> codeSystemVersions){
+		Set<CodingSchemeReference> returnSet = new HashSet<CodingSchemeReference>();
 		
 		for(NameOrURI version : codeSystemVersions){
 			NameVersionPair pair = 
 				this.versionNameConverter.fromCts2VersionName(version.getName());
 			
-			CodeSystemReference ref = new CodeSystemReference();
+			CodingSchemeReference ref = new CodingSchemeReference();
 			ref.setCodingScheme(pair.getName());
 			ref.setVersionOrTag(Constructors.createCodingSchemeVersionOrTagFromVersion(pair.getVersion()));
 			
@@ -141,8 +141,7 @@ public class SearchExtensionEntityQueryService
 			EntityNameOrURI entity,
 			EntityDescriptionQuery restrictions, 
 			ResolvedReadContext readContext) {
-		// TODO Auto-generated method stub
-		return false;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -165,8 +164,7 @@ public class SearchExtensionEntityQueryService
 			EntityDescriptionQuery query, 
 			SortCriteria sortCriteria, 
 			Page page) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

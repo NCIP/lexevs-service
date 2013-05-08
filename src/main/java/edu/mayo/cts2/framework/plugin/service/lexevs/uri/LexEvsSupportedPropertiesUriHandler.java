@@ -31,6 +31,7 @@ import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.codingSchemes.CodingScheme;
+import org.LexGrid.naming.SupportedAssociation;
 import org.LexGrid.naming.SupportedNamespace;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
@@ -90,6 +91,15 @@ public class LexEvsSupportedPropertiesUriHandler implements DelegateUriHandler {
 		}
 		return null;
 	}
+	
+	private SupportedAssociation findSupportedAssociation(String association, SupportedAssociation[] associations){
+		for(SupportedAssociation sa : associations){
+			if(sa.getLocalId().equals(associations)){
+				return sa;
+			}
+		}
+		return null;
+	}
 
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler#getCodeSystemUri(org.LexGrid.codingSchemes.CodingScheme)
@@ -103,6 +113,33 @@ public class LexEvsSupportedPropertiesUriHandler implements DelegateUriHandler {
 	public String getCodeSystemUri(
 			CodingSchemeSummary codingSchemeSummary) {
 		return codingSchemeSummary.getCodingSchemeURI();
+	}
+
+	@Override
+	public String getPredicateUri(
+			String codingSchemeUri,
+			String codingSchemeVersion, 
+			String associationName) {
+		CodingScheme codingScheme;
+		try {
+			codingScheme = this.lexBigService.resolveCodingScheme(
+					codingSchemeUri, 
+					Constructors.createCodingSchemeVersionOrTagFromVersion(codingSchemeVersion));
+		} catch (LBException e) {
+			throw new RuntimeException(e);
+		}
+		
+		SupportedAssociation supportedAssociation =  
+			this.findSupportedAssociation(
+				associationName, 
+				codingScheme.getMappings().getSupportedAssociation());
+		
+		String uri = null;
+		if(supportedAssociation != null){
+			uri = supportedAssociation.getUri();
+		} 
+		
+		return uri;
 	}
 
 	/* (non-Javadoc)

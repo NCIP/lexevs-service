@@ -15,7 +15,7 @@ public class CodedNodeGraphDirectoryBuilder
 
 	public CodedNodeGraphDirectoryBuilder(
 			CodedNodeGraph initialState,
-			edu.mayo.cts2.framework.filter.directory.AbstractStateBuildingDirectoryBuilder.Callback<CodedNodeGraph, AssociationDirectoryEntry> callback,
+			Callback<CodedNodeGraph, AssociationDirectoryEntry> callback,
 			Set<MatchAlgorithmReference> matchAlgorithmReferences,
 			Set<StateAdjustingPropertyReference<CodedNodeGraph>> stateAdjustingPropertyReferences) {
 		super(initialState, 

@@ -23,26 +23,27 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.association;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.io.StringWriter;
 
 import javax.annotation.Resource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.junit.Test;
 
+import edu.mayo.cts2.framework.core.xml.Cts2Marshaller;
+import edu.mayo.cts2.framework.core.xml.DelegatingMarshaller;
 import edu.mayo.cts2.framework.model.association.AssociationDirectoryEntry;
 import edu.mayo.cts2.framework.model.command.Page;
-import edu.mayo.cts2.framework.model.command.ResolvedFilter;
-import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.core.ScopedEntityName;
-import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
-import edu.mayo.cts2.framework.model.service.core.Query;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
 import edu.mayo.cts2.framework.service.command.restriction.AssociationQueryServiceRestrictions;
@@ -57,6 +58,8 @@ public class LexEvsAssociationQueryServiceTestIT extends AbstractTestITBase {
 	@Resource
 	private LexEvsAssociationQueryService service;
 	
+	private Cts2Marshaller marshaller = new DelegatingMarshaller();
+	
 	@Test
 	public void testSetUp() {
 		assertNotNull(this.service);
@@ -65,53 +68,173 @@ public class LexEvsAssociationQueryServiceTestIT extends AbstractTestITBase {
 	@Test
 	public void testResourceSummaries() throws Exception {
 		final String srcEntityName = "A0001";  // LexEVS entity code for entity description "Automobile"
-		NameOrURI csvName = ModelUtils.nameOrUriFromName("Automobiles");
+		NameOrURI csvName = ModelUtils.nameOrUriFromName("Automobiles-1.0");
 		
 		EntityNameOrURI srcEntityNameOrURI = new EntityNameOrURI();
 		ScopedEntityName seName = new ScopedEntityName();
 		seName.setName(srcEntityName);
-		seName.setNamespace(csvName.getName());
+		seName.setNamespace("Automobiles");
 		srcEntityNameOrURI.setEntityName(seName);
-		//srcEntityNameOrURI.setUri(uri);
-		
-		Query query = new Query();
-		query.setMatchAlgorithm(csvName);
-		Set<ResolvedFilter> filterComponent = new HashSet<ResolvedFilter>();
-		ResolvedReadContext readContext = null;		
-		AssociationQueryServiceRestrictions assnQueryServiceRestrictions = new AssociationQueryServiceRestrictions();
+	
+		AssociationQueryServiceRestrictions restrictions = new AssociationQueryServiceRestrictions();
 		// Add the source graphNode - using [A0001] Automobile
-		assnQueryServiceRestrictions.setCodeSystemVersion(csvName);
-		assnQueryServiceRestrictions.setSourceEntity(srcEntityNameOrURI);
+		restrictions.setCodeSystemVersion(csvName);
+		restrictions.setSourceEntity(srcEntityNameOrURI);
 		
-		AssociationQueryImpl assnQuery = new AssociationQueryImpl(query,filterComponent,readContext,assnQueryServiceRestrictions);
-		SortCriteria sortCriteria = null;
+		AssociationQueryImpl assnQuery =
+			new AssociationQueryImpl(null,null,null,restrictions);
 		Page page = new Page();
 		
-		DirectoryResult<AssociationDirectoryEntry> resourceSummaries = this.service.getResourceSummaries(assnQuery, sortCriteria, page);
+		DirectoryResult<AssociationDirectoryEntry> resourceSummaries = 
+			this.service.getResourceSummaries(assnQuery, null, page);
 		
 		assertNotNull(resourceSummaries);		
-		assertEquals("Unexpected # of Associations for Automobile A0005 - ",5,resourceSummaries.getEntries().size());
-		assertEquals("Unexpected result of not being at the end of the paged results ",true, resourceSummaries.isAtEnd());
-		
-		page.setMaxToReturn(4);
-		page.setPage(0);
-		
-		resourceSummaries = this.service.getResourceSummaries(assnQuery, sortCriteria, page);
-		
-		assertNotNull(resourceSummaries);		
-		assertEquals("Unexpected # of Associations for Automobile A0005 - ",4,resourceSummaries.getEntries().size());	
-		assertEquals("Unexpected result of being at the end of the paged results ",false, resourceSummaries.isAtEnd());
-
-		page.setMaxToReturn(4);
-		page.setPage(1);
-		
-		resourceSummaries = this.service.getResourceSummaries(assnQuery, sortCriteria, page);
-		
-		assertNotNull(resourceSummaries);		
-		assertEquals("Unexpected # of Associations for Automobile A0005 - ",1,resourceSummaries.getEntries().size());	
-		assertEquals("Unexpected result of not being at the end of the paged results for the last page ",true, resourceSummaries.isAtEnd());
-
+		assertEquals(5,resourceSummaries.getEntries().size());
+		assertTrue(resourceSummaries.isAtEnd());
 	}
 	
+	@Test
+	public void testResourceSummariesNone() throws Exception {
+		final String srcEntityName = "Jaguar";  // LexEVS entity code for entity description "Automobile"
+		NameOrURI csvName = ModelUtils.nameOrUriFromName("Automobiles-1.0");
+		
+		EntityNameOrURI srcEntityNameOrURI = new EntityNameOrURI();
+		ScopedEntityName seName = new ScopedEntityName();
+		seName.setName(srcEntityName);
+		seName.setNamespace("Automobiles");
+		srcEntityNameOrURI.setEntityName(seName);
+	
+		AssociationQueryServiceRestrictions restrictions = new AssociationQueryServiceRestrictions();
+		// Add the source graphNode - using [A0001] Automobile
+		restrictions.setCodeSystemVersion(csvName);
+		restrictions.setSourceEntity(srcEntityNameOrURI);
+		
+		AssociationQueryImpl assnQuery =
+			new AssociationQueryImpl(null,null,null,restrictions);
+		Page page = new Page();
+		
+		DirectoryResult<AssociationDirectoryEntry> resourceSummaries = 
+			this.service.getResourceSummaries(assnQuery, null, page);
+		
+		assertNotNull(resourceSummaries);		
+		assertEquals(0,resourceSummaries.getEntries().size());
+		assertTrue(resourceSummaries.isAtEnd());
+	}
+	
+	@Test
+	public void testResourceSummariesTarget() throws Exception {
+		final String srcEntityName = "Jaguar";  // LexEVS entity code for entity description "Automobile"
+		NameOrURI csvName = ModelUtils.nameOrUriFromName("Automobiles-1.0");
+		
+		EntityNameOrURI srcEntityNameOrURI = new EntityNameOrURI();
+		ScopedEntityName seName = new ScopedEntityName();
+		seName.setName(srcEntityName);
+		seName.setNamespace("Automobiles");
+		srcEntityNameOrURI.setEntityName(seName);
+	
+		AssociationQueryServiceRestrictions restrictions = new AssociationQueryServiceRestrictions();
+		// Add the source graphNode - using [A0001] Automobile
+		restrictions.setCodeSystemVersion(csvName);
+		restrictions.setTargetEntity(srcEntityNameOrURI);
+		
+		AssociationQueryImpl assnQuery =
+			new AssociationQueryImpl(null,null,null,restrictions);
+		Page page = new Page();
+		
+		DirectoryResult<AssociationDirectoryEntry> resourceSummaries = 
+			this.service.getResourceSummaries(assnQuery, null, page);
+		
+		assertNotNull(resourceSummaries);		
+		assertEquals(1,resourceSummaries.getEntries().size());
+		assertTrue(resourceSummaries.isAtEnd());
+	}
+	
+	@Test
+	public void testResourceSummariesWithLimit() throws Exception {
+		final String srcEntityName = "A0001";  // LexEVS entity code for entity description "Automobile"
+		NameOrURI csvName = ModelUtils.nameOrUriFromName("Automobiles-1.0");
+		
+		EntityNameOrURI srcEntityNameOrURI = new EntityNameOrURI();
+		ScopedEntityName seName = new ScopedEntityName();
+		seName.setName(srcEntityName);
+		seName.setNamespace("Automobiles");
+		srcEntityNameOrURI.setEntityName(seName);
+	
+		AssociationQueryServiceRestrictions restrictions = new AssociationQueryServiceRestrictions();
+		// Add the source graphNode - using [A0001] Automobile
+		restrictions.setCodeSystemVersion(csvName);
+		restrictions.setSourceEntity(srcEntityNameOrURI);
+		
+		AssociationQueryImpl assnQuery =
+			new AssociationQueryImpl(null,null,null,restrictions);
+		Page page = new Page();
+		page.setMaxToReturn(2);
+		
+		DirectoryResult<AssociationDirectoryEntry> resourceSummaries = 
+			this.service.getResourceSummaries(assnQuery, null, page);
+		
+		assertNotNull(resourceSummaries);		
+		assertEquals(2,resourceSummaries.getEntries().size());
+		assertFalse(resourceSummaries.isAtEnd());
+	}
+	
+	@Test
+	public void testResourceSummariesOverLimit() throws Exception {
+		final String srcEntityName = "A0001";  // LexEVS entity code for entity description "Automobile"
+		NameOrURI csvName = ModelUtils.nameOrUriFromName("Automobiles-1.0");
+		
+		EntityNameOrURI srcEntityNameOrURI = new EntityNameOrURI();
+		ScopedEntityName seName = new ScopedEntityName();
+		seName.setName(srcEntityName);
+		seName.setNamespace("Automobiles");
+		srcEntityNameOrURI.setEntityName(seName);
+	
+		AssociationQueryServiceRestrictions restrictions = new AssociationQueryServiceRestrictions();
+		// Add the source graphNode - using [A0001] Automobile
+		restrictions.setCodeSystemVersion(csvName);
+		restrictions.setSourceEntity(srcEntityNameOrURI);
+		
+		AssociationQueryImpl assnQuery =
+			new AssociationQueryImpl(null,null,null,restrictions);
+		Page page = new Page();
+		page.setPage(10);
+		
+		DirectoryResult<AssociationDirectoryEntry> resourceSummaries = 
+			this.service.getResourceSummaries(assnQuery, null, page);
+		
+		assertNotNull(resourceSummaries);		
+		assertEquals(0,resourceSummaries.getEntries().size());
+		assertTrue(resourceSummaries.isAtEnd());
+	}
 
+	@Test
+	public void testResourceSummariesValidXml() throws Exception {
+		final String srcEntityName = "A0001";  // LexEVS entity code for entity description "Automobile"
+		NameOrURI csvName = ModelUtils.nameOrUriFromName("Automobiles-1.0");
+		
+		EntityNameOrURI srcEntityNameOrURI = new EntityNameOrURI();
+		ScopedEntityName seName = new ScopedEntityName();
+		seName.setName(srcEntityName);
+		seName.setNamespace("Automobiles");
+		srcEntityNameOrURI.setEntityName(seName);
+	
+		AssociationQueryServiceRestrictions restrictions = new AssociationQueryServiceRestrictions();
+		// Add the source graphNode - using [A0001] Automobile
+		restrictions.setCodeSystemVersion(csvName);
+		restrictions.setSourceEntity(srcEntityNameOrURI);
+		
+		AssociationQueryImpl assnQuery =
+			new AssociationQueryImpl(null,null,null,restrictions);
+		Page page = new Page();
+		
+		DirectoryResult<AssociationDirectoryEntry> resourceSummaries = 
+			this.service.getResourceSummaries(assnQuery, null, page);
+		
+		assertNotNull(resourceSummaries);		
+		assertEquals(5,resourceSummaries.getEntries().size());
+		
+		for(AssociationDirectoryEntry entry : resourceSummaries.getEntries()){
+			this.marshaller.marshal(entry, new StreamResult(new StringWriter()));
+		}
+	}
 }

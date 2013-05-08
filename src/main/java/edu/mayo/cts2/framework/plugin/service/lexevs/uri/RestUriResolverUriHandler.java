@@ -64,7 +64,14 @@ public class RestUriResolverUriHandler implements DelegateUriHandler {
 			return null;
 		}
 	}
-	
+
+	@Override
+	public String getPredicateUri(String codingSchemeUri,
+			String codingSchemeVersion, String associationName) {
+		//this doesn't apply here
+		return null;
+	}
+
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler#getCodeSystemUri(org.LexGrid.codingSchemes.CodingScheme)
 	 */
