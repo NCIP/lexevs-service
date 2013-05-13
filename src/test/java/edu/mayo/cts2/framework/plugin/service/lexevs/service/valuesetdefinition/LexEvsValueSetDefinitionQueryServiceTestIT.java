@@ -23,53 +23,92 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.valuesetdefinition;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
+
+import java.io.StringWriter;
 
 import javax.annotation.Resource;
+import javax.xml.transform.stream.StreamResult;
 
+import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.junit.Test;
 
+import edu.mayo.cts2.framework.core.xml.Cts2Marshaller;
+import edu.mayo.cts2.framework.core.xml.DelegatingMarshaller;
+import edu.mayo.cts2.framework.model.command.Page;
+import edu.mayo.cts2.framework.model.directory.DirectoryResult;
+import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinition;
+import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinitionDirectoryEntry;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
 
 /**
  * @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
  *
  */
+@LoadContent(contentPath="lexevs/test-content/valueset/vdTestData.xml")
 public class LexEvsValueSetDefinitionQueryServiceTestIT extends
 		AbstractTestITBase {
 
 	@Resource
 	private LexEvsValueSetDefinitionQueryService service;
 	
+	private Cts2Marshaller marshaller = new DelegatingMarshaller();
+	
 	@Test
 	public void testSetUp() {
 		assertNotNull(this.service);
 	}
 	
-//	@Test
-//	@LoadContent(contentPath="lexevs/test-content/VSDOnlyTest.xml")
-//	public void testResourceSummaries() throws Exception {
-////		String uri = "SRITEST:AUTO:PropertyRefTest1-VSDONLY";
-//		String name = "Automobiles";
-//		//NameOrURI uriName = ModelUtils.nameOrUriFromUri(uri);
-//		NameOrURI codeSystemName = ModelUtils.nameOrUriFromName(name);
-//		
-//		//uriName.setName("Automobiles");  // LexEVS defaultCodingScheme of ValueSetDefinition
-//		
-//		Query query = null;
-//		Set<ResolvedFilter> filterComponent = null;
-//		ResolvedReadContext readContext = null;		
-//		ValueSetDefinitionQueryServiceRestrictions vsdQueryServiceRestrictions = new ValueSetDefinitionQueryServiceRestrictions();
-//		vsdQueryServiceRestrictions.setValueSet(codeSystemName);
-//		
-//		ValueSetDefinitionQueryImpl vsdQuery = new ValueSetDefinitionQueryImpl(query,filterComponent,readContext,vsdQueryServiceRestrictions);
-//						
-//		SortCriteria sortCriteria = null;
-//		Page page = new Page();
-//		
-//		DirectoryResult<ValueSetDefinitionDirectoryEntry> resourceSummaries = service.getResourceSummaries(vsdQuery, sortCriteria, page);
-//		
-//		assertNotNull(resourceSummaries);
-//	}
+	@Test
+	public void testResourceSummaries() throws Exception {						
+		Page page = new Page();
+		
+		DirectoryResult<ValueSetDefinitionDirectoryEntry> summaries = 
+			service.getResourceSummaries(null, null, page);
+		
+		assertNotNull(summaries);
+		assertEquals(20, summaries.getEntries().size());
+	}
+	
+	@Test
+	public void testResourceList() throws Exception {						
+		Page page = new Page();
+		
+		DirectoryResult<ValueSetDefinition> summaries = 
+			service.getResourceList(null, null, page);
+		
+		assertNotNull(summaries);
+		assertEquals(20, summaries.getEntries().size());
+	}
+	
+	@Test
+	public void testResourceSummariesValidXml() throws Exception {						
+		Page page = new Page();
+		
+		DirectoryResult<ValueSetDefinitionDirectoryEntry> summaries = 
+			service.getResourceSummaries(null, null, page);
+		
+		assertNotNull(summaries);
+		assertTrue(summaries.getEntries().size() > 0);
+		
+		for(ValueSetDefinitionDirectoryEntry summary : summaries.getEntries()){
+			this.marshaller.marshal(summary, new StreamResult(new StringWriter()));	
+		}
+	}
+	
+	@Test
+	public void testResourceListValidXml() throws Exception {						
+		Page page = new Page();
+		
+		DirectoryResult<ValueSetDefinition> summaries = 
+			service.getResourceList(null, null, page);
+		
+		assertNotNull(summaries);
+		assertTrue(summaries.getEntries().size() > 0);
+		
+		for(ValueSetDefinition summary : summaries.getEntries()){
+			this.marshaller.marshal(summary, new StreamResult(new StringWriter()));	
+		}
+	}
 
 }

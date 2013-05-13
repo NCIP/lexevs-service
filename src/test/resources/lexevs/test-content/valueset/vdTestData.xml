@@ -27,6 +27,7 @@
             <lgNaming:supportedNamespace localId="Automobiles" uri="urn:oid:11.11.0.1" equivalentCodingScheme="Automobiles">Automobiles</lgNaming:supportedNamespace>
             <lgNaming:supportedNamespace localId="ExpendableParts" uri="urn:oid:11.11.0.50" equivalentCodingScheme="ExpendableParts">Expendable Parts</lgNaming:supportedNamespace>
             <lgNaming:supportedNamespace localId="GermanMadePartsNamespace" uri="urn:oid:11.11.0.2" equivalentCodingScheme="GermanMadeParts">German Made Parts</lgNaming:supportedNamespace>
+            <lgNaming:supportedNamespace localId="fungal_anatomy" uri="urn:lsid:bioontology.org:fungal_anatomy" equivalentCodingScheme="fungal_anatomy">fungal_anatomy</lgNaming:supportedNamespace>
             <lgNaming:supportedProperty localId="definition">definition</lgNaming:supportedProperty>
             <lgNaming:supportedProperty localId="textualPresentation">textualPresentation</lgNaming:supportedProperty>
             <lgNaming:supportedSource localId="lexgrid.org">lexgrid.org</lgNaming:supportedSource>
@@ -342,10 +343,10 @@
                 </lgCommon:property>
             </lgVD:properties>
             <lgVD:definitionEntry ruleOrder="1" operator="OR">
-                <lgVD:entityReference entityCode="FAO:0000001" referenceAssociation="is_a" transitiveClosure="true"  targetToSource="true" leafOnly="false"/>
+                <lgVD:entityReference entityCode="FAO:0000001" entityCodeNamespace="fungal_anatomy" referenceAssociation="is_a" transitiveClosure="true"  targetToSource="true" leafOnly="false"/>
             </lgVD:definitionEntry>
             <lgVD:definitionEntry ruleOrder="2" operator="AND">
-                <lgVD:entityReference entityCode="FAO:0001003" referenceAssociation="is_a" transitiveClosure="true"  targetToSource="true" leafOnly="false"/>
+                <lgVD:entityReference entityCode="FAO:0001003" entityCodeNamespace="fungal_anatomy" referenceAssociation="is_a" transitiveClosure="true"  targetToSource="true" leafOnly="false"/>
             </lgVD:definitionEntry>
         </lgVD:valueSetDefinition>     
     </lgVer:valueSetDefinitions>    

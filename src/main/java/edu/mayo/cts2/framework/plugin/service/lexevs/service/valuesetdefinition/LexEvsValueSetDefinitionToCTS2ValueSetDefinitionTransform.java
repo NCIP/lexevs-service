@@ -23,19 +23,33 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.valuesetdefinition;
 
+import javax.annotation.Resource;
+
+import org.LexGrid.naming.Mappings;
+import org.LexGrid.naming.SupportedAssociation;
+import org.LexGrid.naming.SupportedCodingScheme;
+import org.LexGrid.naming.SupportedNamespace;
+import org.LexGrid.naming.SupportedProperty;
 import org.LexGrid.valueSets.CodingSchemeReference;
 import org.LexGrid.valueSets.DefinitionEntry;
 import org.LexGrid.valueSets.EntityReference;
 import org.LexGrid.valueSets.PropertyReference;
 import org.LexGrid.valueSets.ValueSetDefinitionReference;
 import org.LexGrid.valueSets.types.DefinitionOperator;
+import org.apache.commons.lang.StringUtils;
+import org.lexevs.dao.database.utility.DaoUtility;
 import org.springframework.stereotype.Component;
 
+import edu.mayo.cts2.framework.model.core.CodeSystemReference;
+import edu.mayo.cts2.framework.model.core.FilterComponent;
+import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
+import edu.mayo.cts2.framework.model.core.SourceAndNotation;
 import edu.mayo.cts2.framework.model.core.URIAndEntityName;
 import edu.mayo.cts2.framework.model.core.ValueSetReference;
 import edu.mayo.cts2.framework.model.core.types.AssociationDirection;
 import edu.mayo.cts2.framework.model.core.types.SetOperator;
+import edu.mayo.cts2.framework.model.core.types.TargetReferenceType;
 import edu.mayo.cts2.framework.model.valuesetdefinition.AssociatedEntitiesReference;
 import edu.mayo.cts2.framework.model.valuesetdefinition.CompleteCodeSystemReference;
 import edu.mayo.cts2.framework.model.valuesetdefinition.CompleteValueSetReference;
@@ -47,6 +61,7 @@ import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinitionEntry;
 import edu.mayo.cts2.framework.model.valuesetdefinition.types.LeafOrAll;
 import edu.mayo.cts2.framework.model.valuesetdefinition.types.TransitiveClosure;
 import edu.mayo.cts2.framework.plugin.service.lexevs.transform.AbstractBaseTransform;
+import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
 
 /**
  * Transforms a LexEVS ValueSetDefinition object into a CTS2 ValueSetDefinition object.
@@ -61,6 +76,9 @@ public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform
 		org.LexGrid.valueSets.ValueSetDefinition, 
 		ValueSetDefinitionDirectoryEntry, 
 		org.LexGrid.valueSets.ValueSetDefinition> {
+	
+	@Resource
+	private UriHandler uriHandler;
 
 	public ValueSetDefinition transformFullDescription(org.LexGrid.valueSets.ValueSetDefinition lexEvsVSD) {
 		if (lexEvsVSD == null) {
@@ -70,8 +88,14 @@ public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform
 		ValueSetDefinition cts2VSD = new ValueSetDefinition();
 
 		cts2VSD.setAbout(lexEvsVSD.getValueSetDefinitionURI());
+		cts2VSD.setDocumentURI(lexEvsVSD.getValueSetDefinitionURI());
+
 		cts2VSD.setFormalName(lexEvsVSD.getValueSetDefinitionURI());
 
+		SourceAndNotation sourceAndNotation = new SourceAndNotation();
+		sourceAndNotation.setSourceAndNotationDescription("LexEVS");
+		cts2VSD.setSourceAndNotation(sourceAndNotation);
+		
 		ValueSetReference vsReference = new ValueSetReference();
 		vsReference.setContent(lexEvsVSD.getValueSetDefinitionURI());
 		cts2VSD.setDefinedValueSet(vsReference);
@@ -80,20 +104,22 @@ public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform
 			ValueSetDefinitionEntry cts2Entry = new ValueSetDefinitionEntry();
 			
 			if(entry.getCodingSchemeReference() != null){
-				this.add(entry.getCodingSchemeReference(), cts2Entry);
+				this.add(entry.getCodingSchemeReference(), cts2Entry, lexEvsVSD);
 			}
 			if(entry.getEntityReference() != null){
-				this.add(entry.getEntityReference(), cts2Entry);
+				this.add(entry.getEntityReference(), cts2Entry, lexEvsVSD);
 			}
 			if(entry.getPropertyReference() != null){
-				this.add(entry.getPropertyReference(), cts2Entry);
+				this.add(entry.getPropertyReference(), cts2Entry, lexEvsVSD);
 			}
-			if(entry.getPropertyReference() != null){
+			if(entry.getValueSetDefinitionReference() != null){
 				this.add(entry.getValueSetDefinitionReference(), cts2Entry);
 			}
 			
 			cts2Entry.setEntryOrder(entry.getRuleOrder());
 			cts2Entry.setOperator(this.toSetOperator(entry.getOperator()));
+			
+			cts2VSD.addEntry(cts2Entry);
 		}
 	
 		return cts2VSD;
@@ -111,25 +137,108 @@ public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform
 	private void add(
 			ValueSetDefinitionReference valueSetDefinitionReference,
 			ValueSetDefinitionEntry cts2Entry) {
+		String uri = valueSetDefinitionReference.getValueSetDefinitionURI();
+
 		CompleteValueSetReference vsr = new CompleteValueSetReference();
+		
+		ValueSetReference ref = new ValueSetReference();
+		ref.setContent(uri);
+		ref.setUri(uri);
+		vsr.setValueSet(ref);
 		
 		cts2Entry.setCompleteValueSet(vsr);
 	}
 
 	private void add(
 			PropertyReference propertyReference,
-			ValueSetDefinitionEntry cts2Entry) {
+			ValueSetDefinitionEntry cts2Entry,
+			org.LexGrid.valueSets.ValueSetDefinition definition) {
 		PropertyQueryReference pqr = new PropertyQueryReference();
+
+		String codingScheme = propertyReference.getCodingScheme();
+		SupportedCodingScheme supportedCodingScheme = this.findCodingScheme(definition, codingScheme);
+		pqr.setCodeSystem(
+			this.getTransformUtils().toCodeSystemReference(
+				supportedCodingScheme.getLocalId(), 
+				supportedCodingScheme.getUri()));
 		
+		String propertyName = propertyReference.getPropertyName();
+		String matchAlgorithm = propertyReference.getPropertyMatchValue().getMatchAlgorithm();
+		String matchValue = propertyReference.getPropertyMatchValue().getContent();
+				
+		SupportedProperty supportedProperty = this.findProperty(definition.getMappings(), propertyName);
+		
+		String propName;
+		String propUri;
+		if(StringUtils.isBlank(propertyName)){
+			//TODO: What is the correct behavior here?
+			propName = "UNSPECIFIED";
+			propUri = "UNSPECIFIED";
+		} else {
+			propName = supportedProperty.getLocalId();
+			propUri = supportedProperty.getUri();
+		}
+		
+		FilterComponent filter = new FilterComponent();
+		filter.setMatchAlgorithm(new MatchAlgorithmReference());
+		filter.getMatchAlgorithm().setContent(matchAlgorithm);
+		filter.setReferenceTarget(new URIAndEntityName());
+		filter.getReferenceTarget().setName(propName);
+		filter.getReferenceTarget().setUri(propUri);
+		filter.setReferenceType(TargetReferenceType.PROPERTY);
+		
+		filter.setMatchValue(matchValue);
+		
+		pqr.setFilter(filter);
 		cts2Entry.setPropertyQuery(pqr);
+	}
+	
+	private SupportedCodingScheme findCodingScheme(
+			org.LexGrid.valueSets.ValueSetDefinition definition, String localId){
+		if(StringUtils.isBlank(localId)){
+			localId = definition.getDefaultCodingScheme();
+		}
+		return DaoUtility.getURIMap(definition.getMappings(), SupportedCodingScheme.class, localId);
+	}
+	
+	private SupportedNamespace findNamespace(Mappings mappings, String localId){
+		return DaoUtility.getURIMap(mappings, SupportedNamespace.class, localId);
+	}
+	
+	private SupportedProperty findProperty(Mappings mappings, String localId){
+		return DaoUtility.getURIMap(mappings, SupportedProperty.class, localId);
+	}
+	
+	private SupportedAssociation findAssociation(Mappings mappings, String localId){
+		return DaoUtility.getURIMap(mappings, SupportedAssociation.class, localId);
 	}
 
 	private void add(
 			EntityReference entityReference,
-			ValueSetDefinitionEntry cts2Entry) {
+			ValueSetDefinitionEntry cts2Entry, 
+			org.LexGrid.valueSets.ValueSetDefinition lexEvsVSD) {
 		URIAndEntityName uriAndName = new URIAndEntityName();
 		uriAndName.setName(entityReference.getEntityCode());
-		uriAndName.setNamespace(entityReference.getEntityCodeNamespace());
+		
+		String namespace = entityReference.getEntityCodeNamespace();
+		if(StringUtils.isBlank(namespace)){
+			namespace = lexEvsVSD.getDefaultCodingScheme();
+		}
+		
+		uriAndName.setNamespace(namespace);
+		
+		SupportedNamespace supportedNamespace = 
+			this.findNamespace(lexEvsVSD.getMappings(), namespace);
+		
+		if(supportedNamespace == null){
+			throw new RuntimeException("EntityRefernece: " + 
+					entityReference.getEntityCodeNamespace()  +
+					":" + entityReference.getEntityCode() +
+					" does not have a valid namespace.");
+		}
+		
+		uriAndName.setUri(
+			supportedNamespace.getUri() + "#" + entityReference.getEntityCode());
 		
 		if(entityReference.getReferenceAssociation() != null){
 			AssociatedEntitiesReference ref = new AssociatedEntitiesReference();
@@ -138,6 +247,16 @@ public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform
 				entityReference.getTargetToSource() ? 
 					AssociationDirection.TARGET_TO_SOURCE : 
 					AssociationDirection.SOURCE_TO_TARGET);
+			
+			String cs = supportedNamespace.getEquivalentCodingScheme();
+			SupportedCodingScheme supportedCodingScheme = 
+				this.findCodingScheme(lexEvsVSD, cs);
+			
+			CodeSystemReference codingSchemeRef = this.getTransformUtils().toCodeSystemReference(
+				supportedCodingScheme.getLocalId(), 
+				supportedCodingScheme.getUri());
+			
+			ref.setCodeSystem(codingSchemeRef);
 			
 			ref.setTransitivity(
 					entityReference.getTransitiveClosure() ? 
@@ -149,13 +268,18 @@ public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform
 						LeafOrAll.LEAF_ONLY :
 						LeafOrAll.ALL_INTERMEDIATE_NODES);
 			
+			String association = entityReference.getReferenceAssociation();
 			PredicateReference predicate = new PredicateReference();
-			predicate.setName(entityReference.getReferenceAssociation());
+			predicate.setName(association);
 			
 			//namespace for a predicate is not guaranteed in LexEVS... not sure 
 			//how we want to handle this. For now, assume the same namespace
-			//as the starting entity.
-			predicate.setNamespace(entityReference.getEntityCodeNamespace());
+			//as the starting entity.		
+			SupportedAssociation supportedAssociation = 
+					this.findAssociation(lexEvsVSD.getMappings(), association);
+			predicate.setNamespace(supportedAssociation.getEntityCodeNamespace());
+			predicate.setUri(supportedAssociation.getUri());
+			
 			ref.setPredicate(predicate);
 			
 			cts2Entry.setAssociatedEntities(ref);
@@ -170,13 +294,19 @@ public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform
 
 	private void add(
 			CodingSchemeReference codingSchemeReference,
-			ValueSetDefinitionEntry cts2Entry) {
+			ValueSetDefinitionEntry cts2Entry,
+			org.LexGrid.valueSets.ValueSetDefinition definition) {
 		CompleteCodeSystemReference ccr = new CompleteCodeSystemReference();
 
 		String codeSystemName = codingSchemeReference.getCodingScheme();
 		
+		SupportedCodingScheme supportedCodingScheme = 
+				this.findCodingScheme(definition, codeSystemName);
+		
 		ccr.setCodeSystem(
-			this.getTransformUtils().toCodeSystemReference(codeSystemName, null));
+			this.getTransformUtils().toCodeSystemReference(
+				supportedCodingScheme.getLocalId(), 
+				supportedCodingScheme.getUri()));
 		
 		cts2Entry.setCompleteCodeSystem(ccr);
 	}
@@ -190,6 +320,8 @@ public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform
 		ValueSetDefinitionDirectoryEntry vsdDirEntry = new ValueSetDefinitionDirectoryEntry();
 		
 		vsdDirEntry.setAbout(lexEvsVSD.getValueSetDefinitionURI());
+		vsdDirEntry.setDocumentURI(lexEvsVSD.getValueSetDefinitionURI());
+
 		vsdDirEntry.setFormalName(lexEvsVSD.getValueSetDefinitionURI());
 
 		ValueSetReference vsReference = new ValueSetReference();

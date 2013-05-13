@@ -23,13 +23,18 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.valuesetdefinition;
 
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.LexGrid.valueSets.ValueSetDefinition;
+import org.lexgrid.valuesets.LexEVSValueSetDefinitionServices;
 import org.springframework.stereotype.Component;
 
+import edu.mayo.cts2.framework.filter.directory.AbstractStateBuildingDirectoryBuilder.Callback;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
@@ -37,7 +42,6 @@ import edu.mayo.cts2.framework.model.core.PropertyReference;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
-import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinition;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinitionDirectoryEntry;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.service.profile.valuesetdefinition.ValueSetDefinitionQuery;
@@ -52,7 +56,77 @@ public class LexEvsValueSetDefinitionQueryService extends AbstractLexEvsService
 		implements ValueSetDefinitionQueryService {
 
 	@Resource
+	private LexEVSValueSetDefinitionServices definitionServices;
+	
+	@Resource
 	private LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform transformer;
+	
+	private interface TransformClosure<T>{
+		T transform(org.LexGrid.valueSets.ValueSetDefinition item);
+	}
+	
+	private final Callback<List<String>, edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinition> 
+		listCallack = 
+			new DefinitionCallback<edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinition>(
+				new TransformClosure<edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinition>() {
+
+					@Override
+					public edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinition transform(
+							ValueSetDefinition item) {
+						return transformer.transformFullDescription(item);
+					}
+
+				});
+	
+	private final Callback<List<String>, ValueSetDefinitionDirectoryEntry> summariesCallack = 
+		new DefinitionCallback<ValueSetDefinitionDirectoryEntry>(
+			new TransformClosure<ValueSetDefinitionDirectoryEntry>() {
+
+				@Override
+				public ValueSetDefinitionDirectoryEntry transform(
+						ValueSetDefinition item) {
+					return transformer.transformSummaryDescription(item);
+				}
+
+			});
+	
+	private class DefinitionCallback<T> implements Callback<List<String>, T> {
+		
+		private TransformClosure<T> transformClosure;
+		
+		private DefinitionCallback(TransformClosure<T> transformClosure){
+			super();
+			this.transformClosure = transformClosure;
+		}
+
+		@Override
+		public DirectoryResult<T> execute(List<String> state, int start,
+				int maxResults) {
+			List<T> returnList = new ArrayList<T>();
+
+			for(String uri : state){
+				org.LexGrid.valueSets.ValueSetDefinition definition;
+				try {
+					definition = definitionServices.getValueSetDefinition(new URI(uri), null);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+				
+				returnList.add(this.transformClosure.transform(definition));
+			}
+			
+			return 
+				new DirectoryResult<T>(
+						returnList, 
+						start + maxResults > state.size());
+		}
+
+		@Override
+		public int executeCount(List<String> state) {
+			return state.size();
+		}
+		
+	}
 	
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.service.profile.QueryService#getResourceSummaries(edu.mayo.cts2.framework.service.profile.ResourceQuery, edu.mayo.cts2.framework.model.core.SortCriteria, edu.mayo.cts2.framework.model.command.Page)
@@ -61,17 +135,40 @@ public class LexEvsValueSetDefinitionQueryService extends AbstractLexEvsService
 	public DirectoryResult<ValueSetDefinitionDirectoryEntry> getResourceSummaries(
 			ValueSetDefinitionQuery query, 
 			SortCriteria sortCriteria, Page page) {
+		List<String> uris = this.definitionServices.listValueSetDefinitionURIs();
 		
-		throw new UnsupportedOperationException();
+		ValueSetDefinitionDirectoryBuilder<ValueSetDefinitionDirectoryEntry> builder = 
+			new ValueSetDefinitionDirectoryBuilder<ValueSetDefinitionDirectoryEntry>(
+					uris, 
+					this.summariesCallack, 
+					null, 
+					null);
+		
+		return builder.
+				addMaxToReturn(page.getMaxToReturn()).
+				addStart(page.getStart()).
+				resolve();
 	}
 
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.service.profile.QueryService#getResourceList(edu.mayo.cts2.framework.service.profile.ResourceQuery, edu.mayo.cts2.framework.model.core.SortCriteria, edu.mayo.cts2.framework.model.command.Page)
 	 */
 	@Override
-	public DirectoryResult<ValueSetDefinition> getResourceList(
+	public DirectoryResult<edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinition> getResourceList(
 			ValueSetDefinitionQuery query, SortCriteria sortCriteria, Page page) {
-		throw new UnsupportedOperationException();
+		List<String> uris = this.definitionServices.listValueSetDefinitionURIs();
+		
+		ValueSetDefinitionDirectoryBuilder<edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinition> builder = 
+			new ValueSetDefinitionDirectoryBuilder<edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinition>(
+					uris, 
+					this.listCallack, 
+					null, 
+					null);
+		
+		return builder.
+				addMaxToReturn(page.getMaxToReturn()).
+				addStart(page.getStart()).
+				resolve();
 	}
 
 	/* (non-Javadoc)
@@ -79,7 +176,16 @@ public class LexEvsValueSetDefinitionQueryService extends AbstractLexEvsService
 	 */
 	@Override
 	public int count(ValueSetDefinitionQuery query) {
-		throw new UnsupportedOperationException();
+		List<String> uris = this.definitionServices.listValueSetDefinitionURIs();
+		
+		ValueSetDefinitionDirectoryBuilder<ValueSetDefinitionDirectoryEntry> builder = 
+			new ValueSetDefinitionDirectoryBuilder<ValueSetDefinitionDirectoryEntry>(
+					uris, 
+					this.summariesCallack, 
+					null, 
+					null);
+		
+		return builder.count();
 	}
 
 	/* (non-Javadoc)

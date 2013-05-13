@@ -39,7 +39,7 @@ import edu.mayo.cts2.framework.service.profile.valuesetdefinition.name.ValueSetD
  * @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
  *
  */
-@LoadContent(contentPath="lexevs/test-content/VSDOnlyTest.xml")
+@LoadContent(contentPath="lexevs/test-content/valueset/VSDOnlyTest.xml")
 public class LexEvsValueSetDefinitionReadServiceTestIT
 	extends AbstractReadServiceTest<LocalIdValueSetDefinition, ValueSetDefinitionReadId> {
 

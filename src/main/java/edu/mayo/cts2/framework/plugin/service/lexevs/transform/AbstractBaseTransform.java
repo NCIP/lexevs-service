@@ -13,7 +13,6 @@ public abstract class AbstractBaseTransform<
 	DescriptionDataIN, 
 	DirectoryEntryDataType, 
 	DirectoryEntryDataIN>
-	
 	implements LexEvsToCTS2Transformer<
 		DescriptionDataType, 
 		DescriptionDataIN, 

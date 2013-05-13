@@ -28,6 +28,8 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.springframework.stereotype.Component;
 
@@ -49,8 +51,9 @@ import edu.mayo.cts2.framework.service.profile.valuesetdefinition.name.ValueSetD
 public class LexEvsValueSetDefinitionReadService extends AbstractLexEvsService
 		implements ValueSetDefinitionReadService {
 	
-	private LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform vsdTransformer = new LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform();
-
+	@Resource
+	private LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform vsdTransformer;
+	
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.service.profile.TagAwareReadService#readByTag(edu.mayo.cts2.framework.model.service.core.NameOrURI, edu.mayo.cts2.framework.model.core.VersionTagReference, edu.mayo.cts2.framework.model.command.ResolvedReadContext)
 	 */
