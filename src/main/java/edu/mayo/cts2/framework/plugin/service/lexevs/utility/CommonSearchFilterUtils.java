@@ -169,24 +169,26 @@ public final class CommonSearchFilterUtils {
 		return filteredLexCodingSchemeList;
 	}
 	
-	public static <T extends ResourceQuery> void filterLexCodedNodeSet(CodedNodeSet lexCodedNodeSet, QueryData<T> queryData){
+	public static <T extends ResourceQuery> CodedNodeSet filterLexCodedNodeSet(CodedNodeSet lexCodedNodeSet, QueryData<T> queryData){
 		if(lexCodedNodeSet != null){
 			// Apply restrictions if they exists
 			Set<EntityNameOrURI> cts2Entities = queryData.getCts2Entities();
-			CommonSearchFilterUtils.filterLexCodedNodeSet(lexCodedNodeSet, cts2Entities);
+			lexCodedNodeSet = CommonSearchFilterUtils.filterLexCodedNodeSet(lexCodedNodeSet, cts2Entities);
 			
 			
 			// Apply filters if they exist
 			Set<ResolvedFilter> cts2Filters = queryData.getCts2Filters();
 			if(cts2Filters != null){
 				for(ResolvedFilter cts2Filter : cts2Filters){
-					CommonSearchFilterUtils.filterLexCodedNodeSet(lexCodedNodeSet, cts2Filter);
+					lexCodedNodeSet = CommonSearchFilterUtils.filterLexCodedNodeSet(lexCodedNodeSet, cts2Filter);
 				}
 			}
 		}
+		
+		return lexCodedNodeSet;
 	}
 	
-	public static void filterLexCodedNodeSet(
+	public static CodedNodeSet filterLexCodedNodeSet(
 			CodedNodeSet lexCodedNodeSet,
 			ResolvedFilter cts2Filter){
 		String cts2MatchValue = null;
@@ -200,16 +202,18 @@ public final class CommonSearchFilterUtils {
 		String lexLanguage = null;																// This field is not really used, uses default "en"
 		
 		try {
-			lexCodedNodeSet.restrictToMatchingDesignations(cts2MatchValue, lexSearchOption, cts2MatchAlgorithm, lexLanguage);
+			lexCodedNodeSet = lexCodedNodeSet.restrictToMatchingDesignations(cts2MatchValue, lexSearchOption, cts2MatchAlgorithm, lexLanguage);
 		} catch (LBInvocationException e) {
 			throw new RuntimeException(e);
 		} catch (LBParameterException e) {
 			throw new RuntimeException(e);
 		}
+		
+		return lexCodedNodeSet;
 	}
 
 	
-	public static void filterLexCodedNodeSet(
+	public static CodedNodeSet filterLexCodedNodeSet(
 			CodedNodeSet lexCodedNodeSet,
 			Set<EntityNameOrURI> cts2EntitySet) {
 		ConceptReferenceList lexConceptReferenceList = new ConceptReferenceList();
@@ -236,13 +240,15 @@ public final class CommonSearchFilterUtils {
 		
 		if(!listEmpty){
 			try {
-				lexCodedNodeSet.restrictToCodes(lexConceptReferenceList);
+				lexCodedNodeSet = lexCodedNodeSet.restrictToCodes(lexConceptReferenceList);
 			} catch (LBInvocationException e) {
 				throw new RuntimeException(e);
 			} catch (LBParameterException e) {
 				throw new RuntimeException(e);
 			}		
 		}
+		
+		return lexCodedNodeSet;
 	}
 
 	public static CodingSchemeRenderingList filterLexCodingSchemeRenderingList(

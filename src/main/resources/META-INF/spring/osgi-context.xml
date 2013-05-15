@@ -9,6 +9,8 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
 		http://www.springframework.org/schema/osgi-compendium http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium-1.2.xsd">
 
+	<osgi:service ref="bulkDownloadController" interface="edu.mayo.cts2.framework.webapp.rest.extensions.controller.ControllerProvider"/>
+	
 	<osgi:reference id="pluginConfigManager" interface="edu.mayo.cts2.framework.core.plugin.PluginConfigManager"/>
 	
 	<osgi:reference id="cts2Marshaller" interface="edu.mayo.cts2.framework.core.xml.Cts2Marshaller"/>
