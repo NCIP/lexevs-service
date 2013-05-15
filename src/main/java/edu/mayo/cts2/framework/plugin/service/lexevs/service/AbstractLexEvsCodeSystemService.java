@@ -29,7 +29,9 @@ import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.codingSchemes.CodingScheme;
+import org.apache.commons.lang.StringUtils;
 
+import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
@@ -119,5 +121,34 @@ public abstract class AbstractLexEvsCodeSystemService<T> extends AbstractLexEvsS
 		}
 		
 		return codingScheme;
+	}
+
+	public NameVersionPair getNamePair(
+			VersionNameConverter nameConverter, 
+			NameOrURI cts2NameOrURI,
+			ResolvedReadContext cts2ReadContext) {
+		if(cts2NameOrURI == null){
+			return null;
+		}
+		String cts2Name;
+		NameVersionPair namePair;
+		
+		if (cts2NameOrURI.getName() != null) {
+			cts2Name = cts2NameOrURI.getName();
+			if (!nameConverter.isValidVersionName(cts2Name)) {
+				namePair = null;
+			}
+			else{
+				namePair = nameConverter.fromCts2VersionName(cts2Name);		
+			}
+		} else {
+			String fullUri = cts2NameOrURI.getUri();
+			String uri = StringUtils.substringBeforeLast(fullUri, "/");
+			String version = StringUtils.substringAfterLast(fullUri, "/");
+			
+			namePair = new NameVersionPair(uri, version);
+		}
+
+		return namePair;
 	}
 }

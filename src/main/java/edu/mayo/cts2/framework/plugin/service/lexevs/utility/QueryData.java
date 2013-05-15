@@ -3,10 +3,9 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
 import java.util.Set;
 
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.util.Assert;
 
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
+import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
@@ -58,6 +57,8 @@ public final class QueryData <Query extends ResourceQuery>{
 	private TaggedCodeSystemRestriction cts2TaggedCodeSystemRestriction = null;		// Used in EntityDescriptionQuery
 	
 	private Set<EntityNameOrURI> cts2TargetEntities = null;					// Used in MapEntryQuery
+	
+	private ResolvedReadContext readContext;
 
 	public Set<ResolvedFilter> getCts2Filters(){
 		return this.cts2Filters;
@@ -292,6 +293,7 @@ public final class QueryData <Query extends ResourceQuery>{
 		CodeSystemVersionQueryServiceRestrictions localCts2Restrictions = cts2Query.getRestrictions();
 		this.cts2Restrictions = localCts2Restrictions;
 		this.cts2Filters = cts2Query.getFilterComponent();
+		this.setReadContext(cts2Query.getReadContext());
 
 		// Not needed?
 //		query.getReadContext();
@@ -328,6 +330,14 @@ public final class QueryData <Query extends ResourceQuery>{
 	
 	public NameVersionPair fromCts2VersionName(String cts2CodeSystemVersionName){
 		return this.nameConverter.fromCts2VersionName(cts2CodeSystemVersionName);
+	}
+
+	public ResolvedReadContext getReadContext() {
+		return readContext;
+	}
+
+	public void setReadContext(ResolvedReadContext readContext) {
+		this.readContext = readContext;
 	}
 	
 }

@@ -87,7 +87,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		}
 		LexBIGService lexBigService = this.getLexBigService();
 		QueryData<CodeSystemVersionQuery> queryData = new QueryData<CodeSystemVersionQuery>(query, null);
-		
+
 		CodingSchemeRendering [] renderings = CommonResourceUtils.getLexCodingSchemeRenderings(lexBigService, nameConverter, queryData, null, null);
 		return renderings.length;
 	}

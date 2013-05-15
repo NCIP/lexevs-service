@@ -29,6 +29,8 @@ import java.util.Set;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.junit.Test;
 
+import edu.mayo.cts2.framework.core.config.ServerContext;
+import edu.mayo.cts2.framework.core.url.UrlConstructor;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
@@ -61,11 +63,31 @@ public class LexEvsMapVersionQueryServiceTest {
 		
 		service.setLexBigService(lexBigService);
 
+		CodingSchemeToMapVersionTransform transform = new CodingSchemeToMapVersionTransform(new VersionNameConverter());
+		transform.setUrlConstructor(new UrlConstructor(new ServerContext(){
+
+			@Override
+			public String getServerRoot() {
+				return "test";
+			}
+
+			@Override
+			public String getServerRootWithAppName() {
+				return "test";
+			}
+
+			@Override
+			public String getAppName() {
+				return "test";
+			}
+			
+		}));
+		
 		// Overwrite objects in service object 
 		service.setCodeSystemVersionNameConverter(new VersionNameConverter());
-		service.setCodingSchemeToMapVersionTransform(new CodingSchemeToMapVersionTransform(new VersionNameConverter()));
+		service.setCodingSchemeToMapVersionTransform(transform);
 		service.setMappingExtension(new MappingExtensionImpl(fakeLexEvs));
-		
+
 		return service;
 	}
 	

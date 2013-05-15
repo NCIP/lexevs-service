@@ -11,6 +11,7 @@ import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.Collections.ConceptReferenceList;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.Core.ConceptReference;
+import org.LexGrid.LexBIG.DataModel.Core.types.CodingSchemeVersionStatus;
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
 import org.LexGrid.LexBIG.Exceptions.LBParameterException;
@@ -20,9 +21,11 @@ import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet.SearchDesignationOption;
 import org.LexGrid.codingSchemes.CodingScheme;
 
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
+import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PropertyReference;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
+import edu.mayo.cts2.framework.model.service.core.types.ActiveOrAll;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
@@ -86,7 +89,9 @@ public final class CommonSearchFilterUtils {
 		if (cts2SearchAttribute.equals(Constants.ATTRIBUTE_NAME_ABOUT)) {
 			sourceValue = lexSchemeSummary.getCodingSchemeURI();
 		} else if (cts2SearchAttribute.equals(Constants.ATTRIBUTE_NAME_RESOURCE_SYNOPSIS)) {
-			sourceValue = lexSchemeSummary.getCodingSchemeDescription().getContent();
+			if(lexSchemeSummary.getCodingSchemeDescription() != null){
+				sourceValue = lexSchemeSummary.getCodingSchemeDescription().getContent();
+			}
 		} else if (cts2SearchAttribute.equals(Constants.ATTRIBUTE_NAME_RESOURCE_NAME)) {
 			sourceValue = 
 				nameConverter.toCts2VersionName(
@@ -365,5 +370,26 @@ public final class CommonSearchFilterUtils {
 		}  
 		
 		return lexFilteredRendering;
+	}
+
+	public static CodingSchemeRenderingList filterLexCodingSchemeRenderingList(
+			CodingSchemeRenderingList list,
+			ResolvedReadContext readContext) {
+		
+		if(readContext.getActive() == null || 
+				readContext.getActive().equals(ActiveOrAll.ACTIVE_AND_INACTIVE)){
+			return list;
+		}
+
+		CodingSchemeRenderingList returnList = new CodingSchemeRenderingList();
+		
+		for(CodingSchemeRendering csr : list.getCodingSchemeRendering()){
+			if(csr.getRenderingDetail().getVersionStatus().
+						equals(CodingSchemeVersionStatus.ACTIVE)){
+						returnList.addCodingSchemeRendering(csr);
+			}
+		}
+		
+		return returnList;
 	}	
 }

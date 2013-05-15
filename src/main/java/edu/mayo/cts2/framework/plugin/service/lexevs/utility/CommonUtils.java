@@ -91,34 +91,6 @@ public final class CommonUtils {
 		}		
 		return lexResolvedConceptReferencesIterator;
 	}
-
-
-	public static NameVersionPair getNamePair(
-			VersionNameConverter nameConverter, 
-			NameOrURI cts2NameOrURI,
-			ResolvedReadContext cts2ReadContext) {
-		if(cts2NameOrURI == null){
-			return null;
-		}
-		String cts2Name;
-		NameVersionPair namePair;
-		
-		if (cts2NameOrURI.getName() != null) {
-			cts2Name = cts2NameOrURI.getName();
-			if (!nameConverter.isValidVersionName(cts2Name)) {
-				namePair = null;
-			}
-			else{
-				namePair = nameConverter.fromCts2VersionName(cts2Name);		
-			}
-		} else {
-			throw new UnsupportedOperationException(
-					"Cannot resolve by DocumentURI yet.");
-		}
-
-		return namePair;
-	}
-	
 	
 	public static CodingSchemeVersionOrTag convertTag(VersionTagReference tag){
 		CodingSchemeVersionOrTag lexVersionOrTag = Constants.CURRENT_LEXEVS_TAG;

@@ -30,6 +30,9 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.LexGrid.LexBIG.DataModel.Core.AbsoluteCodingSchemeVersionReference;
+import org.LexGrid.LexBIG.Impl.LexBIGServiceImpl;
+import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContents;
 import org.junit.Test;
@@ -38,7 +41,9 @@ import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogE
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntrySummary;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
+import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
+import edu.mayo.cts2.framework.model.service.core.types.ActiveOrAll;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractQueryServiceTest;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonTestUtils;
@@ -117,6 +122,53 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		int expecting = 1;
 		int actual = this.service.count(query);
 		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
+	}
+	
+
+	@Test
+	public void testOnlyActive() throws Exception {
+
+		ResolvedReadContext readContext = new ResolvedReadContext();
+		readContext.setActive(ActiveOrAll.ACTIVE_ONLY);
+		
+		AbsoluteCodingSchemeVersionReference autos = 
+			Constructors.createAbsoluteCodingSchemeVersionReference("urn:oid:11.11.0.1", "1.0");
+		
+		LexBIGServiceImpl.defaultInstance().getServiceManager(null).
+			deactivateCodingSchemeVersion(autos, null);
+		
+		// Build query using filters
+		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, null, readContext, null);
+
+		int expecting = 1;
+		int actual = this.service.count(query);
+		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
+		
+		LexBIGServiceImpl.defaultInstance().getServiceManager(null).
+			activateCodingSchemeVersion(autos);
+	}
+	
+	@Test
+	public void testActiveAndInactive() throws Exception {
+
+		ResolvedReadContext readContext = new ResolvedReadContext();
+		readContext.setActive(ActiveOrAll.ACTIVE_AND_INACTIVE);
+		
+		AbsoluteCodingSchemeVersionReference autos = 
+			Constructors.createAbsoluteCodingSchemeVersionReference("urn:oid:11.11.0.1", "1.0");
+		
+		LexBIGServiceImpl.defaultInstance().getServiceManager(null).
+			deactivateCodingSchemeVersion(autos, null);
+		
+		// Build query using filters
+		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, null, readContext, null);
+
+		int expecting = 2;
+		int actual = this.service.count(query);
+		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
+		
+		LexBIGServiceImpl.defaultInstance().getServiceManager(null).
+			activateCodingSchemeVersion(autos);
 	}
 		
 	@Test

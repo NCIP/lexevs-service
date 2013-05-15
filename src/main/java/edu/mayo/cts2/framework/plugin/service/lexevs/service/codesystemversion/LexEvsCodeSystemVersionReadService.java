@@ -100,7 +100,7 @@ public class LexEvsCodeSystemVersionReadService extends
 	@Override
 	public CodeSystemVersionCatalogEntry read(NameOrURI identifier,
 			ResolvedReadContext readContext) {
-		NameVersionPair pair = CommonUtils.getNamePair(nameConverter, identifier, readContext);
+		NameVersionPair pair = this.getNamePair(nameConverter, identifier, readContext);
 		
 		return this.getByVersionIdOrTag(pair);
 	}

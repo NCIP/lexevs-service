@@ -96,12 +96,13 @@ public class CodingSchemeToMapVersionTransform extends AbstractBaseTransform <Ma
 		
 		mapVersion.setSourceAndNotation(sourceAndNotation);
 		
+		String mapName = codingScheme.getCodingSchemeName();
 		MapReference mapReference = new MapReference();
-		mapReference.setContent(codingScheme.getCodingSchemeName());
+		mapReference.setContent(mapName);
 		mapReference.setUri(codingScheme.getCodingSchemeURI());
+		mapReference.setHref(this.getUrlConstructor().createMapUrl(mapName));
 		mapVersion.setVersionOf(mapReference);
-		
-	
+
 		Tuple<CodeSystemVersionReference> fromAndTo = this.getFromToCodingSchemes(codingScheme);
 		mapVersion.setFromCodeSystemVersion(fromAndTo.getOne());
 		mapVersion.setToCodeSystemVersion(fromAndTo.getTwo());
@@ -130,6 +131,18 @@ public class CodingSchemeToMapVersionTransform extends AbstractBaseTransform <Ma
 					codingSchemeRendering.getCodingSchemeSummary().getCodingSchemeDescription().getContent()));
 			summary.setResourceSynopsis(description);			
 		}
+		
+		String mapName = codingSchemeSummary.getLocalName();
+		MapReference mapReference = new MapReference();
+		mapReference.setContent(mapName);
+		mapReference.setUri(codingSchemeSummary.getCodingSchemeURI());
+		mapReference.setHref(this.getUrlConstructor().createMapUrl(mapName));
+		summary.setVersionOf(mapReference);
+		
+		summary.setHref(
+			this.getUrlConstructor().
+				createMapVersionUrl(
+					mapName, name));
 		
 		return summary;
 	}

@@ -163,6 +163,10 @@ public final class CommonResourceUtils{
 		lexRenderingList = CommonSearchFilterUtils.filterLexCodingSchemeRenderingList(lexRenderingList, cts2SystemName, lexMappingExtension);
 		lexRenderingList = CommonSearchFilterUtils.filterLexCodingSchemeRenderingList(lexRenderingList, cts2Filters, nameConverter);
 		
+		if(queryData.getReadContext() != null){
+			lexRenderingList = CommonSearchFilterUtils.filterLexCodingSchemeRenderingList(lexRenderingList, queryData.getReadContext());
+		}
+		
 		// TODO: Need to filter further for restrictions
 		
 		return lexRenderingList.getCodingSchemeRendering();
