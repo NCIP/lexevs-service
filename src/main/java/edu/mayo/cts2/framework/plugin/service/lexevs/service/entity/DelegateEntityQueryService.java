@@ -25,6 +25,7 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 
 import org.springframework.core.Ordered;
 
+import edu.mayo.cts2.framework.plugin.service.lexevs.service.entity.DelegatingEntityQueryService.QueryType;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQuery;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQueryService;
 
@@ -41,6 +42,6 @@ public interface DelegateEntityQueryService extends EntityDescriptionQueryServic
 	 * @param query the query
 	 * @return true, if successful
 	 */
-	public boolean canHandle(EntityDescriptionQuery query);
+	public boolean canHandle(EntityDescriptionQuery query, QueryType queryType);
 	
 }

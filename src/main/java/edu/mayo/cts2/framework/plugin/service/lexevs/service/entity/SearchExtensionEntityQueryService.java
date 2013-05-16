@@ -42,6 +42,7 @@ import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
+import edu.mayo.cts2.framework.plugin.service.lexevs.service.entity.DelegatingEntityQueryService.QueryType;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
@@ -70,17 +71,43 @@ public class SearchExtensionEntityQueryService
 		}
 	}
 
-	private class SearchExtensionCallback implements Callback<String,EntityDirectoryEntry>{
+	private class SearchExtensionSummariesCallback extends
+		AbstractSearchExtensionCallback<EntityDirectoryEntry>{
 
-		private List<NameOrURI> codeSystemVersions;
-		
-		private SearchExtensionCallback(NameOrURI... codeSystemVersions){
-			super();
-			this.codeSystemVersions = Arrays.asList(codeSystemVersions);
+		private SearchExtensionSummariesCallback(NameOrURI... codeSystemVersions){
+			super(codeSystemVersions);
 		}
 		
 		@Override
-		public DirectoryResult<EntityDirectoryEntry> execute(
+		protected EntityDirectoryEntry doTransform(ResolvedConceptReference ref) {
+			return transformer.transformSummaryDescription(ref);
+		}
+	}
+	
+	private abstract class AbstractSearchExtensionCallback<T> implements Callback<String,T>{
+
+		private List<NameOrURI> codeSystemVersions;
+		
+		private AbstractSearchExtensionCallback(NameOrURI... codeSystemVersions){
+			super();
+			this.codeSystemVersions = this.removeNulls(codeSystemVersions);
+		}
+
+		private <I> List<I> removeNulls(I[] items) {
+			List<I> returnList = new ArrayList<I>();
+			if(items != null){
+				for(I item : items){
+					if(item != null){
+						returnList.add(item);
+					}
+				}
+			}
+			
+			return returnList;
+		}
+
+		@Override
+		public DirectoryResult<T> execute(
 				String state, 
 				int start,
 				int maxResults) {
@@ -100,13 +127,15 @@ public class SearchExtensionEntityQueryService
 				throw new RuntimeException(e);
 			}
 		
-			List<EntityDirectoryEntry> returnList = new ArrayList<EntityDirectoryEntry>();
+			List<T> returnList = new ArrayList<T>();
 			for(ResolvedConceptReference ref : list.getResolvedConceptReference()){
-				returnList.add(transformer.transformSummaryDescription(ref));
+				returnList.add(this.doTransform(ref));
 			}
 				
-			return new DirectoryResult<EntityDirectoryEntry>(returnList, atEnd);
+			return new DirectoryResult<T>(returnList, atEnd);
 		}
+		
+		protected abstract T doTransform(ResolvedConceptReference ref);
 
 		@Override
 		public int executeCount(String state) {
@@ -150,7 +179,7 @@ public class SearchExtensionEntityQueryService
 			SortCriteria sortCriteria, 
 			Page page) {
 		return new BasicEntityDirectoryBuilder<EntityDirectoryEntry>(
-				new SearchExtensionCallback(query.getRestrictions().getCodeSystemVersion()), 
+				new SearchExtensionSummariesCallback(query.getRestrictions().getCodeSystemVersion()), 
 				this.getSupportedMatchAlgorithms(), 
 				this.getSupportedSearchReferences()).
 				restrict(query.getFilterComponent()).
@@ -170,7 +199,7 @@ public class SearchExtensionEntityQueryService
 	@Override
 	public int count(EntityDescriptionQuery query) {
 		return new BasicEntityDirectoryBuilder<EntityDirectoryEntry>(
-				new SearchExtensionCallback(query.getRestrictions().getCodeSystemVersion()), 
+				new SearchExtensionSummariesCallback(query.getRestrictions().getCodeSystemVersion()), 
 				this.getSupportedMatchAlgorithms(), 
 				this.getSupportedSearchReferences()).restrict(query.getFilterComponent()).count();
 	}
@@ -286,8 +315,9 @@ public class SearchExtensionEntityQueryService
 	}
 
 	@Override
-	public boolean canHandle(EntityDescriptionQuery query) {
+	public boolean canHandle(EntityDescriptionQuery query, QueryType queryType) {
 		return this.searchExtension != null &&
+				!queryType.equals(QueryType.LIST) &&
 				query.getEntitiesFromAssociationsQuery() == null &&
 				query.getRestrictions().getHierarchyRestriction() == null &&
 				this.checkFilters(query.getFilterComponent());

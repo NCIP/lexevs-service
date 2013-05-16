@@ -36,6 +36,8 @@ import edu.mayo.cts2.framework.util.spring.AggregateService;
 @AggregateService
 public class DelegatingEntityQueryService extends AbstractLexEvsService 
 	implements EntityDescriptionQueryService {
+	
+	protected enum QueryType {SUMMARIES, LIST, COUNT}
 
 	private List<DelegateEntityQueryService> delegates;
 	
@@ -44,7 +46,7 @@ public class DelegatingEntityQueryService extends AbstractLexEvsService
 			EntityDescriptionQuery query, 
 			SortCriteria sortCriteria, 
 			Page page) {
-		return this.getDelegate(query).getResourceSummaries(query, sortCriteria, page);
+		return this.getDelegate(query, QueryType.SUMMARIES).getResourceSummaries(query, sortCriteria, page);
 	}
 
 	@Override
@@ -52,17 +54,17 @@ public class DelegatingEntityQueryService extends AbstractLexEvsService
 			EntityDescriptionQuery query, 
 			SortCriteria sortCriteria, 
 			Page page) {
-		return this.getDelegate(query).getResourceList(query, sortCriteria, page);
+		return this.getDelegate(query, QueryType.LIST).getResourceList(query, sortCriteria, page);
 	}
 
 	@Override
 	public int count(EntityDescriptionQuery query) {
-		return this.getDelegate(query).count(query);
+		return this.getDelegate(query, QueryType.COUNT).count(query);
 	}
 	
-	protected EntityDescriptionQueryService getDelegate(EntityDescriptionQuery query) {
+	protected EntityDescriptionQueryService getDelegate(EntityDescriptionQuery query, QueryType queryType) {
 		for(DelegateEntityQueryService delegate : this.delegates){
-			if(delegate.canHandle(query)){
+			if(delegate.canHandle(query, queryType)){
 				return delegate;
 			}
 		}

@@ -59,6 +59,7 @@ import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURIList;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
+import edu.mayo.cts2.framework.plugin.service.lexevs.service.entity.DelegatingEntityQueryService.QueryType;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonPageUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
@@ -246,7 +247,8 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 	}
 
 	@Override
-	public boolean canHandle(EntityDescriptionQuery query) {
+	public boolean canHandle(EntityDescriptionQuery query, QueryType queryType) {
+		//this can handle all QueryTypes, so we don't check that.
 		return query.getEntitiesFromAssociationsQuery() == null &&
 				query.getRestrictions().getHierarchyRestriction() == null &&
 				query.getRestrictions().getCodeSystemVersion() != null;
