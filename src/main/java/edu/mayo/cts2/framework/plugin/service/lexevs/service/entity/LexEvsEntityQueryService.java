@@ -251,7 +251,7 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		//this can handle all QueryTypes, so we don't check that.
 		return query.getEntitiesFromAssociationsQuery() == null &&
 				query.getRestrictions().getHierarchyRestriction() == null &&
-				query.getRestrictions().getCodeSystemVersion() != null;
+				query.getRestrictions().getCodeSystemVersions().size() == 1;
 	}
 
 	@Override

@@ -40,11 +40,18 @@ import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.concepts.Entity;
 import org.LexGrid.concepts.Presentation;
+import org.apache.commons.lang.StringUtils;
+import org.apache.xerces.util.XMLChar;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import edu.mayo.cts2.framework.model.core.Comment;
+import edu.mayo.cts2.framework.model.core.Definition;
 import edu.mayo.cts2.framework.model.core.DescriptionInCodeSystem;
+import edu.mayo.cts2.framework.model.core.PredicateReference;
+import edu.mayo.cts2.framework.model.core.Property;
+import edu.mayo.cts2.framework.model.core.StatementTarget;
 import edu.mayo.cts2.framework.model.core.URIAndEntityName;
 import edu.mayo.cts2.framework.model.entity.Designation;
 import edu.mayo.cts2.framework.model.entity.EntityDescription;
@@ -53,6 +60,8 @@ import edu.mayo.cts2.framework.model.entity.NamedEntityDescription;
 import edu.mayo.cts2.framework.model.entity.types.DesignationRole;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.transform.AbstractBaseTransform;
+import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriResolver;
+import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriResolver.IdType;
 
 /**
  * CTS2 <-> LexEVS Transform dealing with Entities and EntityDescriptions. 
@@ -61,6 +70,9 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.transform.AbstractBaseTrans
 public class EntityTransform 
 	extends AbstractBaseTransform<EntityDescription, ResolvedConceptReference, EntityDirectoryEntry, ResolvedConceptReference> 
 	implements InitializingBean {
+	
+	@Resource
+	private UriResolver uriResolver;
 
 	@Resource
 	private LexBIGService lexBigService;
@@ -88,7 +100,7 @@ public class EntityTransform
 		namedEntity.setEntityID(
 				ModelUtils.createScopedEntityName(
 						entity.getEntityCode(), 
-						entity.getEntityCodeNamespace()));
+						this.sanitizeNamespace(entity.getEntityCodeNamespace())));
 		
 		namedEntity.setDescribingCodeSystemVersion(
 			this.getTransformUtils().toCodeSystemVersionReference(
@@ -97,6 +109,9 @@ public class EntityTransform
 				reference.getCodingSchemeURI()));
 		
 		namedEntity.setDesignation(this.toDesignation(entity.getPresentation()));
+		namedEntity.setProperty(this.toProperty(entity.getProperty()));
+		namedEntity.setDefinition(this.toDefinition(entity.getDefinition()));
+		namedEntity.setNote(this.toNote(entity.getComment()));
 		
 		try {
 			namedEntity.setParent(this.getParents(reference));
@@ -119,11 +134,67 @@ public class EntityTransform
 		
 		return ed;
 	}
+	
+	private List<Comment> toNote(org.LexGrid.concepts.Comment... comments) {
+		List<Comment> returnList = new ArrayList<Comment>();
+		
+		for(org.LexGrid.concepts.Comment comment : comments){
+			Comment cts2Comment = new Comment();
+			cts2Comment.setValue(
+				ModelUtils.toTsAnyType(comment.getValue().getContent()));
+			
+			returnList.add(cts2Comment);
+		}
+		
+		return returnList;
+	}
+	
+	private List<Definition> toDefinition(org.LexGrid.concepts.Definition... definitions) {
+		List<Definition> returnList = new ArrayList<Definition>();
+		
+		for(org.LexGrid.concepts.Definition definition : definitions){
+			Definition cts2Definition = new Definition();
+			cts2Definition.setValue(
+				ModelUtils.toTsAnyType(definition.getValue().getContent()));
+			
+			returnList.add(cts2Definition);
+		}
+		
+		return returnList;
+	}
+
+	private List<Property> toProperty(org.LexGrid.commonTypes.Property... properties) {
+		List<Property> returnList = new ArrayList<Property>();
+		
+		for(org.LexGrid.commonTypes.Property property : properties){
+			Property cts2Prop = new Property();
+			
+			PredicateReference ref = new PredicateReference();
+			ref.setName(property.getPropertyName());
+			
+			cts2Prop.setPredicate(ref);
+			
+			StatementTarget target = new StatementTarget();
+			target.setLiteral(
+				ModelUtils.createOpaqueData(property.getValue().getContent()));
+			
+			cts2Prop.addValue(target);
+			
+			returnList.add(cts2Prop);
+		}
+		
+		return returnList;
+	}
 
 	@Override
 	public EntityDirectoryEntry transformSummaryDescription(ResolvedConceptReference reference) {
 		EntityDirectoryEntry entry = new EntityDirectoryEntry();
 		entry.setAbout(this.getUriHandler().getEntityUri(reference));
+		
+		entry.setName(
+			ModelUtils.createScopedEntityName(
+				reference.getCode(), 
+				this.sanitizeNamespace(reference.getCodeNamespace())));
 		
 		DescriptionInCodeSystem description = new DescriptionInCodeSystem();
 		description.setDescribingCodeSystemVersion(
@@ -160,6 +231,8 @@ public class EntityTransform
 				ModelUtils.toTsAnyType(presentation.getValue().getContent()));
 			
 			designation.setDesignationRole(role);
+			
+			returnList.add(designation);
 		}
 		
 		return returnList;
@@ -189,7 +262,8 @@ public class EntityTransform
 				if(! ROOT_NODES.contains(parent.getCode())){
 					URIAndEntityName parentName = new URIAndEntityName();
 					parentName.setName(parent.getCode());
-					parentName.setNamespace(parent.getCodeNamespace());
+					parentName.setNamespace(
+						this.sanitizeNamespace(parent.getCodeNamespace()));
 					parentName.setUri(this.getUriHandler().getEntityUri(parent));
 					parentName.setHref(this.getTransformUtils().createEntityHref(parent));
 					
@@ -199,6 +273,24 @@ public class EntityTransform
 		}
 		
 		return returnList;
+	}
+	
+	protected String sanitizeNamespace(String namespace){
+		String foundNamespace = 
+			this.uriResolver.idToName(namespace, IdType.CODE_SYSTEM);
+		if(foundNamespace != null){
+			return foundNamespace;
+		} else {
+			boolean isNamespaceValidNCName = XMLChar.isValidNCName(namespace);
+			if(isNamespaceValidNCName){
+				return namespace;
+			} else {
+				//Last ditch effort... generate a random namespace.
+				//If it gets here, it probably needs to be added
+				//to the UriResolver.
+				return "ns" + Integer.toString(namespace.hashCode());
+			}
+		}
 	}
 
 }

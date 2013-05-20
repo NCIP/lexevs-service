@@ -101,7 +101,7 @@ public class CommonTestUtils {
 		// Create restriction for query
 		// ----------------------------
 		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
-		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName(codeSystemVersion));
+		restrictions.getCodeSystemVersions().add(ModelUtils.nameOrUriFromName(codeSystemVersion));
 		
 		
 		EntityDescriptionQuery query = new EntityDescriptionQueryImpl(null, filters, restrictions);

@@ -86,7 +86,7 @@ public class LexEvsEntityQueryServiceTest {
 		
 		// Restrict to given codeSystem
 		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
-		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName(RESOURCE_NAME));
+		restrictions.getCodeSystemVersions().add(ModelUtils.nameOrUriFromName(RESOURCE_NAME));
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
 		EntityDescriptionQuery query = new EntityDescriptionQueryImpl(null, filters, restrictions);
 				
@@ -105,7 +105,7 @@ public class LexEvsEntityQueryServiceTest {
 		
 		// Restrict to given codeSystem
 		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
-		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName(RESOURCE_NAME));
+		restrictions.getCodeSystemVersions().add(ModelUtils.nameOrUriFromName(RESOURCE_NAME));
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
 		EntityDescriptionQuery query = new EntityDescriptionQueryImpl(null, filters, restrictions);
 
@@ -124,7 +124,7 @@ public class LexEvsEntityQueryServiceTest {
 		
 		// Restrict to given codeSystem
 		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
-		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName(RESOURCE_NAME));
+		restrictions.getCodeSystemVersions().add(ModelUtils.nameOrUriFromName(RESOURCE_NAME));
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
 		EntityDescriptionQuery query = new EntityDescriptionQueryImpl(null, filters, restrictions);
 
@@ -145,7 +145,7 @@ public class LexEvsEntityQueryServiceTest {
 		
 		// Restrict to given codeSystem
 		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
-		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName(RESOURCE_NAME));
+		restrictions.getCodeSystemVersions().add(ModelUtils.nameOrUriFromName(RESOURCE_NAME));
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
 		EntityDescriptionQuery query = new EntityDescriptionQueryImpl(null, filters, restrictions);
 
@@ -162,7 +162,7 @@ public class LexEvsEntityQueryServiceTest {
 		
 		// Restrict to given codeSystem
 		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
-		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName(RESOURCE_NAME));
+		restrictions.getCodeSystemVersions().add(ModelUtils.nameOrUriFromName(RESOURCE_NAME));
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
 		EntityDescriptionQuery query = new EntityDescriptionQueryImpl(null, filters, restrictions);
 
@@ -187,7 +187,7 @@ public class LexEvsEntityQueryServiceTest {
 		
 		// Restrict to given codeSystem
 		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
-		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName(RESOURCE_NAME));
+		restrictions.getCodeSystemVersions().add(ModelUtils.nameOrUriFromName(RESOURCE_NAME));
 		EntityDescriptionQuery query = new EntityDescriptionQueryImpl(null, null, restrictions);
 		DirectoryResult<EntityDirectoryEntry> directoryResult = null;
 		
@@ -220,7 +220,7 @@ public class LexEvsEntityQueryServiceTest {
 
 		// Restrict to given codeSystem
 		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
-		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName(RESOURCE_NAME));
+		restrictions.getCodeSystemVersions().add(ModelUtils.nameOrUriFromName(RESOURCE_NAME));
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
 		EntityDescriptionQuery query = new EntityDescriptionQueryImpl(null, filters, restrictions);
 		DirectoryResult<EntityDirectoryEntry> directoryResult = null;
@@ -240,7 +240,7 @@ public class LexEvsEntityQueryServiceTest {
 		
 		// Restrict to given codeSystem
 		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
-		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName(RESOURCE_NAME));
+		restrictions.getCodeSystemVersions().add(ModelUtils.nameOrUriFromName(RESOURCE_NAME));
 		
 		EntityDescriptionQuery query;
 		DirectoryResult<EntityDescription> directoryResult; 
@@ -275,7 +275,7 @@ public class LexEvsEntityQueryServiceTest {
 
 		// Restrict to given codeSystem
 		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
-		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName(RESOURCE_NAME));
+		restrictions.getCodeSystemVersions().add(ModelUtils.nameOrUriFromName(RESOURCE_NAME));
 		
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();
 		EntityDescriptionQuery query = new EntityDescriptionQueryImpl(null, filters, restrictions);

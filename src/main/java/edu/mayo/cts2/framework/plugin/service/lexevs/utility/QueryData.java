@@ -1,5 +1,6 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
 
+import java.util.Iterator;
 import java.util.Set;
 
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
@@ -234,10 +235,20 @@ public final class QueryData <Query extends ResourceQuery>{
 //		query.getReadContext();
 		
 		if(localCts2Restrictions != null){
-			this.cts2CodeSystemVersion = localCts2Restrictions.getCodeSystemVersion();
+			Iterator<NameOrURI> codeSystemVersionItr = 
+					localCts2Restrictions.getCodeSystemVersions().iterator();
+			if(codeSystemVersionItr.hasNext()){
+				this.cts2CodeSystemVersion = codeSystemVersionItr.next();
+			}
+
 			this.convertCts2Name();
 			this.cts2Entities = localCts2Restrictions.getEntities();
-			this.cts2TaggedCodeSystemRestriction = localCts2Restrictions.getTaggedCodeSystem();
+			
+			Iterator<TaggedCodeSystemRestriction> taggedCodeSystemItr = 
+				localCts2Restrictions.getTaggedCodeSystems().iterator();
+			if(taggedCodeSystemItr.hasNext()){
+				this.cts2TaggedCodeSystemRestriction = taggedCodeSystemItr.next();
+			}
 		}
 		
 	}

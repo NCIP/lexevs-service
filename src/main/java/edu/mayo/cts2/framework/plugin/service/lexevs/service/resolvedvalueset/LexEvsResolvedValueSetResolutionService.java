@@ -130,7 +130,7 @@ ResolvedValueSetResolutionService {
 		query.setFilterComponent(filterComponent);
 		EntityDescriptionQueryServiceRestrictions entityRestrictions =
 				new EntityDescriptionQueryServiceRestrictions();
-		entityRestrictions.setCodeSystemVersion(
+		entityRestrictions.getCodeSystemVersions().add(
 				ModelUtils.nameOrUriFromName(identifier.getValueSetDefinition().getName()));
 
 		query.setRestrictions(entityRestrictions);
@@ -270,11 +270,11 @@ ResolvedValueSetResolutionService {
 				ResolvedValueSetResolutionEntityRestrictions restrictions = 
 						query.getResolvedValueSetResolutionEntityRestrictions();
 				
-				entityRestrictions.setCodeSystemVersion(restrictions.getCodeSystemVersion());
+				entityRestrictions.getCodeSystemVersions().add(restrictions.getCodeSystemVersion());
 				entityRestrictions.setEntities(restrictions.getEntities());
 			}
 			
-			entityRestrictions.setCodeSystemVersion(
+			entityRestrictions.getCodeSystemVersions().add(
 				ModelUtils.nameOrUriFromName(identifier.getValueSetDefinition().getName()));
 		
 		return new EntityDescriptionQuery(){

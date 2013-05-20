@@ -87,7 +87,7 @@ public class LexEvsEntityQueryServiceTestIT
 		// Create restriction for query
 		// ----------------------------
 		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
-		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName(name.getName()));
+		restrictions.getCodeSystemVersions().add(ModelUtils.nameOrUriFromName(name.getName()));
 		
 		// Create query, no filters
 		// -------------------------
@@ -115,7 +115,7 @@ public class LexEvsEntityQueryServiceTestIT
 		// Create restriction for query
 		// ----------------------------
 		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
-		restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName(name.getName()));
+		restrictions.getCodeSystemVersions().add(ModelUtils.nameOrUriFromName(name.getName()));
 		
 		// Create query, no filters
 		// -------------------------
@@ -541,7 +541,7 @@ public class LexEvsEntityQueryServiceTestIT
 			@Override
 			public EntityDescriptionQueryServiceRestrictions getRestrictions() {
 				EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
-				restrictions.setCodeSystemVersion(ModelUtils.nameOrUriFromName("Automobiles-1.0"));
+				restrictions.getCodeSystemVersions().add(ModelUtils.nameOrUriFromName("Automobiles-1.0"));
 				
 				return restrictions;
 			}

@@ -53,6 +53,8 @@ public class SearchExtensionEntityQueryService
 	extends AbstractLexEvsService
 	implements InitializingBean, DelegateEntityQueryService {
 	
+	private static final String LUCENE_QUERY = "luceneQuery";
+	
 	@Resource
 	private EntityTransform transformer;
 	
@@ -74,7 +76,7 @@ public class SearchExtensionEntityQueryService
 	private class SearchExtensionSummariesCallback extends
 		AbstractSearchExtensionCallback<EntityDirectoryEntry>{
 
-		private SearchExtensionSummariesCallback(NameOrURI... codeSystemVersions){
+		private SearchExtensionSummariesCallback(Set<NameOrURI> codeSystemVersions){
 			super(codeSystemVersions);
 		}
 		
@@ -88,12 +90,12 @@ public class SearchExtensionEntityQueryService
 
 		private List<NameOrURI> codeSystemVersions;
 		
-		private AbstractSearchExtensionCallback(NameOrURI... codeSystemVersions){
+		private AbstractSearchExtensionCallback(Set<NameOrURI> codeSystemVersions){
 			super();
 			this.codeSystemVersions = this.removeNulls(codeSystemVersions);
 		}
 
-		private <I> List<I> removeNulls(I[] items) {
+		private <I> List<I> removeNulls(Iterable<I> items) {
 			List<I> returnList = new ArrayList<I>();
 			if(items != null){
 				for(I item : items){
@@ -179,7 +181,7 @@ public class SearchExtensionEntityQueryService
 			SortCriteria sortCriteria, 
 			Page page) {
 		return new BasicEntityDirectoryBuilder<EntityDirectoryEntry>(
-				new SearchExtensionSummariesCallback(query.getRestrictions().getCodeSystemVersion()), 
+				new SearchExtensionSummariesCallback(query.getRestrictions().getCodeSystemVersions()), 
 				this.getSupportedMatchAlgorithms(), 
 				this.getSupportedSearchReferences()).
 				restrict(query.getFilterComponent()).
@@ -199,7 +201,7 @@ public class SearchExtensionEntityQueryService
 	@Override
 	public int count(EntityDescriptionQuery query) {
 		return new BasicEntityDirectoryBuilder<EntityDirectoryEntry>(
-				new SearchExtensionSummariesCallback(query.getRestrictions().getCodeSystemVersion()), 
+				new SearchExtensionSummariesCallback(query.getRestrictions().getCodeSystemVersions()), 
 				this.getSupportedMatchAlgorithms(), 
 				this.getSupportedSearchReferences()).restrict(query.getFilterComponent()).count();
 	}
@@ -261,6 +263,8 @@ public class SearchExtensionEntityQueryService
 		if(reference.getContent().equals(
 			StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference().getContent())){
 			return string + "*";
+		} else if(reference.getContent().equals(LUCENE_QUERY)){
+			return string;
 		} else {
 			throw new IllegalStateException();
 		}
@@ -290,8 +294,12 @@ public class SearchExtensionEntityQueryService
 	public Set<MatchAlgorithmReference> getSupportedMatchAlgorithms() {
 		Set<MatchAlgorithmReference> returnSet = new HashSet<MatchAlgorithmReference>();
 		
+		MatchAlgorithmReference lucene = new MatchAlgorithmReference();
+		lucene.setContent(LUCENE_QUERY);
+		
 		returnSet.addAll(
 				Arrays.asList(
+						lucene,
 						StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(),
 						StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference())
 		);
