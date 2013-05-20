@@ -40,7 +40,6 @@ import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.concepts.Entity;
 import org.LexGrid.concepts.Presentation;
-import org.apache.commons.lang.StringUtils;
 import org.apache.xerces.util.XMLChar;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
@@ -109,7 +108,11 @@ public class EntityTransform
 				reference.getCodingSchemeURI()));
 		
 		namedEntity.setDesignation(this.toDesignation(entity.getPresentation()));
-		namedEntity.setProperty(this.toProperty(entity.getProperty()));
+		namedEntity.setProperty(this.toProperty(
+				reference.getCodingSchemeName(),
+				reference.getCodingSchemeURI(),
+				reference.getCodingSchemeVersion(),
+				entity.getProperty()));
 		namedEntity.setDefinition(this.toDefinition(entity.getDefinition()));
 		namedEntity.setNote(this.toNote(entity.getComment()));
 		
@@ -163,15 +166,26 @@ public class EntityTransform
 		return returnList;
 	}
 
-	private List<Property> toProperty(org.LexGrid.commonTypes.Property... properties) {
+	private List<Property> toProperty(
+			String codingSchemeName,
+			String codingSchemeUri,
+			String codingSchemeVersion,
+			org.LexGrid.commonTypes.Property... properties) {
 		List<Property> returnList = new ArrayList<Property>();
 		
 		for(org.LexGrid.commonTypes.Property property : properties){
 			Property cts2Prop = new Property();
 			
+			String propertyName = property.getPropertyName();
+			
+			String predicateUri = this.getUriHandler().getPredicateUri(
+				codingSchemeUri, codingSchemeVersion, propertyName);
+
 			PredicateReference ref = new PredicateReference();
 			ref.setName(property.getPropertyName());
-			
+			ref.setNamespace(this.sanitizeNamespace(codingSchemeName));
+			ref.setUri(predicateUri);
+
 			cts2Prop.setPredicate(ref);
 			
 			StatementTarget target = new StatementTarget();
