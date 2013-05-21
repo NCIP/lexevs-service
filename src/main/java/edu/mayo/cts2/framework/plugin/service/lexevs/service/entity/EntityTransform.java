@@ -116,6 +116,12 @@ public class EntityTransform
 		namedEntity.setDefinition(this.toDefinition(entity.getDefinition()));
 		namedEntity.setNote(this.toNote(entity.getComment()));
 		
+		namedEntity.setChildren(
+			this.getUrlConstructor().createChildrenUrl(
+					reference.getCodingSchemeName(), 
+					reference.getCodingSchemeVersion(), 
+					entity.getEntityCode()));
+		
 		try {
 			namedEntity.setParent(this.getParents(reference));
 		} catch (Exception e) {

@@ -98,10 +98,15 @@ public class MappingToMapEntryTransform
 		
 		String encodedName = EncodingUtils.encodeScopedEntityName(fromName);
 		
+		String mapVersionName = 
+			this.getVersionNameConverter().toCts2VersionName(
+				mapReference.getMapName().getName(),
+				mapReference.getMapName().getVersion());
+		
 		mapEntryDirectoryEntry.setHref(
 			this.getUrlConstructor().createMapEntryUrl(
 					mapReference.getMapName().getName(), 
-					mapReference.getMapName().getVersion(), 
+					mapVersionName, 
 					encodedName));
 		
 		mapEntryDirectoryEntry.setResourceName(encodedName);

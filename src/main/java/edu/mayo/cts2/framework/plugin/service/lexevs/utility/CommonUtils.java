@@ -67,10 +67,6 @@ public final class CommonUtils {
 		
 	}
 
-
-	
-	
-
 	public static ResolvedConceptReferencesIterator getLexResolvedConceptIterator(CodedNodeSet lexCodedNodeSet, SortCriteria cts2SortCriteria){
 		ResolvedConceptReferencesIterator lexResolvedConceptReferencesIterator = null;
 		if(lexCodedNodeSet != null){

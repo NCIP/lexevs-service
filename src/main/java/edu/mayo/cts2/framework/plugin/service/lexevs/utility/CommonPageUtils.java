@@ -68,6 +68,26 @@ public final class CommonPageUtils {
 		
 		return lexResolvedConceptResults;
 	}
+
+	/**
+	 * A way of telling whether or not a source is exhausted or not is
+	 * to ask for one more result than you want, and if you get it, you
+	 * will know that there are more results left. This will assume the
+	 * list passed in contains '#resultsWanted + 1' -- and return back
+	 * a list of '#resultsWanted' plus a boolean flag.
+	 *
+	 * @param list the list
+	 * @param expectec the actual expected number of results
+	 * @return true if 'atEnd' - false if not
+	 */
+	public static <T> boolean adjustForOnExtraResult(List<T> list, int expected){
+		if(list.size() <= expected){
+			return true;
+		} else {
+			list.remove(list.size() - 1);
+			return false;
+		}
+	}
 	
 	public static ResolvedConceptReferenceResults getPage(
 			ResolvedConceptReferencesIterator iterator,
