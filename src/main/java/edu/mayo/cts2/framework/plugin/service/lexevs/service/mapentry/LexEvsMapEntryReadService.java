@@ -37,7 +37,6 @@ import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension.Mapping;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension.Mapping.SearchContext;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
@@ -58,7 +57,7 @@ import edu.mayo.cts2.framework.service.profile.mapentry.name.MapEntryReadId;
  *
 */
 @Component
-public class LexEvsMapEntryReadService extends AbstractLexEvsService implements MapEntryReadService, InitializingBean {
+public class LexEvsMapEntryReadService extends AbstractLexEvsService implements MapEntryReadService {
 
 	@Resource
 	private VersionNameConverter nameConverter;
@@ -66,9 +65,8 @@ public class LexEvsMapEntryReadService extends AbstractLexEvsService implements 
 	@Resource
 	private MappingToMapEntryTransform mappingToMapEntryTransform;
 	
+	@Resource
 	private MappingExtension mappingExtension;
-	
-	public static final String MAPPING_EXTENSION = "MappingExtension";
 	
 	// ------ Local methods ----------------------
 	private String extractMapVersion(MapEntryReadId identifier) {		
@@ -131,11 +129,6 @@ public class LexEvsMapEntryReadService extends AbstractLexEvsService implements 
 
 
 	// -------- Implemented methods ----------------	
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(MAPPING_EXTENSION);
-	}
-	
 	@Override
 	public MapEntry read(
 			MapEntryReadId identifier,

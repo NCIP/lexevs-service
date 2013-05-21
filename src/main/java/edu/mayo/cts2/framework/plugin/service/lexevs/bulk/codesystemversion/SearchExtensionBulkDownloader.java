@@ -21,11 +21,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package edu.mayo.cts2.framework.plugin.service.lexevs.bulk.controller;
+package edu.mayo.cts2.framework.plugin.service.lexevs.bulk.codesystemversion;
 
 import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,23 +32,28 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
-import org.LexGrid.LexBIG.Exceptions.LBException;
+import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Extensions.Generic.CodingSchemeReference;
 import org.LexGrid.LexBIG.Extensions.Generic.SearchExtension;
+import org.LexGrid.LexBIG.Impl.helpers.ResolvedConceptReferencesIteratorAdapter;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
+import edu.mayo.cts2.framework.plugin.service.lexevs.bulk.AbstractBulkDownloader;
+import edu.mayo.cts2.framework.plugin.service.lexevs.bulk.Extractor;
+
 /**
- * A {@link BulkDownloader} implementation using the LexEVS SearchExtension.
+ * A {@link CodeSystemVersionBulkDownloader} implementation using the LexEVS SearchExtension.
  *
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
 @Component
-public class SearchExtensionBulkDownloader implements BulkDownloader, InitializingBean {
+public class SearchExtensionBulkDownloader 
+	extends AbstractBulkDownloader 
+	implements CodeSystemVersionBulkDownloader, InitializingBean {
 
 	@Resource
 	private LexBIGService lexBigService;
@@ -59,50 +62,46 @@ public class SearchExtensionBulkDownloader implements BulkDownloader, Initializi
 	
 	protected Logger log = Logger.getLogger(this.getClass());
 	
-	private interface Extractor {
-		String extract(ResolvedConceptReference ref);
-	}
-	
 	private final static Map<String, Extractor> EXTRACTOR_MAP = new HashMap<String,Extractor>(){
 
 		private static final long serialVersionUID = -7214815015371005224L;
 		{{
-				put(BulkDownloader.CODE_FIELD, new Extractor(){
+				put(CodeSystemVersionBulkDownloader.CODE_FIELD, new Extractor(){
 					@Override
 					public String extract(ResolvedConceptReference ref) {
 						return ref.getCode();
 					}	
 				});
 				
-				put(BulkDownloader.NAMESPACE_FIELD, new Extractor(){
+				put(CodeSystemVersionBulkDownloader.NAMESPACE_FIELD, new Extractor(){
 					@Override
 					public String extract(ResolvedConceptReference ref) {
 						return ref.getCodeNamespace();
 					}	
 				});
 				
-				put(BulkDownloader.DESCRIPTION_FIELD, new Extractor(){
+				put(CodeSystemVersionBulkDownloader.DESCRIPTION_FIELD, new Extractor(){
 					@Override
 					public String extract(ResolvedConceptReference ref) {
 						return ref.getEntityDescription().getContent();
 					}	
 				});
 				
-				put(BulkDownloader.CODINGSCHEME_NAME_FIELD, new Extractor(){
+				put(CodeSystemVersionBulkDownloader.CODINGSCHEME_NAME_FIELD, new Extractor(){
 					@Override
 					public String extract(ResolvedConceptReference ref) {
 						return ref.getCodingSchemeName();
 					}	
 				});
 				
-				put(BulkDownloader.CODINGSCHEME_URI_FIELD, new Extractor(){
+				put(CodeSystemVersionBulkDownloader.CODINGSCHEME_URI_FIELD, new Extractor(){
 					@Override
 					public String extract(ResolvedConceptReference ref) {
 						return ref.getCodingSchemeURI();
 					}	
 				});
 				
-				put(BulkDownloader.CODINGSCHEME_VERSION_FIELD, new Extractor(){
+				put(CodeSystemVersionBulkDownloader.CODINGSCHEME_VERSION_FIELD, new Extractor(){
 					@Override
 					public String extract(ResolvedConceptReference ref) {
 						return ref.getCodingSchemeVersion();
@@ -128,27 +127,20 @@ public class SearchExtensionBulkDownloader implements BulkDownloader, Initializi
 	 * @see edu.mayo.cts2.framework.plugin.service.lexevs.bulk.controller.BulkDownloader#download(java.io.OutputStream, java.util.Set, java.util.List, java.lang.String)
 	 */
 	@Override
-	public void download(OutputStream outputStream, Set<CodingSchemeReference> codingSchemes, List<String> fields, String separator) {
+	public void download(OutputStream outputStream, Set<CodingSchemeReference> codingSchemes, List<String> fields, char separator) {
 		ResolvedConceptReferencesIterator itr;
 		try {
 			itr = searchExtension.search(null, codingSchemes);
-
-		PrintWriter writer = new PrintWriter(outputStream);
-		while(itr.hasNext()){
-			ResolvedConceptReference ref = itr.next();
-			
-			List<String> fieldValues = new ArrayList<String>();
-			for(String field : fields){
-				fieldValues.add(EXTRACTOR_MAP.get(field).extract(ref));
-			}
-			
-			String line = StringUtils.join(fieldValues, separator);
-			writer.println(line);
-		}
-		
-		} catch (LBException e) {
+		} catch (LBParameterException e) {
 			throw new RuntimeException(e);
 		}
+
+		this.doWrite(outputStream, new ResolvedConceptReferencesIteratorAdapter(itr), separator, fields);
+	}
+
+	@Override
+	protected Map<String, Extractor> getExtractorMap() {
+		return EXTRACTOR_MAP;
 	}
 
 }

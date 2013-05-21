@@ -33,7 +33,6 @@ import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.codingSchemes.CodingScheme;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
@@ -58,7 +57,7 @@ import edu.mayo.cts2.framework.service.profile.mapversion.MapVersionReadService;
 @Component
 public class LexEvsMapVersionReadService
 	extends AbstractLexEvsCodeSystemService<MapVersion>
-	implements MapVersionReadService, InitializingBean {
+	implements MapVersionReadService{
 
 	@Resource
 	private VersionNameConverter nameConverter;
@@ -66,18 +65,12 @@ public class LexEvsMapVersionReadService
 	@Resource
 	private CodingSchemeToMapVersionTransform transformer;
 	
+	@Resource
 	private MappingExtension mappingExtension;
-	
-	public static final String MAPPING_EXTENSION = "MappingExtension";
-	
+
 	// ------ Local methods ----------------------
 	
 	// -------- Implemented methods ----------------	
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(MAPPING_EXTENSION);
-	}
-
 	@Override
 	protected MapVersion transform(CodingScheme codingScheme) {
 		if(! CommonMapUtils.validateMappingCodingScheme(

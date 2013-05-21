@@ -42,7 +42,6 @@ import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
 import org.LexGrid.codingSchemes.CodingScheme;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.command.Page;
@@ -69,7 +68,6 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonCodingSchemeU
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonPageUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.QueryData;
 import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestrictions.CodeSystemRestriction;
 import edu.mayo.cts2.framework.service.command.restriction.MapVersionQueryServiceRestrictions.EntitiesRestriction;
@@ -84,7 +82,7 @@ import edu.mayo.cts2.framework.service.profile.mapversion.MapVersionQueryService
 */
 @Component
 public class LexEvsMapVersionQueryService extends AbstractLexEvsService
-		implements MapVersionQueryService, InitializingBean {
+		implements MapVersionQueryService {
 
 	@Resource
 	private VersionNameConverter nameConverter;
@@ -92,6 +90,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	@Resource
 	private CodingSchemeToMapVersionTransform transformer;
 	
+	@Resource
 	private MappingExtension mappingExtension;
 	
 	// ------ Local methods ----------------------
@@ -434,13 +433,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	
 	
 	
-	// -------- Implemented methods ----------------
-	
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(Constants.MAPPING_EXTENSION);
-	}
-		
+	// -------- Implemented methods ----------------	
 	@Override
 	public int count(MapVersionQuery query) {
 		LexBIGService lexBigService = this.getLexBigService();

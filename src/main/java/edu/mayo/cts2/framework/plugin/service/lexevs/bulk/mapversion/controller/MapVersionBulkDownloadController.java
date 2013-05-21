@@ -21,53 +21,52 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package edu.mayo.cts2.framework.plugin.service.lexevs.bulk.controller;
+package edu.mayo.cts2.framework.plugin.service.lexevs.bulk.mapversion.controller;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
 import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Extensions.Generic.CodingSchemeReference;
-import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import edu.mayo.cts2.framework.webapp.rest.extensions.controller.ControllerProvider;
+import edu.mayo.cts2.framework.plugin.service.lexevs.bulk.AbstractBulkDownloadController;
+import edu.mayo.cts2.framework.plugin.service.lexevs.bulk.mapversion.MapVersionBulkDownloader;
 
 /**
  * A REST Controller for providing access to bulk downloads.
  *
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
-@Controller("bulkDownloadController")
-public class BulkDownloadController implements ControllerProvider {
-	
-	private static final String DEFAULT_SEPARATOR = "|";
-	
-	private static final String DEFAULT_FILE_NAME = "terminology-bulk-download.txt";
-	
+@Controller("mapVersionBulkDownloadController")
+public class MapVersionBulkDownloadController extends AbstractBulkDownloadController {
+
 	private static final List<String> DEFAULT_FIELDS = Arrays.asList(
-				BulkDownloader.CODE_FIELD,
-				BulkDownloader.NAMESPACE_FIELD,
-				BulkDownloader.DESCRIPTION_FIELD,
-				BulkDownloader.CODINGSCHEME_NAME_FIELD,
-				BulkDownloader.CODINGSCHEME_URI_FIELD,
-				BulkDownloader.CODINGSCHEME_VERSION_FIELD);
-	
+				MapVersionBulkDownloader.SOURCE_CODE_FIELD,
+				MapVersionBulkDownloader.SOURCE_NAMESPACE_FIELD,
+				MapVersionBulkDownloader.SOURCE_DESCRIPTION_FIELD,
+				MapVersionBulkDownloader.SOURCE_CODINGSCHEME_NAME_FIELD,
+				MapVersionBulkDownloader.SOURCE_CODINGSCHEME_URI_FIELD,
+				MapVersionBulkDownloader.SOURCE_CODINGSCHEME_VERSION_FIELD,
+				
+				MapVersionBulkDownloader.TARGET_CODE_FIELD,
+				MapVersionBulkDownloader.TARGET_NAMESPACE_FIELD,
+				MapVersionBulkDownloader.TARGET_DESCRIPTION_FIELD,
+				MapVersionBulkDownloader.TARGET_CODINGSCHEME_NAME_FIELD,
+				MapVersionBulkDownloader.TARGET_CODINGSCHEME_URI_FIELD,
+				MapVersionBulkDownloader.TARGET_CODINGSCHEME_VERSION_FIELD			
+	);
+
 	@Resource
-	private LexBIGService lexBigService;
-	
-	@Resource
-	private BulkDownloader bulkDownloader;
+	private MapVersionBulkDownloader mapVersionBulkDownloader;
 
 	/**
 	 * Download.
@@ -78,12 +77,12 @@ public class BulkDownloadController implements ControllerProvider {
 	 * @param separator the separator
 	 * @throws LBException the lB exception
 	 */
-	@RequestMapping(value="/download")
+	@RequestMapping(value="/download/map")
     public void download(
     		HttpServletResponse response,
-    		@RequestParam(value="codingschemes", defaultValue="") String codingschemes,
+    		@RequestParam(value="map", required=true) String map,
     		@RequestParam(value="fields", defaultValue="") String fields,
-    		@RequestParam(value="separator", defaultValue=DEFAULT_SEPARATOR) String separator,
+    		@RequestParam(value="separator", defaultValue=DEFAULT_SEPARATOR) char separator,
     		@RequestParam(value="filename", defaultValue=DEFAULT_FILE_NAME) String filename) throws LBException {
 		
 		List<String> fieldsList;
@@ -93,29 +92,21 @@ public class BulkDownloadController implements ControllerProvider {
 			fieldsList = Arrays.asList(StringUtils.split(fields, ','));
 		}
 		
-		String headerKey = "Content-Disposition";
-        String headerValue = String.format("attachment; filename=\"%s\"", filename);
-        response.setHeader(headerKey, headerValue);
-		response.setContentType("text/plain; charset=utf-8");
+		this.setHeaders(response, filename);
 		
-		Set<CodingSchemeReference> references = new HashSet<CodingSchemeReference>();
+		String[] parts = StringUtils.split(map, ':');
 		
-		for(String codingScheme : StringUtils.split(codingschemes, ',')){
-			String[] parts = StringUtils.split(codingScheme, ':');
-			
-			CodingSchemeReference reference = new CodingSchemeReference();
-			reference.setCodingScheme(parts[0]);
+		CodingSchemeReference reference = new CodingSchemeReference();
+		reference.setCodingScheme(parts[0]);
 
-			if(parts.length == 2){
-				reference.setVersionOrTag(
-					Constructors.createCodingSchemeVersionOrTagFromVersion(parts[1]));
-			} 
-			
-			references.add(reference);
-		}
+		if(parts.length == 2){
+			reference.setVersionOrTag(
+				Constructors.createCodingSchemeVersionOrTagFromVersion(parts[1]));
+		} 
+
 
 		try {
-			this.bulkDownloader.download(response.getOutputStream(), references, fieldsList, separator);
+			this.mapVersionBulkDownloader.download(response.getOutputStream(), reference, fieldsList, separator);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

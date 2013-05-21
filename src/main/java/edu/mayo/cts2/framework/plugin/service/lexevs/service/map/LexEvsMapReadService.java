@@ -32,7 +32,6 @@ import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.codingSchemes.CodingScheme;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
@@ -52,7 +51,7 @@ import edu.mayo.cts2.framework.service.profile.map.MapReadService;
 @Component
 public class LexEvsMapReadService 
 	extends AbstractLexEvsCodeSystemService<MapCatalogEntry>
-	implements MapReadService, InitializingBean {
+	implements MapReadService {
 
 	@Resource
 	CodingSchemeToMapTransform transformer;
@@ -60,10 +59,8 @@ public class LexEvsMapReadService
 	@Resource
 	private VersionNameConverter nameConverter;
 	
+	@Resource
 	private MappingExtension mappingExtension;
-	
-	public static final String MAPPING_EXTENSION = "MappingExtension";	
-
 
 	// ------ Local methods ----------------------
 	public void setCodingSchemeToMapTransform(
@@ -91,11 +88,6 @@ public class LexEvsMapReadService
 	}
 
 	// -------- Implemented methods ----------------	
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(MAPPING_EXTENSION);
-	}
-	
 	@Override
 	protected MapCatalogEntry transform(CodingScheme codingScheme) {
 		return this.transformer.transformFullDescription(codingScheme);

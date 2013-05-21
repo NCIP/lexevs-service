@@ -21,35 +21,35 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package edu.mayo.cts2.framework.plugin.service.lexevs.bulk.controller;
+package edu.mayo.cts2.framework.plugin.service.lexevs.bulk;
 
-import java.io.OutputStream;
-import java.util.List;
-import java.util.Set;
+import javax.servlet.http.HttpServletResponse;
 
-import org.LexGrid.LexBIG.Extensions.Generic.CodingSchemeReference;
+import edu.mayo.cts2.framework.webapp.rest.extensions.controller.ControllerProvider;
+
 
 /**
- * A Bulk Downloading interface for downloading large terminology content.
+ * An abstract Controller for any bulk downloads.
  *
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
-public interface BulkDownloader {
+public abstract class AbstractBulkDownloadController implements ControllerProvider {
 	
-	static final String CODE_FIELD = "code";
-	static final String NAMESPACE_FIELD = "namespace";
-	static final String DESCRIPTION_FIELD = "description";
-	static final String CODINGSCHEME_NAME_FIELD = "codingschemename";
-	static final String CODINGSCHEME_URI_FIELD = "codingschemeuri";
-	static final String CODINGSCHEME_VERSION_FIELD = "codingschemeversion";
+	protected static final String DEFAULT_SEPARATOR = "|";
 	
+	protected static final String DEFAULT_FILE_NAME = "terminology-bulk-download.txt";
+
 	/**
-	 * Send requested content to the provided {@link OutputStream}.
+	 * Sets the headers.
 	 *
-	 * @param outputStream the output stream
-	 * @param codingSchemes the coding schemes
-	 * @param fields the fields
-	 * @param separator the separator
+	 * @param response the response
+	 * @param filename the filename
 	 */
-	void download(OutputStream outputStream, Set<CodingSchemeReference> codingSchemes, List<String> fields, String separator);
+	protected void setHeaders(HttpServletResponse response, String filename){
+		String headerKey = "Content-Disposition";
+        String headerValue = String.format("attachment; filename=\"%s\"", filename);
+        response.setHeader(headerKey, headerValue);
+		response.setContentType("text/plain; charset=utf-8");
+	}
+
 }

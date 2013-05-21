@@ -33,7 +33,6 @@ import javax.annotation.Resource;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.codingSchemes.CodingScheme;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.command.Page;
@@ -53,7 +52,6 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterU
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.QueryData;
 import edu.mayo.cts2.framework.service.profile.map.MapQuery;
 import edu.mayo.cts2.framework.service.profile.map.MapQueryService;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 
 /**
  *  @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
@@ -62,7 +60,7 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 */
 @Component
 public class LexEvsMapQueryService extends AbstractLexEvsService
-		implements MapQueryService, InitializingBean {
+		implements MapQueryService {
 	
 	@Resource
 	CodingSchemeToMapTransform transformer;
@@ -70,6 +68,7 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 	@Resource
 	private VersionNameConverter nameConverter;
 	
+	@Resource
 	private MappingExtension mappingExtension;
 	
 	// ------ Local methods ----------------------
@@ -86,12 +85,6 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 	}
 
 	// -------- Implemented methods ----------------	
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		this.mappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(Constants.MAPPING_EXTENSION);
-	}
-	
-
 	@Override
 	public DirectoryResult<MapCatalogEntrySummary> getResourceSummaries(
 			MapQuery query, 

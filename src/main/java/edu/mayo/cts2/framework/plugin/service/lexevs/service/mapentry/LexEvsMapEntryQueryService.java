@@ -31,7 +31,6 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.command.Page;
@@ -60,7 +59,7 @@ import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryQueryService;
 */
 @Component
 public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
-		MapEntryQueryService, InitializingBean {
+		MapEntryQueryService {
 
 	@Resource
 	private VersionNameConverter nameConverter;
@@ -68,10 +67,9 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	@Resource
 	private MappingToMapEntryTransform transformer;
 		
+	@Resource
 	private MappingExtension lexMappingExtension;
-	
-	public static final String MAPPING_EXTENSION = "MappingExtension";	
-	
+
 	// ------ Local methods ----------------------
 	public void setCodeSystemVersionNameConverter(
 			VersionNameConverter versionNameConverter) {
@@ -86,16 +84,6 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	public void setMappingExtension(MappingExtension extension){
 		this.lexMappingExtension = extension;
 	}
-
-
-	
-	// -------- Implemented methods ----------------	
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		this.lexMappingExtension = (MappingExtension)this.getLexBigService().getGenericExtension(MAPPING_EXTENSION);
-	}
-		
-
 	
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.service.profile.QueryService#getResourceSummaries(edu.mayo.cts2.framework.service.profile.ResourceQuery, edu.mayo.cts2.framework.model.core.SortCriteria, edu.mayo.cts2.framework.model.command.Page)
