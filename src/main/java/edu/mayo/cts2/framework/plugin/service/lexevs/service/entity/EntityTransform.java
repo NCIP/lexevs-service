@@ -40,7 +40,6 @@ import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.concepts.Entity;
 import org.LexGrid.concepts.Presentation;
-import org.apache.xerces.util.XMLChar;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -61,6 +60,7 @@ import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.transform.AbstractBaseTransform;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriResolver;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriResolver.IdType;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.XmlUtils;
 
 /**
  * CTS2 <-> LexEVS Transform dealing with Entities and EntityDescriptions. 
@@ -301,7 +301,7 @@ public class EntityTransform
 		if(foundNamespace != null){
 			return foundNamespace;
 		} else {
-			boolean isNamespaceValidNCName = XMLChar.isValidNCName(namespace);
+			boolean isNamespaceValidNCName = XmlUtils.isNCName(namespace);
 			if(isNamespaceValidNCName){
 				return namespace;
 			} else {
