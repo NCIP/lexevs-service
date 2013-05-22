@@ -60,23 +60,18 @@ public class VersionNameConverter {
 	 * @throws InvaildVersionNameException 
 	 */
 	public NameVersionPair fromCts2VersionName(String cts2CodeSystemVersionName) throws InvaildVersionNameException{
-		String[] nameParts = StringUtils.split(cts2CodeSystemVersionName, SEPARATOR);
-		
-		if(nameParts.length != 2){
+		if(! this.isValidVersionName(cts2CodeSystemVersionName)){
 			throw new InvaildVersionNameException(cts2CodeSystemVersionName);
 		}
 		
-		return new NameVersionPair(nameParts[0], nameParts[1]);
+		String version = StringUtils.substringAfterLast(cts2CodeSystemVersionName, SEPARATOR);
+		String name = StringUtils.substringBeforeLast(cts2CodeSystemVersionName, SEPARATOR);
+
+		return new NameVersionPair(name, version);
 	}
 	
 	public boolean isValidVersionName(String cts2CodeSystemVersionName){
-		boolean answer = false;
-		
 		String[] nameParts = StringUtils.split(cts2CodeSystemVersionName, SEPARATOR);
-		if(nameParts.length == 2){
-			answer = true;
-		}
-		
-		return answer;
+		return nameParts.length >= 2;
 	}
 }
