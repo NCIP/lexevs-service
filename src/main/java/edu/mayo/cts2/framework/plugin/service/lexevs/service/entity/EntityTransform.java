@@ -40,6 +40,7 @@ import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.concepts.Entity;
 import org.LexGrid.concepts.Presentation;
+import org.apache.commons.lang.BooleanUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -241,7 +242,7 @@ public class EntityTransform
 			Designation designation = new Designation();
 			
 			DesignationRole role;
-			if(presentation.isIsPreferred()){
+			if(BooleanUtils.toBoolean(presentation.isIsPreferred())){
 				role = DesignationRole.PREFERRED;
 			} else {
 				role = DesignationRole.ALTERNATIVE;
