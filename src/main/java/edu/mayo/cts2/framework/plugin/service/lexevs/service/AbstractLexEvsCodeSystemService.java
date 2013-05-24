@@ -130,11 +130,11 @@ public abstract class AbstractLexEvsCodeSystemService<T> extends AbstractLexEvsS
 		if(cts2NameOrURI == null){
 			return null;
 		}
-		String cts2Name;
+
 		NameVersionPair namePair;
 		
 		if (cts2NameOrURI.getName() != null) {
-			cts2Name = cts2NameOrURI.getName();
+			String cts2Name = cts2NameOrURI.getName();
 			if (!nameConverter.isValidVersionName(cts2Name)) {
 				namePair = null;
 			}

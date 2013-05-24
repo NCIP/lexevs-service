@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
+import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeTagList;
 import org.LexGrid.LexBIG.DataModel.Collections.ConceptReferenceList;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeSummary;
 import org.LexGrid.LexBIG.DataModel.Core.ConceptReference;
@@ -46,7 +47,7 @@ public final class CommonSearchFilterUtils {
 		return new HashSet<MatchAlgorithmReference>(Arrays.asList(exactMatch,contains,startsWith));
 	}
 
-	public static Set<? extends PropertyReference> getLexSupportedSearchReferences() {
+	public static Set<PropertyReference> getLexSupportedSearchReferences() {
 		
 		PropertyReference name = StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference();		
 		PropertyReference about = StandardModelAttributeReference.ABOUT.getPropertyReference();	
@@ -81,11 +82,14 @@ public final class CommonSearchFilterUtils {
 
 
 
-	public static String determineSourceValue(String cts2SearchAttribute, CodingSchemeSummary lexSchemeSummary, VersionNameConverter nameConverter){
+	public static String determineSourceValue(String cts2SearchAttribute, CodingSchemeRendering lexSchemeRendering, VersionNameConverter nameConverter){
 		String sourceValue = null;
-		if(lexSchemeSummary == null){
+		if(lexSchemeRendering == null){
 			return sourceValue;
 		}
+		
+		CodingSchemeSummary lexSchemeSummary = lexSchemeRendering.getCodingSchemeSummary();
+		
 		if (cts2SearchAttribute.equals(Constants.ATTRIBUTE_NAME_ABOUT)) {
 			sourceValue = lexSchemeSummary.getCodingSchemeURI();
 		} else if (cts2SearchAttribute.equals(Constants.ATTRIBUTE_NAME_RESOURCE_SYNOPSIS)) {
@@ -97,7 +101,13 @@ public final class CommonSearchFilterUtils {
 				nameConverter.toCts2VersionName(
 					lexSchemeSummary.getLocalName(), 
 					lexSchemeSummary.getRepresentsVersion());
-		}
+		} else if (cts2SearchAttribute.equals(Constants.ATTRIBUTE_TAG)) {
+				CodingSchemeTagList tags = lexSchemeRendering.getRenderingDetail().getVersionTags();
+				if(tags != null && tags.getTagCount() == 1){
+					sourceValue = tags.getTag(0);
+				}
+				
+			}
 		
 		return sourceValue;
 	}
@@ -330,7 +340,7 @@ public final class CommonSearchFilterUtils {
 			VersionNameConverter nameConverter) {
 		boolean matches = true;
 		Iterator<ResolvedFilter> filtersItr = cts2Filters.iterator();
-		CodingSchemeSummary lexCodingSchemeSummary = lexCodingSchemeRendering.getCodingSchemeSummary();
+
 		boolean caseSensitive = false;
 		
 		while (filtersItr.hasNext()) {
@@ -342,7 +352,7 @@ public final class CommonSearchFilterUtils {
 			String cts2SearchAttribute = cts2PropertyReference.getReferenceTarget().getName();
 			
 			String cts2MatchValue = cts2ResolvedFilter.getMatchValue();	
-			String sourceValue = CommonSearchFilterUtils.determineSourceValue(cts2SearchAttribute, lexCodingSchemeSummary, nameConverter);
+			String sourceValue = CommonSearchFilterUtils.determineSourceValue(cts2SearchAttribute, lexCodingSchemeRendering, nameConverter);
 			if (!CommonStringUtils.executeMatchAlgorithm(sourceValue, cts2MatchValue, cts2MatchAlgorithmReference, caseSensitive)) {
 				matches = false;
 			}
@@ -368,8 +378,7 @@ public final class CommonSearchFilterUtils {
 		
 		CodingSchemeRendering[] lexCodingSchemeRenderings = lexCodingSchemeRenderingList.getCodingSchemeRendering();
 		for (CodingSchemeRendering lexCodingSchemeRendering : lexCodingSchemeRenderings) {
-			CodingSchemeSummary lexCodingSchemeSummary = lexCodingSchemeRendering.getCodingSchemeSummary();
-			sourceValue = CommonSearchFilterUtils.determineSourceValue(cts2SearchAttribute, lexCodingSchemeSummary, nameConverter);
+			sourceValue = CommonSearchFilterUtils.determineSourceValue(cts2SearchAttribute, lexCodingSchemeRendering, nameConverter);
 			if (CommonStringUtils.executeMatchAlgorithm(sourceValue, cts2MatchValue, cts2MatchAlgorithmReference, caseSensitive)) {
 				lexFilteredRendering.addCodingSchemeRendering(lexCodingSchemeRendering);
 			} 

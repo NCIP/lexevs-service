@@ -26,6 +26,8 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -42,6 +44,9 @@ import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogE
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
+import edu.mayo.cts2.framework.model.core.PropertyReference;
+import edu.mayo.cts2.framework.model.core.URIAndEntityName;
+import edu.mayo.cts2.framework.model.core.types.TargetReferenceType;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.service.core.types.ActiveOrAll;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
@@ -146,6 +151,41 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		
 		LexBIGServiceImpl.defaultInstance().getServiceManager(null).
 			activateCodingSchemeVersion(autos);
+	}
+	
+	@Test
+	public void testOnlyProduction() throws Exception {
+
+		PropertyReference tag = new PropertyReference();
+		tag.setReferenceType(TargetReferenceType.ATTRIBUTE);
+		tag.setReferenceTarget(new URIAndEntityName());
+		tag.getReferenceTarget().setName("tag");
+		
+		ResolvedFilter filter = 
+			CommonTestUtils.createFilter("exactMatch", "PRODUCTION", tag);
+		
+		AbsoluteCodingSchemeVersionReference autos = 
+			Constructors.createAbsoluteCodingSchemeVersionReference("urn:oid:11.11.0.1", "1.0");
+		
+		AbsoluteCodingSchemeVersionReference gmp = 
+				Constructors.createAbsoluteCodingSchemeVersionReference("urn:oid:11.11.0.2", "2.0");
+		
+		LexBIGServiceImpl.defaultInstance().getServiceManager(null).setVersionTag(autos, "PRODUCTION");
+		LexBIGServiceImpl.defaultInstance().getServiceManager(null).setVersionTag(gmp, "NOT-PRODUCTION");
+		
+		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>(Arrays.asList(filter));
+		
+		// Build query using filters
+		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filters, null, null);
+
+		try {
+			int expecting = 1;
+			int actual = this.service.getResourceSummaries(query, null, new Page()).getEntries().size();
+			assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
+		} finally {
+			LexBIGServiceImpl.defaultInstance().getServiceManager(null).setVersionTag(autos, "PRODUCTION");
+			LexBIGServiceImpl.defaultInstance().getServiceManager(null).setVersionTag(gmp, "PRODUCTION");
+		}
 	}
 	
 	@Test

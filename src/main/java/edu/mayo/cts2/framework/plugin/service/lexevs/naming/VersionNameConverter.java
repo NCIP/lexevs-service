@@ -41,6 +41,8 @@ public class VersionNameConverter {
 
 	private static final String SEPARATOR = "-";
 	
+	private static String SEPARATOR_ENCODE = "[:]";
+	
 	/**
 	 * To cts2 code system version name.
 	 *
@@ -49,7 +51,7 @@ public class VersionNameConverter {
 	 * @return the string
 	 */
 	public String toCts2VersionName(String lexEvsCodingSchemeName, String version){
-		return lexEvsCodingSchemeName + SEPARATOR + version;
+		return lexEvsCodingSchemeName + SEPARATOR + this.escapeVersion(version);
 	}
 	
 	/**
@@ -67,11 +69,19 @@ public class VersionNameConverter {
 		String version = StringUtils.substringAfterLast(cts2CodeSystemVersionName, SEPARATOR);
 		String name = StringUtils.substringBeforeLast(cts2CodeSystemVersionName, SEPARATOR);
 
-		return new NameVersionPair(name, version);
+		return new NameVersionPair(name, this.unescapeVersion(version));
 	}
 	
 	public boolean isValidVersionName(String cts2CodeSystemVersionName){
 		String[] nameParts = StringUtils.split(cts2CodeSystemVersionName, SEPARATOR);
 		return nameParts.length >= 2;
+	}
+	
+	public String escapeVersion(String version){
+		return StringUtils.replace(version, SEPARATOR, SEPARATOR_ENCODE);
+	}
+	
+	public String unescapeVersion(String version){
+		return StringUtils.replace(version, SEPARATOR_ENCODE, SEPARATOR);
 	}
 }

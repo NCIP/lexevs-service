@@ -25,6 +25,7 @@ public final class Constants {
 	public static final String ATTRIBUTE_NAME_ABOUT = "about";
 	public static final String ATTRIBUTE_NAME_RESOURCE_SYNOPSIS = "resourceSynopsis";
 	public static final String ATTRIBUTE_NAME_RESOURCE_NAME = "resourceName";
+	public static final Object ATTRIBUTE_TAG = "tag";	
 
 	// MapRole values
 	public static final String MAP_TO_ROLE = "MAP_TO_ROLE"; // represents target mapping
@@ -34,9 +35,8 @@ public final class Constants {
 	public static final String MAPPING_EXTENSION = "MappingExtension";
 
 	public static final String FULL_DESCRIPTION = "FULL_DESCRIPTIONS";
-	public static final String SUMMARY_DESCRIPTION = "SUMMARY_DESCRIPTIONS";	
+	public static final String SUMMARY_DESCRIPTION = "SUMMARY_DESCRIPTIONS";
 	
-
 	private Constants(){
 		super();
 	}

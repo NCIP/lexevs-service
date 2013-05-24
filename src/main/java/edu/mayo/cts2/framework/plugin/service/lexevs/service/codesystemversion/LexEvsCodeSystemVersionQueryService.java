@@ -42,6 +42,8 @@ import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
 import edu.mayo.cts2.framework.model.core.PropertyReference;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
+import edu.mayo.cts2.framework.model.core.URIAndEntityName;
+import edu.mayo.cts2.framework.model.core.types.TargetReferenceType;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
@@ -126,7 +128,17 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 
 	@Override
 	public Set<? extends PropertyReference> getSupportedSearchReferences() {
-		return CommonSearchFilterUtils.getLexSupportedSearchReferences();
+		Set<PropertyReference> references = new HashSet<PropertyReference>(
+				CommonSearchFilterUtils.getLexSupportedSearchReferences());
+		
+		PropertyReference tag = new PropertyReference();
+		tag.setReferenceType(TargetReferenceType.ATTRIBUTE);
+		tag.setReferenceTarget(new URIAndEntityName());
+		tag.getReferenceTarget().setName("tag");
+		
+		references.add(tag);
+		
+		return references;
 	}
 
 	// Methods returning empty lists or sets
