@@ -248,7 +248,7 @@ public final class CommonResourceUtils{
 						cts2EntityNamespace = cts2EntityNameOrURI.getEntityName().getNamespace();
 					}
 					ConceptReferenceList reference = Constructors.createConceptReferenceList(cts2EntityName, cts2EntityNamespace, null);
-					lexMapping = lexMapping.restrictToCodes(reference, SearchContext.SOURCE_OR_TARGET_CODES);
+					lexMapping = lexMapping.restrictToCodes(reference, SearchContext.TARGET_CODES);
 				}
 				
 				lexMapIterator = lexMapping.resolveMapping();

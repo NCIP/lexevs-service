@@ -40,6 +40,7 @@ import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.mapversion.MapEntryDirectoryEntry;
+import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
@@ -89,6 +90,27 @@ public class LexEvsMapEntryQueryServiceTestIT extends AbstractTestITBase {
 		DirectoryResult<MapEntryDirectoryEntry> list = this.service.getResourceSummaries(mapEntryQueryImpl, sortCriteria, page);
 		assertNotNull(list);
 		assertEquals(6,list.getEntries().size());
+	}
+	
+	@Test
+	public void testGetResourceSummariesTargetRestriction() throws Exception {
+
+		MapEntryQueryServiceRestrictions restrictions = new MapEntryQueryServiceRestrictions();
+		NameOrURI mapVersion = ModelUtils.nameOrUriFromName("MappingSample-1.0");
+		restrictions.setMapVersion(mapVersion);
+		
+		EntityNameOrURI target = new EntityNameOrURI();
+		target.setEntityName(ModelUtils.createScopedEntityName("E0001", "GermanMadePartsNamespace"));
+		restrictions.getTargetEntities().add(target);
+		
+		MapEntryQueryImpl mapEntryQueryImpl = new MapEntryQueryImpl(null,null,null,restrictions);
+		
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		
+		DirectoryResult<MapEntryDirectoryEntry> list = this.service.getResourceSummaries(mapEntryQueryImpl, sortCriteria, page);
+		assertNotNull(list);
+		assertEquals(3,list.getEntries().size());
 	}
 	
 	@Test

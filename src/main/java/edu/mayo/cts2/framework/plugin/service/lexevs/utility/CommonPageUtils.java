@@ -27,11 +27,8 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.LexGrid.LexBIG.DataModel.Collections.ResolvedConceptReferenceList;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
-import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
-import org.LexGrid.LexBIG.Exceptions.LBParameterException;
-import org.LexGrid.LexBIG.Exceptions.LBResourceUnavailableException;
+import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
@@ -92,44 +89,35 @@ public final class CommonPageUtils {
 	public static ResolvedConceptReferenceResults getPage(
 			ResolvedConceptReferencesIterator iterator,
 			Page page) {
-		boolean atEnd = false;
-		ResolvedConceptReference[] resolvedConceptReferences = null;
-		ResolvedConceptReferenceList resolvedConceptReferenceList = null;
-		int start = 0, end = 0;
+			
+		List<ResolvedConceptReference> list = new ArrayList<ResolvedConceptReference>();
 		try {
 			if(iterator != null){
-				if(page != null){
-					start = page.getStart();
-					end = page.getEnd();
-				}
-				else{
-					end = iterator.numberRemaining();
+				int start = page.getStart();
+				int max = page.getMaxToReturn();
+
+				int i = 0;
+				while(iterator.hasNext() && list.size() < max){
+					ResolvedConceptReference ref = iterator.next();
+					if(i >= start){
+						list.add(ref);
+					}
+					i++;
 				}
 				
-				if(end > iterator.numberRemaining()){
-					end = iterator.numberRemaining();
-					atEnd = true;				
-				}
-				resolvedConceptReferenceList = iterator.get(start, end);
-				// Get array of resolved concept references
-				
-				if(resolvedConceptReferenceList != null){
-					resolvedConceptReferences = resolvedConceptReferenceList.getResolvedConceptReference();
-				}	
+				return new ResolvedConceptReferenceResults(
+					list.toArray(new ResolvedConceptReference[list.size()]), 
+					!iterator.hasNext());
+			} else {
+				return new ResolvedConceptReferenceResults(
+					list.toArray(new ResolvedConceptReference[0]), true);
 			}
-		} catch (LBInvocationException e) {
+	
+		} catch (LBException e) {
 			throw new RuntimeException(e);
-		} catch (LBParameterException e) {
-			throw new RuntimeException(e);
-		} catch (LBResourceUnavailableException e) {
-			throw new RuntimeException(e);
-		}
-		
-		return new ResolvedConceptReferenceResults(resolvedConceptReferences, atEnd);
+		}	
 	}
-	
-	
-	
+
 	public static  <T> List<T> getPage(List<T> list, Page page){
 		int start = page.getStart();
 		int end = page.getEnd();
