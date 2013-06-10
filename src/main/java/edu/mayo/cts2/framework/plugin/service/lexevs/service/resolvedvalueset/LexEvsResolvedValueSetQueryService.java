@@ -77,19 +77,16 @@ public class LexEvsResolvedValueSetQueryService extends AbstractLexEvsService
 
 	@Override
 	public Set<? extends PropertyReference> getSupportedSortReferences() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Set<PredicateReference> getKnownProperties() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

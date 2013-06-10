@@ -25,6 +25,7 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service.valuesetdefinition
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -73,7 +74,7 @@ public class LexEvsValueSetDefinitionReadService extends AbstractLexEvsService
 	@Override
 	public boolean existsByTag(NameOrURI parentIdentifier,
 			VersionTagReference tag, ResolvedReadContext readContext) {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("Not supported in LexEVS.");
 	}
 
 	/* (non-Javadoc)
@@ -128,7 +129,7 @@ public class LexEvsValueSetDefinitionReadService extends AbstractLexEvsService
 	 */
 	@Override
 	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
-		throw new UnsupportedOperationException();
+		return new ArrayList<DocumentedNamespaceReference>();
 	}
 	
 }

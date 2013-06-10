@@ -11,6 +11,7 @@ import org.LexGrid.commonTypes.PropertyQualifier;
 import org.lexgrid.valuesets.LexEVSValueSetDefinitionServices;
 import org.springframework.stereotype.Component;
 
+import edu.mayo.cts2.framework.core.url.UrlConstructor;
 import edu.mayo.cts2.framework.model.core.CodeSystemReference;
 import edu.mayo.cts2.framework.model.core.CodeSystemVersionReference;
 import edu.mayo.cts2.framework.model.core.EntitySynopsis;
@@ -29,8 +30,12 @@ public class ResolvedCodingSchemeTransform {
 
 	@Resource
 	private UriHandler uriHandler;
+	
 	@Resource
 	private CommonResolvedValueSetUtils resolvedValueSetUtils;
+	
+	@Resource
+	private UrlConstructor urlConstructor;
 
 	List<ResolvedValueSetDirectoryEntry> transform(List<CodingScheme> listcs) {
 		List<ResolvedValueSetDirectoryEntry> rvsde_list = new ArrayList<ResolvedValueSetDirectoryEntry>();
@@ -46,8 +51,12 @@ public class ResolvedCodingSchemeTransform {
 	ResolvedValueSetDirectoryEntry transform(CodingScheme cs) {
 		ResolvedValueSetDirectoryEntry entry = new ResolvedValueSetDirectoryEntry();
 		entry.setResolvedValueSetURI(cs.getCodingSchemeURI());
-		entry.setResourceName(resolvedValueSetUtils.getName(cs));
-		entry.setHref("");
+		
+		String name = resolvedValueSetUtils.getName(cs);
+		entry.setResourceName(name);
+		
+		entry.setHref(this.urlConstructor.createResolvedValueSetUrl(cs.getCodingSchemeName(), name, name));
+		
 		ResolvedValueSetHeader header = new ResolvedValueSetHeader();
 		List<CodeSystemVersionReference> resolvedReferences = getResolvedUsingCodeSystemList(cs);
 		header.setResolvedUsingCodeSystem(resolvedReferences);

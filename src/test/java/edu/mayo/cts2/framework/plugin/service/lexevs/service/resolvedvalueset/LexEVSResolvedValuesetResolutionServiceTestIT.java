@@ -49,8 +49,8 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT extends
 	@Test
 	public void testGetRolution() throws Exception {
 
-		ResolvedValueSetReadId identifier = new ResolvedValueSetReadId("SRITEST:AUTO:AllDomesticANDGM-06736a30878a0f8bd0ea83196732380a",
-				ModelUtils.nameOrUriFromName("SRITEST:AUTO:AllDomesticANDGM"),
+		ResolvedValueSetReadId identifier = new ResolvedValueSetReadId("All Domestic Autos AND GM-06736a30878a0f8bd0ea83196732380a",
+				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"),
 				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM-06736a30878a0f8bd0ea83196732380a"));
 		DirectoryResult<EntitySynopsis> dirResult = service.getResolution(
 				identifier, null, new Page());

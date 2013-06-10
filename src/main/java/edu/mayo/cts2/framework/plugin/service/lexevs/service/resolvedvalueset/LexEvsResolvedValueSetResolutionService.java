@@ -1,20 +1,16 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.resolvedvalueset;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.Exceptions.LBException;
-import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.codingSchemes.CodingScheme;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 import edu.mayo.cts2.framework.core.constants.URIHelperInterface;
 import edu.mayo.cts2.framework.core.url.UrlConstructor;
@@ -42,13 +38,8 @@ import edu.mayo.cts2.framework.model.service.core.Query;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSet;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSetHeader;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.entity.LexEvsEntityQueryService;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonPageUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.QueryData;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.ResolvedConceptReferenceResults;
 import edu.mayo.cts2.framework.service.command.restriction.EntityDescriptionQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.command.restriction.ResolvedValueSetResolutionEntityRestrictions;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
@@ -59,6 +50,7 @@ import edu.mayo.cts2.framework.service.profile.resolvedvalueset.ResolvedValueSet
 import edu.mayo.cts2.framework.service.profile.resolvedvalueset.name.ResolvedValueSetReadId;
 import edu.mayo.cts2.framework.service.profile.valuesetdefinition.ResolvedValueSetResolutionEntityQuery;
 import edu.mayo.cts2.framework.service.profile.valuesetdefinition.ResolvedValueSetResult;
+
 @Component
 public class LexEvsResolvedValueSetResolutionService extends AbstractLexEvsService implements
 ResolvedValueSetResolutionService {
@@ -105,19 +97,16 @@ ResolvedValueSetResolutionService {
 
 	@Override
 	public Set<? extends PropertyReference> getSupportedSortReferences() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Set<PredicateReference> getKnownProperties() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -147,7 +136,6 @@ ResolvedValueSetResolutionService {
 	@Override
 	public ResolvedValueSet getResolution(ResolvedValueSetReadId identifier) {
 		throw new UnsupportedOperationException("Cannot resolve the complete ResolvedValueSet yet...");
-
 	}
 
 	@Override
@@ -220,8 +208,6 @@ ResolvedValueSetResolutionService {
 		
 		for(EntityDirectoryEntry entry : result.getEntries()){
 			
-			
-		
 			entry.setHref(
 					this.urlConstructor.getServerRootWithAppName() + "/" + URIHelperInterface.ENTITY + "/" + 
 							EncodingUtils.encodeScopedEntityName(entry.getName()));
