@@ -36,6 +36,13 @@
     <lgNaming:supportedSource localId="lexgrid.org">lexgrid.org</lgNaming:supportedSource>
   </mappings>
   <entities>
+    <lgCon:entity entityCode="H0001" status="a1" isActive="true" entityCodeNamespace="GermanMadeParts">
+      <lgCommon:entityDescription>Hood</lgCommon:entityDescription>
+      <lgCon:entityType>concept</lgCon:entityType>
+      <lgCon:presentation language="ge" propertyName="textualPresentation" propertyId="t2" isPreferred="false">
+        <lgCommon:value>Hood</lgCommon:value>
+      </lgCon:presentation>
+    </lgCon:entity>
     <lgCon:entity entityCode="E0001" status="a1" isActive="true" entityCodeNamespace="GermanMadePartsNamespace">
       <lgCommon:entityDescription>Engine</lgCommon:entityDescription>
       <lgCon:entityType>concept</lgCon:entityType>

@@ -23,7 +23,10 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+import java.util.Arrays;
 
 import javax.annotation.Resource;
 
@@ -32,8 +35,11 @@ import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContents;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import edu.mayo.cts2.framework.model.command.Page;
+import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.entity.EntityDescription;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
+import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractQueryServiceTest;
 import edu.mayo.cts2.framework.service.command.restriction.EntityDescriptionQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.profile.QueryService;
@@ -56,6 +62,37 @@ public class SearchExtensionEntityQueryServiceTestIT
 	@Test
 	public void testSetUp() {
 		assertNotNull(this.service);
+	}
+	
+	@Test
+	public void testGetEntitiesFromUriList() throws Exception {
+		// Create restriction for query
+		// ----------------------------
+		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
+		
+		for(String uri : Arrays.asList(
+				"urn:oid:11.11.0.1/C0001",
+				"urn:oid:11.11.0.1/A0001",
+				"urn:oid:11.11.0.2/H0001"
+				)){
+			EntityNameOrURI nameOrUri = new EntityNameOrURI();
+			nameOrUri.setUri(uri);
+			
+			restrictions.getEntities().add(nameOrUri);
+		}
+
+		// Create query, no filters
+		// -------------------------
+		EntityDescriptionQuery query = new EntityDescriptionQueryImpl(null, null, restrictions);	
+		
+		// Call getResourceSummaries from service
+		// --------------------------------------
+		Page page = new Page();		
+		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, null, page);
+		
+		// Test results
+		// ------------
+		assertEquals(3, directoryResult.getEntries().size());		
 	}
 
 	@Ignore

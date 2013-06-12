@@ -2,6 +2,9 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.uri;
 
 import javax.annotation.Resource;
 
+import org.LexGrid.LexBIG.Exceptions.LBException;
+import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.LexGrid.codingSchemes.CodingScheme;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +17,9 @@ public class EntityUriResolver {
 	private final String URI_SEPARATOR = "/";
 	
 	@Resource
+	private LexBIGService lexBigService;
+	
+	@Resource
 	private UriResolver uriResolver;
 	
 	public ScopedEntityName resolveUri(String entityUri){
@@ -23,14 +29,22 @@ public class EntityUriResolver {
 		
 		String namespace = this.uriResolver.idToName(namespaceUri, IdType.CODE_SYSTEM);
 		
+		ScopedEntityName name = new ScopedEntityName();
+		name.setName(parts[1]);
+
 		if(StringUtils.isNotBlank(namespace)){
-			ScopedEntityName name = new ScopedEntityName();
 			name.setNamespace(namespace);
-			name.setName(parts[1]);
 			
 			return name;
 		} else {
-			return null;
+			try {
+				CodingScheme cs = this.lexBigService.resolveCodingScheme(namespaceUri, null);
+				name.setNamespace(cs.getCodingSchemeName());
+				return name;
+			} catch (LBException e) {
+				//didn't find it here... return null.
+				return null;
+			}	
 		}
 	}
 	

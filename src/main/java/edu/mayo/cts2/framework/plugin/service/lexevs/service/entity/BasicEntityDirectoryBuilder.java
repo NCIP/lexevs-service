@@ -23,11 +23,19 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 
+import java.util.HashSet;
 import java.util.Set;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 
 import edu.mayo.cts2.framework.filter.directory.AbstractStateBuildingDirectoryBuilder;
 import edu.mayo.cts2.framework.filter.match.StateAdjustingPropertyReference;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
+import edu.mayo.cts2.framework.model.core.ScopedEntityName;
+import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
+import edu.mayo.cts2.framework.plugin.service.lexevs.uri.EntityUriResolver;
+import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQuery;
 
 /**
  * A Basic EntityDirectoryBuilder.
@@ -36,6 +44,8 @@ import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
  */
 public class BasicEntityDirectoryBuilder<T> extends AbstractStateBuildingDirectoryBuilder<String,T> {
 
+	private EntityUriResolver entityUriResolver;
+	
 	/**
 	 * Instantiates a new basic entity directory builder.
 	 *
@@ -45,11 +55,49 @@ public class BasicEntityDirectoryBuilder<T> extends AbstractStateBuildingDirecto
 	 * @param stateAdjustingPropertyReferences the state adjusting property references
 	 */
 	public BasicEntityDirectoryBuilder(
+			EntityUriResolver entityUriResolver,
 			AbstractStateBuildingDirectoryBuilder.Callback<String, T> callback,
 			Set<MatchAlgorithmReference> matchAlgorithmReferences,
 			Set<StateAdjustingPropertyReference<String>> stateAdjustingPropertyReferences) {
 		super("", callback, matchAlgorithmReferences,
 				stateAdjustingPropertyReferences);
+		
+		this.entityUriResolver = entityUriResolver;
+	}
+
+	public BasicEntityDirectoryBuilder<T> restrict(
+			EntityDescriptionQuery query) {
+		if(query != null){
+			this.restrict(query.getFilterComponent());
+			
+			if(query.getRestrictions() != null &&
+					CollectionUtils.isNotEmpty(query.getRestrictions().getEntities())){
+				
+				Set<EntityNameOrURI> entities = query.getRestrictions().getEntities();
+				
+				StringBuilder entityQueryString = new StringBuilder("(");
+				
+				Set<String> entitySearchStrings = new HashSet<String>();
+				
+				for(EntityNameOrURI nameOrUri : entities){
+					ScopedEntityName name;
+					if(nameOrUri.getEntityName() != null){
+						name = nameOrUri.getEntityName();
+					} else {
+						name = this.entityUriResolver.resolveUri(nameOrUri.getUri());
+					}
+					
+					entitySearchStrings.add(String.format("(code:%s AND namespace:%s)", name.getName(), name.getNamespace()));
+				}
+				entityQueryString.append(StringUtils.join(entitySearchStrings, " OR "));
+				
+				entityQueryString.append(")");
+				
+				this.updateState(this.getState() + entityQueryString.toString());
+			}
+		}
+		
+		return this;
 	}
 
 }
