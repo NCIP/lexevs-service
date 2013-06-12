@@ -58,7 +58,7 @@
 
 	<properties>
 		<forkMode>never</forkMode>
-		<lexevs.version>6.0.5.7-SNAPSHOT</lexevs.version>
+		<lexevs.version>6.0.5.8-SNAPSHOT</lexevs.version>
 		<lexevs.remote.version>6.0</lexevs.remote.version>
 		<cagrid.version>1.3</cagrid.version>
 		<spring-security.version>${org.springframework-version}</spring-security.version>

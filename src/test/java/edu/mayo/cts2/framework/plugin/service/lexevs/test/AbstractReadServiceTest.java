@@ -15,7 +15,7 @@ import edu.mayo.cts2.framework.service.profile.ReadService;
 
 public abstract class AbstractReadServiceTest<R,I> extends AbstractTestITBase {
 	
-	private Cts2Marshaller marshaller = new DelegatingMarshaller();
+	protected Cts2Marshaller marshaller = new DelegatingMarshaller();
 	
 	protected abstract ReadService<R,I> getService();
 	

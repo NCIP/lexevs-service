@@ -38,6 +38,7 @@ import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Extensions.Generic.LexBIGServiceConvenienceMethods;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Constructors;
+import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
 import org.LexGrid.concepts.Entity;
 import org.LexGrid.concepts.Presentation;
 import org.apache.commons.lang.BooleanUtils;
@@ -48,8 +49,10 @@ import org.springframework.util.Assert;
 import edu.mayo.cts2.framework.model.core.Comment;
 import edu.mayo.cts2.framework.model.core.Definition;
 import edu.mayo.cts2.framework.model.core.DescriptionInCodeSystem;
+import edu.mayo.cts2.framework.model.core.EntityReference;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
 import edu.mayo.cts2.framework.model.core.Property;
+import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.core.StatementTarget;
 import edu.mayo.cts2.framework.model.core.URIAndEntityName;
 import edu.mayo.cts2.framework.model.entity.Designation;
@@ -233,6 +236,47 @@ public class EntityTransform
 		entry.setHref(this.getTransformUtils().createEntityHref(reference));
 		
 		return entry;
+	}
+	
+	public EntityReference transformEntityReference(ScopedEntityName name, ResolvedConceptReferencesIterator itr) {
+		
+		try {
+			if(! itr.hasNext()){
+				return null;
+			} else {
+				EntityReference reference = new EntityReference();
+
+				reference.setName(name);
+				
+				while(itr.hasNext()){
+					ResolvedConceptReference ref = itr.next();
+					
+					if(reference.getAbout() == null){
+						reference.setAbout(this.getUriHandler().getEntityUri(ref));
+					}
+					
+					DescriptionInCodeSystem description = new DescriptionInCodeSystem();
+					description.setDescribingCodeSystemVersion(
+						this.getTransformUtils().toCodeSystemVersionReference(
+							ref.getCodingSchemeName(), 
+							ref.getCodingSchemeVersion(),
+							ref.getCodingSchemeURI()));
+					
+					description.setHref(this.getTransformUtils().createEntityHref(ref));
+					
+					if(ref.getEntityDescription() != null){
+						description.setDesignation(ref.getEntityDescription().getContent());
+					}
+					
+					reference.addKnownEntityDescription(description);
+				}
+
+				return reference;
+			}
+		} catch (LBException e) {
+			//LexEVS did not find it or it is invalid... return null.
+			return null;
+		}
 	}
 	
 	protected List<Designation> toDesignation(Presentation... presentations){

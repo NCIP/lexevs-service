@@ -27,13 +27,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.io.StringWriter;
+
 import javax.annotation.Resource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.junit.Test;
 
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
+import edu.mayo.cts2.framework.model.core.EntityReference;
 import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.entity.EntityDescription;
 import edu.mayo.cts2.framework.model.entity.NamedEntityDescription;
@@ -148,6 +152,35 @@ public class LexEvsEntityReadServiceTestIT extends
 		boolean existsFlag = this.service.exists(identifier, readContext);
 		
 		assertEquals(true, existsFlag);
+	}	
+	
+	@Test
+	public void testAvailableDescriptions() throws Exception {
+		EntityNameOrURI entity = new EntityNameOrURI();
+		ScopedEntityName scopedEntityName = new ScopedEntityName();
+		scopedEntityName.setNamespace("Automobiles");
+		scopedEntityName.setName("C0001");
+		entity.setEntityName(scopedEntityName);
+		
+		EntityReference reference = this.service.availableDescriptions(entity, null);
+		
+		assertNotNull(reference);
+		assertEquals(1, reference.getKnownEntityDescriptionCount());
+	}	
+	
+	@Test
+	public void testAvailableDescriptionsValidXml() throws Exception {
+		EntityNameOrURI entity = new EntityNameOrURI();
+		ScopedEntityName scopedEntityName = new ScopedEntityName();
+		scopedEntityName.setNamespace("Automobiles");
+		scopedEntityName.setName("C0001");
+		entity.setEntityName(scopedEntityName);
+		
+		EntityReference reference = this.service.availableDescriptions(entity, null);
+
+		assertNotNull(reference);
+		assertEquals(1, reference.getKnownEntityDescriptionCount());
+		this.marshaller.marshal(reference, new StreamResult(new StringWriter()));	
 	}	
 	
 	@Test

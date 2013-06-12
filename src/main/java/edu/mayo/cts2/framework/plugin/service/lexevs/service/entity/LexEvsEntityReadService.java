@@ -30,7 +30,10 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
+import org.LexGrid.LexBIG.Exceptions.LBParameterException;
+import org.LexGrid.LexBIG.Extensions.Generic.SearchExtension;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.command.Page;
@@ -38,6 +41,7 @@ import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.core.CodeSystemReference;
 import edu.mayo.cts2.framework.model.core.CodeSystemVersionReference;
 import edu.mayo.cts2.framework.model.core.EntityReference;
+import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
@@ -47,6 +51,7 @@ import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
+import edu.mayo.cts2.framework.plugin.service.lexevs.uri.EntityUriResolver;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionReadService;
@@ -61,13 +66,28 @@ import edu.mayo.cts2.framework.service.profile.entitydescription.name.EntityDesc
 */
 @Component
 public class LexEvsEntityReadService extends AbstractLexEvsService 
-	implements EntityDescriptionReadService {
+	implements EntityDescriptionReadService, InitializingBean {
 
 	@Resource
 	private EntityTransform transformer;
 	
 	@Resource
 	private VersionNameConverter nameConverter;
+	
+	@Resource
+	private EntityUriResolver entityUriResolver;
+	
+	private SearchExtension searchExtension;
+	
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		try {
+		this.searchExtension = 
+			(SearchExtension) this.getLexBigService().getGenericExtension("SearchExtension");
+		} catch (Exception e){
+			log.warn("SearchExtension is not available.");
+		}
+	}
 
 	// ------ Local methods ----------------------
 	public void setCodeSystemVersionNameConverter(
@@ -120,7 +140,24 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 	@Override
 	public EntityReference availableDescriptions(EntityNameOrURI entityId,
 			ResolvedReadContext readContext) {
-		throw new UnsupportedOperationException();
+		ScopedEntityName name;
+		if(entityId.getEntityName() != null){
+			name = entityId.getEntityName();
+		} else {
+			name = this.entityUriResolver.resolveUri(entityId.getUri());
+		}
+		
+		String searchString = 
+			String.format("code:%s AND namespace:%s", name.getName(), name.getNamespace());
+		
+		try {
+			return this.transformer.transformEntityReference(
+				name,
+				this.searchExtension.search(searchString));
+		} catch (LBParameterException e) {
+			//Exception on the LexEVS side dealing with an invalid input. Return null.
+			return null;
+		}	
 	}
 
 	@Override
