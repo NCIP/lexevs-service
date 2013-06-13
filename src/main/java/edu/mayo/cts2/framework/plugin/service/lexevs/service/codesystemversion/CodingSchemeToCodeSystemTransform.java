@@ -110,7 +110,7 @@ public class CodingSchemeToCodeSystemTransform
 		codeSystemVersion.setSourceAndNotation(sourceAndNotation);
 
 		CodeSystemReference codeSystemReference = 
-			this.getTransformUtils().toCodeSystemReference(codingSchemeName, codeSystemVersion.getAbout());
+			this.getTransformUtils().toCodeSystemReference(codingSchemeName, codingScheme.getCodingSchemeURI());
 
 		codeSystemVersion.setVersionOf(codeSystemReference);
 		
