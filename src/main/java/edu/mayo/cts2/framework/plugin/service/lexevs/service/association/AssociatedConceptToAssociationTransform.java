@@ -99,7 +99,7 @@ public class AssociatedConceptToAssociationTransform
 				entry.setSubject(uriEntityName);
 				entry.setAssertedBy(
 					this.getTransformUtils().toCodeSystemVersionReference(
-							subject.getCodingSchemeName(), 
+							this.getCodingSchemeNameTranslator().translate(subject.getCodingSchemeName()), 
 							subject.getCodingSchemeVersion(),
 							subject.getCodingSchemeURI()));
 

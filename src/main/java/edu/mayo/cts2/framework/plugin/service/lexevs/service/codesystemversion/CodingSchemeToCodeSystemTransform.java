@@ -74,7 +74,10 @@ public class CodingSchemeToCodeSystemTransform
 				this.getUriHandler().getCodeSystemUri(codingScheme)
 		);
 		
-		String name = this.getName(codingScheme);
+		String codingSchemeName = 
+			this.getCodingSchemeNameTranslator().translate(codingScheme.getCodingSchemeName());
+		
+		String name = this.getName(codingSchemeName, codingScheme.getCodingSchemeURI());
 		
 		codeSystemVersion.setCodeSystemVersionName(name);
 		codeSystemVersion.setOfficialResourceVersionId(codingScheme.getRepresentsVersion());
@@ -105,15 +108,15 @@ public class CodingSchemeToCodeSystemTransform
 		sourceAndNotation.setSourceAndNotationDescription("LexEVS");
 		
 		codeSystemVersion.setSourceAndNotation(sourceAndNotation);
-		
-		CodeSystemReference codeSystemReference = new CodeSystemReference();
-		codeSystemReference.setContent(codingScheme.getCodingSchemeName());
-		codeSystemReference.setUri(codeSystemVersion.getAbout());
+
+		CodeSystemReference codeSystemReference = 
+			this.getTransformUtils().toCodeSystemReference(codingSchemeName, codeSystemVersion.getAbout());
+
 		codeSystemVersion.setVersionOf(codeSystemReference);
 		
 		codeSystemVersion.setEntityDescriptions(
 			this.getUrlConstructor().createEntitiesOfCodeSystemVersionUrl(
-				codingScheme.getCodingSchemeName(), 
+				codingSchemeName, 
 				codingScheme.getRepresentsVersion()));
 		
 		return codeSystemVersion;
@@ -125,7 +128,10 @@ public class CodingSchemeToCodeSystemTransform
 		
 		CodingSchemeSummary codingSchemeSummary = codingSchemeRendering.getCodingSchemeSummary();
 		
-		String name = this.getName(codingSchemeRendering);
+		String codingSchemeName = 
+			this.getCodingSchemeNameTranslator().translate(codingSchemeSummary.getLocalName());
+		
+		String name = this.getName(codingSchemeName, codingSchemeSummary.getRepresentsVersion());
 		
 		summary.setCodeSystemVersionName(name);
 		summary.setOfficialResourceVersionId(codingSchemeSummary.getRepresentsVersion());
@@ -146,29 +152,20 @@ public class CodingSchemeToCodeSystemTransform
 			summary.setResourceSynopsis(description);			
 		}
 		
-		CodeSystemReference codeSystemReference = new CodeSystemReference();
-		codeSystemReference.setContent(codingSchemeSummary.getLocalName());
-		codeSystemReference.setUri(summary.getAbout());
+		CodeSystemReference codeSystemReference =
+			this.getTransformUtils().toCodeSystemReference(
+					codingSchemeName, 
+					codingSchemeSummary.getCodingSchemeURI());
 		
 		summary.setVersionOf(codeSystemReference);
 		
 		summary.setHref(
 				this.getUrlConstructor().
 					createCodeSystemVersionUrl(
-							codingSchemeSummary.getLocalName(), 
+							codingSchemeName, 
 							codingSchemeSummary.getRepresentsVersion()));
 		
 		return summary;
-	}
-	
-	private String getName(CodingScheme codingScheme){
-		return this.getName(codingScheme.getCodingSchemeName(), 
-					codingScheme.getRepresentsVersion());
-	}
-	
-	private String getName(CodingSchemeRendering codingScheme){
-		return this.getName(codingScheme.getCodingSchemeSummary().getLocalName(), 
-					codingScheme.getCodingSchemeSummary().getRepresentsVersion());
 	}
 	
 	private String getName(String name, String version){

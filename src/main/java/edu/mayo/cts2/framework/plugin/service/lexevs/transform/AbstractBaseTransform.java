@@ -5,6 +5,7 @@ import javax.annotation.Resource;
 import org.apache.log4j.Logger;
 
 import edu.mayo.cts2.framework.core.url.UrlConstructor;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodingSchemeNameTranslator;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
 
@@ -29,6 +30,9 @@ public abstract class AbstractBaseTransform<
 	
 	@Resource
 	private VersionNameConverter versionNameConverter;
+	
+	@Resource
+	private CodingSchemeNameTranslator codingSchemeNameTranslator;
 	
 	@Resource
 	private UriHandler uriHandler;
@@ -63,6 +67,15 @@ public abstract class AbstractBaseTransform<
 
 	public void setUriHandler(UriHandler uriHandler) {
 		this.uriHandler = uriHandler;
+	}
+
+	public CodingSchemeNameTranslator getCodingSchemeNameTranslator() {
+		return codingSchemeNameTranslator;
+	}
+
+	public void setCodingSchemeNameTranslator(
+			CodingSchemeNameTranslator codingSchemeNameTranslator) {
+		this.codingSchemeNameTranslator = codingSchemeNameTranslator;
 	}
 
 }

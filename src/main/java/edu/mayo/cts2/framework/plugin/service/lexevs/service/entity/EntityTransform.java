@@ -105,15 +105,17 @@ public class EntityTransform
 						entity.getEntityCode(), 
 						this.sanitizeNamespace(entity.getEntityCodeNamespace())));
 		
+		String codingSchemeName = this.getCodingSchemeNameTranslator().translate(reference.getCodingSchemeName());
+		
 		namedEntity.setDescribingCodeSystemVersion(
 			this.getTransformUtils().toCodeSystemVersionReference(
-				reference.getCodingSchemeName(), 
+				codingSchemeName, 
 				reference.getCodingSchemeVersion(),
 				reference.getCodingSchemeURI()));
 		
 		namedEntity.setDesignation(this.toDesignation(entity.getPresentation()));
 		namedEntity.setProperty(this.toProperty(
-				reference.getCodingSchemeName(),
+				codingSchemeName,
 				reference.getCodingSchemeURI(),
 				reference.getCodingSchemeVersion(),
 				entity.getProperty()));
@@ -122,7 +124,7 @@ public class EntityTransform
 		
 		namedEntity.setChildren(
 			this.getUrlConstructor().createChildrenUrl(
-					reference.getCodingSchemeName(), 
+					codingSchemeName, 
 					reference.getCodingSchemeVersion(), 
 					entity.getEntityCode()));
 		
@@ -219,7 +221,7 @@ public class EntityTransform
 			ModelUtils.createScopedEntityName(
 				reference.getCode(), 
 				this.sanitizeNamespace(reference.getCodeNamespace())));
-		
+
 		DescriptionInCodeSystem description = new DescriptionInCodeSystem();
 		description.setDescribingCodeSystemVersion(
 			this.getTransformUtils().toCodeSystemVersionReference(
@@ -244,6 +246,7 @@ public class EntityTransform
 			if(! itr.hasNext()){
 				return null;
 			} else {
+				
 				EntityReference reference = new EntityReference();
 
 				reference.setName(name);
@@ -254,7 +257,7 @@ public class EntityTransform
 					if(reference.getAbout() == null){
 						reference.setAbout(this.getUriHandler().getEntityUri(ref));
 					}
-					
+			
 					DescriptionInCodeSystem description = new DescriptionInCodeSystem();
 					description.setDescribingCodeSystemVersion(
 						this.getTransformUtils().toCodeSystemVersionReference(

@@ -36,7 +36,9 @@ import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogE
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodingSchemeNameTranslator;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.transform.TransformUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.FakeLexEvsData.DataField;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.FakeLexEvsSystem;
@@ -70,10 +72,14 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 		EasyMock.replay(uriHandler);
 		
 		UrlConstructor urlConstructor = org.easymock.classextension.EasyMock.createNiceMock(UrlConstructor.class);
-		org.easymock.classextension.EasyMock.replay(urlConstructor);
+		CodingSchemeNameTranslator translator = org.easymock.classextension.EasyMock.createNiceMock(CodingSchemeNameTranslator.class);
+		TransformUtils utils = org.easymock.classextension.EasyMock.createNiceMock(TransformUtils.class);
+		org.easymock.classextension.EasyMock.replay(urlConstructor, translator, utils);
 		
 		transform.setUriHandler(uriHandler);
 		transform.setUrlConstructor(urlConstructor);
+		transform.setCodingSchemeNameTranslator(translator);
+		transform.setTransformUtils(utils);
 		
 		service.setCodingSchemeTransformer(transform);
 		

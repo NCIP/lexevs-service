@@ -19,7 +19,6 @@ import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSetDirectoryEntry;
-import edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion.CodeSystemVersionQueryImpl;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonTestUtils;
 import edu.mayo.cts2.framework.service.command.restriction.ResolvedValueSetQueryServiceRestrictions;
@@ -32,7 +31,6 @@ import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 			@LoadContent(contentPath="lexevs/test-content/valueset/ResolvedAllDomesticAutosButGM.xml"),
 		}
 	)
-
 public class LexEVSResolvedValuesetQueryServiceTestIT extends
 		AbstractTestITBase {
 

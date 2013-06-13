@@ -39,6 +39,7 @@ import edu.mayo.cts2.framework.model.core.PredicateReference;
 import edu.mayo.cts2.framework.model.core.StatementTarget;
 import edu.mayo.cts2.framework.model.core.URIAndEntityName;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodingSchemeNameTranslator;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
 
@@ -58,6 +59,9 @@ public class TransformUtils {
 	
 	@Resource
 	private UriHandler uriHandler;
+	
+	@Resource
+	private CodingSchemeNameTranslator codingSchemeNameTranslator;
 
 	/**
 	 * To property.
@@ -91,6 +95,8 @@ public class TransformUtils {
 	 */
 	public CodeSystemReference toCodeSystemReference(
 			String name, String uri){
+		name = codingSchemeNameTranslator.translate(name);
+		
 		CodeSystemReference ref = new CodeSystemReference();
 		ref.setContent(name);
 		ref.setUri(uri);
@@ -100,6 +106,8 @@ public class TransformUtils {
 	
 	public MapReference toMapReference(
 			String name, String uri){
+		name = codingSchemeNameTranslator.translate(name);
+		
 		MapReference ref = new MapReference();
 		ref.setContent(name);
 		ref.setUri(uri);
@@ -110,6 +118,8 @@ public class TransformUtils {
 
 	public CodeSystemVersionReference toCodeSystemVersionReference(
 			String name, String version, String about) {
+		name = codingSchemeNameTranslator.translate(name);
+		
 		CodeSystemVersionReference ref = new CodeSystemVersionReference();
 		ref.setCodeSystem(toCodeSystemReference(name, about));
 		
@@ -143,8 +153,10 @@ public class TransformUtils {
 	}
 	
 	public String createEntityHref(ResolvedConceptReference reference){
+		String codingSchemeName = codingSchemeNameTranslator.translate(reference.getCodingSchemeName());
+		
 		return this.urlConstructor.createEntityUrl(
-				reference.getCodingSchemeName(), 
+				codingSchemeName, 
 				reference.getCodingSchemeVersion(), 
 				ModelUtils.createScopedEntityName(reference.getCode(), reference.getCodeNamespace()));
 	}

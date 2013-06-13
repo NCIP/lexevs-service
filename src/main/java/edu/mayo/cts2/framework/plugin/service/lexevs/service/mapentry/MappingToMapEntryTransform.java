@@ -97,7 +97,7 @@ public class MappingToMapEntryTransform
 		mapEntryDirectoryEntry.setMapFrom(fromName);
 		
 		String encodedName = EncodingUtils.encodeScopedEntityName(fromName);
-		
+
 		String mapVersionName = 
 			this.getVersionNameConverter().toCts2VersionName(
 				mapReference.getMapName().getName(),

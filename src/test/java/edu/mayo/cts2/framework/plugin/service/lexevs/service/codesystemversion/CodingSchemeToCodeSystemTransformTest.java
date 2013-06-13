@@ -28,7 +28,9 @@ import org.easymock.EasyMock;
 import org.junit.Test;
 
 import edu.mayo.cts2.framework.core.url.UrlConstructor;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodingSchemeNameTranslator;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.transform.TransformUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
 
 public class CodingSchemeToCodeSystemTransformTest {
@@ -45,8 +47,13 @@ public class CodingSchemeToCodeSystemTransformTest {
 		transform.setUriHandler(uriHandler);
 		
 		UrlConstructor urlConstructor = org.easymock.classextension.EasyMock.createNiceMock(UrlConstructor.class);
-		org.easymock.classextension.EasyMock.replay(urlConstructor);
+		CodingSchemeNameTranslator translator = org.easymock.classextension.EasyMock.createNiceMock(CodingSchemeNameTranslator.class);
+		TransformUtils utils = org.easymock.classextension.EasyMock.createNiceMock(TransformUtils.class);
+		org.easymock.classextension.EasyMock.replay(urlConstructor, translator, utils);
+
 		transform.setUrlConstructor(urlConstructor);
+		transform.setCodingSchemeNameTranslator(translator);
+		transform.setTransformUtils(utils);
 		
 		transform.transformFullDescription(new CodingScheme());
 	}
