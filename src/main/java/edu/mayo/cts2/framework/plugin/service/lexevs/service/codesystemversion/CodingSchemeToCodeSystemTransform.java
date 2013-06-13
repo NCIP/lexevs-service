@@ -77,7 +77,7 @@ public class CodingSchemeToCodeSystemTransform
 		String codingSchemeName = 
 			this.getCodingSchemeNameTranslator().translate(codingScheme.getCodingSchemeName());
 		
-		String name = this.getName(codingSchemeName, codingScheme.getCodingSchemeURI());
+		String name = this.getName(codingSchemeName, codingScheme.getRepresentsVersion());
 		
 		codeSystemVersion.setCodeSystemVersionName(name);
 		codeSystemVersion.setOfficialResourceVersionId(codingScheme.getRepresentsVersion());

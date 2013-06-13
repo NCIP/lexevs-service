@@ -64,6 +64,7 @@ public class DefaultCodingSchemeNameTranslator implements CodingSchemeNameTransl
 	 */
 	@Override
 	public String translate(String name){
+		String officialName = this.uriResolver.idToName(name, IdType.CODE_SYSTEM);
 		CodingScheme cs;
 		try {
 			cs = this.lexBigService.resolveCodingScheme(name, null);
@@ -72,7 +73,7 @@ public class DefaultCodingSchemeNameTranslator implements CodingSchemeNameTransl
 			//we couldn't find it in LexEVS - return it as-is.
 			return name;
 		}
-		String officialName = this.uriResolver.idToName(name, IdType.CODE_SYSTEM);
+		
 	
 		if(StringUtils.isNotBlank(officialName)){
 			//found a match... make sure it will resolve to the same CodeSystem
