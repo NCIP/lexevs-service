@@ -98,7 +98,7 @@ public class DefaultCodingSchemeNameTranslator implements CodingSchemeNameTransl
 		String name = cs.getCodingSchemeName();
 		
 		for(String localName : cs.getLocalName()){
-			if(localName.length() < name.length()){
+			if(StringUtils.isAlpha(localName) && (localName.length() < name.length())){
 				name = localName;
 			}
 		}

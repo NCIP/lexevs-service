@@ -71,7 +71,7 @@ public class CodingSchemeToCodeSystemTransform
 		CodeSystemVersionCatalogEntry codeSystemVersion = new CodeSystemVersionCatalogEntry();
 
 		codeSystemVersion.setAbout(
-				this.getUriHandler().getCodeSystemUri(codingScheme)
+				this.getUriHandler().getCodeSystemVersionUri(codingScheme)
 		);
 		
 		String codingSchemeName = 
@@ -139,7 +139,7 @@ public class CodingSchemeToCodeSystemTransform
 				this.getUriHandler().getCodeSystemVersionUri(codingSchemeSummary)
 		);
 		summary.setAbout(
-				this.getUriHandler().getCodeSystemUri(codingSchemeSummary)
+				this.getUriHandler().getCodeSystemVersionUri(codingSchemeSummary)
 		);
 		
 		summary.setFormalName(codingSchemeSummary.getFormalName());
