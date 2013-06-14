@@ -48,7 +48,10 @@ public final class CommonUtils {
 		
 		ScopedEntityName entityName = cts2EntityDescriptionReadId.getEntityName();
 		versionOrTag = Constructors.createCodingSchemeVersionOrTagFromVersion(codingSchemeName.getVersion());
-		referenceList = Constructors.createConceptReferenceList(entityName.getName(), entityName.getNamespace(), codingSchemeName.getName());
+		referenceList = Constructors.createConceptReferenceList(
+			entityName.getName(), 
+			nameConverter.getCodingSchemeNameTranslator().translateToLexGrid(entityName.getNamespace()), 
+			codingSchemeName.getName());
 		
 		try {
 			lexCodedNodeSet = lexBigService.getNodeSet(codingSchemeName.getName(), versionOrTag, null);

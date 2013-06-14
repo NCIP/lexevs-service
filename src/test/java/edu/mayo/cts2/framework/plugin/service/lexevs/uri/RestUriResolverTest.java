@@ -52,6 +52,11 @@ public class RestUriResolverTest {
 		assertEquals("http://id.nlm.nih.gov/cui/C1136323/",
 				resolver.idToBaseUri("LNC"));
 	}
+	
+	@Test
+	public void TestIdToIds() {
+		assertTrue(resolver.idToIds("MDR").contains("MedDRA"));
+	}
 
 	@Test
 	public void TestIdAndVersionToUri() {

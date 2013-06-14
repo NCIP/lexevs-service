@@ -227,7 +227,6 @@ public final class CommonSearchFilterUtils {
 			CodedNodeSet lexCodedNodeSet,
 			Set<EntityNameOrURI> cts2EntitySet) {
 		ConceptReferenceList lexConceptReferenceList = new ConceptReferenceList();
-		ConceptReference lexConcpetReference = null;
 		String cts2EntityName;
 		boolean listEmpty = true;
 		
@@ -239,7 +238,7 @@ public final class CommonSearchFilterUtils {
 				}
 				
 				if(cts2EntityName != null){
-					lexConcpetReference = new ConceptReference();
+					ConceptReference lexConcpetReference = new ConceptReference();
 					lexConcpetReference.setCode(cts2EntityName);
 					lexConceptReferenceList.addConceptReference(lexConcpetReference);
 					listEmpty = false;

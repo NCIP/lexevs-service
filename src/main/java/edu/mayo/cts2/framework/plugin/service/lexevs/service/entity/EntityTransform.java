@@ -52,7 +52,6 @@ import edu.mayo.cts2.framework.model.core.DescriptionInCodeSystem;
 import edu.mayo.cts2.framework.model.core.EntityReference;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
 import edu.mayo.cts2.framework.model.core.Property;
-import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.core.StatementTarget;
 import edu.mayo.cts2.framework.model.core.URIAndEntityName;
 import edu.mayo.cts2.framework.model.entity.Designation;
@@ -63,7 +62,6 @@ import edu.mayo.cts2.framework.model.entity.types.DesignationRole;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.transform.AbstractBaseTransform;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriResolver;
-import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriResolver.IdType;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.XmlUtils;
 
 /**
@@ -105,7 +103,8 @@ public class EntityTransform
 						entity.getEntityCode(), 
 						this.sanitizeNamespace(entity.getEntityCodeNamespace())));
 		
-		String codingSchemeName = this.getCodingSchemeNameTranslator().translate(reference.getCodingSchemeName());
+		String codingSchemeName = 
+			this.getCodingSchemeNameTranslator().translateFromLexGrid(reference.getCodingSchemeName());
 		
 		namedEntity.setDescribingCodeSystemVersion(
 			this.getTransformUtils().toCodeSystemVersionReference(
@@ -240,22 +239,26 @@ public class EntityTransform
 		return entry;
 	}
 	
-	public EntityReference transformEntityReference(ScopedEntityName name, ResolvedConceptReferencesIterator itr) {
+	public EntityReference transformEntityReference(ResolvedConceptReferencesIterator itr) {
 		
 		try {
 			if(! itr.hasNext()){
 				return null;
 			} else {
 				
-				EntityReference reference = new EntityReference();
-
-				reference.setName(name);
+				EntityReference reference = new EntityReference();;
 				
 				while(itr.hasNext()){
 					ResolvedConceptReference ref = itr.next();
 					
 					if(reference.getAbout() == null){
 						reference.setAbout(this.getUriHandler().getEntityUri(ref));
+					}
+					if(reference.getName() == null){
+						reference.setName(
+								ModelUtils.createScopedEntityName(
+									ref.getCode(), 
+									this.sanitizeNamespace(ref.getCodeNamespace())));
 					}
 			
 					DescriptionInCodeSystem description = new DescriptionInCodeSystem();
@@ -344,20 +347,16 @@ public class EntityTransform
 	}
 	
 	protected String sanitizeNamespace(String namespace){
-		String foundNamespace = 
-			this.uriResolver.idToName(namespace, IdType.CODE_SYSTEM);
-		if(foundNamespace != null){
-			return foundNamespace;
+		namespace = this.getCodingSchemeNameTranslator().translateFromLexGrid(namespace);
+
+		boolean isNamespaceValidNCName = XmlUtils.isNCName(namespace);
+		if(isNamespaceValidNCName){
+			return namespace;
 		} else {
-			boolean isNamespaceValidNCName = XmlUtils.isNCName(namespace);
-			if(isNamespaceValidNCName){
-				return namespace;
-			} else {
-				//Last ditch effort... generate a random namespace.
-				//If it gets here, it probably needs to be added
-				//to the UriResolver.
-				return "ns" + Integer.toString(namespace.hashCode());
-			}
+			//Last ditch effort... generate a random namespace.
+			//If it gets here, it probably needs to be added
+			//to the UriResolver.
+			return "ns" + Integer.toString(namespace.hashCode());
 		}
 	}
 

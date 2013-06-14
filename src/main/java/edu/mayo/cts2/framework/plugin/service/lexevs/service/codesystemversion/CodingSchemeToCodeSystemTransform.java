@@ -75,7 +75,7 @@ public class CodingSchemeToCodeSystemTransform
 		);
 		
 		String codingSchemeName = 
-			this.getCodingSchemeNameTranslator().translate(codingScheme.getCodingSchemeName());
+			this.getCodingSchemeNameTranslator().translateFromLexGrid(codingScheme.getCodingSchemeName());
 		
 		String name = this.getName(codingSchemeName, codingScheme.getRepresentsVersion());
 		
@@ -129,7 +129,7 @@ public class CodingSchemeToCodeSystemTransform
 		CodingSchemeSummary codingSchemeSummary = codingSchemeRendering.getCodingSchemeSummary();
 		
 		String codingSchemeName = 
-			this.getCodingSchemeNameTranslator().translate(codingSchemeSummary.getLocalName());
+			this.getCodingSchemeNameTranslator().translateFromLexGrid(codingSchemeSummary.getLocalName());
 		
 		String name = this.getName(codingSchemeName, codingSchemeSummary.getRepresentsVersion());
 		

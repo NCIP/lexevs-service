@@ -51,7 +51,6 @@ import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
-import edu.mayo.cts2.framework.plugin.service.lexevs.uri.EntityUriResolver;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionReadService;
@@ -67,6 +66,9 @@ import edu.mayo.cts2.framework.service.profile.entitydescription.name.EntityDesc
 @Component
 public class LexEvsEntityReadService extends AbstractLexEvsService 
 	implements EntityDescriptionReadService, InitializingBean {
+	
+	@Resource
+	private EntityNameQueryBuilder entityNameQueryBuilder;
 
 	@Resource
 	private EntityTransform transformer;
@@ -147,12 +149,10 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 			name = this.entityUriResolver.resolveUri(entityId.getUri());
 		}
 		
-		String searchString = 
-			String.format("code:%s AND namespace:%s", name.getName(), name.getNamespace());
+		String searchString = this.entityNameQueryBuilder.buildQuery(name);
 		
 		try {
 			return this.transformer.transformEntityReference(
-				name,
 				this.searchExtension.search(searchString));
 		} catch (LBParameterException e) {
 			//Exception on the LexEVS side dealing with an invalid input. Return null.

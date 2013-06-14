@@ -15,7 +15,7 @@ public class DefaultCodingSchemeNameTranslatorTestIT extends AbstractTestITBase 
 	
 	@Test
 	public void translateNotFound(){
-		assertEquals("not found", translator.translate("not found"));
+		assertEquals("not found", translator.translateFromLexGrid("not found"));
 	}
 
 }

@@ -23,6 +23,8 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.naming;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -43,6 +45,17 @@ public class VersionNameConverter {
 	
 	private static String SEPARATOR_ENCODE = "[:]";
 	
+	@Resource
+	private CodingSchemeNameTranslator codingSchemeNameTranslator;
+	
+	public VersionNameConverter(){
+		super();
+	}
+	
+	public VersionNameConverter(CodingSchemeNameTranslator codingSchemeNameTranslator){
+		super();
+		this.codingSchemeNameTranslator = codingSchemeNameTranslator;
+	}
 	/**
 	 * To cts2 code system version name.
 	 *
@@ -51,7 +64,10 @@ public class VersionNameConverter {
 	 * @return the string
 	 */
 	public String toCts2VersionName(String lexEvsCodingSchemeName, String version){
-		return lexEvsCodingSchemeName + SEPARATOR + this.escapeVersion(version);
+		return 
+			this.codingSchemeNameTranslator.translateFromLexGrid(lexEvsCodingSchemeName) 
+			+ SEPARATOR
+			+ this.escapeVersion(version);
 	}
 	
 	/**
@@ -69,7 +85,9 @@ public class VersionNameConverter {
 		String version = StringUtils.substringAfterLast(cts2CodeSystemVersionName, SEPARATOR);
 		String name = StringUtils.substringBeforeLast(cts2CodeSystemVersionName, SEPARATOR);
 
-		return new NameVersionPair(name, this.unescapeVersion(version));
+		return new NameVersionPair(
+			this.codingSchemeNameTranslator.translateToLexGrid(name), 
+			this.unescapeVersion(version));
 	}
 	
 	public boolean isValidVersionName(String cts2CodeSystemVersionName){
@@ -84,4 +102,14 @@ public class VersionNameConverter {
 	public String unescapeVersion(String version){
 		return StringUtils.replace(version, SEPARATOR_ENCODE, SEPARATOR);
 	}
+
+	public CodingSchemeNameTranslator getCodingSchemeNameTranslator() {
+		return codingSchemeNameTranslator;
+	}
+
+	public void setCodingSchemeNameTranslator(
+			CodingSchemeNameTranslator codingSchemeNameTranslator) {
+		this.codingSchemeNameTranslator = codingSchemeNameTranslator;
+	}
+	
 }

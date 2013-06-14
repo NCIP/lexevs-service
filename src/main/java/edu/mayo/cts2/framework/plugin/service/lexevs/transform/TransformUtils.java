@@ -27,6 +27,7 @@ import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.commonTypes.Property;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.core.url.UrlConstructor;
@@ -95,7 +96,7 @@ public class TransformUtils {
 	 */
 	public CodeSystemReference toCodeSystemReference(
 			String name, String uri){
-		name = codingSchemeNameTranslator.translate(name);
+		name = codingSchemeNameTranslator.translateFromLexGrid(name);
 		
 		CodeSystemReference ref = new CodeSystemReference();
 		ref.setContent(name);
@@ -106,7 +107,7 @@ public class TransformUtils {
 	
 	public MapReference toMapReference(
 			String name, String uri){
-		name = codingSchemeNameTranslator.translate(name);
+		name = codingSchemeNameTranslator.translateFromLexGrid(name);
 		
 		MapReference ref = new MapReference();
 		ref.setContent(name);
@@ -118,7 +119,7 @@ public class TransformUtils {
 
 	public CodeSystemVersionReference toCodeSystemVersionReference(
 			String name, String version, String about) {
-		name = codingSchemeNameTranslator.translate(name);
+		name = codingSchemeNameTranslator.translateFromLexGrid(name);
 		
 		CodeSystemVersionReference ref = new CodeSystemVersionReference();
 		ref.setCodeSystem(toCodeSystemReference(name, about));
@@ -153,12 +154,26 @@ public class TransformUtils {
 	}
 	
 	public String createEntityHref(ResolvedConceptReference reference){
-		String codingSchemeName = codingSchemeNameTranslator.translate(reference.getCodingSchemeName());
+		String codingSchemeName = 
+			this.codingSchemeNameTranslator.translateFromLexGrid(reference.getCodingSchemeName());
 		
-		return this.urlConstructor.createEntityUrl(
-				codingSchemeName, 
-				reference.getCodingSchemeVersion(), 
-				ModelUtils.createScopedEntityName(reference.getCode(), reference.getCodeNamespace()));
+		String namespace = 
+			this.codingSchemeNameTranslator.translateFromLexGrid(reference.getCodeNamespace());
+		
+		//if the namespace equals the CodingSchemeName, we don't need to add the namespace in the href.
+		if(StringUtils.equals(codingSchemeName, namespace)){
+			return this.urlConstructor.createEntityUrl(
+					codingSchemeName, 
+					reference.getCodingSchemeVersion(), 
+					reference.getCode());
+		} else {
+			return this.urlConstructor.createEntityUrl(
+					codingSchemeName, 
+					reference.getCodingSchemeVersion(), 
+					ModelUtils.createScopedEntityName(reference.getCode(), namespace));
+		}
+		
+
 	}
 
 	public URIAndEntityName toUriAndEntityName(

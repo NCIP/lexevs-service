@@ -43,7 +43,6 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.entity.DelegatingEntityQueryService.QueryType;
-import edu.mayo.cts2.framework.plugin.service.lexevs.uri.EntityUriResolver;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
@@ -55,6 +54,9 @@ public class SearchExtensionEntityQueryService
 	implements InitializingBean, DelegateEntityQueryService {
 	
 	private static final String LUCENE_QUERY = "luceneQuery";
+	
+	@Resource
+	private EntityNameQueryBuilder entityNameQueryBuilder;
 	
 	@Resource
 	private EntityTransform transformer;
@@ -185,6 +187,7 @@ public class SearchExtensionEntityQueryService
 			SortCriteria sortCriteria, 
 			Page page) {
 		return new BasicEntityDirectoryBuilder<EntityDirectoryEntry>(
+				this.entityNameQueryBuilder,
 				this.entityUriResolver,
 				new SearchExtensionSummariesCallback(query.getRestrictions().getCodeSystemVersions()), 
 				this.getSupportedMatchAlgorithms(), 
@@ -206,6 +209,7 @@ public class SearchExtensionEntityQueryService
 	@Override
 	public int count(EntityDescriptionQuery query) {
 		return new BasicEntityDirectoryBuilder<EntityDirectoryEntry>(
+				this.entityNameQueryBuilder,
 				this.entityUriResolver,
 				new SearchExtensionSummariesCallback(query.getRestrictions().getCodeSystemVersions()), 
 				this.getSupportedMatchAlgorithms(), 

@@ -23,6 +23,10 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.uri;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -46,6 +50,7 @@ public class RestUriResolver implements UriResolver, InitializingBean {
 	Var getBaseEntityUri;
 	Var getVersionName;
 	Var getVersionUri;
+	Var getIds;
 	
 	public RestUriResolver(){
 		super();
@@ -145,6 +150,21 @@ public class RestUriResolver implements UriResolver, InitializingBean {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Set<String> idToIds(String id) {
+		try {
+			Object ids = getIds.invoke(uriResolutionServiceUrl, id);
+			if (ids != null) { 
+				return new HashSet<String>((Collection<? extends String>) ids);
+			} else {
+				return null;
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -163,5 +183,7 @@ public class RestUriResolver implements UriResolver, InitializingBean {
 		getBaseEntityUri = RT.var("cts2.uri", "getBaseEntityUri");
 		getVersionName = RT.var("cts2.uri", "getVersionName");
 		getVersionUri = RT.var("cts2.uri", "getVersionUri");
+		getIds = RT.var("cts2.uri", "getIds");
 	}
+
 }

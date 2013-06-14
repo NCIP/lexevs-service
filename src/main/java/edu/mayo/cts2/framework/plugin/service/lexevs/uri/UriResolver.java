@@ -23,6 +23,8 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.uri;
 
+import java.util.Set;
+
 /**
  * Service Interface for resolvinig identifiers to URIs.
  *
@@ -47,6 +49,8 @@ public interface UriResolver {
 	 * @return the string
 	 */
 	public String idToUri(String id, IdType idType);
+	
+	public Set<String> idToIds(String id);
 
 	/**
 	 * Id to name.

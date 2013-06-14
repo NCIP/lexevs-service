@@ -25,6 +25,10 @@
  [baseuri id]
     (doGetId baseuri "CODE_SYSTEM" id "baseEntityURI"))
 
+(defn getIds 
+ [baseuri id]
+    (call (str baseuri "/ids/CODE_SYSTEM/" (encode id)) "identifiers"))
+
 (defn getName 
  [baseuri type id]
     (doGetId baseuri type id "resourceName"))

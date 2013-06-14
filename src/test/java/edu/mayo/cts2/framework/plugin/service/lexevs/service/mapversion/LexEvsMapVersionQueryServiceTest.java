@@ -36,6 +36,7 @@ import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.mapversion.MapVersion;
 import edu.mayo.cts2.framework.model.mapversion.MapVersionDirectoryEntry;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodingSchemeNameTranslator;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.FakeLexEvsData.DataField;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.FakeLexEvsSystem;
@@ -63,7 +64,22 @@ public class LexEvsMapVersionQueryServiceTest {
 		
 		service.setLexBigService(lexBigService);
 
-		CodingSchemeToMapVersionTransform transform = new CodingSchemeToMapVersionTransform(new VersionNameConverter());
+		CodingSchemeToMapVersionTransform transform = 
+			new CodingSchemeToMapVersionTransform(
+				new VersionNameConverter(new CodingSchemeNameTranslator(){
+
+			@Override
+			public String translateFromLexGrid(String name) {
+				return name;
+			}
+
+			@Override
+			public String translateToLexGrid(String name) {
+				return name;
+			}
+	
+		}));
+		
 		transform.setUrlConstructor(new UrlConstructor(new ServerContext(){
 
 			@Override
@@ -84,7 +100,20 @@ public class LexEvsMapVersionQueryServiceTest {
 		}));
 		
 		// Overwrite objects in service object 
-		service.setCodeSystemVersionNameConverter(new VersionNameConverter());
+		service.setCodeSystemVersionNameConverter(
+			new VersionNameConverter(new CodingSchemeNameTranslator(){
+
+			@Override
+			public String translateFromLexGrid(String name) {
+				return name;
+			}
+
+			@Override
+			public String translateToLexGrid(String name) {
+				return name;
+			}
+	
+		}));
 		service.setCodingSchemeToMapVersionTransform(transform);
 		service.setMappingExtension(new MappingExtensionImpl(fakeLexEvs));
 

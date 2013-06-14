@@ -34,7 +34,6 @@ import edu.mayo.cts2.framework.filter.match.StateAdjustingPropertyReference;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
-import edu.mayo.cts2.framework.plugin.service.lexevs.uri.EntityUriResolver;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQuery;
 
 /**
@@ -46,6 +45,8 @@ public class BasicEntityDirectoryBuilder<T> extends AbstractStateBuildingDirecto
 
 	private EntityUriResolver entityUriResolver;
 	
+	private EntityNameQueryBuilder entityNameQueryBuilder;
+	
 	/**
 	 * Instantiates a new basic entity directory builder.
 	 *
@@ -55,6 +56,7 @@ public class BasicEntityDirectoryBuilder<T> extends AbstractStateBuildingDirecto
 	 * @param stateAdjustingPropertyReferences the state adjusting property references
 	 */
 	public BasicEntityDirectoryBuilder(
+			EntityNameQueryBuilder entityNameQueryBuilder,
 			EntityUriResolver entityUriResolver,
 			AbstractStateBuildingDirectoryBuilder.Callback<String, T> callback,
 			Set<MatchAlgorithmReference> matchAlgorithmReferences,
@@ -63,6 +65,7 @@ public class BasicEntityDirectoryBuilder<T> extends AbstractStateBuildingDirecto
 				stateAdjustingPropertyReferences);
 		
 		this.entityUriResolver = entityUriResolver;
+		this.entityNameQueryBuilder = entityNameQueryBuilder;
 	}
 
 	public BasicEntityDirectoryBuilder<T> restrict(
@@ -87,7 +90,7 @@ public class BasicEntityDirectoryBuilder<T> extends AbstractStateBuildingDirecto
 						name = this.entityUriResolver.resolveUri(nameOrUri.getUri());
 					}
 					
-					entitySearchStrings.add(String.format("(code:%s AND namespace:%s)", name.getName(), name.getNamespace()));
+					entitySearchStrings.add(this.entityNameQueryBuilder.buildQuery(name));
 				}
 				entityQueryString.append(StringUtils.join(entitySearchStrings, " OR "));
 				

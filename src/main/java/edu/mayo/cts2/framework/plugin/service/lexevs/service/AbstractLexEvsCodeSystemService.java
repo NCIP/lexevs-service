@@ -33,6 +33,7 @@ import org.apache.commons.lang.StringUtils;
 
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodingSchemeNameTranslator;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriResolver;
@@ -49,6 +50,9 @@ public abstract class AbstractLexEvsCodeSystemService<T> extends AbstractLexEvsS
 	
 	@Resource
 	private VersionNameConverter versionNameConverter;
+	
+	@Resource
+	private CodingSchemeNameTranslator codingSchemeNameTranslator;
 	
 	protected abstract T transform(CodingScheme codingScheme);
 
@@ -112,6 +116,8 @@ public abstract class AbstractLexEvsCodeSystemService<T> extends AbstractLexEvsS
 	
 	protected CodingScheme resolve(String nameOrUri, CodingSchemeVersionOrTag versionIdOrTag){
 		CodingScheme codingScheme;
+		
+		nameOrUri = this.codingSchemeNameTranslator.translateToLexGrid(nameOrUri);
 		try {
 			codingScheme = this.getLexBigService().resolveCodingScheme(nameOrUri, versionIdOrTag);
 		} catch (LBException e) {

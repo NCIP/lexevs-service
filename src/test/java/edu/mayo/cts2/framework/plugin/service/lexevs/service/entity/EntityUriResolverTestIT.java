@@ -1,4 +1,4 @@
-package edu.mayo.cts2.framework.plugin.service.lexevs.uri;
+package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;

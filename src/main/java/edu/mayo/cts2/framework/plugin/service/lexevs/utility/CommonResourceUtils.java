@@ -198,18 +198,17 @@ public final class CommonResourceUtils{
 			QueryData<T> queryData,
 			SortCriteria cts2SortCriteria){
 		CodedNodeSet lexCodedNodeSet = null;
-		boolean dataExists = false;
 		
 		if(queryData.hasNameAndVersion()){
 			try {
 				LocalNameList lexLocalNameList = new LocalNameList();
 				
 				CodingSchemeRenderingList lexCodingSchemeRenderingList = lexBigService.getSupportedCodingSchemes();
-				dataExists = CommonSearchFilterUtils.queryReturnsData(lexCodingSchemeRenderingList, queryData);			
+				boolean dataExists = CommonSearchFilterUtils.queryReturnsData(lexCodingSchemeRenderingList, queryData);			
 				if(dataExists){
 					// Get Code Node Set from LexBIG service for given coding scheme
 					lexCodedNodeSet = lexBigService.getNodeSet(queryData.getLexSchemeName(), queryData.getLexVersionOrTag() , lexLocalNameList);
-					CommonSearchFilterUtils.filterLexCodedNodeSet(lexCodedNodeSet, queryData);
+					lexCodedNodeSet = CommonSearchFilterUtils.filterLexCodedNodeSet(lexCodedNodeSet, queryData);
 				}
 			} catch (LBException e) {
 				throw new RuntimeException(e);

@@ -8,7 +8,19 @@ public class VersionNameConverterTest {
 
 	@Test
 	public void fromCts2Name(){
-		VersionNameConverter converter = new VersionNameConverter();
+		VersionNameConverter converter = new VersionNameConverter(new CodingSchemeNameTranslator(){
+
+			@Override
+			public String translateFromLexGrid(String name) {
+				return name;
+			}
+
+			@Override
+			public String translateToLexGrid(String name) {
+				return name;
+			}
+	
+		});
 		
 		NameVersionPair pair = converter.fromCts2VersionName("test-1.0");
 		
@@ -18,7 +30,19 @@ public class VersionNameConverterTest {
 	
 	@Test
 	public void fromCts2NameWithEscape(){
-		VersionNameConverter converter = new VersionNameConverter();
+		VersionNameConverter converter = new VersionNameConverter(new CodingSchemeNameTranslator(){
+
+			@Override
+			public String translateFromLexGrid(String name) {
+				return name;
+			}
+
+			@Override
+			public String translateToLexGrid(String name) {
+				return name;
+			}
+	
+		});
 		
 		NameVersionPair pair = converter.fromCts2VersionName("test-1[:]0");
 		
@@ -28,7 +52,19 @@ public class VersionNameConverterTest {
 	
 	@Test
 	public void toCts2Name(){
-		VersionNameConverter converter = new VersionNameConverter();
+		VersionNameConverter converter = new VersionNameConverter(new CodingSchemeNameTranslator(){
+
+			@Override
+			public String translateFromLexGrid(String name) {
+				return name;
+			}
+
+			@Override
+			public String translateToLexGrid(String name) {
+				return name;
+			}
+	
+		});
 		
 		String name = converter.toCts2VersionName("test", "1.0");
 		
@@ -37,7 +73,19 @@ public class VersionNameConverterTest {
 	
 	@Test
 	public void toCts2NameWithEscape(){
-		VersionNameConverter converter = new VersionNameConverter();
+		VersionNameConverter converter = new VersionNameConverter(new CodingSchemeNameTranslator(){
+
+			@Override
+			public String translateFromLexGrid(String name) {
+				return name;
+			}
+
+			@Override
+			public String translateToLexGrid(String name) {
+				return name;
+			}
+	
+		});
 		
 		String name = converter.toCts2VersionName("test", "1-0");
 		
@@ -46,7 +94,19 @@ public class VersionNameConverterTest {
 	
 	@Test
 	public void isValidCts2Name(){
-		VersionNameConverter converter = new VersionNameConverter();
+		VersionNameConverter converter = new VersionNameConverter(new CodingSchemeNameTranslator(){
+
+			@Override
+			public String translateFromLexGrid(String name) {
+				return name;
+			}
+
+			@Override
+			public String translateToLexGrid(String name) {
+				return name;
+			}
+	
+		});
 		
 		assertTrue(converter.isValidVersionName("test-something-1.0"));
 	}

@@ -38,8 +38,23 @@ public class CodingSchemeToCodeSystemTransformTest {
 	@Test
 	@SuppressWarnings("deprecation")
 	public void testTransformWithEmpty(){
+		
 		CodingSchemeToCodeSystemTransform transform = 
-				new CodingSchemeToCodeSystemTransform(new VersionNameConverter());
+				new CodingSchemeToCodeSystemTransform(
+					new VersionNameConverter(
+						new CodingSchemeNameTranslator(){
+
+					@Override
+					public String translateFromLexGrid(String name) {
+						return name;
+					}
+
+					@Override
+					public String translateToLexGrid(String name) {
+						return name;
+					}
+			
+		}));
 		
 		UriHandler uriHandler = EasyMock.createNiceMock(UriHandler.class);
 		EasyMock.replay(uriHandler);
