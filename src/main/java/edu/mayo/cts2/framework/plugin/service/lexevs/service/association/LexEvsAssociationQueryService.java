@@ -30,6 +30,7 @@ import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodingSchemeNameTranslator;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
@@ -47,6 +48,9 @@ public class LexEvsAssociationQueryService extends AbstractLexEvsService impleme
 
 	@Resource
 	private VersionNameConverter nameConverter;
+	
+	@Resource
+	private CodingSchemeNameTranslator codingSchemeNameTranslator;
 	
 	private class CodedNodeGraphCallback 
 		implements Callback<CodedNodeGraph,AssociationDirectoryEntry> {
@@ -162,7 +166,7 @@ public class LexEvsAssociationQueryService extends AbstractLexEvsService impleme
 		ConceptReference ref = 
 			Constructors.createConceptReference(
 				focus.getEntityName().getName(), 
-				focus.getEntityName().getNamespace(), 
+				this.codingSchemeNameTranslator.translateToLexGrid(focus.getEntityName().getNamespace()), 
 				null);
 		
 		DirectoryBuilder<AssociationDirectoryEntry> builder = 

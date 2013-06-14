@@ -76,6 +76,17 @@ public class DefaultCodingSchemeNameTranslator implements
 							lexgridName, IdType.CODE_SYSTEM);
 					if (StringUtils.isNotBlank(officialName)) {
 						this.aliasToLexGridMap.put(officialName, lexgridName);
+						
+						String uri = this.uriResolver.idToUri(officialName, IdType.CODE_SYSTEM);
+						String baseUri = this.uriResolver.idToBaseUri(officialName);
+						
+						if(StringUtils.isNotBlank(uri)){
+							this.aliasToLexGridMap.put(uri, lexgridName);
+						}
+						if(StringUtils.isNotBlank(baseUri)){
+							this.aliasToLexGridMap.put(baseUri, lexgridName);
+						}
+
 						this.lexgridToAliasMap.put(lexgridName, officialName);
 					}
 				}
