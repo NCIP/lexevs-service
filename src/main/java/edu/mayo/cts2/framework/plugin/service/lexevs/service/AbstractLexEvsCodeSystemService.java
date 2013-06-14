@@ -29,7 +29,6 @@ import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.codingSchemes.CodingScheme;
-import org.apache.commons.lang.StringUtils;
 
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
@@ -53,6 +52,9 @@ public abstract class AbstractLexEvsCodeSystemService<T> extends AbstractLexEvsS
 	
 	@Resource
 	private CodingSchemeNameTranslator codingSchemeNameTranslator;
+	
+	@Resource
+	private CodeSystemVersionUriResolver codeSystemVersionUriResolver;
 	
 	protected abstract T transform(CodingScheme codingScheme);
 
@@ -149,10 +151,7 @@ public abstract class AbstractLexEvsCodeSystemService<T> extends AbstractLexEvsS
 			}
 		} else {
 			String fullUri = cts2NameOrURI.getUri();
-			String uri = StringUtils.substringBeforeLast(fullUri, "/");
-			String version = StringUtils.substringAfterLast(fullUri, "/");
-			
-			namePair = new NameVersionPair(uri, version);
+			namePair = this.codeSystemVersionUriResolver.resolveUri(fullUri);
 		}
 
 		return namePair;
