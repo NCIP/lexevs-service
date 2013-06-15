@@ -71,9 +71,9 @@ public class SearchExtensionEntityQueryServiceTestIT
 		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
 		
 		for(String uri : Arrays.asList(
-				"urn:oid:11.11.0.1/C0001",
-				"urn:oid:11.11.0.1/A0001",
-				"urn:oid:11.11.0.2/H0001"
+				"urn:oid:11.11.0.1:C0001",
+				"urn:oid:11.11.0.1:A0001",
+				"urn:oid:11.11.0.2:H0001"
 				)){
 			EntityNameOrURI nameOrUri = new EntityNameOrURI();
 			nameOrUri.setUri(uri);

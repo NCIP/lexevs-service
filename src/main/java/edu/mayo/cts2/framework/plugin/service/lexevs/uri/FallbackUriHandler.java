@@ -52,7 +52,7 @@ public class FallbackUriHandler implements DelegateUriHandler {
 	
 		String name = reference.getCode();
 		
-		return codingSchemeUri + "/" + name;
+		return UriUtils.combine(codingSchemeUri, name);
 	}
 	
 	/* (non-Javadoc)
@@ -73,18 +73,22 @@ public class FallbackUriHandler implements DelegateUriHandler {
 	 */
 	@Override
 	public String getCodeSystemVersionUri(CodingScheme codingScheme) {
-		return codingScheme.getCodingSchemeURI() + "/" + codingScheme.getRepresentsVersion();
+		return UriUtils.combine(
+				codingScheme.getCodingSchemeURI(), 
+				codingScheme.getRepresentsVersion());
 	}
 
 	@Override
 	public String getCodeSystemVersionUri(CodingSchemeSummary codingSchemeSummary) {
-		return codingSchemeSummary.getCodingSchemeURI() + "/" + codingSchemeSummary.getRepresentsVersion();
+		return UriUtils.combine(
+				codingSchemeSummary.getCodingSchemeURI(),
+				codingSchemeSummary.getRepresentsVersion());
 	}
 
 	@Override
 	public String getPredicateUri(String codingSchemeUri,
 			String codingSchemeVersion, String associationName) {
-		return codingSchemeUri + "/" + associationName;
+		return UriUtils.combine(codingSchemeUri, associationName);
 	}
 	
 	@Override

@@ -11,12 +11,11 @@ import org.springframework.stereotype.Component;
 import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriResolver;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriResolver.IdType;
+import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriUtils;
 
 @Component
 public class EntityUriResolver {
-	
-	private final String URI_SEPARATOR = "/";
-	
+		
 	@Resource
 	private LexBIGService lexBigService;
 	
@@ -24,12 +23,13 @@ public class EntityUriResolver {
 	private UriResolver uriResolver;
 	
 	public ScopedEntityName resolveUri(String entityUri){
-		String[] parts = this.splitNamespaceAndLocalPart(entityUri);
+		String namePart = UriUtils.getLocalPart(entityUri);
+		String namespacePart = UriUtils.getNamespace(entityUri);
 		
 		ScopedEntityName name = new ScopedEntityName();
-		name.setName(parts[1]);
+		name.setName(namePart);
 
-		String namespace = this.uriResolver.idToName(parts[0], IdType.CODE_SYSTEM);
+		String namespace = this.uriResolver.idToName(namespacePart, IdType.CODE_SYSTEM);
 		
 		if(StringUtils.isNotBlank(namespace)){
 			name.setNamespace(namespace);
@@ -37,7 +37,7 @@ public class EntityUriResolver {
 			return name;
 		} else {
 			try {
-				CodingScheme cs = this.lexBigService.resolveCodingScheme(parts[0], null);
+				CodingScheme cs = this.lexBigService.resolveCodingScheme(namespacePart, null);
 				name.setNamespace(cs.getCodingSchemeName());
 				return name;
 			} catch (LBException e) {
@@ -45,12 +45,6 @@ public class EntityUriResolver {
 				return null;
 			}	
 		}
-	}
-	
-	protected String[] splitNamespaceAndLocalPart(String uri){
-		return new String[]{
-			StringUtils.substringBeforeLast(uri, URI_SEPARATOR),
-			StringUtils.substringAfterLast(uri, URI_SEPARATOR)};
 	}
 
 }
