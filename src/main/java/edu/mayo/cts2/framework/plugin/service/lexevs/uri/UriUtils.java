@@ -60,10 +60,15 @@ public final class UriUtils {
 	 * @return the string
 	 */
 	public static String combine(String uri, String tokenToAppend) {
-		if (StringUtils.startsWithIgnoreCase(uri, URN_PREFIX)) {
-			return uri + URN_SEPARATOR + tokenToAppend;
+		char lastChar = uri.charAt(uri.length() - 1);
+		if(SEPARATORS.contains(lastChar)){
+			return uri + tokenToAppend;
 		} else {
-			return uri + DEFAULT_SEPARATOR + tokenToAppend;
+			if (StringUtils.startsWithIgnoreCase(uri, URN_PREFIX)) {
+				return uri + URN_SEPARATOR + tokenToAppend;
+			} else {
+				return uri + DEFAULT_SEPARATOR + tokenToAppend;
+			}
 		}
 	}
 
