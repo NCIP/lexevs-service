@@ -52,12 +52,18 @@ public class LexBigServiceFactory implements FactoryBean<LexBIGService>, Disposa
 	private Boolean useRemoteApi;
 	
 	private String lgConfigFile;
+	
+	private boolean hasBeenConfigured = false;
 
 	/* (non-Javadoc)
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */
 	@Override
 	public LexBIGService getObject() throws Exception {
+		while(! this.hasBeenConfigured){
+			this.log.warn("Waiting for the Configuration Service to start...");
+			Thread.sleep(4000);
+		}
 		if (BooleanUtils.toBoolean(this.useRemoteApi) && StringUtils.isNotBlank(this.lexevsRemoteApiUrl)) {
 			return (LexEVSApplicationService) ApplicationServiceProvider
 					.getApplicationServiceFromUrl(this.lexevsRemoteApiUrl, "EvsServiceInfo");
@@ -100,6 +106,8 @@ public class LexBigServiceFactory implements FactoryBean<LexBIGService>, Disposa
 		this.lexevsRemoteApiUrl = (String)properties.get("lexevsRemoteApiUrl");
 		this.lgConfigFile = (String)properties.get(LG_CONFIG_FILE_ENV);
 		this.useRemoteApi = BooleanUtils.toBoolean(properties.get("useRemoteApi").toString());
+		
+		this.hasBeenConfigured = true;
 	}
 
 	public String getLexevsRemoteApiUrl() {
