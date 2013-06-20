@@ -35,6 +35,7 @@ import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Extensions.Generic.CodingSchemeReference;
 import org.LexGrid.LexBIG.Extensions.Generic.SearchExtension;
+import org.LexGrid.LexBIG.Extensions.Generic.SearchExtension.MatchAlgorithm;
 import org.LexGrid.LexBIG.Impl.helpers.ResolvedConceptReferencesIteratorAdapter;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
@@ -130,7 +131,7 @@ public class SearchExtensionBulkDownloader
 	public void download(OutputStream outputStream, Set<CodingSchemeReference> codingSchemes, List<String> fields, char separator) {
 		ResolvedConceptReferencesIterator itr;
 		try {
-			itr = searchExtension.search(null, codingSchemes);
+			itr = searchExtension.search(null, codingSchemes, MatchAlgorithm.LUCENE);
 		} catch (LBParameterException e) {
 			throw new RuntimeException(e);
 		}

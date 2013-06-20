@@ -32,6 +32,7 @@ import javax.annotation.Resource;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Extensions.Generic.SearchExtension;
+import org.LexGrid.LexBIG.Extensions.Generic.SearchExtension.MatchAlgorithm;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
@@ -153,7 +154,7 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 		
 		try {
 			return this.transformer.transformEntityReference(
-				this.searchExtension.search(searchString));
+				this.searchExtension.search(searchString, MatchAlgorithm.LUCENE));
 		} catch (LBParameterException e) {
 			//Exception on the LexEVS side dealing with an invalid input. Return null.
 			return null;

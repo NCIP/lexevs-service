@@ -14,6 +14,7 @@ import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Extensions.Generic.CodingSchemeReference;
 import org.LexGrid.LexBIG.Extensions.Generic.SearchExtension;
+import org.LexGrid.LexBIG.Extensions.Generic.SearchExtension.MatchAlgorithm;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
 import org.apache.commons.lang.StringUtils;
@@ -121,7 +122,7 @@ public class SearchExtensionEntityQueryService
 				int maxResults) {
 			ResolvedConceptReferencesIterator iterator;
 			try {
-				iterator = searchExtension.search(state, toCodingSchemeReference(this.codeSystemVersions));
+				iterator = searchExtension.search(state, toCodingSchemeReference(this.codeSystemVersions), MatchAlgorithm.LUCENE);
 			} catch (LBParameterException e) {
 				throw new RuntimeException(e);
 			}
@@ -149,7 +150,10 @@ public class SearchExtensionEntityQueryService
 		public int executeCount(String state) {
 			try {
 				return 
-					searchExtension.search(state, toCodingSchemeReference(this.codeSystemVersions)).numberRemaining();
+					searchExtension.search(
+						state, 
+						toCodingSchemeReference(this.codeSystemVersions), 
+						MatchAlgorithm.LUCENE).numberRemaining();
 			} catch (LBException e) {
 				throw new RuntimeException(e);
 			}

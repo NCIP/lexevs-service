@@ -58,7 +58,7 @@
 
 	<properties>
 		<forkMode>never</forkMode>
-		<lexevs.version>6.0.5.9-SNAPSHOT</lexevs.version>
+		<lexevs.version>6.0.5.12-SNAPSHOT</lexevs.version>
 		<lexevs.remote.version>6.0</lexevs.remote.version>
 		<cagrid.version>1.3</cagrid.version>
 		<spring-security.version>${org.springframework-version}</spring-security.version>
@@ -73,7 +73,7 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
-				<packaging>bundle</packaging>
+				<packaging>war</packaging>
 			</properties>
 		</profile>
 	</profiles>
@@ -197,6 +197,14 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<packagingExcludes>
+						WEB-INF/lib/commons-logging*.jar,
+						WEB-INF/lib/xml-apis*.jar,
+						WEB-INF/lib/log4j*.jar
+						WEB-INF/lib/axis-saaj*.jar
+					</packagingExcludes>
+				</configuration>
 				<executions>
 					<execution>
 						<!-- When also running maven-jar-plugin correct maven-war-plugin's 
@@ -206,8 +214,6 @@
 						<goals>
 							<goal>war</goal>
 						</goals>
-						<configuration>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -367,6 +373,13 @@
 			<artifactId>commons-discovery</artifactId>
 			<version>0.4</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.0.4</version>
+			<scope>provided</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>javax.xml</groupId>
@@ -396,6 +409,12 @@
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
 			<version>3.6.10.Final</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>3.1.0.GA</version>
 		</dependency>
 
 		<dependency>
@@ -438,6 +457,7 @@
 			<groupId>xerces</groupId>
 			<artifactId>xercesImpl</artifactId>
 			<version>2.11.0</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
@@ -545,7 +565,7 @@
 			<artifactId>plugin-util</artifactId>
 			<version>${develpment.framework.version}</version>
 		</dependency>
-
+		
 		<dependency>
 			<groupId>edu.mayo.cts2.framework</groupId>
 			<artifactId>webapp-rest-extensions</artifactId>
