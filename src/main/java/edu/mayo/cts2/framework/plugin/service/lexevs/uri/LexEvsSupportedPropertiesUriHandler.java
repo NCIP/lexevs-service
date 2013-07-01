@@ -94,7 +94,7 @@ public class LexEvsSupportedPropertiesUriHandler implements DelegateUriHandler {
 	
 	private SupportedAssociation findSupportedAssociation(String association, SupportedAssociation[] associations){
 		for(SupportedAssociation sa : associations){
-			if(sa.getLocalId().equals(associations)){
+			if(sa.getLocalId().equals(association)){
 				return sa;
 			}
 		}

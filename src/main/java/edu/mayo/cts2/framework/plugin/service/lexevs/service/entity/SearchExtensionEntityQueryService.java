@@ -18,6 +18,7 @@ import org.LexGrid.LexBIG.Extensions.Generic.SearchExtension.MatchAlgorithm;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
 import org.apache.commons.lang.StringUtils;
+import org.apache.lucene.queryParser.QueryParser;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
@@ -243,22 +244,35 @@ public class SearchExtensionEntityQueryService
 	
 	private StateUpdater<String> RESOURCE_NAME_STATE_UPDATER = new AbstractStateUpdater(){
 		@Override
-		protected String decorate(String string) {
-			return "code:" + string;
+		protected String decorate(String string, MatchAlgorithmReference matchAlgorithm) {
+			return "code:" + QueryParser.escape(string);
 		}
 	};
 	
 	private StateUpdater<String> RESOURCE_SYNOPSIS_STATE_UPDATER = new AbstractStateUpdater(){
 		@Override
-		protected String decorate(String string) {
-			return string;
+		protected String decorate(String text, MatchAlgorithmReference matchAlgorithm) {
+			if(matchAlgorithm.getContent().equals(
+				StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference().getContent())){
+				text = QueryParser.escape(text);
+	            StringBuilder sb = new StringBuilder();
+	            for(String token : text.split("\\s+")){
+	               sb.append("description:");
+	               sb.append(token);
+	               sb.append("* ");
+	            }
+	            return sb.toString().trim();
+			} else if(matchAlgorithm.getContent().equals(
+					StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference().getContent())){
+				return "exactDescription:\"" + QueryParser.escape(text) + "\"";
+			} else {
+				throw new IllegalStateException();
+			}
 		}
 	};
-	
+  
 	private abstract class AbstractStateUpdater implements StateUpdater<String>{
 
-		protected abstract String decorate(String string);
-		
 		@Override
 		public String updateState(
 				String currentState,
@@ -268,21 +282,11 @@ public class SearchExtensionEntityQueryService
 			if(StringUtils.isNotBlank(currentState)){
 				andOrBlank = " AND ";
 			}
-			return currentState + andOrBlank + decorate(adjustQueryString(queryString, matchAlgorithm));
+			return currentState + andOrBlank + decorate(queryString, matchAlgorithm);
 		}
-		
+
+		protected abstract String decorate(String queryString, MatchAlgorithmReference matchAlgorithm);
 	};
-	
-	protected String adjustQueryString(String string, MatchAlgorithmReference reference){
-		if(reference.getContent().equals(
-			StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference().getContent())){
-			return string + "*";
-		} else if(reference.getContent().equals(LUCENE_QUERY)){
-			return string;
-		} else {
-			throw new IllegalStateException();
-		}
-	}
 
 	@Override
 	public EntityReferenceList resolveAsEntityReferenceList(
