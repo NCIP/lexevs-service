@@ -228,14 +228,14 @@ public class EntityTransform
 				reference.getCodingSchemeVersion(),
 				reference.getCodingSchemeURI()));
 		
+		description.setHref(this.getTransformUtils().createEntityHref(reference));
+		
 		if(reference.getEntityDescription() != null){
 			description.setDesignation(reference.getEntityDescription().getContent());
 		}
 		
 		entry.addKnownEntityDescription(description);
-		
-		entry.setHref(this.getTransformUtils().createEntityHref(reference));
-		
+	
 		return entry;
 	}
 	
