@@ -30,6 +30,7 @@ import org.LexGrid.relations.Relations;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import edu.mayo.cts2.framework.core.constants.URIHelperInterface;
 import edu.mayo.cts2.framework.model.core.CodeSystemReference;
 import edu.mayo.cts2.framework.model.core.EntryDescription;
 import edu.mayo.cts2.framework.model.map.MapCatalogEntry;
@@ -59,7 +60,11 @@ public class CodingSchemeToMapTransform
 				this.getUriHandler().getCodeSystemUri(codingScheme)
 		);
 		
-		mapCatalogEntry.setMapName(codingScheme.getCodingSchemeName());
+		String mapName = codingScheme.getCodingSchemeName();
+		
+		mapCatalogEntry.setMapName(mapName);
+		mapCatalogEntry.setVersions(
+			this.getUrlConstructor().createMapUrl(mapName + "/" + URIHelperInterface.VERSIONS));
 		
 		mapCatalogEntry.setFormalName(codingScheme.getFormalName());
 		
@@ -99,7 +104,10 @@ public class CodingSchemeToMapTransform
 				this.getUriHandler().getCodeSystemUri(codingScheme)
 		);
 		
-		mapCatalogEntrySummary.setMapName(codingScheme.getCodingSchemeName());
+		String mapName = codingScheme.getCodingSchemeName();
+		
+		mapCatalogEntrySummary.setMapName(mapName);
+		mapCatalogEntrySummary.setHref(this.getUrlConstructor().createMapUrl(mapName));
 		
 		mapCatalogEntrySummary.setFormalName(codingScheme.getFormalName());
 		

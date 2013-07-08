@@ -12,9 +12,7 @@ import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.codingSchemes.CodingScheme;
 import org.springframework.stereotype.Component;
 
-import edu.mayo.cts2.framework.core.constants.URIHelperInterface;
 import edu.mayo.cts2.framework.core.url.UrlConstructor;
-import edu.mayo.cts2.framework.core.util.EncodingUtils;
 import edu.mayo.cts2.framework.filter.match.ContainsMatcher;
 import edu.mayo.cts2.framework.filter.match.ExactMatcher;
 import edu.mayo.cts2.framework.filter.match.ResolvableMatchAlgorithmReference;
@@ -22,14 +20,11 @@ import edu.mayo.cts2.framework.filter.match.StartsWithMatcher;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
-import edu.mayo.cts2.framework.model.core.CodeSystemVersionReference;
-import edu.mayo.cts2.framework.model.core.DescriptionInCodeSystem;
 import edu.mayo.cts2.framework.model.core.EntitySynopsis;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
 import edu.mayo.cts2.framework.model.core.PropertyReference;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
-import edu.mayo.cts2.framework.model.core.ValueSetDefinitionReference;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.entity.EntityDescription;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
@@ -87,12 +82,12 @@ ResolvedValueSetResolutionService {
 	public Set<? extends PropertyReference> getSupportedSearchReferences() {
 		PropertyReference
 		name = StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference();
-	PropertyReference
-		about = StandardModelAttributeReference.ABOUT.getPropertyReference();
-	PropertyReference
-		description = StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference();
-	return new HashSet<PropertyReference>(Arrays.asList(name,about,description));
-
+		PropertyReference
+			about = StandardModelAttributeReference.ABOUT.getPropertyReference();
+		PropertyReference
+			description = StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference();
+		
+		return new HashSet<PropertyReference>(Arrays.asList(name,about,description));
 	}
 
 	@Override
@@ -156,16 +151,14 @@ ResolvedValueSetResolutionService {
 		
 	}
 
-	
 	protected ResolvedValueSetHeader getResolvedValueSetHeader(String id){
 		CodingScheme cs= resolve(id, null);
 		if (cs !=null) {
-		return transform.transformToResolvedValueSetHeader(cs);
+			return transform.transformToResolvedValueSetHeader(cs);
 		} else {
 			return null;
 		}
 	}
-	
 	
 	@Override
 	public DirectoryResult<EntityDescription> getEntityList(
@@ -197,55 +190,6 @@ ResolvedValueSetResolutionService {
 		return codingScheme;
 	}
 	
-	private ResolvedValueSetResult<EntityDirectoryEntry> addInEntitiesHrefs(
-			ResolvedValueSetResult<EntityDirectoryEntry> result) {
-		if(result == null || result.getEntries() == null){
-			return null;
-		}
-		
-		CodeSystemVersionReference ref = 
-				result.getResolvedValueSetHeader().getResolvedUsingCodeSystem(0);
-		
-		for(EntityDirectoryEntry entry : result.getEntries()){
-			
-			entry.setHref(
-					this.urlConstructor.getServerRootWithAppName() + "/" + URIHelperInterface.ENTITY + "/" + 
-							EncodingUtils.encodeScopedEntityName(entry.getName()));
-			
-			ValueSetDefinitionReference resolutionOf = result.getResolvedValueSetHeader().getResolutionOf();
-			
-			for(DescriptionInCodeSystem description : entry.getKnownEntityDescription()){
-				description.setHref(this.urlConstructor.createEntityUrl(
-						resolutionOf.getValueSet().getContent(),
-						resolutionOf.getValueSetDefinition().getContent(),
-						entry.getName()));
-				
-				description.setDescribingCodeSystemVersion(ref);
-			}
-			
-		}
-		
-		return result;
-	}
-
-	private ResolvedValueSetResult<EntitySynopsis> addInHrefs(
-			ResolvedValueSetResult<EntitySynopsis> result) {
-		if(result == null || result.getEntries() == null){
-			return null;
-		}
-		
-		for(EntitySynopsis entry : result.getEntries()){
-	
-			ValueSetDefinitionReference resolutionOf = result.getResolvedValueSetHeader().getResolutionOf();
-			
-			entry.setHref(this.urlConstructor.createEntityUrl(
-				resolutionOf.getValueSet().getContent(),
-				resolutionOf.getValueSetDefinition().getContent(),
-				EncodingUtils.encodeScopedEntityName(entry)));
-		}
-		
-		return result;
-	}	
 	private EntityDescriptionQuery toEntityDescriptionQuery(
 			ResolvedValueSetReadId identifier, final ResolvedValueSetResolutionEntityQuery query){
 		
