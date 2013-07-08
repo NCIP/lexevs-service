@@ -46,6 +46,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import edu.mayo.cts2.framework.core.constants.URIHelperInterface;
 import edu.mayo.cts2.framework.model.core.Comment;
 import edu.mayo.cts2.framework.model.core.Definition;
 import edu.mayo.cts2.framework.model.core.DescriptionInCodeSystem;
@@ -142,6 +143,20 @@ public class EntityTransform
 	    entityType.setUri("http://www.w3.org/2002/07/owl#Class");
 
 	    namedEntity.addEntityType(entityType);
+	    
+	    String entityHref = this.getTransformUtils().createEntityHref(reference);
+	    
+	    if(reference.getSourceOf() != null &&
+	    	reference.getSourceOf().getAssociationCount() > 0){
+	    	namedEntity.setSubjectOf(
+	    		entityHref + "/" + URIHelperInterface.SUBJECTOF);
+	    }
+	    
+	    if(reference.getTargetOf() != null &&
+		 	reference.getTargetOf().getAssociationCount() > 0){
+		 	namedEntity.setTargetOf(
+				entityHref + "/" + URIHelperInterface.TARGETOF);
+		}
 
 		EntityDescription ed = new EntityDescription();
 		ed.setNamedEntity(namedEntity);
