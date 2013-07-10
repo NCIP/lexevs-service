@@ -199,9 +199,8 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
 					<packagingExcludes>
-						WEB-INF/lib/commons-logging*.jar,
+						WEB-INF/lib/icu4j*.jar,
 						WEB-INF/lib/xml-apis*.jar,
-						WEB-INF/lib/log4j*.jar,
 						WEB-INF/lib/axis-saaj*.jar
 					</packagingExcludes>
 				</configuration>
