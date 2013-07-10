@@ -56,11 +56,8 @@ public class ResolvedCodingSchemeTransform {
 		entry.setResourceName(name);
 		
 		entry.setHref(this.urlConstructor.createResolvedValueSetUrl(cs.getCodingSchemeName(), name, name));
-		
-		ResolvedValueSetHeader header = new ResolvedValueSetHeader();
-		List<CodeSystemVersionReference> resolvedReferences = getResolvedUsingCodeSystemList(cs);
-		header.setResolvedUsingCodeSystem(resolvedReferences);
-		entry.setResolvedHeader(header);
+
+		entry.setResolvedHeader(this.transformToResolvedValueSetHeader(cs));
 		return entry;
 	}
 
