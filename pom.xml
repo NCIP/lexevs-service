@@ -73,7 +73,7 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
-				<packaging>war</packaging>
+				<packaging>bundle</packaging>
 			</properties>
 		</profile>
 	</profiles>

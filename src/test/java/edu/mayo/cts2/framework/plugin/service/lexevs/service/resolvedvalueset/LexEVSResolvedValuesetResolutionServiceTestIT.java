@@ -30,6 +30,7 @@ import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 import edu.mayo.cts2.framework.service.profile.resolvedvalueset.ResolvedValueSetResolutionService;
 import edu.mayo.cts2.framework.service.profile.resolvedvalueset.name.ResolvedValueSetReadId;
+import edu.mayo.cts2.framework.service.profile.valuesetdefinition.ResolvedValueSetResult;
 
 @LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosAndGM.xml")
 public class LexEVSResolvedValuesetResolutionServiceTestIT extends
@@ -116,7 +117,7 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT extends
 		assertTrue(dirResult.getEntries().size() > 0);
 
 	}	
-	
+
 	
 	@Test
 	public void testGetResolutionValidXML() throws Exception {
@@ -127,20 +128,35 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT extends
 		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
 		  		  StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), 
 		  		"GM");
-
 		
-		DirectoryResult<EntitySynopsis> dirResult = service.getResolution(
+		ResolvedValueSetResult<EntitySynopsis> dirResult = service.getResolution(
 				identifier, filter, new Page());
 
-
-		
-		
 		for (EntitySynopsis synopsis: dirResult.getEntries()) {
 			StreamResult result= new StreamResult(new StringWriter());
 			marshaller.marshal(synopsis, result);
 			System.out.println(result.getWriter().toString());
 		}
 		
+	}
+	
+	@Test
+	public void testGetResolutionValidHasValidHeader() throws Exception {
+		ResolvedValueSetReadId identifier = new ResolvedValueSetReadId("SRITEST:AUTO:AllDomesticANDGM-06736a30878a0f8bd0ea83196732380a",
+				ModelUtils.nameOrUriFromName("SRITEST:AUTO:AllDomesticANDGM"),
+				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM-06736a30878a0f8bd0ea83196732380a"));
+		
+		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
+		  		  StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), 
+		  		"GM");
+		
+		ResolvedValueSetResult<EntitySynopsis> dirResult = service.getResolution(
+				identifier, filter, new Page());
+
+		assertNotNull(dirResult.getResolvedValueSetHeader());
+		
+		StreamResult result = new StreamResult(new StringWriter());
+		marshaller.marshal(dirResult.getResolvedValueSetHeader(), result);		
 	}
 
 }

@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.Exceptions.LBException;
+import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.codingSchemes.CodingScheme;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +34,8 @@ import edu.mayo.cts2.framework.model.service.core.Query;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSet;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSetHeader;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.entity.LexEvsEntityQueryService;
 import edu.mayo.cts2.framework.service.command.restriction.EntityDescriptionQueryServiceRestrictions;
@@ -56,6 +59,9 @@ ResolvedValueSetResolutionService {
 	@Resource
 	private ResolvedCodingSchemeTransform transform;
 		
+	@Resource
+	private VersionNameConverter nameConverter;
+	
 	@Resource
 	private LexEvsEntityQueryService lexEvsEntityQueryService;	
 	
@@ -152,11 +158,16 @@ ResolvedValueSetResolutionService {
 	}
 
 	protected ResolvedValueSetHeader getResolvedValueSetHeader(String id){
-		CodingScheme cs= resolve(id, null);
+		NameVersionPair versionNamePair = this.nameConverter.fromCts2VersionName(id);
+		
+		CodingScheme cs = resolve(
+			versionNamePair.getName(), 
+			Constructors.createCodingSchemeVersionOrTagFromVersion(versionNamePair.getVersion()));
+		
 		if (cs !=null) {
 			return transform.transformToResolvedValueSetHeader(cs);
 		} else {
-			return null;
+			throw new RuntimeException("Cannot find CodingScheme for ResolvedValueSet Header: " + id);
 		}
 	}
 	
