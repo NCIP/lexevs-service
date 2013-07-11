@@ -110,8 +110,8 @@ public class ResolvedCodingSchemeTransform {
 			synopsis.setName(scopedEntity.getName());
 			synopsis.setNamespace(scopedEntity.getNamespace());
 		}
-		synopsis.setDesignation(entry.getResourceName());
-		synopsis.setUri(entry.getHref());
+		synopsis.setDesignation(entry.getKnownEntityDescription()[0].getDesignation());
+		synopsis.setUri(entry.getAbout());
 		synopsis.setHref(entry.getHref());
 		return synopsis;
 

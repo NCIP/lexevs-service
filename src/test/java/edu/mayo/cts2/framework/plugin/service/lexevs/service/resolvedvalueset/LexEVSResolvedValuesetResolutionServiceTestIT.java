@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,6 +14,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.junit.Test;
+import org.springframework.oxm.XmlMappingException;
 
 import edu.mayo.cts2.framework.core.xml.Cts2Marshaller;
 import edu.mayo.cts2.framework.model.command.Page;
@@ -74,6 +76,19 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT extends
 
 	}
 
+	@Test
+	public void testGetResolutionEntitiesNoFilterValidXML() throws Exception {
+		ResolvedValueSetReadId identifier = new ResolvedValueSetReadId("SRITEST:AUTO:AllDomesticANDGM-06736a30878a0f8bd0ea83196732380a",
+				ModelUtils.nameOrUriFromName("SRITEST:AUTO:AllDomesticANDGM"),
+				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM-06736a30878a0f8bd0ea83196732380a"));
+		DirectoryResult<EntityDirectoryEntry> dirResult = service.getEntities(
+				identifier, null, null, new Page());
+		
+		for(EntityDirectoryEntry entry : dirResult.getEntries()){
+			StreamResult result = new StreamResult(new StringWriter());
+			marshaller.marshal(entry, result);	
+		}
+	}
 	
 	@Test
 	public void testGetResolutionEntitiesWithFilter() {
@@ -117,27 +132,23 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT extends
 		assertTrue(dirResult.getEntries().size() > 0);
 
 	}	
-
 	
 	@Test
 	public void testGetResolutionValidXML() throws Exception {
 		ResolvedValueSetReadId identifier = new ResolvedValueSetReadId("SRITEST:AUTO:AllDomesticANDGM-06736a30878a0f8bd0ea83196732380a",
 				ModelUtils.nameOrUriFromName("SRITEST:AUTO:AllDomesticANDGM"),
 				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM-06736a30878a0f8bd0ea83196732380a"));
-		
-		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
-		  		  StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), 
-		  		"GM");
-		
+
 		ResolvedValueSetResult<EntitySynopsis> dirResult = service.getResolution(
-				identifier, filter, new Page());
+				identifier, null, new Page());
 
 		for (EntitySynopsis synopsis: dirResult.getEntries()) {
-			StreamResult result= new StreamResult(new StringWriter());
+			
+			StringWriter sw = new StringWriter();
+			StreamResult result= new StreamResult(sw);
 			marshaller.marshal(synopsis, result);
-			System.out.println(result.getWriter().toString());
-		}
-		
+			System.out.println(sw.toString());
+		}		
 	}
 	
 	@Test
