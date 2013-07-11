@@ -256,15 +256,20 @@ public class SearchExtensionEntityQueryService
 				StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference().getContent())){
 				text = QueryParser.escape(text);
 	            StringBuilder sb = new StringBuilder();
+	            sb.append("(");
 	            for(String token : text.split("\\s+")){
 	               sb.append("description:");
 	               sb.append(token);
 	               sb.append("* ");
 	            }
+	            sb.append(")");
+	            sb.append(" OR description:\""+text+"\"");
 	            return sb.toString().trim();
 			} else if(matchAlgorithm.getContent().equals(
 					StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference().getContent())){
 				return "exactDescription:\"" + QueryParser.escape(text) + "\"";
+			} else if(matchAlgorithm.getContent().equals(LUCENE_QUERY)){
+				return text;
 			} else {
 				throw new IllegalStateException();
 			}
