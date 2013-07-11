@@ -146,18 +146,15 @@ public class EntityTransform
 	    
 	    String entityHref = this.getTransformUtils().createEntityHref(reference);
 	    
-	    if(reference.getSourceOf() != null &&
-	    	reference.getSourceOf().getAssociationCount() > 0){
-	    	namedEntity.setSubjectOf(
-	    		entityHref + "/" + URIHelperInterface.SUBJECTOF);
-	    }
-	    
-	    if(reference.getTargetOf() != null &&
-		 	reference.getTargetOf().getAssociationCount() > 0){
-		 	namedEntity.setTargetOf(
-				entityHref + "/" + URIHelperInterface.TARGETOF);
-		}
+	    //NOTE: We probably want to check this with the CodedNodeGraph to
+	    //see if there actually are associations to link to. That's added
+	    //expense that I'm not sure if we want.
+	    namedEntity.setSubjectOf(
+	    	entityHref + "/" + URIHelperInterface.SUBJECTOF);
 
+	 	namedEntity.setTargetOf(
+			entityHref + "/" + URIHelperInterface.TARGETOF);
+		
 		EntityDescription ed = new EntityDescription();
 		ed.setNamedEntity(namedEntity);
 		

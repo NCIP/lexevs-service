@@ -78,6 +78,7 @@ public class AssociatedConceptToAssociationTransform
 		uriEntityName.setName(subject.getCode());
 		uriEntityName.setNamespace(subject.getCodeNamespace());
 		uriEntityName.setUri(this.getUriHandler().getEntityUri(subject));
+		uriEntityName.setHref(this.getTransformUtils().createEntityHref(subject));
 		
 		AssociationList associations;
 		switch(ref.getDirection()){
@@ -122,6 +123,7 @@ public class AssociatedConceptToAssociationTransform
 						uriEntityName.setName(target.getCode());
 						uriEntityName.setNamespace(target.getCodeNamespace());
 						uriEntityName.setUri(this.getUriHandler().getEntityUri(target));
+						uriEntityName.setHref(this.getTransformUtils().createEntityHref(target));
 						st.setEntity(uriEntityName);
 						entry.setTarget(st);
 		
