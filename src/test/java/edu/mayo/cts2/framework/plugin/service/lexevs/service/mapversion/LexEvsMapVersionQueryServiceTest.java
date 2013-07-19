@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import edu.mayo.cts2.framework.core.config.ServerContext;
@@ -241,7 +242,9 @@ public class LexEvsMapVersionQueryServiceTest {
 			}
 		}
 	}
+	
 	@Test
+	@Ignore
 	public void testGetResourceSummaries_DeepCompare_PropertyReferences_MatchingAlgorithms_Pages_CodindgSchemes_Substrings() throws Exception {
 		Page page = new Page();		
 		FakeLexEvsSystem<MapVersion, MapVersionDirectoryEntry, MapVersionQuery, LexEvsMapVersionQueryService> fakeLexEvs;
