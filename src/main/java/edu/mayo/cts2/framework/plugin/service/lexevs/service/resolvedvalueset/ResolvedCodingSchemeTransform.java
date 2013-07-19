@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import edu.mayo.cts2.framework.core.url.UrlConstructor;
 import edu.mayo.cts2.framework.model.core.CodeSystemReference;
 import edu.mayo.cts2.framework.model.core.CodeSystemVersionReference;
+import edu.mayo.cts2.framework.model.core.DescriptionInCodeSystem;
 import edu.mayo.cts2.framework.model.core.EntitySynopsis;
 import edu.mayo.cts2.framework.model.core.NameAndMeaningReference;
 import edu.mayo.cts2.framework.model.core.ScopedEntityName;
@@ -110,11 +111,14 @@ public class ResolvedCodingSchemeTransform {
 			synopsis.setName(scopedEntity.getName());
 			synopsis.setNamespace(scopedEntity.getNamespace());
 		}
-		synopsis.setDesignation(entry.getKnownEntityDescription()[0].getDesignation());
+		
+		DescriptionInCodeSystem description = entry.getKnownEntityDescription()[0];
+		
+		synopsis.setDesignation(description.getDesignation());
 		synopsis.setUri(entry.getAbout());
-		synopsis.setHref(entry.getHref());
+		synopsis.setHref(description.getHref());
+		
 		return synopsis;
-
 	}
 
 	List<EntitySynopsis> transform(DirectoryResult<EntityDirectoryEntry> data) {

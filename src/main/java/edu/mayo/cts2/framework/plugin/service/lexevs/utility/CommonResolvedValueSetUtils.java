@@ -223,6 +223,20 @@ public final class CommonResolvedValueSetUtils {
 		}
 		return list;
 	}
+	
+	public Property getResolvedValueSetCodingSchemeProperty(CodingScheme cs) {
+		if(cs == null) {
+			return null;
+		}
+		
+		for (Property prop: cs.getProperties().getProperty()) {
+			if (prop.getPropertyName().equalsIgnoreCase(LexEVSValueSetDefinitionServices.RESOLVED_AGAINST_CODING_SCHEME_VERSION)) {
+				return prop;
+			}
+
+		}
+		return null;
+	}
 
 	public VersionNameConverter getCodeSystemVersionNameConverter() {
 		return nameConverter;

@@ -26,6 +26,10 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.transform;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
+import org.LexGrid.LexBIG.Exceptions.LBException;
+import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.LexGrid.LexBIG.Utility.Constructors;
+import org.LexGrid.codingSchemes.CodingScheme;
 import org.LexGrid.commonTypes.Property;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
@@ -43,6 +47,7 @@ import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodingSchemeNameTranslator;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResolvedValueSetUtils;
 
 /**
  * Common Transformation Utilities.
@@ -63,6 +68,12 @@ public class TransformUtils {
 	
 	@Resource
 	private CodingSchemeNameTranslator codingSchemeNameTranslator;
+	
+	@Resource
+	private CommonResolvedValueSetUtils commonResolvedValueSetUtils;
+	
+	@Resource
+	private LexBIGService lexBigService;
 
 	/**
 	 * To property.
@@ -166,14 +177,51 @@ public class TransformUtils {
 					codingSchemeName, 
 					reference.getCodingSchemeVersion(), 
 					reference.getCode());
-		} else {
-			return this.urlConstructor.createEntityUrl(
+		} else { 
+			Property valueSetCodeSystemVersionProp = null;
+			CodingScheme cs = this.resolveCodingScheme(
+				reference.getCodingSchemeURI(), reference.getCodingSchemeVersion());
+				
+			valueSetCodeSystemVersionProp = 
+				this.commonResolvedValueSetUtils.getResolvedValueSetCodingSchemeProperty(cs);
+			
+			if(valueSetCodeSystemVersionProp == null){
+				return this.urlConstructor.createEntityUrl(
 					codingSchemeName, 
 					reference.getCodingSchemeVersion(), 
 					ModelUtils.createScopedEntityName(reference.getCode(), namespace));
+			} else {
+				String resolvedAgainstUri = valueSetCodeSystemVersionProp.getValue().getContent();
+				String resolvedAgainstVersion = valueSetCodeSystemVersionProp.getPropertyQualifier()[0].getValue().getContent();
+				
+				CodingScheme actualCodingScheme = this.resolveCodingScheme(resolvedAgainstUri, resolvedAgainstVersion);
+				
+				if(actualCodingScheme != null){
+					codingSchemeName = 
+						this.codingSchemeNameTranslator.translateFromLexGrid(actualCodingScheme.getCodingSchemeName());
+				
+					return this.urlConstructor.createEntityUrl(
+							codingSchemeName, 
+							resolvedAgainstVersion, 
+							ModelUtils.createScopedEntityName(reference.getCode(), namespace));
+				} else {
+					return null;
+				}
+			}
+		}
+	}
+	
+	private CodingScheme resolveCodingScheme(String identifier, String version){
+		CodingScheme cs = null;
+		try {
+			cs = this.lexBigService.resolveCodingScheme(
+					identifier, 
+					Constructors.createCodingSchemeVersionOrTagFromVersion(version));
+		} catch (LBException e) {
+			//didn't find it
 		}
 		
-
+		return cs;
 	}
 
 	public URIAndEntityName toUriAndEntityName(

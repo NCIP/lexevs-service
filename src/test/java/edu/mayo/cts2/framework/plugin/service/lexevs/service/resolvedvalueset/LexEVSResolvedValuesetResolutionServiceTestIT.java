@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,8 +12,8 @@ import javax.annotation.Resource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
+import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContents;
 import org.junit.Test;
-import org.springframework.oxm.XmlMappingException;
 
 import edu.mayo.cts2.framework.core.xml.Cts2Marshaller;
 import edu.mayo.cts2.framework.model.command.Page;
@@ -34,7 +33,9 @@ import edu.mayo.cts2.framework.service.profile.resolvedvalueset.ResolvedValueSet
 import edu.mayo.cts2.framework.service.profile.resolvedvalueset.name.ResolvedValueSetReadId;
 import edu.mayo.cts2.framework.service.profile.valuesetdefinition.ResolvedValueSetResult;
 
-@LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosAndGM.xml")
+@LoadContents({
+	@LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosAndGM.xml"),
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")})
 public class LexEVSResolvedValuesetResolutionServiceTestIT extends
 		AbstractTestITBase {
 
@@ -169,5 +170,46 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT extends
 		StreamResult result = new StreamResult(new StringWriter());
 		marshaller.marshal(dirResult.getResolvedValueSetHeader(), result);		
 	}
+	
+	@Test
+	public void testGetResolutionHasCorrectHrefs() throws Exception {
+		ResolvedValueSetReadId identifier = new ResolvedValueSetReadId("SRITEST:AUTO:AllDomesticANDGM-06736a30878a0f8bd0ea83196732380a",
+				ModelUtils.nameOrUriFromName("SRITEST:AUTO:AllDomesticANDGM"),
+				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM-06736a30878a0f8bd0ea83196732380a"));
+		
+		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
+		  		  StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), 
+		  		"GM");
+		
+		ResolvedValueSetResult<EntitySynopsis> dirResult = service.getResolution(
+				identifier, filter, new Page());
+
+		EntitySynopsis synopsis = dirResult.getEntries().get(0);
+		String href = synopsis.getHref();
+			
+		assertNotNull(href);
+		assertEquals("http://localhost:8080/webapp/codesystem/Automobiles/version/1.0/entity/Automobiles:GM", href);
+	}
+	
+	@Test
+	public void testGetResolutionHasCorrectUri() throws Exception {
+		ResolvedValueSetReadId identifier = new ResolvedValueSetReadId("SRITEST:AUTO:AllDomesticANDGM-06736a30878a0f8bd0ea83196732380a",
+				ModelUtils.nameOrUriFromName("SRITEST:AUTO:AllDomesticANDGM"),
+				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM-06736a30878a0f8bd0ea83196732380a"));
+		
+		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
+		  		  StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), 
+		  		"GM");
+		
+		ResolvedValueSetResult<EntitySynopsis> dirResult = service.getResolution(
+				identifier, filter, new Page());
+
+		EntitySynopsis synopsis = dirResult.getEntries().get(0);
+		String uri = synopsis.getUri();
+		
+		assertEquals("urn:oid:11.11.0.1:GM", uri);
+		
+	}
+
 
 }
