@@ -23,6 +23,8 @@ import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSetDirectoryEntry;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSetHeader;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ResolvedValueSetNameTranslator;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ResolvedValueSetNameTriple;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResolvedValueSetUtils;
 
@@ -37,6 +39,9 @@ public class ResolvedCodingSchemeTransform {
 	
 	@Resource
 	private UrlConstructor urlConstructor;
+	
+	@Resource
+	private ResolvedValueSetNameTranslator resolvedValueSetNameTranslator;
 
 	List<ResolvedValueSetDirectoryEntry> transform(List<CodingScheme> listcs) {
 		List<ResolvedValueSetDirectoryEntry> rvsde_list = new ArrayList<ResolvedValueSetDirectoryEntry>();
@@ -52,13 +57,18 @@ public class ResolvedCodingSchemeTransform {
 	ResolvedValueSetDirectoryEntry transform(CodingScheme cs) {
 		ResolvedValueSetDirectoryEntry entry = new ResolvedValueSetDirectoryEntry();
 		entry.setResolvedValueSetURI(cs.getCodingSchemeURI());
+
+		ResolvedValueSetNameTriple name = 
+			this.resolvedValueSetNameTranslator.getResolvedValueSetNameTriple(cs.getCodingSchemeURI());
 		
-		String name = resolvedValueSetUtils.getName(cs);
-		entry.setResourceName(name);
-		
-		entry.setHref(this.urlConstructor.createResolvedValueSetUrl(cs.getCodingSchemeName(), name, name));
+		entry.setHref(
+			this.urlConstructor.createResolvedValueSetUrl(
+				name.getValueSetName(), 
+				name.getDefinitionLocalId(), 
+				name.getResolutionLocalId()));
 
 		entry.setResolvedHeader(this.transformToResolvedValueSetHeader(cs));
+		
 		return entry;
 	}
 

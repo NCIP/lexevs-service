@@ -39,7 +39,7 @@ public class LexEVSResolvedValuesetQueryServiceTestIT extends
 
 	@Resource
 	private LexEvsResolvedValueSetQueryService service;
-
+	
 	// ---- Test methods ----
 	@Test
 	public void testSetUp() {

@@ -185,6 +185,7 @@
 							!aspectjrt,
 							!commons-logging,
 							!aopalliance,
+							!HermiT,
 							!aspectjweaver,
 							*;scope=compile|runtime;inline=false
 						</Embed-Dependency>

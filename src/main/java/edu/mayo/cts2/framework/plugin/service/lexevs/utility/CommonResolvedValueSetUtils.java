@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ResolvedValueSetNameTranslator;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.service.command.restriction.ResolvedValueSetQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.profile.resolvedvalueset.ResolvedValueSetQuery;
@@ -37,6 +38,9 @@ public final class CommonResolvedValueSetUtils {
 	private VersionNameConverter nameConverter;
 	@Resource
 	private LexBIGService lexBIGService;
+	
+	@Resource
+	private ResolvedValueSetNameTranslator resolvedValueSetNameTranslator;
 
 	private CommonResolvedValueSetUtils(){
 		super();
@@ -244,15 +248,6 @@ public final class CommonResolvedValueSetUtils {
 
 	public void setCodeSystemVersionNameConverter(VersionNameConverter converter) {
 		this.nameConverter = converter;
-	}
-
-	public String getName(CodingScheme codingScheme) {
-		return this.getName(codingScheme.getCodingSchemeName(),
-				codingScheme.getRepresentsVersion());
-	}
-
-	private String getName(String name, String version) {
-		return this.nameConverter.toCts2VersionName(name, version);
 	}
 
 }

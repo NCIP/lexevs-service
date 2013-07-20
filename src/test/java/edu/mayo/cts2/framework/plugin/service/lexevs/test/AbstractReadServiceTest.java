@@ -36,6 +36,8 @@ public abstract class AbstractReadServiceTest<R,I> extends AbstractTestITBase {
 	@Test
 	public void testReadValidXml() throws Exception {
 		R resource = this.getService().read(this.getGoodIdentifier(), null);
+		
+		assertNotNull(resource);
 
 		this.marshaller.marshal(resource, new StreamResult(new StringWriter()));	
 	}

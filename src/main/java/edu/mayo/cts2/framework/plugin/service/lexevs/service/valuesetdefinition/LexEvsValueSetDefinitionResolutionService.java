@@ -45,6 +45,7 @@ import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSet;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.InvaildVersionNameException;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ResolvedValueSetNameTranslator;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.service.profile.resolvedvalueset.ResolvedValueSetResolutionService;
 import edu.mayo.cts2.framework.service.profile.resolvedvalueset.name.ResolvedValueSetReadId;
@@ -100,7 +101,7 @@ public class LexEvsValueSetDefinitionResolutionService extends AbstractLexEvsSer
 		String definitionName = definitionId.getName();
 		
 		ResolvedValueSetReadId id = new ResolvedValueSetReadId(
-			definitionName, 
+			ResolvedValueSetNameTranslator.RESOLVED_VS_LOCAL_ID, 
 			definitionId.getValueSet(), 
 			ModelUtils.nameOrUriFromName(definitionName));
 		

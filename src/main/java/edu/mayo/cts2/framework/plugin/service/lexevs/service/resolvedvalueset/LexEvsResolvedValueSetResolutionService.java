@@ -35,6 +35,8 @@ import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSet;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSetHeader;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ResolvedValueSetNameTranslator;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ResolvedValueSetNameTriple;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.entity.LexEvsEntityQueryService;
@@ -64,6 +66,9 @@ ResolvedValueSetResolutionService {
 	
 	@Resource
 	private LexEvsEntityQueryService lexEvsEntityQueryService;	
+	
+	@Resource
+	private ResolvedValueSetNameTranslator resolvedValueSetNameTranslator;
 	
 	@Override
 	public Set<? extends MatchAlgorithmReference> getSupportedMatchAlgorithms() {
@@ -115,13 +120,21 @@ ResolvedValueSetResolutionService {
 	public ResolvedValueSetResult<EntitySynopsis> getResolution(
 			ResolvedValueSetReadId identifier,
 			Set<ResolvedFilter> filterComponent, Page page) {
-		String id = identifier.getLocalName();
+		NameVersionPair codingScheme = this.getNameVersionPair(identifier);
+		
+		if(codingScheme == null){
+			return null;
+		}
+		
+		String cts2VersionName = 
+			this.nameConverter.toCts2VersionName(codingScheme.getName(), codingScheme.getVersion());
+		
 		EntityDescriptionQueryImpl query= new EntityDescriptionQueryImpl();
 		query.setFilterComponent(filterComponent);
 		EntityDescriptionQueryServiceRestrictions entityRestrictions =
 				new EntityDescriptionQueryServiceRestrictions();
 		entityRestrictions.getCodeSystemVersions().add(
-				ModelUtils.nameOrUriFromName(identifier.getValueSetDefinition().getName()));
+				ModelUtils.nameOrUriFromName(cts2VersionName));
 
 		query.setRestrictions(entityRestrictions);
 		DirectoryResult<EntityDirectoryEntry> result = this.lexEvsEntityQueryService.getResourceSummaries(
@@ -129,7 +142,7 @@ ResolvedValueSetResolutionService {
 		List<EntitySynopsis> transformedResult= transform.transform(result);
 		
 		return new ResolvedValueSetResult<EntitySynopsis>(
-				this.getResolvedValueSetHeader(id), 
+				this.getResolvedValueSetHeader(codingScheme), 
 				transformedResult, 
 				result.isAtEnd());
 	}
@@ -144,22 +157,33 @@ ResolvedValueSetResolutionService {
 			ResolvedValueSetReadId identifier,
 			ResolvedValueSetResolutionEntityQuery query,
 			SortCriteria sortCriteria, Page page) {
-		String id = identifier.getLocalName();
+		NameVersionPair codingScheme = this.getNameVersionPair(identifier);
+		
+		if(codingScheme == null){
+			return null;
+		}
 
 		DirectoryResult<EntityDirectoryEntry> result = this.lexEvsEntityQueryService.getResourceSummaries(
-				this.toEntityDescriptionQuery(identifier, query),
+				this.toEntityDescriptionQuery(codingScheme, query),
 				sortCriteria, 
 				page);
-		return new ResolvedValueSetResult<EntityDirectoryEntry>(
-				this.getResolvedValueSetHeader(id), 
-				result.getEntries(), 
-				result.isAtEnd());
 		
+		return new ResolvedValueSetResult<EntityDirectoryEntry>(
+				this.getResolvedValueSetHeader(codingScheme), 
+				result.getEntries(), 
+				result.isAtEnd());		
 	}
 
-	protected ResolvedValueSetHeader getResolvedValueSetHeader(String id){
-		NameVersionPair versionNamePair = this.nameConverter.fromCts2VersionName(id);
-		
+	protected NameVersionPair getNameVersionPair(ResolvedValueSetReadId identifier){
+		String valueSetId = identifier.getValueSet().getName();
+		String definitionId = identifier.getValueSetDefinition().getName();
+		String id = identifier.getLocalName();
+	
+		return this.resolvedValueSetNameTranslator.getNameVersionPair(
+			new ResolvedValueSetNameTriple(valueSetId, definitionId, id));
+	}
+	
+	protected ResolvedValueSetHeader getResolvedValueSetHeader(NameVersionPair versionNamePair){	
 		CodingScheme cs = resolve(
 			versionNamePair.getName(), 
 			Constructors.createCodingSchemeVersionOrTagFromVersion(versionNamePair.getVersion()));
@@ -167,7 +191,7 @@ ResolvedValueSetResolutionService {
 		if (cs !=null) {
 			return transform.transformToResolvedValueSetHeader(cs);
 		} else {
-			throw new RuntimeException("Cannot find CodingScheme for ResolvedValueSet Header: " + id);
+			throw new RuntimeException("Cannot find CodingScheme for ResolvedValueSet Header: " + versionNamePair.getName());
 		}
 	}
 	
@@ -176,15 +200,19 @@ ResolvedValueSetResolutionService {
 			ResolvedValueSetReadId identifier,
 			ResolvedValueSetResolutionEntityQuery query,
 			SortCriteria sortCriteria, Page page) {
-        String id = identifier.getLocalName();
+		NameVersionPair codingScheme = this.getNameVersionPair(identifier);
+		
+		if(codingScheme == null){
+			return null;
+		}
 		
 		DirectoryResult<EntityDescription> result = this.lexEvsEntityQueryService.getResourceList(
-				this.toEntityDescriptionQuery(identifier, query),
+				this.toEntityDescriptionQuery(codingScheme, query),
 				sortCriteria, 
 				page);
 		
 		return new ResolvedValueSetResult<EntityDescription>(
-					this.getResolvedValueSetHeader(id), 
+					this.getResolvedValueSetHeader(codingScheme), 
 					result.getEntries(), 
 					result.isAtEnd());
 	}
@@ -202,7 +230,7 @@ ResolvedValueSetResolutionService {
 	}
 	
 	private EntityDescriptionQuery toEntityDescriptionQuery(
-			ResolvedValueSetReadId identifier, final ResolvedValueSetResolutionEntityQuery query){
+			NameVersionPair codingScheme, final ResolvedValueSetResolutionEntityQuery query){
 		
 			final EntityDescriptionQueryServiceRestrictions entityRestrictions =
 				new EntityDescriptionQueryServiceRestrictions();
@@ -214,9 +242,12 @@ ResolvedValueSetResolutionService {
 				entityRestrictions.getCodeSystemVersions().add(restrictions.getCodeSystemVersion());
 				entityRestrictions.setEntities(restrictions.getEntities());
 			}
-			
+		
 			entityRestrictions.getCodeSystemVersions().add(
-				ModelUtils.nameOrUriFromName(identifier.getValueSetDefinition().getName()));
+				ModelUtils.nameOrUriFromName(
+					this.nameConverter.toCts2VersionName(
+						codingScheme.getName(), 
+						codingScheme.getVersion())));
 		
 		return new EntityDescriptionQuery(){
 

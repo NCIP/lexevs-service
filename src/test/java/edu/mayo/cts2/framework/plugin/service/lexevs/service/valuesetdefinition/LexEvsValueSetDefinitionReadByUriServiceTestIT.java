@@ -40,7 +40,7 @@ import edu.mayo.cts2.framework.service.profile.valuesetdefinition.name.ValueSetD
  *
  */
 @LoadContent(contentPath="lexevs/test-content/valueset/VSDOnlyTest.xml")
-public class LexEvsValueSetDefinitionReadServiceTestIT
+public class LexEvsValueSetDefinitionReadByUriServiceTestIT
 	extends AbstractReadServiceTest<LocalIdValueSetDefinition, ValueSetDefinitionReadId> {
 
 	@Resource

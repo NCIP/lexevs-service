@@ -32,6 +32,7 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.Exceptions.LBException;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
@@ -39,6 +40,10 @@ import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.extension.LocalIdValueSetDefinition;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
+import edu.mayo.cts2.framework.model.util.ModelUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ValueSetDefinitionUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ValueSetNamePair;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ValueSetNameTranslator;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.service.profile.valuesetdefinition.ValueSetDefinitionReadService;
@@ -55,17 +60,25 @@ public class LexEvsValueSetDefinitionReadService extends AbstractLexEvsService
 	@Resource
 	private LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform vsdTransformer;
 	
+	@Resource
+	private ValueSetNameTranslator valueSetNameTranslator;
+	
 	/* (non-Javadoc)
 	 * @see edu.mayo.cts2.framework.service.profile.TagAwareReadService#readByTag(edu.mayo.cts2.framework.model.service.core.NameOrURI, edu.mayo.cts2.framework.model.core.VersionTagReference, edu.mayo.cts2.framework.model.command.ResolvedReadContext)
 	 */
 	@Override
-	public LocalIdValueSetDefinition readByTag(NameOrURI parentIdentifier,
-			VersionTagReference tag, ResolvedReadContext readContext) {
-		throw new UnsupportedOperationException("Not supported in LexEVS.");
-	}
-
-	protected LocalIdValueSetDefinition getValueSetDefinition(NameOrURI parentIdentifier, VersionTagReference tag) {
-		throw new UnsupportedOperationException("Not supported in LexEVS.");
+	public LocalIdValueSetDefinition readByTag(
+			NameOrURI parentIdentifier,
+			VersionTagReference tag, 
+			ResolvedReadContext readContext) {
+		ValueSetNamePair name = valueSetNameTranslator.getCurrentDefinition(parentIdentifier.getName());
+		
+		ValueSetDefinitionReadId id = 
+			new ValueSetDefinitionReadId(
+				name.getDefinitionLocalId(), 
+				ModelUtils.nameOrUriFromName(name.getValueSetName()));
+		
+		return this.read(id, readContext);
 	}
 
 	/* (non-Javadoc)
@@ -74,7 +87,7 @@ public class LexEvsValueSetDefinitionReadService extends AbstractLexEvsService
 	@Override
 	public boolean existsByTag(NameOrURI parentIdentifier,
 			VersionTagReference tag, ResolvedReadContext readContext) {
-		throw new UnsupportedOperationException("Not supported in LexEVS.");
+		return this.readByTag(parentIdentifier, tag, readContext) != null;
 	}
 
 	/* (non-Javadoc)
@@ -92,7 +105,22 @@ public class LexEvsValueSetDefinitionReadService extends AbstractLexEvsService
 	public LocalIdValueSetDefinition read(
 			ValueSetDefinitionReadId identifier,
 			ResolvedReadContext readContext) {
-		String uriString = identifier.getUri();
+		String uriString;
+		
+		String localName = identifier.getName();
+		if(localName != null){
+			uriString = 
+				this.valueSetNameTranslator.getDefinitionUri(
+					identifier.getValueSet().getName(),
+					identifier.getName());
+		} else {
+			uriString = identifier.getUri();
+		}
+
+		if(StringUtils.isBlank(uriString)){
+			return null;
+		}
+		
 		URI valueSetDefinitionURI;
 		try {
 			valueSetDefinitionURI = new URI(uriString);
@@ -108,7 +136,9 @@ public class LexEvsValueSetDefinitionReadService extends AbstractLexEvsService
 		}
 			
 		if (lexGridValueSetDefinition != null) {
+			String localId = ValueSetDefinitionUtils.getValueSetDefinitionLocalId(uriString);
 			return new LocalIdValueSetDefinition(
+				localId,
 				vsdTransformer.transformFullDescription(lexGridValueSetDefinition));			
 		} else {
 			return null;

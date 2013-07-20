@@ -38,12 +38,13 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
+import edu.mayo.cts2.framework.plugin.service.lexevs.event.LexEvsChangeEventObserver;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriResolver;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriResolver.IdType;
 
 @Component
 public class DefaultCodingSchemeNameTranslator implements
-		CodingSchemeNameTranslator, InitializingBean {
+		CodingSchemeNameTranslator, LexEvsChangeEventObserver, InitializingBean {
 
 	private static final int FLUSH_PERIOD_MINUTES = 60;
 
@@ -67,6 +68,9 @@ public class DefaultCodingSchemeNameTranslator implements
 
 	protected void buildCaches() {
 		synchronized(this.mutex){
+			this.lexgridToAliasMap.clear();
+			this.aliasToLexGridMap.clear();
+			
 			try {
 				for (CodingSchemeRendering csr : this.lexBigService
 						.getSupportedCodingSchemes().getCodingSchemeRendering()) {
@@ -132,6 +136,11 @@ public class DefaultCodingSchemeNameTranslator implements
 
 		int minutesInMillis = FLUSH_PERIOD_MINUTES * 60 * 1000;
 		timer.schedule(flushTask, 0, minutesInMillis);
+	}
+
+	@Override
+	public void onChange() {
+		this.buildCaches();
 	}
 
 }
