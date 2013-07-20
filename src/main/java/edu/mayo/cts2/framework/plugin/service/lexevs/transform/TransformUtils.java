@@ -23,6 +23,9 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.transform;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
@@ -32,6 +35,7 @@ import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.codingSchemes.CodingScheme;
 import org.LexGrid.commonTypes.Property;
 import org.apache.commons.lang.StringUtils;
+import org.lexgrid.valuesets.LexEVSValueSetDefinitionServices;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.core.url.UrlConstructor;
@@ -43,8 +47,13 @@ import edu.mayo.cts2.framework.model.core.NameAndMeaningReference;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
 import edu.mayo.cts2.framework.model.core.StatementTarget;
 import edu.mayo.cts2.framework.model.core.URIAndEntityName;
+import edu.mayo.cts2.framework.model.core.ValueSetDefinitionReference;
+import edu.mayo.cts2.framework.model.core.ValueSetReference;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.event.LexEvsChangeEventObserver;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodingSchemeNameTranslator;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ValueSetDefinitionUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ValueSetNameTranslator;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResolvedValueSetUtils;
@@ -55,7 +64,7 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResolvedValue
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
 @Component
-public class TransformUtils {
+public class TransformUtils implements LexEvsChangeEventObserver {
 	
 	@Resource
 	private VersionNameConverter versionNameConverter;
@@ -74,6 +83,13 @@ public class TransformUtils {
 	
 	@Resource
 	private LexBIGService lexBigService;
+
+	@Resource
+	private LexEVSValueSetDefinitionServices lexEVSValueSetDefinitionServices;
+	
+	private Set<String> valueSetDefinitionUrisCache;
+	
+	private Object mutex = new Object();
 
 	/**
 	 * To property.
@@ -125,6 +141,49 @@ public class TransformUtils {
 		ref.setUri(uri);
 		ref.setHref(this.urlConstructor.createMapUrl(name));
 
+		return ref;
+	}
+	
+	public ValueSetReference toValueSetReference(String valueSetName){	
+		ValueSetReference ref = new ValueSetReference();
+		ref.setContent(
+			StringUtils.isNotBlank(valueSetName) ? valueSetName : ValueSetNameTranslator.UNNAMED_VALUESET);
+		
+		return ref;
+	}
+	
+	public ValueSetDefinitionReference toValueSetDefinitionReference(String valueSetName, String definitionUri){	
+		valueSetName = 
+			StringUtils.isNotBlank(valueSetName) ? valueSetName : ValueSetNameTranslator.UNNAMED_VALUESET;
+		
+			ValueSetDefinitionReference ref = new ValueSetDefinitionReference();
+		
+		String definitionLocalId = ValueSetDefinitionUtils.getValueSetDefinitionLocalId(definitionUri);
+		
+		NameAndMeaningReference definition = new NameAndMeaningReference();
+		definition.setContent(definitionLocalId);
+		definition.setUri(definitionUri);
+		
+		boolean containsDefinition;
+		synchronized(this.mutex){	
+			if(this.valueSetDefinitionUrisCache == null){
+				this.valueSetDefinitionUrisCache = 
+					new HashSet<String>(this.lexEVSValueSetDefinitionServices.listValueSetDefinitionURIs());
+			}
+			
+			containsDefinition = 
+				this.valueSetDefinitionUrisCache.contains(definitionUri);
+		}
+		
+		if(containsDefinition){
+			definition.setHref(
+				this.urlConstructor.createValueSetDefinitionUrl(valueSetName, definitionLocalId));
+		}
+		
+		ref.setValueSetDefinition(definition);
+		
+		ref.setValueSet(this.toValueSetReference(valueSetName));
+		
 		return ref;
 	}
 
@@ -232,6 +291,13 @@ public class TransformUtils {
 		uriAndName.setUri(this.uriHandler.getEntityUri(resolvedConceptReference));
 		
 		return uriAndName;
+	}
+
+	@Override
+	public void onChange() {
+		synchronized(this.mutex){
+			this.valueSetDefinitionUrisCache = null;
+		}
 	}
 	
 }

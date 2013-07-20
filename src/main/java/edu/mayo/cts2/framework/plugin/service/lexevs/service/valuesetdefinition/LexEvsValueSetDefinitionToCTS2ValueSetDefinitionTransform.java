@@ -23,6 +23,8 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.valuesetdefinition;
 
+import java.net.URI;
+
 import javax.annotation.Resource;
 
 import org.LexGrid.naming.Mappings;
@@ -38,9 +40,11 @@ import org.LexGrid.valueSets.ValueSetDefinitionReference;
 import org.LexGrid.valueSets.types.DefinitionOperator;
 import org.apache.commons.lang.StringUtils;
 import org.lexevs.dao.database.utility.DaoUtility;
+import org.lexgrid.valuesets.LexEVSValueSetDefinitionServices;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.core.CodeSystemReference;
+import edu.mayo.cts2.framework.model.core.EntryDescription;
 import edu.mayo.cts2.framework.model.core.FilterComponent;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
@@ -50,6 +54,7 @@ import edu.mayo.cts2.framework.model.core.ValueSetReference;
 import edu.mayo.cts2.framework.model.core.types.AssociationDirection;
 import edu.mayo.cts2.framework.model.core.types.SetOperator;
 import edu.mayo.cts2.framework.model.core.types.TargetReferenceType;
+import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.model.valuesetdefinition.AssociatedEntitiesReference;
 import edu.mayo.cts2.framework.model.valuesetdefinition.CompleteCodeSystemReference;
 import edu.mayo.cts2.framework.model.valuesetdefinition.CompleteValueSetReference;
@@ -60,6 +65,8 @@ import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinitionDirect
 import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinitionEntry;
 import edu.mayo.cts2.framework.model.valuesetdefinition.types.LeafOrAll;
 import edu.mayo.cts2.framework.model.valuesetdefinition.types.TransitiveClosure;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ValueSetNamePair;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ValueSetNameTranslator;
 import edu.mayo.cts2.framework.plugin.service.lexevs.transform.AbstractBaseTransform;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriUtils;
@@ -80,6 +87,12 @@ public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform
 	
 	@Resource
 	private UriHandler uriHandler;
+	
+	@Resource
+	private LexEVSValueSetDefinitionServices lexEVSValueSetDefinitionServices;
+	
+	@Resource
+	private ValueSetNameTranslator valueSetNameTranslator;
 
 	public ValueSetDefinition transformFullDescription(org.LexGrid.valueSets.ValueSetDefinition lexEvsVSD) {
 		if (lexEvsVSD == null) {
@@ -97,9 +110,17 @@ public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform
 		sourceAndNotation.setSourceAndNotationDescription("LexEVS");
 		cts2VSD.setSourceAndNotation(sourceAndNotation);
 		
-		ValueSetReference vsReference = new ValueSetReference();
-		vsReference.setContent(lexEvsVSD.getValueSetDefinitionURI());
-		cts2VSD.setDefinedValueSet(vsReference);
+		if(lexEvsVSD.getEntityDescription() != null){
+			String content = lexEvsVSD.getEntityDescription().getContent();
+			EntryDescription description = new EntryDescription();
+			description.setValue(ModelUtils.toTsAnyType(content));
+			
+			cts2VSD.setResourceSynopsis(description);
+		}
+		
+		cts2VSD.setDefinedValueSet(
+			this.getTransformUtils().toValueSetReference(
+				lexEvsVSD.getValueSetDefinitionName()));
 		
 		for(DefinitionEntry entry : lexEvsVSD.getDefinitionEntry()){
 			ValueSetDefinitionEntry cts2Entry = new ValueSetDefinitionEntry();
@@ -139,12 +160,18 @@ public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform
 			ValueSetDefinitionReference valueSetDefinitionReference,
 			ValueSetDefinitionEntry cts2Entry) {
 		String uri = valueSetDefinitionReference.getValueSetDefinitionURI();
+	
+		String name;
+		try {
+			name = this.lexEVSValueSetDefinitionServices.getValueSetDefinition(new URI(uri), null).getValueSetDefinitionName();
+		} catch (Exception e) {
+			//couldn't find it in LexEVS -- use the URI.
+			name = uri;
+		}
+				
+		ValueSetReference ref = this.getTransformUtils().toValueSetReference(name);
 
 		CompleteValueSetReference vsr = new CompleteValueSetReference();
-		
-		ValueSetReference ref = new ValueSetReference();
-		ref.setContent(uri);
-		ref.setUri(uri);
 		vsr.setValueSet(ref);
 		
 		cts2Entry.setCompleteValueSet(vsr);
@@ -324,11 +351,28 @@ public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform
 		
 		vsdDirEntry.setAbout(lexEvsVSD.getValueSetDefinitionURI());
 		vsdDirEntry.setDocumentURI(lexEvsVSD.getValueSetDefinitionURI());
-
-		vsdDirEntry.setFormalName(lexEvsVSD.getValueSetDefinitionURI());
-
-		ValueSetReference vsReference = new ValueSetReference();
-		vsReference.setContent(lexEvsVSD.getValueSetDefinitionURI());
+		vsdDirEntry.setFormalName(lexEvsVSD.getValueSetDefinitionName());
+		
+		if(lexEvsVSD.getEntityDescription() != null){
+			String content = lexEvsVSD.getEntityDescription().getContent();
+			EntryDescription description = new EntryDescription();
+			description.setValue(ModelUtils.toTsAnyType(content));
+			
+			vsdDirEntry.setResourceSynopsis(description);
+		}
+		
+		ValueSetNamePair pair = this.valueSetNameTranslator.
+			getDefinitionNameAndVersion(
+				lexEvsVSD.getValueSetDefinitionURI());
+		
+		vsdDirEntry.setHref(
+			this.getUrlConstructor().
+				createValueSetDefinitionUrl(
+					pair.getValueSetName(), 
+					pair.getDefinitionLocalId()));
+		
+		ValueSetReference vsReference = 
+			this.getTransformUtils().toValueSetReference(lexEvsVSD.getValueSetDefinitionName());
 		vsdDirEntry.setDefinedValueSet(vsReference);
 		
 		return vsdDirEntry;

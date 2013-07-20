@@ -21,8 +21,6 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.event.LexEvsChangeEventObse
 public class DefaultValueSetNameTranslator 
 	implements ValueSetNameTranslator, LexEvsChangeEventObserver, InitializingBean {
 
-	private static final String UNNAMED = "Unnamed";
-	
 	@Resource
 	private LexEVSValueSetDefinitionServices lexEVSValueSetDefinitionServices;
 	
@@ -48,7 +46,7 @@ public class DefaultValueSetNameTranslator
 			String name = definition.getValueSetDefinitionName();
 			
 			if(StringUtils.isBlank(name)){
-				name = UNNAMED;
+				name = UNNAMED_VALUESET;
 			}
 
 			ValueSetNamePair pair = new ValueSetNamePair(name, ValueSetDefinitionUtils.getValueSetDefinitionLocalId(definitionUri));

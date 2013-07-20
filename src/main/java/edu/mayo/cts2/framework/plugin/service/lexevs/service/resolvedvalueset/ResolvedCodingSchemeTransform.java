@@ -25,6 +25,7 @@ import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSetDirector
 import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSetHeader;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ResolvedValueSetNameTranslator;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ResolvedValueSetNameTriple;
+import edu.mayo.cts2.framework.plugin.service.lexevs.transform.TransformUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResolvedValueSetUtils;
 
@@ -42,6 +43,9 @@ public class ResolvedCodingSchemeTransform {
 	
 	@Resource
 	private ResolvedValueSetNameTranslator resolvedValueSetNameTranslator;
+	
+	@Resource
+	private TransformUtils transformUtils;
 
 	List<ResolvedValueSetDirectoryEntry> transform(List<CodingScheme> listcs) {
 		List<ResolvedValueSetDirectoryEntry> rvsde_list = new ArrayList<ResolvedValueSetDirectoryEntry>();
@@ -76,11 +80,12 @@ public class ResolvedCodingSchemeTransform {
 		ResolvedValueSetHeader header = new ResolvedValueSetHeader();
 		List<CodeSystemVersionReference> resolvedReferences = getResolvedUsingCodeSystemList(cs);
 		header.setResolvedUsingCodeSystem(resolvedReferences);
-		ValueSetDefinitionReference resolutionOf = new ValueSetDefinitionReference();
-
-		NameAndMeaningReference valueSetDefinition = new NameAndMeaningReference(
+		
+		ValueSetDefinitionReference resolutionOf = 
+			this.transformUtils.toValueSetDefinitionReference(
+				cs.getCodingSchemeName(), 
 				cs.getCodingSchemeURI());
-		resolutionOf.setValueSetDefinition(valueSetDefinition);
+		
 		header.setResolutionOf(resolutionOf);
 		return header;
 	}
@@ -105,7 +110,9 @@ public class ResolvedCodingSchemeTransform {
 				CodeSystemVersionReference csvr = new CodeSystemVersionReference();
 				CodeSystemReference csr = new CodeSystemReference();
 				csr.setUri(uri);
+				csr.setContent(uri);
 				csvr.setCodeSystem(csr);
+				
 				NameAndMeaningReference versionRef = new NameAndMeaningReference();
 				versionRef.setContent(version);
 				csvr.setVersion(versionRef);
