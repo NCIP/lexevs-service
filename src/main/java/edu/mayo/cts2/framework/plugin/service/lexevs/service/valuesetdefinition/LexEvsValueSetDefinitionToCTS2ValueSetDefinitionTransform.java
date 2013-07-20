@@ -62,6 +62,7 @@ import edu.mayo.cts2.framework.model.valuesetdefinition.types.LeafOrAll;
 import edu.mayo.cts2.framework.model.valuesetdefinition.types.TransitiveClosure;
 import edu.mayo.cts2.framework.plugin.service.lexevs.transform.AbstractBaseTransform;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
+import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriUtils;
 
 /**
  * Transforms a LexEVS ValueSetDefinition object into a CTS2 ValueSetDefinition object.
@@ -238,7 +239,9 @@ public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform
 		}
 		
 		uriAndName.setUri(
-			supportedNamespace.getUri() + "#" + entityReference.getEntityCode());
+			UriUtils.combine(
+				supportedNamespace.getUri(),
+				entityReference.getEntityCode()));
 		
 		if(entityReference.getReferenceAssociation() != null){
 			AssociatedEntitiesReference ref = new AssociatedEntitiesReference();
