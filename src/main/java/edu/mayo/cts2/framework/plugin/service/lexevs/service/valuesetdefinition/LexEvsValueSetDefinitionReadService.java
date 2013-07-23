@@ -73,12 +73,16 @@ public class LexEvsValueSetDefinitionReadService extends AbstractLexEvsService
 			ResolvedReadContext readContext) {
 		ValueSetNamePair name = valueSetNameTranslator.getCurrentDefinition(parentIdentifier.getName());
 		
-		ValueSetDefinitionReadId id = 
-			new ValueSetDefinitionReadId(
-				name.getDefinitionLocalId(), 
-				ModelUtils.nameOrUriFromName(name.getValueSetName()));
-		
-		return this.read(id, readContext);
+		if(name != null){
+			ValueSetDefinitionReadId id = 
+				new ValueSetDefinitionReadId(
+					name.getDefinitionLocalId(), 
+					ModelUtils.nameOrUriFromName(name.getValueSetName()));
+			
+			return this.read(id, readContext);
+		} else {
+			return null;
+		}
 	}
 
 	/* (non-Javadoc)
