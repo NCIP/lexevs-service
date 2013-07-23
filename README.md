@@ -91,7 +91,7 @@ supportEmail=support@yourservice.org
 * ```service.pid``` - Must be ```ServerContext```
 * ```server.root``` - The base URL of the service as deployed (defaults to ```http://localhost/8080```.
 
-___Example - server-context.propertie___
+___Example - server-context.properties___
 ```
 service.pid=ServerContext
 server.root=http://myservice.org/lexevs
@@ -107,6 +107,8 @@ $USER_HOME
                     |_ cts2-deployment.properties (required)
                     |_ lexevs.properties (required)
                     |_ webapp-config.properties (optional)
+                    |_ server-context.properties (optional)
+
 
 ```
 
