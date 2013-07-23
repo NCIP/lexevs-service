@@ -32,6 +32,8 @@ __CodeSystemVersion__
 ## Installation (Non-OSGi)
 Clone the LexEVS Service Plugin: ```git clone https://github.com/cts2/lexevs-service.git```
 
+Set MAVEN_OPTS to insure there are no out of memory errors: ```export MAVEN_OPTS="-Xmx1000m -XX:MaxPermSize=500m"```
+
 Build the Plugin: ```mvn clean install```
 
 Create a ```$USER_HOME/.cts2/[context]/config``` directory.
