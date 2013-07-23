@@ -32,7 +32,10 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
+import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.LexGrid.codingSchemes.CodingScheme;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntry;
@@ -46,6 +49,7 @@ import edu.mayo.cts2.framework.model.core.URIAndEntityName;
 import edu.mayo.cts2.framework.model.core.types.TargetReferenceType;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
+import edu.mayo.cts2.framework.plugin.service.lexevs.event.LexEvsChangeEventObserver;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonPageUtils;
@@ -62,7 +66,10 @@ import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersi
 */
 @Component
 public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
-		implements CodeSystemVersionQueryService {
+		implements 
+			InitializingBean,
+			LexEvsChangeEventObserver, 
+			CodeSystemVersionQueryService {
 
 	@Resource
 	private CodingSchemeToCodeSystemTransform transformer;
@@ -70,7 +77,28 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 	@Resource
 	private VersionNameConverter nameConverter;
 	
-
+	private Set<UriVersionPair> resolvedValueSets = new HashSet<UriVersionPair>();
+	
+	private Object mutex = new Object();
+	
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.buildResolvedValueSetCache();
+	}
+	
+	public void buildResolvedValueSetCache() {
+		synchronized(this.mutex){
+			this.resolvedValueSets.clear();
+			try {
+				for(CodingScheme cs : this.getLexEVSResolvedService().listAllResolvedValueSets()){
+					this.resolvedValueSets.add(new UriVersionPair(cs.getCodingSchemeURI(), cs.getRepresentsVersion()));
+				}
+			} catch (LBException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+	
 	// ------ Local methods ----------------------
 	public void setCodingSchemeTransformer(
 			CodingSchemeToCodeSystemTransform codingSchemeTransformer) {
@@ -87,10 +115,10 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		if(query == null){
 			return 0;
 		}
-		LexBIGService lexBigService = this.getLexBigService();
 		QueryData<CodeSystemVersionQuery> queryData = new QueryData<CodeSystemVersionQuery>(query, null);
 
-		CodingSchemeRendering [] renderings = CommonResourceUtils.getLexCodingSchemeRenderings(lexBigService, nameConverter, queryData, null, null);
+		CodingSchemeRendering [] renderings = this.getNonResolvedValueSetCodingSchemes(queryData, null);
+		
 		return renderings.length;
 	}
 
@@ -100,25 +128,43 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		LexBIGService lexBigService = this.getLexBigService();		
 		QueryData<CodeSystemVersionQuery> queryData = new QueryData<CodeSystemVersionQuery>(query, null);
 		
-		CodingSchemeRendering[] csRendering = CommonResourceUtils.getLexCodingSchemeRenderings(lexBigService, nameConverter, queryData, null, sortCriteria);
+		CodingSchemeRendering[] csRendering = this.getNonResolvedValueSetCodingSchemes(queryData, sortCriteria);
 		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPage(csRendering, page);
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
-		
-		//PrintUtility.createStringFromCodingSchemeRendering(csRenderingPage);
-		
+
 		return CommonResourceUtils.createDirectoryResultWithEntryFullVersionDescriptions(lexBigService, this.transformer, csRenderingPage, atEnd);
 	}
 
 	@Override
 	public DirectoryResult<CodeSystemVersionCatalogEntrySummary> getResourceSummaries(
 			CodeSystemVersionQuery query, SortCriteria sortCriteria, Page page) {
-		LexBIGService lexBigService = this.getLexBigService();
 		QueryData<CodeSystemVersionQuery> queryData = new QueryData<CodeSystemVersionQuery>(query, null);
 		
-		CodingSchemeRendering[] csRendering = CommonResourceUtils.getLexCodingSchemeRenderings(lexBigService, nameConverter, queryData, null, sortCriteria);
+		CodingSchemeRendering[] csRendering = this.getNonResolvedValueSetCodingSchemes(queryData, sortCriteria);
 		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPage(csRendering, page);
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
 		return CommonResourceUtils.createDirectoryResultsWithSummary(this.transformer, csRenderingPage, atEnd);
+	}
+	
+	protected CodingSchemeRendering[] getNonResolvedValueSetCodingSchemes(QueryData<CodeSystemVersionQuery> queryData, SortCriteria sortCriteria){
+		synchronized(this.mutex){
+			List<CodingSchemeRendering> returnList = new ArrayList<CodingSchemeRendering>();
+			
+			CodingSchemeRendering[] renderings = 
+				CommonResourceUtils.getLexCodingSchemeRenderings(
+					this.getLexBigService(), this.nameConverter, queryData, null, sortCriteria);
+			
+			for(CodingSchemeRendering rendering : renderings){
+				String uri = rendering.getCodingSchemeSummary().getCodingSchemeURI();
+				String version = rendering.getCodingSchemeSummary().getRepresentsVersion();
+				
+				if(! this.resolvedValueSets.contains(new UriVersionPair(uri, version))){
+					returnList.add(rendering);
+				}
+			}
+			
+			return returnList.toArray(new CodingSchemeRendering[returnList.size()]);
+		}
 	}
 
 	@Override
@@ -156,6 +202,54 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 	@Override
 	public Set<? extends PropertyReference> getSupportedSortReferences() {
 		return new HashSet<PropertyReference>();
+	}
+
+	@Override
+	public void onChange() {
+		this.buildResolvedValueSetCache();
+	}
+	
+	private static class UriVersionPair {
+		private String uri;
+		private String version;
+		
+		protected UriVersionPair(String uri, String version) {
+			super();
+			this.uri = uri;
+			this.version = version;
+		}
+		
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((uri == null) ? 0 : uri.hashCode());
+			result = prime * result
+					+ ((version == null) ? 0 : version.hashCode());
+			return result;
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			UriVersionPair other = (UriVersionPair) obj;
+			if (uri == null) {
+				if (other.uri != null)
+					return false;
+			} else if (!uri.equals(other.uri))
+				return false;
+			if (version == null) {
+				if (other.version != null)
+					return false;
+			} else if (!version.equals(other.version))
+				return false;
+			return true;
+		}	
 	}
 
 }

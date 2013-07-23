@@ -166,9 +166,7 @@ public final class CommonResourceUtils{
 		if(queryData.getReadContext() != null){
 			lexRenderingList = CommonSearchFilterUtils.filterLexCodingSchemeRenderingList(lexRenderingList, queryData.getReadContext());
 		}
-		
-		// TODO: Need to filter further for restrictions
-		
+
 		return lexRenderingList.getCodingSchemeRendering();
 	}
 	

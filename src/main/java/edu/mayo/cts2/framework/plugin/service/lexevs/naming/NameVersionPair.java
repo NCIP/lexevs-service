@@ -59,5 +59,5 @@ public class NameVersionPair {
 	public void setVersion(String version) {
 		this.version = version;
 	}
-	
+
 }
