@@ -34,17 +34,23 @@ Clone the LexEVS Service Plugin: ```git clone https://github.com/cts2/lexevs-ser
 
 Build the Plugin: ```mvn clean install```
 
-Create a ```$USER_HOME/.cts2/[context]/config``` directory
+Create a ```$USER_HOME/.cts2/[context]/config``` directory.
 The ```context``` should be the name of your WAR file.
 
 For example, if you install the Plugin into Tomcat as ```lexevs.war```, the configuration directory for that service will be ```$USER_HOME/.cts2/lexevs/config```.
 
-There are several configuration files that can be placed in this directory
-
 ### Configuration Files
+There are several configuration files used to customize the service.
+These will all be placed in the ```$USER_HOME/.cts2/[context]/config``` directory.
+
 #### _cts2-deployment.properties_ (Required)
 Parameters:
 * ```osgi.suppress``` - (true/false) Whether or not to suppress the the OSGi framework. Must be ```true```.
+
+___Example - cts2-deployment.properties___
+```
+osgi.suppress=true
+```
 
 #### _lexevs.properties_ (Required)
 Parameters:
@@ -54,17 +60,45 @@ Parameters:
 * ```LG_CONFIG_FILE``` - The path to the LexEVS ```lbconfig.props``` file to use when running against a local LexEVS installation
 * ```uriResolutionServiceUrl``` - The URL to the URI Resolution Service, must be ```https://informatics.mayo.edu/cts2/services/uriresolver/```
 
+___Example - lexevs.properties___
+```
+service.pid=edu.mayo.cts2.framework.plugin.service.lexevs
+lexevsRemoteApiUrl=
+useRemoteApi=false
+LG_CONFIG_FILE=/Applications/LexEVS/resources/config/lbconfig.props
+uriResolutionServiceUrl=https://informatics.mayo.edu/cts2/services/uriresolver/
+```
+
 #### _webapp-config.properties_ (Optional)
 * ```service.pid``` - Must be ```edu.mayo.cts2.framework.webapp.rest.config```
 * ```allowHtmlRendering``` - (true/false) Allow an HTML rendering of content.
 * ```showStackTrace``` - (true/false) Show the Java Stack Trace in the browser on Exception. This should be ```false```, unless during development.
 * ```showHomePage``` - (true/false) Show a Home/Welcome page at the root context ("/").
 * ```allowSoap``` - (true/false) Turn on/off the SOAP API.
+* ```supportEmail``` - The email address to direct unexpected user encountered errors.
+
+___Example - webapp-config.properties___
+```
+service.pid=edu.mayo.cts2.framework.webapp.rest.config
+allowHtmlRendering=false
+showStackTrace=false
+showHomePage=false
+allowSoap=false
+supportEmail=support@yourservice.org
+```
 
 #### _server-context.properties_ (Optional)
+* ```service.pid``` - Must be ```ServerContext```
 * ```server.root``` - The base URL of the service as deployed (defaults to ```http://localhost/8080```.
 
+___Example - server-context.propertie___
+```
+service.pid=ServerContext
+server.root=http://myservice.org/lexevs
+```
+
 The resulting directory structure should resemble:
+
 ```
 $USER_HOME
   |_ .cts2
