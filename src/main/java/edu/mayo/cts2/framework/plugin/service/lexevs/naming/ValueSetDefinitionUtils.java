@@ -7,8 +7,10 @@ public final class ValueSetDefinitionUtils {
 	}
 
 	public static String getValueSetDefinitionLocalId(String definitionUri){
+		String hash = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(definitionUri.getBytes());
 		return 
-			org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(definitionUri.getBytes()).substring(0, 4);
+			org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(definitionUri.getBytes()).
+				substring(hash.length() - 5, hash.length() - 1);
 	}
 	
 }

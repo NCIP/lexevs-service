@@ -60,14 +60,38 @@ public class LexEVSResolvedValuesetQueryServiceTestIT extends
 	}
 
 	@Test
-	public void testGetResourceSummaries_Restriction_ValueSetDefinitions()
+	public void testGetResourceSummaries_Restriction_ValueSetDefinitionName()
 			throws Exception {
 
 		// Restrict to given codeSystem
 		ResolvedValueSetQueryServiceRestrictions restrictions = new ResolvedValueSetQueryServiceRestrictions();
 		Set<NameOrURI> valueSetDefinitions = new HashSet<NameOrURI>();
 		valueSetDefinitions.add(ModelUtils
-				.nameOrUriFromName("SRITEST:AUTO:AllDomesticANDGM"));
+				.nameOrUriFromName("5ER0"));
+		restrictions.setValueSetDefinitions(valueSetDefinitions);
+
+		// Create query with restriction
+		ResolvedValueSetQueryImpl query = new ResolvedValueSetQueryImpl(null,
+				null, restrictions);
+		DirectoryResult<ResolvedValueSetDirectoryEntry> dirResult = service
+				.getResourceSummaries(query, null, new Page());
+
+		assertNotNull(dirResult);
+		int expecting = 1;
+		int actual = dirResult.getEntries().size();
+		assertEquals("Expecting " + expecting + " but got " + actual,
+				expecting, actual);
+	}
+	
+	@Test
+	public void testGetResourceSummaries_Restriction_ValueSetDefinitionUri()
+			throws Exception {
+
+		// Restrict to given codeSystem
+		ResolvedValueSetQueryServiceRestrictions restrictions = new ResolvedValueSetQueryServiceRestrictions();
+		Set<NameOrURI> valueSetDefinitions = new HashSet<NameOrURI>();
+		valueSetDefinitions.add(ModelUtils
+				.nameOrUriFromUri("SRITEST:AUTO:AllDomesticANDGM"));
 		restrictions.setValueSetDefinitions(valueSetDefinitions);
 
 		// Create query with restriction

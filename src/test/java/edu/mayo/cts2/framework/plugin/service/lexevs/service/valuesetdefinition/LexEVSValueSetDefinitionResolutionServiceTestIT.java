@@ -41,7 +41,7 @@ public class LexEVSValueSetDefinitionResolutionServiceTestIT extends
 	@Test
 	public void testGetResolution() throws Exception {	
 		ValueSetDefinitionReadId defintionId = 
-			new ValueSetDefinitionReadId("U1JJ", ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"));
+			new ValueSetDefinitionReadId("5ER0", ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"));
 		
 		DirectoryResult<EntitySynopsis> dirResult = service.
 				resolveDefinition(defintionId, null, null, null, null, null, new Page());

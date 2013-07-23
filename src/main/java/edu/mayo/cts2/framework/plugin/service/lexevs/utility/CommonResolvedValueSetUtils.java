@@ -27,6 +27,7 @@ import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ResolvedValueSetNameTranslator;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ResolvedValueSetNameTriple;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.service.command.restriction.ResolvedValueSetQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.profile.resolvedvalueset.ResolvedValueSetQuery;
@@ -131,7 +132,7 @@ public final class CommonResolvedValueSetUtils {
 	public List<CodingScheme> filterOnDefinitions(List<CodingScheme> csList,
 			Set<NameOrURI> definitions)  {
 		List<CodingScheme> temp = new ArrayList<CodingScheme>();
-		for (CodingScheme cs : csList) {
+		for (CodingScheme cs : csList) { 
 			if( matchesValueSetDefinitions(cs, definitions)){
 				temp.add(cs);
 			}
@@ -161,8 +162,19 @@ public final class CommonResolvedValueSetUtils {
 		}
 		if (cs != null) {
 			for (NameOrURI def : definitions) {
-				if (cs.getCodingSchemeURI().equalsIgnoreCase(def.getName())) {
-					return true;
+				
+				if(def.getUri() != null){
+					if(def.getUri().equals(cs.getCodingSchemeURI())){
+						return true;
+					}
+				} else {
+					ResolvedValueSetNameTriple resolvedValueSetName = 
+						this.resolvedValueSetNameTranslator.getResolvedValueSetNameTriple(cs.getCodingSchemeURI());
+					if(resolvedValueSetName != null 
+							&& 
+							resolvedValueSetName.getDefinitionLocalId().equals(def.getName())){
+						return true;
+					}
 				}
 			}
 		}
