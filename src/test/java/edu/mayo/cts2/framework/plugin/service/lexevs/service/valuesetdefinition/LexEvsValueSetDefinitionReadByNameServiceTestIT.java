@@ -32,7 +32,6 @@ import org.junit.Test;
 
 import edu.mayo.cts2.framework.model.extension.LocalIdValueSetDefinition;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ValueSetDefinitionUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractReadServiceTest;
 import edu.mayo.cts2.framework.service.profile.ReadService;
 import edu.mayo.cts2.framework.service.profile.valuesetdefinition.name.ValueSetDefinitionReadId;

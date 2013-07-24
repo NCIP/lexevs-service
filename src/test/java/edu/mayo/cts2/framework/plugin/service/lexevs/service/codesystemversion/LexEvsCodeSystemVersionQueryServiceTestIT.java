@@ -39,7 +39,7 @@ import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContents;
 import org.junit.Test;
 
-import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntry;
+import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntryListEntry;
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntrySummary;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
@@ -68,7 +68,7 @@ import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersi
 @LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
 @LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml")})
 public class LexEvsCodeSystemVersionQueryServiceTestIT
-	extends AbstractQueryServiceTest<CodeSystemVersionCatalogEntry, 
+	extends AbstractQueryServiceTest<CodeSystemVersionCatalogEntryListEntry, 
 		CodeSystemVersionCatalogEntrySummary, 
 		CodeSystemVersionQuery> {
 	
@@ -583,7 +583,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, null, null, restrictions);
 
 		// Get Directory Results for given codeSystem (no restrictions and empty query so return all entities)
-		DirectoryResult<CodeSystemVersionCatalogEntry> dirResult = service.getResourceList(query, null, new Page());
+		DirectoryResult<CodeSystemVersionCatalogEntryListEntry> dirResult = service.getResourceList(query, null, new Page());
 		
 		// Test results, Automobiles has one entity
 		assertNotNull(dirResult);
@@ -605,7 +605,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, null, null, restrictions);
 
 		// Get Directory Results for given codeSystem (no restrictions and empty query so return all entities)
-		DirectoryResult<CodeSystemVersionCatalogEntry> dirResult = service.getResourceList(query, null, new Page());
+		DirectoryResult<CodeSystemVersionCatalogEntryListEntry> dirResult = service.getResourceList(query, null, new Page());
 		
 		// Test results, Automobiles has one entity
 		assertNotNull(dirResult);
@@ -618,7 +618,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 
 
 	@Override
-	protected QueryService<CodeSystemVersionCatalogEntry, CodeSystemVersionCatalogEntrySummary, CodeSystemVersionQuery> getService() {
+	protected QueryService<CodeSystemVersionCatalogEntryListEntry, CodeSystemVersionCatalogEntrySummary, CodeSystemVersionQuery> getService() {
 		return this.service;
 	}
 

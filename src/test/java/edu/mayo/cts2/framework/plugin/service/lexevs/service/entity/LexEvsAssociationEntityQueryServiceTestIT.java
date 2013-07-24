@@ -37,6 +37,7 @@ import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.entity.EntityDescription;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
+import edu.mayo.cts2.framework.model.entity.EntityListEntry;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractQueryServiceTest;
@@ -48,7 +49,7 @@ import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescripti
 
 @LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 public class LexEvsAssociationEntityQueryServiceTestIT 
-	extends AbstractQueryServiceTest<EntityDescription, EntityDirectoryEntry, EntityDescriptionQuery> {
+	extends AbstractQueryServiceTest<EntityListEntry, EntityDirectoryEntry, EntityDescriptionQuery> {
 	
 	@Resource
 	private LexEvsAssociationEntityQueryService service;
@@ -59,7 +60,7 @@ public class LexEvsAssociationEntityQueryServiceTestIT
 	}
 
 	@Override
-	protected QueryService<EntityDescription, EntityDirectoryEntry, EntityDescriptionQuery> getService() {
+	protected QueryService<EntityListEntry, EntityDirectoryEntry, EntityDescriptionQuery> getService() {
 		return this.service;
 	}
 	

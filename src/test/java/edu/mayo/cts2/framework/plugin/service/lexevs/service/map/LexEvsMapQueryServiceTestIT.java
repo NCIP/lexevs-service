@@ -38,7 +38,7 @@ import edu.mayo.cts2.framework.core.xml.Cts2Marshaller;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
-import edu.mayo.cts2.framework.model.map.MapCatalogEntry;
+import edu.mayo.cts2.framework.model.map.MapCatalogEntryListEntry;
 import edu.mayo.cts2.framework.model.map.MapCatalogEntrySummary;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.service.mapversion.types.MapRole;
@@ -85,7 +85,7 @@ public class LexEvsMapQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		
-		DirectoryResult<MapCatalogEntry> resourceList = this.service.getResourceList(mapQueryImpl, sortCriteria, page);
+		DirectoryResult<MapCatalogEntryListEntry> resourceList = this.service.getResourceList(mapQueryImpl, sortCriteria, page);
 		assertNotNull(resourceList);
 		assertEquals(1,resourceList.getEntries().size());
 	}
@@ -135,7 +135,7 @@ public class LexEvsMapQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		
-		DirectoryResult<MapCatalogEntry> resourceList = this.service.getResourceList(mapQueryImpl, sortCriteria, page);
+		DirectoryResult<MapCatalogEntryListEntry> resourceList = this.service.getResourceList(mapQueryImpl, sortCriteria, page);
 		assertNotNull(resourceList);
 		assertEquals(1,resourceList.getEntries().size());
 	}
@@ -162,7 +162,7 @@ public class LexEvsMapQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		
-		DirectoryResult<MapCatalogEntry> resourceList = this.service.getResourceList(mapQueryImpl, sortCriteria, page);
+		DirectoryResult<MapCatalogEntryListEntry> resourceList = this.service.getResourceList(mapQueryImpl, sortCriteria, page);
 		assertNotNull(resourceList);
 		assertEquals(0,resourceList.getEntries().size());
 	}
@@ -185,7 +185,7 @@ public class LexEvsMapQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		
-		DirectoryResult<MapCatalogEntry> resourceList = this.service.getResourceList(mapQueryImpl, sortCriteria, page);
+		DirectoryResult<MapCatalogEntryListEntry> resourceList = this.service.getResourceList(mapQueryImpl, sortCriteria, page);
 		assertNotNull(resourceList);
 		assertEquals(0,resourceList.getEntries().size());
 	}
@@ -231,7 +231,7 @@ public class LexEvsMapQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		
-		DirectoryResult<MapCatalogEntry> resourceList = this.service.getResourceList(mapQueryImpl, sortCriteria, page);
+		DirectoryResult<MapCatalogEntryListEntry> resourceList = this.service.getResourceList(mapQueryImpl, sortCriteria, page);
 		assertNotNull(resourceList);
 		assertEquals(1,resourceList.getEntries().size());
 	}
@@ -254,7 +254,7 @@ public class LexEvsMapQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		
-		DirectoryResult<MapCatalogEntry> resourceList = this.service.getResourceList(mapQueryImpl, sortCriteria, page);
+		DirectoryResult<MapCatalogEntryListEntry> resourceList = this.service.getResourceList(mapQueryImpl, sortCriteria, page);
 		assertNotNull(resourceList);
 		assertEquals(0,resourceList.getEntries().size());
 	}
@@ -282,7 +282,7 @@ public class LexEvsMapQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		
-		DirectoryResult<MapCatalogEntry> resourceList = this.service.getResourceList(mapQueryImpl, sortCriteria, page);
+		DirectoryResult<MapCatalogEntryListEntry> resourceList = this.service.getResourceList(mapQueryImpl, sortCriteria, page);
 		assertNotNull(resourceList);
 		assertEquals(1,resourceList.getEntries().size());
 	}
@@ -309,7 +309,7 @@ public class LexEvsMapQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		
-		DirectoryResult<MapCatalogEntry> resourceList = this.service.getResourceList(mapQueryImpl, sortCriteria, page);
+		DirectoryResult<MapCatalogEntryListEntry> resourceList = this.service.getResourceList(mapQueryImpl, sortCriteria, page);
 		assertNotNull(resourceList);
 		assertEquals(1,resourceList.getEntries().size());
 	}
@@ -337,7 +337,7 @@ public class LexEvsMapQueryServiceTestIT extends AbstractTestITBase {
 		SortCriteria sortCriteria = null;
 		Page page = new Page();
 		
-		DirectoryResult<MapCatalogEntry> resourceList = this.service.getResourceList(mapQueryImpl, sortCriteria, page);
+		DirectoryResult<MapCatalogEntryListEntry> resourceList = this.service.getResourceList(mapQueryImpl, sortCriteria, page);
 		assertNotNull(resourceList);
 		assertEquals(0,resourceList.getEntries().size());
 	}

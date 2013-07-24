@@ -41,8 +41,8 @@ import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
-import edu.mayo.cts2.framework.model.entity.EntityDescription;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
+import edu.mayo.cts2.framework.model.entity.EntityListEntry;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.service.core.Query;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
@@ -61,7 +61,7 @@ import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescripti
  */
 @LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
 public class LexEvsEntityQueryServiceTestIT 
-	extends AbstractQueryServiceTest<EntityDescription, EntityDirectoryEntry, EntityDescriptionQuery> {
+	extends AbstractQueryServiceTest<EntityListEntry, EntityDirectoryEntry, EntityDescriptionQuery> {
 	
 	@Resource
 	private LexEvsEntityQueryService service;
@@ -103,6 +103,34 @@ public class LexEvsEntityQueryServiceTestIT
 		// Test results
 		// ------------
 		List<EntityDirectoryEntry> list = directoryResult.getEntries();
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() > 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() > 0);		
+	}
+	
+	@Test
+	public void testGetResourceList_CodingSchemeExists_andNotEmpty() throws Exception {
+		final NameOrURI name = ModelUtils.nameOrUriFromName("Automobiles-1.0");
+		
+		// Create restriction for query
+		// ----------------------------
+		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
+		restrictions.getCodeSystemVersions().add(ModelUtils.nameOrUriFromName(name.getName()));
+		
+		// Create query, no filters
+		// -------------------------
+		EntityDescriptionQuery query = new EntityDescriptionQueryImpl(null, null, restrictions);	
+		
+		// Call getResourceSummaries from service
+		// --------------------------------------
+		SortCriteria sortCriteria = null;
+		Page page = new Page();		
+		DirectoryResult<EntityListEntry> directoryResult = this.service.getResourceList(query, sortCriteria, page);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
+		
+		// Test results
+		// ------------
+		List<EntityListEntry> list = directoryResult.getEntries();
 		assertNotNull("Expecting data returned but list is null", list);
 		String msg = "Expecting list.size() > 0, instead list.size() = " + list.size();
 		assertTrue(msg, list.size() > 0);		
@@ -510,7 +538,7 @@ public class LexEvsEntityQueryServiceTestIT
 	}	
 
 	@Override
-	protected QueryService<EntityDescription, EntityDirectoryEntry, EntityDescriptionQuery> getService() {
+	protected QueryService<EntityListEntry, EntityDirectoryEntry, EntityDescriptionQuery> getService() {
 		return this.service;
 	}
 

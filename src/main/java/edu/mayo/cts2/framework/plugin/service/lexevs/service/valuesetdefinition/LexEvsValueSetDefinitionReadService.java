@@ -143,7 +143,7 @@ public class LexEvsValueSetDefinitionReadService extends AbstractLexEvsService
 			String localId = ValueSetDefinitionUtils.getValueSetDefinitionLocalId(uriString);
 			return new LocalIdValueSetDefinition(
 				localId,
-				vsdTransformer.transformFullDescription(lexGridValueSetDefinition));			
+				vsdTransformer.transformFullDescription(lexGridValueSetDefinition).getEntry(0));			
 		} else {
 			return null;
 		}

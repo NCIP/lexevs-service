@@ -38,7 +38,7 @@ import org.LexGrid.codingSchemes.CodingScheme;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
-import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntry;
+import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntryListEntry;
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntrySummary;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
@@ -123,7 +123,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 	}
 
 	@Override
-	public DirectoryResult<CodeSystemVersionCatalogEntry> getResourceList(
+	public DirectoryResult<CodeSystemVersionCatalogEntryListEntry> getResourceList(
 			CodeSystemVersionQuery query, SortCriteria sortCriteria, Page page) {
 		LexBIGService lexBigService = this.getLexBigService();		
 		QueryData<CodeSystemVersionQuery> queryData = new QueryData<CodeSystemVersionQuery>(query, null);

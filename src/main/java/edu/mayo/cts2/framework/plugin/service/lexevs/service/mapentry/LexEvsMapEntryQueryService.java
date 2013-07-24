@@ -39,8 +39,8 @@ import edu.mayo.cts2.framework.model.core.PredicateReference;
 import edu.mayo.cts2.framework.model.core.PropertyReference;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
-import edu.mayo.cts2.framework.model.mapversion.MapEntry;
 import edu.mayo.cts2.framework.model.mapversion.MapEntryDirectoryEntry;
+import edu.mayo.cts2.framework.model.mapversion.MapEntryListEntry;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
@@ -119,9 +119,9 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	 * @see edu.mayo.cts2.framework.service.profile.QueryService#getResourceList(edu.mayo.cts2.framework.service.profile.ResourceQuery, edu.mayo.cts2.framework.model.core.SortCriteria, edu.mayo.cts2.framework.model.command.Page)
 	 */
 	@Override
-	public DirectoryResult<MapEntry> getResourceList(MapEntryQuery query,
+	public DirectoryResult<MapEntryListEntry> getResourceList(MapEntryQuery query,
 			SortCriteria sortCriteria, Page page) {
-		DirectoryResult<MapEntry> cts2DirectoryResult;
+		DirectoryResult<MapEntryListEntry> cts2DirectoryResult;
 		if (this.validateMapEntryQuery(query)) {
 			MapResolvedConceptReferenceResults lexReferenceResults = CommonResourceUtils
 					.getLexMapReferenceResults(query, sortCriteria, page,
@@ -130,8 +130,8 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 					this.transformer, lexReferenceResults,
 					Constants.FULL_DESCRIPTION);
 		} else {
-			cts2DirectoryResult = new DirectoryResult<MapEntry>(
-					new ArrayList<MapEntry>(), true);
+			cts2DirectoryResult = new DirectoryResult<MapEntryListEntry>(
+					new ArrayList<MapEntryListEntry>(), true);
 		}
 
 		return cts2DirectoryResult;

@@ -33,6 +33,7 @@ import edu.mayo.cts2.framework.core.util.EncodingUtils;
 import edu.mayo.cts2.framework.model.core.URIAndEntityName;
 import edu.mayo.cts2.framework.model.mapversion.MapEntry;
 import edu.mayo.cts2.framework.model.mapversion.MapEntryDirectoryEntry;
+import edu.mayo.cts2.framework.model.mapversion.MapEntryListEntry;
 import edu.mayo.cts2.framework.model.mapversion.MapSet;
 import edu.mayo.cts2.framework.model.mapversion.MapTarget;
 import edu.mayo.cts2.framework.model.mapversion.types.MapProcessingRule;
@@ -41,10 +42,10 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.utility.MapResolvedConceptR
 
 @Component
 public class MappingToMapEntryTransform 
-	extends AbstractBaseTransform<MapEntry, MapResolvedConceptReference, MapEntryDirectoryEntry, MapResolvedConceptReference>  {
+	extends AbstractBaseTransform<MapEntryListEntry, MapResolvedConceptReference, MapEntryDirectoryEntry, MapResolvedConceptReference>  {
 
 	@Override
-	public MapEntry transformFullDescription(MapResolvedConceptReference mapReference) {
+	public MapEntryListEntry transformFullDescription(MapResolvedConceptReference mapReference) {
 		if(mapReference == null){
 			return null;
 		}
@@ -78,8 +79,25 @@ public class MappingToMapEntryTransform
 		}
 		
 		mapEntry.addMapSet(mapSet);
+		
+		URIAndEntityName fromName = this.getTransformUtils().toUriAndEntityName(resolvedConceptReference);
+		String encodedName = EncodingUtils.encodeScopedEntityName(fromName);
 
-		return mapEntry;
+		String mapVersionName = 
+			this.getVersionNameConverter().toCts2VersionName(
+				mapReference.getMapName().getName(),
+				mapReference.getMapName().getVersion());
+		
+		MapEntryListEntry listEntry = new MapEntryListEntry();
+		listEntry.setEntry(mapEntry);
+		listEntry.setResourceName(encodedName);
+		listEntry.setHref(
+				this.getUrlConstructor().createMapEntryUrl(
+						mapReference.getMapName().getName(), 
+						mapVersionName, 
+						encodedName));
+
+		return listEntry;
 	}
 	
 	@Override

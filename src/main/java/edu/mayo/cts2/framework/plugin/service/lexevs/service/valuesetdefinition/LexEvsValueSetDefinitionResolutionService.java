@@ -128,7 +128,7 @@ public class LexEvsValueSetDefinitionResolutionService extends AbstractLexEvsSer
 		String definitionName = definitionId.getName();
 		
 		ResolvedValueSetReadId id = new ResolvedValueSetReadId(
-				definitionName, 
+				ResolvedValueSetNameTranslator.RESOLVED_VS_LOCAL_ID,
 				definitionId.getValueSet(), 
 				ModelUtils.nameOrUriFromName(definitionName));
 		
@@ -146,8 +146,19 @@ public class LexEvsValueSetDefinitionResolutionService extends AbstractLexEvsSer
 			Set<NameOrURI> codeSystemVersions, 
 			NameOrURI tag,
 			ResolvedReadContext readContext) {
-		throw new UnsupportedOperationException("Cannot resolve the complete ResolvedValueSet yet...");
+		String definitionName = definitionId.getName();
+		
+		ResolvedValueSetReadId id = new ResolvedValueSetReadId(
+			ResolvedValueSetNameTranslator.RESOLVED_VS_LOCAL_ID, 
+			definitionId.getValueSet(), 
+			ModelUtils.nameOrUriFromName(definitionName));
+
+		try {
+			return this.resolvedValueSetResolutionService.getResolution(id);
+		} catch (InvaildVersionNameException e) {
+			//Invalid name - return null;
+			return null;
+		}
 	}
-	
 	
 }

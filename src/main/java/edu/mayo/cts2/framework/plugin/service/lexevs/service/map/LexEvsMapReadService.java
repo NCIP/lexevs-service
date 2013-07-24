@@ -36,6 +36,7 @@ import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.map.MapCatalogEntry;
+import edu.mayo.cts2.framework.model.map.MapCatalogEntryListEntry;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
@@ -90,7 +91,9 @@ public class LexEvsMapReadService
 	// -------- Implemented methods ----------------	
 	@Override
 	protected MapCatalogEntry transform(CodingScheme codingScheme) {
-		return this.transformer.transformFullDescription(codingScheme);
+		MapCatalogEntryListEntry listEntry = this.transformer.transformFullDescription(codingScheme);
+		
+		return listEntry == null ? null : listEntry.getEntry();
 	}
 
 	@Override

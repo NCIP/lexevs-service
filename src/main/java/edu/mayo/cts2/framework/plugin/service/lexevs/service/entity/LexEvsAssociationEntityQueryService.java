@@ -51,8 +51,8 @@ import edu.mayo.cts2.framework.model.core.PropertyReference;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
-import edu.mayo.cts2.framework.model.entity.EntityDescription;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
+import edu.mayo.cts2.framework.model.entity.EntityListEntry;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURIList;
@@ -154,7 +154,7 @@ public class LexEvsAssociationEntityQueryService extends AbstractLexEvsService
 	}
 
 	@Override
-	public DirectoryResult<EntityDescription> getResourceList(
+	public DirectoryResult<EntityListEntry> getResourceList(
 			EntityDescriptionQuery query, SortCriteria sortCriteria, Page page) {
 		return this.doQuery(query, sortCriteria, this.listClosure, page);
 	}
@@ -163,9 +163,9 @@ public class LexEvsAssociationEntityQueryService extends AbstractLexEvsService
 		T transform(AssociatedConcept ac);
 	}
 	
-	private TransformClosure<EntityDescription> listClosure = new TransformClosure<EntityDescription>(){
+	private TransformClosure<EntityListEntry> listClosure = new TransformClosure<EntityListEntry>(){
 		@Override
-		public EntityDescription transform(AssociatedConcept ac) {
+		public EntityListEntry transform(AssociatedConcept ac) {
 			return transformer.transformFullDescription(ac);
 		}
 	};

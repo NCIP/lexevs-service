@@ -13,7 +13,9 @@ import edu.mayo.cts2.framework.core.xml.Cts2Marshaller;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.core.EntitySynopsis;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
+import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
+import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSet;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ValueSetDefinitionUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
 import edu.mayo.cts2.framework.service.profile.valuesetdefinition.name.ValueSetDefinitionReadId;
@@ -53,6 +55,32 @@ public class LexEVSValueSetDefinitionResolutionServiceTestIT extends
 				expecting, actual);
 	}
 	
+	@Test
+	public void testGetResolutionEntities() throws Exception {	
+		ValueSetDefinitionReadId defintionId = 
+			new ValueSetDefinitionReadId("5ER0", ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"));
+		
+		DirectoryResult<EntityDirectoryEntry> dirResult = service.
+				resolveDefinitionAsEntityDirectory(defintionId, null, null, null, null, null, new Page());
+
+		assertNotNull(dirResult);
+		int expecting = 1;
+		int actual = dirResult.getEntries().size();
+		assertEquals("Expecting " + expecting + " but got " + actual,
+				expecting, actual);
+	}
+	
+	@Test
+	public void testGetResolutionComplete() throws Exception {	
+		ValueSetDefinitionReadId defintionId = 
+			new ValueSetDefinitionReadId("5ER0", ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"));
+		
+		ResolvedValueSet resolution = service.resolveDefinitionAsCompleteSet(defintionId, null, null, null);
+		assertNotNull(resolution);
+		
+		assertEquals(1, resolution.getMemberCount());
+	}
+		
 	@Test
 	public void testGetResolutionInvalidId() throws Exception {
 

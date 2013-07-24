@@ -34,6 +34,7 @@ import edu.mayo.cts2.framework.core.constants.URIHelperInterface;
 import edu.mayo.cts2.framework.model.core.CodeSystemReference;
 import edu.mayo.cts2.framework.model.core.EntryDescription;
 import edu.mayo.cts2.framework.model.map.MapCatalogEntry;
+import edu.mayo.cts2.framework.model.map.MapCatalogEntryListEntry;
 import edu.mayo.cts2.framework.model.map.MapCatalogEntrySummary;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.transform.AbstractBaseTransform;
@@ -46,10 +47,10 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Tuple;
  */
 @Component
 public class CodingSchemeToMapTransform 
-	extends AbstractBaseTransform<MapCatalogEntry, CodingScheme, MapCatalogEntrySummary, CodingScheme> {
+	extends AbstractBaseTransform<MapCatalogEntryListEntry, CodingScheme, MapCatalogEntrySummary, CodingScheme> {
 
 	@Override
-	public MapCatalogEntry transformFullDescription(CodingScheme codingScheme) {
+	public MapCatalogEntryListEntry transformFullDescription(CodingScheme codingScheme) {
 		if(codingScheme == null){
 			return null;
 		}
@@ -89,7 +90,12 @@ public class CodingSchemeToMapTransform
 		mapCatalogEntry.setFromCodeSystem(fromAndTo.getOne());
 		mapCatalogEntry.setToCodeSystem(fromAndTo.getTwo());
 		
-		return mapCatalogEntry;
+		MapCatalogEntryListEntry listEntry = new MapCatalogEntryListEntry();
+		listEntry.setEntry(mapCatalogEntry);
+		listEntry.setHref(this.getUrlConstructor().createMapUrl(mapName));
+		listEntry.setResourceName(mapCatalogEntry.getMapName());
+		
+		return listEntry;
 	}
 	
 	@Override

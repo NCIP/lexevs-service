@@ -31,6 +31,7 @@ import org.LexGrid.commonTypes.Property;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntry;
+import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntryListEntry;
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntrySummary;
 import edu.mayo.cts2.framework.model.core.CodeSystemReference;
 import edu.mayo.cts2.framework.model.core.EntryDescription;
@@ -47,7 +48,7 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.transform.TransformUtils;
  */
 @Component
 public class CodingSchemeToCodeSystemTransform 
-	extends AbstractBaseTransform<CodeSystemVersionCatalogEntry, CodingScheme, CodeSystemVersionCatalogEntrySummary, CodingSchemeRendering>{
+	extends AbstractBaseTransform<CodeSystemVersionCatalogEntryListEntry, CodingScheme, CodeSystemVersionCatalogEntrySummary, CodingSchemeRendering>{
 	//DescriptionDataType, DescriptionDataIN, DirectoryEntryDataType, DirecotoryEntryDataIN> 
 	
 	public CodingSchemeToCodeSystemTransform(){
@@ -67,7 +68,7 @@ public class CodingSchemeToCodeSystemTransform
 	 * @return the code system version catalog entry
 	 */
 	@Override
-	public CodeSystemVersionCatalogEntry transformFullDescription(CodingScheme codingScheme){
+	public CodeSystemVersionCatalogEntryListEntry transformFullDescription(CodingScheme codingScheme){
 		CodeSystemVersionCatalogEntry codeSystemVersion = new CodeSystemVersionCatalogEntry();
 
 		codeSystemVersion.setAbout(
@@ -119,7 +120,17 @@ public class CodingSchemeToCodeSystemTransform
 				codingSchemeName, 
 				codingScheme.getRepresentsVersion()));
 		
-		return codeSystemVersion;
+		CodeSystemVersionCatalogEntryListEntry listEntry = new CodeSystemVersionCatalogEntryListEntry();
+		listEntry.setEntry(codeSystemVersion);
+		listEntry.setResourceName(codeSystemVersion.getCodeSystemVersionName());
+		
+		listEntry.setHref(
+				this.getUrlConstructor().
+					createCodeSystemVersionUrl(
+							codingSchemeName, 
+							codingScheme.getRepresentsVersion()));
+		
+		return listEntry;
 	}
 	
 	@Override
