@@ -33,7 +33,10 @@ import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.LexBIG.Exceptions.LBException;
+import org.LexGrid.LexBIG.Exceptions.LBParameterException;
+import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.codingSchemes.CodingScheme;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
@@ -77,6 +80,9 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 	@Resource
 	private VersionNameConverter nameConverter;
 	
+	@Resource
+	private MappingExtension mappingExtension;
+	
 	private Set<UriVersionPair> resolvedValueSets = new HashSet<UriVersionPair>();
 	
 	private Object mutex = new Object();
@@ -117,7 +123,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		}
 		QueryData<CodeSystemVersionQuery> queryData = new QueryData<CodeSystemVersionQuery>(query, null);
 
-		CodingSchemeRendering [] renderings = this.getNonResolvedValueSetCodingSchemes(queryData, null);
+		CodingSchemeRendering [] renderings = this.getNonMappingAndNonResolvedValueSetCodingSchemes(queryData, null);
 		
 		return renderings.length;
 	}
@@ -128,7 +134,7 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		LexBIGService lexBigService = this.getLexBigService();		
 		QueryData<CodeSystemVersionQuery> queryData = new QueryData<CodeSystemVersionQuery>(query, null);
 		
-		CodingSchemeRendering[] csRendering = this.getNonResolvedValueSetCodingSchemes(queryData, sortCriteria);
+		CodingSchemeRendering[] csRendering = this.getNonMappingAndNonResolvedValueSetCodingSchemes(queryData, sortCriteria);
 		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPage(csRendering, page);
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
 
@@ -140,13 +146,13 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 			CodeSystemVersionQuery query, SortCriteria sortCriteria, Page page) {
 		QueryData<CodeSystemVersionQuery> queryData = new QueryData<CodeSystemVersionQuery>(query, null);
 		
-		CodingSchemeRendering[] csRendering = this.getNonResolvedValueSetCodingSchemes(queryData, sortCriteria);
+		CodingSchemeRendering[] csRendering = this.getNonMappingAndNonResolvedValueSetCodingSchemes(queryData, sortCriteria);
 		CodingSchemeRendering[] csRenderingPage = (CodingSchemeRendering[]) CommonPageUtils.getPage(csRendering, page);
 		boolean atEnd = (page.getEnd() >= csRendering.length) ? true : false;
 		return CommonResourceUtils.createDirectoryResultsWithSummary(this.transformer, csRenderingPage, atEnd);
 	}
 	
-	protected CodingSchemeRendering[] getNonResolvedValueSetCodingSchemes(QueryData<CodeSystemVersionQuery> queryData, SortCriteria sortCriteria){
+	protected CodingSchemeRendering[] getNonMappingAndNonResolvedValueSetCodingSchemes(QueryData<CodeSystemVersionQuery> queryData, SortCriteria sortCriteria){
 		synchronized(this.mutex){
 			List<CodingSchemeRendering> returnList = new ArrayList<CodingSchemeRendering>();
 			
@@ -158,12 +164,25 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 				String uri = rendering.getCodingSchemeSummary().getCodingSchemeURI();
 				String version = rendering.getCodingSchemeSummary().getRepresentsVersion();
 				
-				if(! this.resolvedValueSets.contains(new UriVersionPair(uri, version))){
+				boolean isMapping = this.isMappingCodingScheme(uri, version);
+				if(! isMapping && 
+						! this.resolvedValueSets.contains(new UriVersionPair(uri, version))){
 					returnList.add(rendering);
 				}
 			}
 			
 			return returnList.toArray(new CodingSchemeRendering[returnList.size()]);
+		}
+	}
+	
+	protected boolean isMappingCodingScheme(String uri, String version){
+		try {
+			return this.mappingExtension.
+				isMappingCodingScheme(uri, Constructors.createCodingSchemeVersionOrTagFromVersion(version));
+		} catch (LBParameterException e) {
+			//didn't find it or a LexEVS error -- assume not a Mapping CodingScheme.
+			log.warn(e);
+			return false;
 		}
 	}
 
@@ -250,6 +269,14 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 				return false;
 			return true;
 		}	
+	}
+
+	public MappingExtension getMappingExtension() {
+		return mappingExtension;
+	}
+
+	public void setMappingExtension(MappingExtension mappingExtension) {
+		this.mappingExtension = mappingExtension;
 	}
 
 }

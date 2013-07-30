@@ -26,6 +26,7 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -62,7 +63,11 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 		// Mock LexBIGService, overwrite return value for getSupportedCodingSchemes
 		LexBIGService lexBigService = fakeLexEvs.createMockedLexBIGServiceWithFakeLexEvsData(service, withData);
 		
+		MappingExtension mappingExtension = EasyMock.createNiceMock(MappingExtension.class);
+		EasyMock.replay(mappingExtension);
+		
 		service.setLexBigService(lexBigService);
+		service.setMappingExtension(mappingExtension);
 
 		// Overwrite objects in service object
 		CodingSchemeToCodeSystemTransform transform = 
