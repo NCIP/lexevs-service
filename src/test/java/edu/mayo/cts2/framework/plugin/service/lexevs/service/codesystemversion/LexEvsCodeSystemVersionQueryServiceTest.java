@@ -41,6 +41,7 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodingSchemeNameTran
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.transform.TransformUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResolvedValueSetUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.FakeLexEvsData.DataField;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.FakeLexEvsSystem;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
@@ -64,10 +65,12 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 		LexBIGService lexBigService = fakeLexEvs.createMockedLexBIGServiceWithFakeLexEvsData(service, withData);
 		
 		MappingExtension mappingExtension = EasyMock.createNiceMock(MappingExtension.class);
-		EasyMock.replay(mappingExtension);
+		CommonResolvedValueSetUtils valueSetUtils = EasyMock.createNiceMock(CommonResolvedValueSetUtils.class);
+		EasyMock.replay(mappingExtension, valueSetUtils);
 		
 		service.setLexBigService(lexBigService);
 		service.setMappingExtension(mappingExtension);
+		service.setCommonResolvedValueSetUtils(valueSetUtils);
 
 		// Overwrite objects in service object
 		CodingSchemeToCodeSystemTransform transform = 

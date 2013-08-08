@@ -1,6 +1,7 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -20,11 +21,14 @@ import org.LexGrid.codingSchemes.CodingScheme;
 import org.LexGrid.commonTypes.Property;
 import org.LexGrid.commonTypes.PropertyQualifier;
 import org.apache.commons.lang.StringUtils;
+import org.lexgrid.resolvedvalueset.LexEVSResolvedValueSetService;
 import org.lexgrid.valuesets.LexEVSValueSetDefinitionServices;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
+import edu.mayo.cts2.framework.plugin.service.lexevs.event.LexEvsChangeEventObserver;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ResolvedValueSetNameTranslator;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ResolvedValueSetNameTriple;
@@ -33,18 +37,51 @@ import edu.mayo.cts2.framework.service.command.restriction.ResolvedValueSetQuery
 import edu.mayo.cts2.framework.service.profile.resolvedvalueset.ResolvedValueSetQuery;
 
 @Component
-public final class CommonResolvedValueSetUtils {
+public class CommonResolvedValueSetUtils  
+	implements InitializingBean, LexEvsChangeEventObserver{
 
 	@Resource
 	private VersionNameConverter nameConverter;
+	
 	@Resource
 	private LexBIGService lexBIGService;
 	
 	@Resource
+	private LexEVSResolvedValueSetService lexEVSResolvedService;
+	
+	@Resource
 	private ResolvedValueSetNameTranslator resolvedValueSetNameTranslator;
-
+	
+	private Set<UriVersionPair> resolvedValueSets = new HashSet<UriVersionPair>();
+	
+	private Object mutex = new Object();
+	
 	private CommonResolvedValueSetUtils(){
 		super();
+	}
+	
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.buildResolvedValueSetCache();
+	}
+	
+	public void buildResolvedValueSetCache() {
+		synchronized(this.mutex){
+			this.resolvedValueSets.clear();
+			try {
+				for(CodingScheme cs : this.lexEVSResolvedService.listAllResolvedValueSets()){
+					this.resolvedValueSets.add(new UriVersionPair(cs.getCodingSchemeURI(), cs.getRepresentsVersion()));
+				}
+			} catch (LBException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+	
+	public boolean isResolvedValueSet(UriVersionPair versionPair){
+		synchronized(this.mutex){
+			return this.resolvedValueSets.contains(versionPair);
+		}
 	}
 
 	public List<CodingScheme> restrictByQuery(
@@ -260,6 +297,54 @@ public final class CommonResolvedValueSetUtils {
 
 	public void setCodeSystemVersionNameConverter(VersionNameConverter converter) {
 		this.nameConverter = converter;
+	}
+	
+	@Override
+	public void onChange() {
+		this.buildResolvedValueSetCache();
+	}
+	
+	public static class UriVersionPair {
+		private String uri;
+		private String version;
+		
+		public UriVersionPair(String uri, String version) {
+			super();
+			this.uri = uri;
+			this.version = version;
+		}
+		
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((uri == null) ? 0 : uri.hashCode());
+			result = prime * result
+					+ ((version == null) ? 0 : version.hashCode());
+			return result;
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			UriVersionPair other = (UriVersionPair) obj;
+			if (uri == null) {
+				if (other.uri != null)
+					return false;
+			} else if (!uri.equals(other.uri))
+				return false;
+			if (version == null) {
+				if (other.version != null)
+					return false;
+			} else if (!version.equals(other.version))
+				return false;
+			return true;
+		}	
 	}
 
 }
