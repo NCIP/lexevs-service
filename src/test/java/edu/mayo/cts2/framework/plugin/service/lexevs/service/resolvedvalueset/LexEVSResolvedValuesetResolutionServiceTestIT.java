@@ -12,6 +12,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContents;
 import org.junit.Test;
+import org.springframework.beans.factory.InitializingBean;
 
 import edu.mayo.cts2.framework.core.xml.Cts2Marshaller;
 import edu.mayo.cts2.framework.model.command.Page;
@@ -22,6 +23,7 @@ import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.event.LexEvsChangeEventObserver;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonTestUtils;
 import edu.mayo.cts2.framework.service.command.restriction.ResolvedValueSetResolutionEntityRestrictions;
@@ -34,8 +36,8 @@ import edu.mayo.cts2.framework.service.profile.valuesetdefinition.ResolvedValueS
 @LoadContents({
 	@LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosAndGM.xml"),
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")})
-public class LexEVSResolvedValuesetResolutionServiceTestIT extends
-		AbstractTestITBase {
+public class LexEVSResolvedValuesetResolutionServiceTestIT 
+	extends AbstractTestITBase {
 
 	@Resource
 	private ResolvedValueSetResolutionService service;
@@ -120,6 +122,8 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT extends
 		
 		DirectoryResult<EntityDirectoryEntry> dirResult = service.getEntities(
 				identifier, null, null, new Page());
+		
+		assertTrue(dirResult.getEntries().size() > 0);
 		
 		for(EntityDirectoryEntry entry : dirResult.getEntries()){
 			StreamResult result = new StreamResult(new StringWriter());
