@@ -15,9 +15,11 @@ public class EntityNameQueryBuilder {
 	private CodingSchemeNameTranslator codingSchemeNameTranslator;
 
 	public String buildQuery(ScopedEntityName name){
+		String escapedName = QueryParser.escape(name.getName());
 		StringBuilder sb = new StringBuilder(
-			String.format("(code:%s AND namespace:%s)", 
-				QueryParser.escape(name.getName()),
+			String.format("(code:%s OR (code:%s AND namespace:%s))", 
+				escapedName,
+				escapedName,
 				QueryParser.escape(
 					this.codingSchemeNameTranslator.translateToLexGrid(name.getNamespace()))));	
 		
