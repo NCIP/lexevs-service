@@ -169,6 +169,27 @@ public class LexEvsEntityReadServiceTestIT extends
 	}	
 	
 	@Test
+	public void testAvailableDescriptionsUri() throws Exception {
+		EntityNameOrURI entity = new EntityNameOrURI();
+		entity.setUri("urn:oid:11.11.0.1:Chevy");
+		
+		EntityReference reference = this.service.availableDescriptions(entity, null);
+		
+		assertNotNull(reference);
+		assertEquals(1, reference.getKnownEntityDescriptionCount());
+	}	
+	
+	@Test
+	public void testAvailableDescriptionsBadUri() throws Exception {
+		EntityNameOrURI entity = new EntityNameOrURI();
+		entity.setUri("__INVALID__");
+		
+		EntityReference reference = this.service.availableDescriptions(entity, null);
+		
+		assertNull(reference);
+	}	
+	
+	@Test
 	public void testAvailableDescriptionsValidXml() throws Exception {
 		EntityNameOrURI entity = new EntityNameOrURI();
 		ScopedEntityName scopedEntityName = new ScopedEntityName();

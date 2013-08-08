@@ -95,6 +95,12 @@ public final class UriUtils {
 
 		return StringUtils.substring(uri, 0, separator);
 	}
+	
+	public static char getSeparator(String uri) {
+		int separator = getSeparatorPosition(uri);
+
+		return uri.charAt(separator);
+	}
 
 	private static int getSeparatorPosition(String string) {
 		char[] chars = string.toCharArray();
@@ -105,6 +111,16 @@ public final class UriUtils {
 			}
 		}
 
-		throw new IllegalStateException();
+		throw new BadUriException("Malformed URI: " + string);
+	}
+	
+	public static class BadUriException extends IllegalArgumentException {
+
+		private static final long serialVersionUID = 7847250670382555646L;
+		
+		private BadUriException(String message){
+			super(message);
+		}
+		
 	}
 }

@@ -65,6 +65,8 @@ import edu.mayo.cts2.framework.model.entity.types.DesignationRole;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.transform.AbstractBaseTransform;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriResolver;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResolvedValueSetUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResolvedValueSetUtils.UriVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.XmlUtils;
 
 /**
@@ -82,6 +84,9 @@ public class EntityTransform
 	private LexBIGService lexBigService;
 	
 	private LexBIGServiceConvenienceMethods lbscm;
+	
+	@Resource
+	private CommonResolvedValueSetUtils commonResolvedValueSetUtils;
 	
 	private static Set<String> ROOT_NODES = new HashSet<String>(Arrays.asList("@", "@@"));
 	
@@ -270,10 +275,16 @@ public class EntityTransform
 				return null;
 			} else {
 				
-				EntityReference reference = new EntityReference();;
+				EntityReference reference = new EntityReference();
 				
 				while(itr.hasNext()){
 					ResolvedConceptReference ref = itr.next();
+					
+					//skip ResolvedValueSets
+					if(this.commonResolvedValueSetUtils.isResolvedValueSet(
+						new UriVersionPair(ref.getCodingSchemeURI(), ref.getCodingSchemeVersion()))){
+						continue;
+					}
 					
 					if(reference.getAbout() == null){
 						reference.setAbout(this.getUriHandler().getEntityUri(ref));

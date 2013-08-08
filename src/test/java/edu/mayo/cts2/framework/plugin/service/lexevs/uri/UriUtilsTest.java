@@ -11,4 +11,9 @@ public class UriUtilsTest {
 		assertEquals("http://test#it", UriUtils.combine("http://test#", "it"));
 	}
 	
+	@Test
+	public void getSeparator(){
+		assertEquals('#', UriUtils.getSeparator("http://test#something"));
+	}
+	
 }

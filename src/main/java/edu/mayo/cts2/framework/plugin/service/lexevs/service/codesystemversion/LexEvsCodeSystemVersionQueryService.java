@@ -32,13 +32,10 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
-import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Constructors;
-import org.LexGrid.codingSchemes.CodingScheme;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntryListEntry;
@@ -52,10 +49,11 @@ import edu.mayo.cts2.framework.model.core.URIAndEntityName;
 import edu.mayo.cts2.framework.model.core.types.TargetReferenceType;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
-import edu.mayo.cts2.framework.plugin.service.lexevs.event.LexEvsChangeEventObserver;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonPageUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResolvedValueSetUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResolvedValueSetUtils.UriVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.QueryData;
@@ -69,10 +67,7 @@ import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersi
 */
 @Component
 public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
-		implements 
-			InitializingBean,
-			LexEvsChangeEventObserver, 
-			CodeSystemVersionQueryService {
+		implements CodeSystemVersionQueryService {
 
 	@Resource
 	private CodingSchemeToCodeSystemTransform transformer;
@@ -83,28 +78,9 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 	@Resource
 	private MappingExtension mappingExtension;
 	
-	private Set<UriVersionPair> resolvedValueSets = new HashSet<UriVersionPair>();
-	
-	private Object mutex = new Object();
-	
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		this.buildResolvedValueSetCache();
-	}
-	
-	public void buildResolvedValueSetCache() {
-		synchronized(this.mutex){
-			this.resolvedValueSets.clear();
-			try {
-				for(CodingScheme cs : this.getLexEVSResolvedService().listAllResolvedValueSets()){
-					this.resolvedValueSets.add(new UriVersionPair(cs.getCodingSchemeURI(), cs.getRepresentsVersion()));
-				}
-			} catch (LBException e) {
-				throw new RuntimeException(e);
-			}
-		}
-	}
-	
+	@Resource
+	private CommonResolvedValueSetUtils commonResolvedValueSetUtils;
+
 	// ------ Local methods ----------------------
 	public void setCodingSchemeTransformer(
 			CodingSchemeToCodeSystemTransform codingSchemeTransformer) {
@@ -153,7 +129,6 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 	}
 	
 	protected CodingSchemeRendering[] getNonMappingAndNonResolvedValueSetCodingSchemes(QueryData<CodeSystemVersionQuery> queryData, SortCriteria sortCriteria){
-		synchronized(this.mutex){
 			List<CodingSchemeRendering> returnList = new ArrayList<CodingSchemeRendering>();
 			
 			CodingSchemeRendering[] renderings = 
@@ -166,13 +141,12 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 				
 				boolean isMapping = this.isMappingCodingScheme(uri, version);
 				if(! isMapping && 
-						! this.resolvedValueSets.contains(new UriVersionPair(uri, version))){
+						! this.commonResolvedValueSetUtils.isResolvedValueSet(new UriVersionPair(uri, version))){
 					returnList.add(rendering);
 				}
 			}
 			
 			return returnList.toArray(new CodingSchemeRendering[returnList.size()]);
-		}
 	}
 	
 	protected boolean isMappingCodingScheme(String uri, String version){
@@ -223,54 +197,6 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 		return new HashSet<PropertyReference>();
 	}
 
-	@Override
-	public void onChange() {
-		this.buildResolvedValueSetCache();
-	}
-	
-	private static class UriVersionPair {
-		private String uri;
-		private String version;
-		
-		protected UriVersionPair(String uri, String version) {
-			super();
-			this.uri = uri;
-			this.version = version;
-		}
-		
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((uri == null) ? 0 : uri.hashCode());
-			result = prime * result
-					+ ((version == null) ? 0 : version.hashCode());
-			return result;
-		}
-		
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			UriVersionPair other = (UriVersionPair) obj;
-			if (uri == null) {
-				if (other.uri != null)
-					return false;
-			} else if (!uri.equals(other.uri))
-				return false;
-			if (version == null) {
-				if (other.version != null)
-					return false;
-			} else if (!version.equals(other.version))
-				return false;
-			return true;
-		}	
-	}
-
 	public MappingExtension getMappingExtension() {
 		return mappingExtension;
 	}
@@ -278,5 +204,15 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 	public void setMappingExtension(MappingExtension mappingExtension) {
 		this.mappingExtension = mappingExtension;
 	}
+
+	public CommonResolvedValueSetUtils getCommonResolvedValueSetUtils() {
+		return commonResolvedValueSetUtils;
+	}
+
+	public void setCommonResolvedValueSetUtils(
+			CommonResolvedValueSetUtils commonResolvedValueSetUtils) {
+		this.commonResolvedValueSetUtils = commonResolvedValueSetUtils;
+	}
+
 
 }

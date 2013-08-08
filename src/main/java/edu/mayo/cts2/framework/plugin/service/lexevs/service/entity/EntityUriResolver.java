@@ -1,5 +1,7 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 
+import java.util.Arrays;
+
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.Exceptions.LBException;
@@ -25,26 +27,30 @@ public class EntityUriResolver {
 	public ScopedEntityName resolveUri(String entityUri){
 		String namePart = UriUtils.getLocalPart(entityUri);
 		String namespacePart = UriUtils.getNamespace(entityUri);
-		
+		String namespacePartWithSeparator = namespacePart + UriUtils.getSeparator(entityUri);
+
 		ScopedEntityName name = new ScopedEntityName();
 		name.setName(namePart);
-
-		String namespace = this.uriResolver.idToName(namespacePart, IdType.CODE_SYSTEM);
 		
-		if(StringUtils.isNotBlank(namespace)){
-			name.setNamespace(namespace);
-			
-			return name;
-		} else {
-			try {
-				CodingScheme cs = this.lexBigService.resolveCodingScheme(namespacePart, null);
-				name.setNamespace(cs.getCodingSchemeName());
+		for(String ns : Arrays.asList(namespacePart, namespacePartWithSeparator)){
+			String namespace = this.uriResolver.idToName(ns, IdType.CODE_SYSTEM);
+		
+			if(StringUtils.isNotBlank(namespace)){
+				name.setNamespace(namespace);
+				
 				return name;
-			} catch (LBException e) {
-				//didn't find it here... return null.
-				return null;
-			}	
+			} else {
+				try {
+					CodingScheme cs = this.lexBigService.resolveCodingScheme(ns, null);
+					name.setNamespace(cs.getCodingSchemeName());
+					return name;
+				} catch (LBException e) {
+					//didn't find it here...
+				}	
+			}
 		}
+		
+		return null;
 	}
 
 }
