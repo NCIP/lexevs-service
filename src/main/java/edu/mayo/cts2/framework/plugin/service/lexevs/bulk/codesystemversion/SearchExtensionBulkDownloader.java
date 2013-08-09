@@ -40,6 +40,7 @@ import org.LexGrid.LexBIG.Impl.helpers.ResolvedConceptReferencesIteratorAdapter;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
 import org.apache.log4j.Logger;
+import org.compass.core.util.CollectionUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
@@ -84,7 +85,11 @@ public class SearchExtensionBulkDownloader
 				put(CodeSystemVersionBulkDownloader.DESCRIPTION_FIELD, new Extractor(){
 					@Override
 					public String extract(ResolvedConceptReference ref) {
-						return ref.getEntityDescription().getContent();
+						if(ref.getEntityDescription() != null) {
+							return ref.getEntityDescription().getContent();
+						} else {
+							return "";
+						}
 					}	
 				});
 				
@@ -130,6 +135,11 @@ public class SearchExtensionBulkDownloader
 	@Override
 	public void download(OutputStream outputStream, Set<CodingSchemeReference> codingSchemes, List<String> fields, char separator) {
 		ResolvedConceptReferencesIterator itr;
+		
+		if(CollectionUtils.isEmpty(codingSchemes)){
+			codingSchemes = null;
+		}
+		
 		try {
 			itr = searchExtension.search(null, codingSchemes, MatchAlgorithm.LUCENE);
 		} catch (LBParameterException e) {

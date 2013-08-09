@@ -72,7 +72,7 @@ public abstract class AbstractBulkDownloader {
 				listWriter.write(fieldValues);
 			}
 
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 
 		} finally {

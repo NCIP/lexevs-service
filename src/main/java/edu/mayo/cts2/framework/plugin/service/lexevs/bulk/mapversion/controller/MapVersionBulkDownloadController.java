@@ -24,14 +24,19 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.bulk.mapversion.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
+import org.LexGrid.LexBIG.DataModel.Core.types.CodingSchemeVersionStatus;
+import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Extensions.Generic.CodingSchemeReference;
+import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
+import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
@@ -64,9 +69,15 @@ public class MapVersionBulkDownloadController extends AbstractBulkDownloadContro
 				MapVersionBulkDownloader.TARGET_CODINGSCHEME_URI_FIELD,
 				MapVersionBulkDownloader.TARGET_CODINGSCHEME_VERSION_FIELD			
 	);
+	
+	@Resource
+	private LexBIGService lexBigService;
 
 	@Resource
 	private MapVersionBulkDownloader mapVersionBulkDownloader;
+	
+	@Resource
+	private MappingExtension mappingExtension;
 
 	/**
 	 * Download.
@@ -77,7 +88,7 @@ public class MapVersionBulkDownloadController extends AbstractBulkDownloadContro
 	 * @param separator the separator
 	 * @throws LBException the lB exception
 	 */
-	@RequestMapping(value="/download/map")
+	@RequestMapping(value="/export/map")
     public void download(
     		HttpServletResponse response,
     		@RequestParam(value="map", required=true) String map,
@@ -122,5 +133,39 @@ public class MapVersionBulkDownloadController extends AbstractBulkDownloadContro
 	public Object getController() {
 		return this;
 	}
+	
+	@Override
+	protected String getValidParametersMessage() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("map - (Optional) the Map to export\n");
+		sb.append("\tFormat: mapName[:version]  - example: 'MyMap' or 'MyMap:1.0'\n");
+		sb.append("\tAvailable: " + this.getAvailableCodingSchemesString() + "\n");
+		sb.append("fields - (Optional) Content fields to output. Default: "+ DEFAULT_FIELDS + "\n");
+		sb.append("separator -(Optional) One character field separator. Default: " + DEFAULT_SEPARATOR +"\n");
+		sb.append("filename - (Optional) Output file name. Default: " + DEFAULT_FILE_NAME);
+		
+		return sb.toString();
+	}
 
+	private String getAvailableCodingSchemesString(){
+		List<String> schemes = new ArrayList<String>();
+		try {
+			for(CodingSchemeRendering scheme : lexBigService.getSupportedCodingSchemes().getCodingSchemeRendering()){
+				boolean isMapping = 
+						mappingExtension.isMappingCodingScheme(
+								scheme.getCodingSchemeSummary().getCodingSchemeURI(),
+								Constructors.createCodingSchemeVersionOrTagFromVersion(
+										scheme.getCodingSchemeSummary().getRepresentsVersion()));
+				if(isMapping && scheme.getRenderingDetail().getVersionStatus().equals(CodingSchemeVersionStatus.ACTIVE)){
+					String name = scheme.getCodingSchemeSummary().getLocalName();
+					String version = scheme.getCodingSchemeSummary().getRepresentsVersion();
+					schemes.add(name + "[:" + version + "]");
+				}
+			}
+		} catch (LBException e) {
+			return "";
+		}
+		
+		return StringUtils.join(schemes, ",");
+	}
 }
