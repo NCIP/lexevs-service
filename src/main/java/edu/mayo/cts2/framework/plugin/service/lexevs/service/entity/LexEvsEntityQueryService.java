@@ -52,8 +52,8 @@ import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
-import edu.mayo.cts2.framework.model.entity.EntityDescription;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
+import edu.mayo.cts2.framework.model.entity.EntityListEntry;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURIList;
@@ -166,7 +166,7 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 	}
 
 	@Override
-	public DirectoryResult<EntityDescription> getResourceList(
+	public DirectoryResult<EntityListEntry> getResourceList(
 			EntityDescriptionQuery query, SortCriteria sortCriteria, Page page) {
 		
 		LexBIGService lexBigService = this.getLexBigService();
@@ -175,7 +175,7 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		ResolvedConceptReferenceResults resolvedConceptReferenceResultsPage;
 		resolvedConceptReferenceResultsPage = CommonPageUtils.getPage(lexBigService, queryData, sortCriteria, page);
 
-		DirectoryResult<EntityDescription> directoryResult;
+		DirectoryResult<EntityListEntry> directoryResult;
 		directoryResult = CommonResourceUtils.createDirectoryResults(this.transformer, resolvedConceptReferenceResultsPage, Constants.FULL_DESCRIPTION);
 
 		return directoryResult;

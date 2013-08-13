@@ -76,7 +76,11 @@ public class MappingExtensionBulkDownloader
 				put(MapVersionBulkDownloader.SOURCE_DESCRIPTION_FIELD, new Extractor(){
 					@Override
 					public String extract(ResolvedConceptReference ref) {
-						return ref.getEntityDescription().getContent();
+						if(ref.getEntityDescription() != null) {
+							return ref.getEntityDescription().getContent();
+						} else {
+							return "";
+						}
 					}	
 				});
 				

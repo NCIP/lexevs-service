@@ -47,6 +47,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import edu.mayo.cts2.framework.core.constants.URIHelperInterface;
+import edu.mayo.cts2.framework.core.util.EncodingUtils;
 import edu.mayo.cts2.framework.model.core.Comment;
 import edu.mayo.cts2.framework.model.core.Definition;
 import edu.mayo.cts2.framework.model.core.DescriptionInCodeSystem;
@@ -58,11 +59,14 @@ import edu.mayo.cts2.framework.model.core.URIAndEntityName;
 import edu.mayo.cts2.framework.model.entity.Designation;
 import edu.mayo.cts2.framework.model.entity.EntityDescription;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
+import edu.mayo.cts2.framework.model.entity.EntityListEntry;
 import edu.mayo.cts2.framework.model.entity.NamedEntityDescription;
 import edu.mayo.cts2.framework.model.entity.types.DesignationRole;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.transform.AbstractBaseTransform;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriResolver;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResolvedValueSetUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResolvedValueSetUtils.UriVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.XmlUtils;
 
 /**
@@ -70,7 +74,7 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.utility.XmlUtils;
  */
 @Component
 public class EntityTransform 
-	extends AbstractBaseTransform<EntityDescription, ResolvedConceptReference, EntityDirectoryEntry, ResolvedConceptReference> 
+	extends AbstractBaseTransform<EntityListEntry, ResolvedConceptReference, EntityDirectoryEntry, ResolvedConceptReference> 
 	implements InitializingBean {
 	
 	@Resource
@@ -81,6 +85,9 @@ public class EntityTransform
 	
 	private LexBIGServiceConvenienceMethods lbscm;
 	
+	@Resource
+	private CommonResolvedValueSetUtils commonResolvedValueSetUtils;
+	
 	private static Set<String> ROOT_NODES = new HashSet<String>(Arrays.asList("@", "@@"));
 	
 	@Override
@@ -90,7 +97,7 @@ public class EntityTransform
 	}
 
 	@Override
-	public EntityDescription transformFullDescription(ResolvedConceptReference reference) {
+	public EntityListEntry transformFullDescription(ResolvedConceptReference reference) {
 		Assert.isTrue(reference.getEntity() != null, 
 				"The Entity is null. Please resolve the CodedNodeSet with Resolve = true");
 
@@ -158,7 +165,17 @@ public class EntityTransform
 		EntityDescription ed = new EntityDescription();
 		ed.setNamedEntity(namedEntity);
 		
-		return ed;
+		EntityListEntry listEntry = new EntityListEntry();
+		listEntry.setEntry(ed);
+		listEntry.setResourceName(
+			EncodingUtils.encodeScopedEntityName(
+				ModelUtils.createScopedEntityName(
+					reference.getCode(), 
+					this.sanitizeNamespace(reference.getCodeNamespace()))));
+		
+		listEntry.setHref(this.getTransformUtils().createEntityHref(reference));
+		
+		return listEntry;
 	}
 	
 	private List<Comment> toNote(org.LexGrid.concepts.Comment... comments) {
@@ -258,10 +275,16 @@ public class EntityTransform
 				return null;
 			} else {
 				
-				EntityReference reference = new EntityReference();;
+				EntityReference reference = new EntityReference();
 				
 				while(itr.hasNext()){
 					ResolvedConceptReference ref = itr.next();
+					
+					//skip ResolvedValueSets
+					if(this.commonResolvedValueSetUtils.isResolvedValueSet(
+						new UriVersionPair(ref.getCodingSchemeURI(), ref.getCodingSchemeVersion()))){
+						continue;
+					}
 					
 					if(reference.getAbout() == null){
 						reference.setAbout(this.getUriHandler().getEntityUri(ref));

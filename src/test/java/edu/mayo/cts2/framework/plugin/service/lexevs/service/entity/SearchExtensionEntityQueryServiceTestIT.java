@@ -37,8 +37,8 @@ import org.junit.Test;
 
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
-import edu.mayo.cts2.framework.model.entity.EntityDescription;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
+import edu.mayo.cts2.framework.model.entity.EntityListEntry;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractQueryServiceTest;
 import edu.mayo.cts2.framework.service.command.restriction.EntityDescriptionQueryServiceRestrictions;
@@ -54,7 +54,7 @@ import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescripti
 @LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml"),
 @LoadContent(contentPath="lexevs/test-content/Automobiles.xml")})
 public class SearchExtensionEntityQueryServiceTestIT 
-	extends AbstractQueryServiceTest<EntityDescription, EntityDirectoryEntry, EntityDescriptionQuery> {
+	extends AbstractQueryServiceTest<EntityListEntry, EntityDirectoryEntry, EntityDescriptionQuery> {
 	
 	@Resource
 	private SearchExtensionEntityQueryService service;
@@ -102,7 +102,7 @@ public class SearchExtensionEntityQueryServiceTestIT
 	}
 	
 	@Override
-	protected QueryService<EntityDescription, EntityDirectoryEntry, EntityDescriptionQuery> getService() {
+	protected QueryService<EntityListEntry, EntityDirectoryEntry, EntityDescriptionQuery> getService() {
 		return this.service;
 	}
 

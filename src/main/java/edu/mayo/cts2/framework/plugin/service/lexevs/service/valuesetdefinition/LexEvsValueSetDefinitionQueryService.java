@@ -43,6 +43,7 @@ import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinitionDirectoryEntry;
+import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinitionListEntry;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.service.profile.valuesetdefinition.ValueSetDefinitionQuery;
 import edu.mayo.cts2.framework.service.profile.valuesetdefinition.ValueSetDefinitionQueryService;
@@ -65,13 +66,13 @@ public class LexEvsValueSetDefinitionQueryService extends AbstractLexEvsService
 		T transform(org.LexGrid.valueSets.ValueSetDefinition item);
 	}
 	
-	private final Callback<List<String>, edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinition> 
+	private final Callback<List<String>, ValueSetDefinitionListEntry> 
 		listCallack = 
-			new DefinitionCallback<edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinition>(
-				new TransformClosure<edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinition>() {
+			new DefinitionCallback<ValueSetDefinitionListEntry>(
+				new TransformClosure<ValueSetDefinitionListEntry>() {
 
 					@Override
-					public edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinition transform(
+					public ValueSetDefinitionListEntry transform(
 							ValueSetDefinition item) {
 						return transformer.transformFullDescription(item);
 					}
@@ -154,12 +155,12 @@ public class LexEvsValueSetDefinitionQueryService extends AbstractLexEvsService
 	 * @see edu.mayo.cts2.framework.service.profile.QueryService#getResourceList(edu.mayo.cts2.framework.service.profile.ResourceQuery, edu.mayo.cts2.framework.model.core.SortCriteria, edu.mayo.cts2.framework.model.command.Page)
 	 */
 	@Override
-	public DirectoryResult<edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinition> getResourceList(
+	public DirectoryResult<ValueSetDefinitionListEntry> getResourceList(
 			ValueSetDefinitionQuery query, SortCriteria sortCriteria, Page page) {
 		List<String> uris = this.definitionServices.listValueSetDefinitionURIs();
 		
-		ValueSetDefinitionDirectoryBuilder<edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinition> builder = 
-			new ValueSetDefinitionDirectoryBuilder<edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinition>(
+		ValueSetDefinitionDirectoryBuilder<ValueSetDefinitionListEntry> builder = 
+			new ValueSetDefinitionDirectoryBuilder<ValueSetDefinitionListEntry>(
 					uris, 
 					this.listCallack, 
 					null, 

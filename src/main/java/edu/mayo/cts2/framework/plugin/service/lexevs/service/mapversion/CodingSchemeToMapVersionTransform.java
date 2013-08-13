@@ -38,6 +38,7 @@ import edu.mayo.cts2.framework.model.core.MapReference;
 import edu.mayo.cts2.framework.model.core.SourceAndNotation;
 import edu.mayo.cts2.framework.model.mapversion.MapVersion;
 import edu.mayo.cts2.framework.model.mapversion.MapVersionDirectoryEntry;
+import edu.mayo.cts2.framework.model.mapversion.MapVersionListEntry;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.transform.AbstractBaseTransform;
@@ -50,7 +51,7 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Tuple;
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
 @Component
-public class CodingSchemeToMapVersionTransform extends AbstractBaseTransform <MapVersion, CodingScheme, MapVersionDirectoryEntry, CodingSchemeRendering> {
+public class CodingSchemeToMapVersionTransform extends AbstractBaseTransform <MapVersionListEntry, CodingScheme, MapVersionDirectoryEntry, CodingSchemeRendering> {
 
 	public CodingSchemeToMapVersionTransform(){
 		super();
@@ -63,7 +64,7 @@ public class CodingSchemeToMapVersionTransform extends AbstractBaseTransform <Ma
 	}
 
 	@Override
-	public MapVersion transformFullDescription(CodingScheme codingScheme){
+	public MapVersionListEntry transformFullDescription(CodingScheme codingScheme){
 		MapVersion mapVersion = new MapVersion();
 
 		mapVersion.setAbout(codingScheme.getCodingSchemeURI());
@@ -107,7 +108,15 @@ public class CodingSchemeToMapVersionTransform extends AbstractBaseTransform <Ma
 		mapVersion.setFromCodeSystemVersion(fromAndTo.getOne());
 		mapVersion.setToCodeSystemVersion(fromAndTo.getTwo());
 		
-		return mapVersion;
+		MapVersionListEntry listEntry = new MapVersionListEntry();
+		listEntry.setEntry(mapVersion);
+		listEntry.setResourceName(mapVersion.getMapVersionName());
+		listEntry.setHref(
+				this.getUrlConstructor().
+					createMapVersionUrl(
+						mapName, name));
+		
+		return listEntry;
 	}
 	
 	@Override

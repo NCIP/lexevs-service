@@ -38,6 +38,7 @@ import org.springframework.stereotype.Component;
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.mapversion.MapVersion;
+import edu.mayo.cts2.framework.model.mapversion.MapVersionListEntry;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
@@ -79,7 +80,9 @@ public class LexEvsMapVersionReadService
 				mappingExtension)){
 			return null;
 		} else {
-			return this.transformer.transformFullDescription(codingScheme);
+			MapVersionListEntry listEntry = this.transformer.transformFullDescription(codingScheme);
+			
+			return listEntry == null ? null : listEntry.getEntry();
 		}
 	}
 	

@@ -24,6 +24,7 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.bulk.codesystemversion.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -32,7 +33,10 @@ import java.util.Set;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
+import org.LexGrid.LexBIG.DataModel.Core.types.CodingSchemeVersionStatus;
+import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.LexBIG.Exceptions.LBException;
+import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
 import org.LexGrid.LexBIG.Extensions.Generic.CodingSchemeReference;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Constructors;
@@ -53,6 +57,8 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.bulk.codesystemversion.Code
 public class CodeSystemVersionBulkDownloadController extends AbstractBulkDownloadController {
 	
 	private static final String DEFAULT_SEPARATOR = "|";
+	
+	private static final String DEFAULT_CODING_SCHEMES = CodeSystemVersionBulkDownloader.ALL_CODINGSCHEMES;
 	
 	private static final String DEFAULT_FILE_NAME = "terminology-bulk-download.txt";
 	
@@ -79,7 +85,7 @@ public class CodeSystemVersionBulkDownloadController extends AbstractBulkDownloa
 	 * @param separator the separator
 	 * @throws LBException the lB exception
 	 */
-	@RequestMapping(value="/download")
+	@RequestMapping(value="/export/codingscheme")
     public void download(
     		HttpServletResponse response,
     		@RequestParam(value="codingschemes", defaultValue="") String codingschemes,
@@ -87,6 +93,10 @@ public class CodeSystemVersionBulkDownloadController extends AbstractBulkDownloa
     		@RequestParam(value="separator", defaultValue=DEFAULT_SEPARATOR) char separator,
     		@RequestParam(value="filename", defaultValue=DEFAULT_FILE_NAME) String filename) throws LBException {
 		
+		if(StringUtils.isBlank(codingschemes)){
+			throw new UserInputException("'codingschemes' parameter is required.");
+		}
+
 		List<String> fieldsList;
 		if(StringUtils.isBlank(fields)){
 			fieldsList = DEFAULT_FIELDS;
@@ -99,6 +109,9 @@ public class CodeSystemVersionBulkDownloadController extends AbstractBulkDownloa
 		Set<CodingSchemeReference> references = new HashSet<CodingSchemeReference>();
 		
 		for(String codingScheme : StringUtils.split(codingschemes, ',')){
+			if(codingScheme.equals(CodeSystemVersionBulkDownloader.ALL_CODINGSCHEMES)){
+				continue;
+			}
 			String[] parts = StringUtils.split(codingScheme, ':');
 			
 			CodingSchemeReference reference = new CodingSchemeReference();
@@ -124,7 +137,37 @@ public class CodeSystemVersionBulkDownloadController extends AbstractBulkDownloa
 			throw new RuntimeException(e);
 		}
     }
+
+	@Override
+	protected String getValidParametersMessage() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("codingschemes - (Optional) CodingSchemes to include (comma-separated). Default: " + DEFAULT_CODING_SCHEMES +"\n");
+		sb.append("\tFormat: codingSchemeName[:version]  - example: 'MyCodingScheme' or 'MyCodingScheme:1.0'\n");
+		sb.append("\tAvailable: all," + this.getAvailableCodingSchemesString() +"\n");
+		sb.append("fields - (Optional) Content fields to output. Default: "+ DEFAULT_FIELDS + "\n");
+		sb.append("separator -(Optional) One character field separator. Default: " + DEFAULT_SEPARATOR +"\n");
+		sb.append("filename - (Optional) Output file name. Default: " + DEFAULT_FILE_NAME);
+		
+		return sb.toString();
+	}
 	
+	private String getAvailableCodingSchemesString(){
+		List<String> schemes = new ArrayList<String>();
+		try {
+			for(CodingSchemeRendering scheme : lexBigService.getSupportedCodingSchemes().getCodingSchemeRendering()){
+				if(scheme.getRenderingDetail().getVersionStatus().equals(CodingSchemeVersionStatus.ACTIVE)){
+					String name = scheme.getCodingSchemeSummary().getLocalName();
+					String version = scheme.getCodingSchemeSummary().getRepresentsVersion();
+					schemes.add(name + "[:" + version + "]");
+				}
+			}
+		} catch (LBInvocationException e) {
+			return "";
+		}
+		
+		return StringUtils.join(schemes, ",");
+	}
+
 	@Override
 	public Object getController() {
 		return this;

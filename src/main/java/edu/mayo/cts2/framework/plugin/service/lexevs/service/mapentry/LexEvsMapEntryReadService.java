@@ -42,6 +42,7 @@ import org.springframework.stereotype.Component;
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.mapversion.MapEntry;
+import edu.mayo.cts2.framework.model.mapversion.MapEntryListEntry;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
@@ -139,9 +140,11 @@ public class LexEvsMapEntryReadService extends AbstractLexEvsService implements 
 		if(resolvedConceptReference == null){
 			return null;
 		} else {
-			return this.mappingToMapEntryTransform.transformFullDescription(
+			MapEntryListEntry listEntry = this.mappingToMapEntryTransform.transformFullDescription(
 				new MapResolvedConceptReference(
 					this.nameConverter.fromCts2VersionName(identifier.getMapVersion().getName()), resolvedConceptReference));
+		
+			return listEntry == null ? null : listEntry.getEntry();
 		}
 	}
 

@@ -23,7 +23,9 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.valuesetdefinition;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.StringWriter;
 
@@ -39,6 +41,7 @@ import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinition;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinitionDirectoryEntry;
+import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinitionListEntry;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
 
 /**
@@ -74,7 +77,7 @@ public class LexEvsValueSetDefinitionQueryServiceTestIT extends
 	public void testResourceList() throws Exception {						
 		Page page = new Page();
 		
-		DirectoryResult<ValueSetDefinition> summaries = 
+		DirectoryResult<ValueSetDefinitionListEntry> summaries = 
 			service.getResourceList(null, null, page);
 		
 		assertNotNull(summaries);
@@ -100,13 +103,13 @@ public class LexEvsValueSetDefinitionQueryServiceTestIT extends
 	public void testResourceListValidXml() throws Exception {						
 		Page page = new Page();
 		
-		DirectoryResult<ValueSetDefinition> summaries = 
+		DirectoryResult<ValueSetDefinitionListEntry> summaries = 
 			service.getResourceList(null, null, page);
 		
 		assertNotNull(summaries);
 		assertTrue(summaries.getEntries().size() > 0);
 		
-		for(ValueSetDefinition summary : summaries.getEntries()){
+		for(ValueSetDefinitionListEntry summary : summaries.getEntries()){
 			this.marshaller.marshal(summary, new StreamResult(new StringWriter()));	
 		}
 	}

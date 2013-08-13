@@ -20,8 +20,8 @@ import edu.mayo.cts2.framework.model.core.PropertyReference;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
-import edu.mayo.cts2.framework.model.entity.EntityDescription;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
+import edu.mayo.cts2.framework.model.entity.EntityListEntry;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURIList;
@@ -50,7 +50,7 @@ public class DelegatingEntityQueryService extends AbstractLexEvsService
 	}
 
 	@Override
-	public DirectoryResult<EntityDescription> getResourceList(
+	public DirectoryResult<EntityListEntry> getResourceList(
 			EntityDescriptionQuery query, 
 			SortCriteria sortCriteria, 
 			Page page) {

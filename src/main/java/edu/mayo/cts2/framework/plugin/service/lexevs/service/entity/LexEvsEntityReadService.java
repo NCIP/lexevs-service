@@ -52,6 +52,7 @@ import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
+import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriUtils.BadUriException;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionReadService;
@@ -113,7 +114,9 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 		if(entity == null){
 			return null;
 		} else {
-			return this.transformer.transformFullDescription(entity);
+			EntityListEntry listEntry = this.transformer.transformFullDescription(entity);
+			
+			return listEntry == null ? null : listEntry.getEntry();
 		}
 	}
 
@@ -147,7 +150,11 @@ public class LexEvsEntityReadService extends AbstractLexEvsService
 		if(entityId.getEntityName() != null){
 			name = entityId.getEntityName();
 		} else {
-			name = this.entityUriResolver.resolveUri(entityId.getUri());
+			try {
+				name = this.entityUriResolver.resolveUri(entityId.getUri());
+			} catch (BadUriException e){
+				return null;
+			}
 		}
 		
 		String searchString = this.entityNameQueryBuilder.buildQuery(name);

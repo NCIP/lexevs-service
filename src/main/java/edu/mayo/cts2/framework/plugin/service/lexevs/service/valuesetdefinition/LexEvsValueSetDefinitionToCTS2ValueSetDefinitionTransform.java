@@ -63,6 +63,7 @@ import edu.mayo.cts2.framework.model.valuesetdefinition.SpecificEntityList;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinition;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinitionDirectoryEntry;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinitionEntry;
+import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinitionListEntry;
 import edu.mayo.cts2.framework.model.valuesetdefinition.types.LeafOrAll;
 import edu.mayo.cts2.framework.model.valuesetdefinition.types.TransitiveClosure;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ValueSetNamePair;
@@ -80,7 +81,7 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriUtils;
 @Component
 public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform 
 	extends AbstractBaseTransform<
-		ValueSetDefinition, 
+		ValueSetDefinitionListEntry, 
 		org.LexGrid.valueSets.ValueSetDefinition, 
 		ValueSetDefinitionDirectoryEntry, 
 		org.LexGrid.valueSets.ValueSetDefinition> {
@@ -94,7 +95,7 @@ public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform
 	@Resource
 	private ValueSetNameTranslator valueSetNameTranslator;
 
-	public ValueSetDefinition transformFullDescription(org.LexGrid.valueSets.ValueSetDefinition lexEvsVSD) {
+	public ValueSetDefinitionListEntry transformFullDescription(org.LexGrid.valueSets.ValueSetDefinition lexEvsVSD) {
 		if (lexEvsVSD == null) {
 			return null;
 		}
@@ -144,7 +145,23 @@ public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform
 			cts2VSD.addEntry(cts2Entry);
 		}
 	
-		return cts2VSD;
+		ValueSetDefinitionListEntry listEntry = new ValueSetDefinitionListEntry();
+		listEntry.addEntry(cts2VSD);
+		
+		ValueSetNamePair pair = this.valueSetNameTranslator.
+				getDefinitionNameAndVersion(
+					lexEvsVSD.getValueSetDefinitionURI());
+			
+		listEntry.setResourceName(pair.getDefinitionLocalId());
+		
+		listEntry.setHref(
+			this.getUrlConstructor().
+				createValueSetDefinitionUrl(
+					pair.getValueSetName(), 
+					pair.getDefinitionLocalId()));
+		
+		
+		return listEntry;
 	}
 	
 	private SetOperator toSetOperator(DefinitionOperator operator){

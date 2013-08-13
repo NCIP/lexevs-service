@@ -1,5 +1,6 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.resolvedvalueset;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -29,6 +30,7 @@ import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.entity.EntityDescription;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
+import edu.mayo.cts2.framework.model.entity.EntityListEntry;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.Query;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
@@ -119,7 +121,8 @@ ResolvedValueSetResolutionService {
 	@Override
 	public ResolvedValueSetResult<EntitySynopsis> getResolution(
 			ResolvedValueSetReadId identifier,
-			Set<ResolvedFilter> filterComponent, Page page) {
+			Set<ResolvedFilter> filterComponent, 
+			Page page) {
 		NameVersionPair codingScheme = this.getNameVersionPair(identifier);
 		
 		if(codingScheme == null){
@@ -149,7 +152,22 @@ ResolvedValueSetResolutionService {
 
 	@Override
 	public ResolvedValueSet getResolution(ResolvedValueSetReadId identifier) {
-		throw new UnsupportedOperationException("Cannot resolve the complete ResolvedValueSet yet...");
+		Page page = new Page();
+		page.setPage(0);
+		page.setMaxToReturn(Integer.MAX_VALUE);
+				
+		ResolvedValueSetResult<EntitySynopsis> resolution = this.getResolution(identifier, null, page);
+		if(resolution == null){
+			return null;
+		}
+		
+		ResolvedValueSet resolvedValueSet = new ResolvedValueSet();
+		resolvedValueSet.setResolutionInfo(resolution.getResolvedValueSetHeader());
+		for(EntitySynopsis synopsis : resolution.getEntries()){
+			resolvedValueSet.addMember(synopsis);
+		}
+		
+		return resolvedValueSet;		
 	}
 
 	@Override
@@ -206,15 +224,24 @@ ResolvedValueSetResolutionService {
 			return null;
 		}
 		
-		DirectoryResult<EntityDescription> result = this.lexEvsEntityQueryService.getResourceList(
+		DirectoryResult<EntityListEntry> result = this.lexEvsEntityQueryService.getResourceList(
 				this.toEntityDescriptionQuery(codingScheme, query),
 				sortCriteria, 
 				page);
 		
 		return new ResolvedValueSetResult<EntityDescription>(
 					this.getResolvedValueSetHeader(codingScheme), 
-					result.getEntries(), 
+					this.listEntriesToDescriptions(result.getEntries()), 
 					result.isAtEnd());
+	}
+	
+	private List<EntityDescription> listEntriesToDescriptions(List<EntityListEntry> listEntries){
+		List<EntityDescription> returnList = new ArrayList<EntityDescription>();
+		for(EntityListEntry entry : listEntries){
+			returnList.add(entry.getEntry());
+		}
+		
+		return returnList;
 	}
 	
 	protected CodingScheme resolve(String nameOrUri, CodingSchemeVersionOrTag versionIdOrTag){

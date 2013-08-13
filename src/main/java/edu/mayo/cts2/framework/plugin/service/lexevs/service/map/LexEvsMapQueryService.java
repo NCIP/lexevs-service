@@ -41,7 +41,7 @@ import edu.mayo.cts2.framework.model.core.PredicateReference;
 import edu.mayo.cts2.framework.model.core.PropertyReference;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
-import edu.mayo.cts2.framework.model.map.MapCatalogEntry;
+import edu.mayo.cts2.framework.model.map.MapCatalogEntryListEntry;
 import edu.mayo.cts2.framework.model.map.MapCatalogEntrySummary;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
@@ -105,7 +105,7 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 
 
 	@Override
-	public DirectoryResult<MapCatalogEntry> getResourceList(MapQuery query,
+	public DirectoryResult<MapCatalogEntryListEntry> getResourceList(MapQuery query,
 			SortCriteria sortCriteria, Page page) {
 
 		LexBIGService lexBigService = this.getLexBigService();

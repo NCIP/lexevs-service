@@ -36,6 +36,8 @@ import org.LexGrid.LexBIG.Extensions.Generic.CodingSchemeReference;
  */
 public interface CodeSystemVersionBulkDownloader {
 	
+	static final String ALL_CODINGSCHEMES = "all";
+	
 	static final String CODE_FIELD = "code";
 	static final String NAMESPACE_FIELD = "namespace";
 	static final String DESCRIPTION_FIELD = "description";

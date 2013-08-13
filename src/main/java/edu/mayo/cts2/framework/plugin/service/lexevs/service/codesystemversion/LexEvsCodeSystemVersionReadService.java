@@ -35,6 +35,7 @@ import org.LexGrid.codingSchemes.CodingScheme;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntry;
+import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntryListEntry;
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.core.VersionTagReference;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
@@ -131,7 +132,9 @@ public class LexEvsCodeSystemVersionReadService extends
 
 	@Override
 	protected CodeSystemVersionCatalogEntry transform(CodingScheme codingScheme) {
-		return this.transformer.transformFullDescription(codingScheme);
+		CodeSystemVersionCatalogEntryListEntry cs = this.transformer.transformFullDescription(codingScheme);
+		
+		return cs == null ? null : cs.getEntry();
 	}
 
 	// Methods returning empty lists or sets

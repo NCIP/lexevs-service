@@ -26,6 +26,7 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -40,6 +41,7 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodingSchemeNameTran
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.transform.TransformUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResolvedValueSetUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.FakeLexEvsData.DataField;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.FakeLexEvsSystem;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
@@ -62,7 +64,13 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 		// Mock LexBIGService, overwrite return value for getSupportedCodingSchemes
 		LexBIGService lexBigService = fakeLexEvs.createMockedLexBIGServiceWithFakeLexEvsData(service, withData);
 		
+		MappingExtension mappingExtension = EasyMock.createNiceMock(MappingExtension.class);
+		CommonResolvedValueSetUtils valueSetUtils = EasyMock.createNiceMock(CommonResolvedValueSetUtils.class);
+		EasyMock.replay(mappingExtension, valueSetUtils);
+		
 		service.setLexBigService(lexBigService);
+		service.setMappingExtension(mappingExtension);
+		service.setCommonResolvedValueSetUtils(valueSetUtils);
 
 		// Overwrite objects in service object
 		CodingSchemeToCodeSystemTransform transform = 
