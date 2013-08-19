@@ -53,5 +53,5 @@ public interface CodeSystemVersionBulkDownloader {
 	 * @param fields the fields
 	 * @param separator the separator
 	 */
-	void download(OutputStream outputStream, Set<CodingSchemeReference> codingSchemes, List<String> fields, char separator);
+	void download(OutputStream outputStream, Set<CodingSchemeReference> codingSchemes, Set<CodingSchemeReference> excludedCodingSchemes, List<String> fields, char separator);
 }

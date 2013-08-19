@@ -133,7 +133,7 @@ public class SearchExtensionBulkDownloader
 	 * @see edu.mayo.cts2.framework.plugin.service.lexevs.bulk.controller.BulkDownloader#download(java.io.OutputStream, java.util.Set, java.util.List, java.lang.String)
 	 */
 	@Override
-	public void download(OutputStream outputStream, Set<CodingSchemeReference> codingSchemes, List<String> fields, char separator) {
+	public void download(OutputStream outputStream, Set<CodingSchemeReference> codingSchemes, Set<CodingSchemeReference> excludedCodingSchemes, List<String> fields, char separator) {
 		ResolvedConceptReferencesIterator itr;
 		
 		if(CollectionUtils.isEmpty(codingSchemes)){
@@ -141,7 +141,7 @@ public class SearchExtensionBulkDownloader
 		}
 		
 		try {
-			itr = searchExtension.search(null, codingSchemes, MatchAlgorithm.LUCENE);
+			itr = searchExtension.search(null, codingSchemes, excludedCodingSchemes, MatchAlgorithm.LUCENE);
 		} catch (LBParameterException e) {
 			throw new RuntimeException(e);
 		}

@@ -368,7 +368,7 @@
 			<artifactId>caGrid-CQL-cql.1.0</artifactId>
 			<version>1.2</version>
 		</dependency>
-
+		
 		<dependency>
 			<groupId>commons-discovery</groupId>
 			<artifactId>commons-discovery</artifactId>

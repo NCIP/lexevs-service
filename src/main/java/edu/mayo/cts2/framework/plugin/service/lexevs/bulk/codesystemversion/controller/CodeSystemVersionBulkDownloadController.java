@@ -41,12 +41,14 @@ import org.LexGrid.LexBIG.Extensions.Generic.CodingSchemeReference;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import edu.mayo.cts2.framework.plugin.service.lexevs.bulk.AbstractBulkDownloadController;
 import edu.mayo.cts2.framework.plugin.service.lexevs.bulk.codesystemversion.CodeSystemVersionBulkDownloader;
+import edu.mayo.cts2.framework.plugin.service.lexevs.security.msso.MssoUserValidator;
 
 /**
  * A REST Controller for providing access to bulk downloads.
@@ -54,13 +56,17 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.bulk.codesystemversion.Code
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
 @Controller("codeSystemVersionBulkDownloadController")
-public class CodeSystemVersionBulkDownloadController extends AbstractBulkDownloadController {
+public class CodeSystemVersionBulkDownloadController extends AbstractBulkDownloadController implements InitializingBean {
 	
 	private static final String DEFAULT_SEPARATOR = "|";
 	
 	private static final String DEFAULT_CODING_SCHEMES = CodeSystemVersionBulkDownloader.ALL_CODINGSCHEMES;
 	
 	private static final String DEFAULT_FILE_NAME = "terminology-bulk-download.txt";
+	
+	private static final String MEDDRA_NAME = "MedDRA";
+	
+	private static final String NCI_META_NAME = "NCI Metathesaurus";
 	
 	private static final List<String> DEFAULT_FIELDS = Arrays.asList(
 				CodeSystemVersionBulkDownloader.CODE_FIELD,
@@ -76,6 +82,19 @@ public class CodeSystemVersionBulkDownloadController extends AbstractBulkDownloa
 	@Resource
 	private CodeSystemVersionBulkDownloader codeSystemVersionBulkDownloader;
 
+	@Resource
+	private MssoUserValidator mssoUserValidator;
+	
+	private Set<CodingSchemeReference> meddraExclusions;
+	
+	private Set<CodingSchemeReference> nciMetaExclusions;
+	
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.meddraExclusions = this.getMeddraCodingSchemes();
+		this.nciMetaExclusions = this.getNciMetaCodingSchemes();
+	}
+	
 	/**
 	 * Download.
 	 *
@@ -88,6 +107,7 @@ public class CodeSystemVersionBulkDownloadController extends AbstractBulkDownloa
 	@RequestMapping(value="/exporter/codingscheme")
     public void download(
     		HttpServletResponse response,
+    		@RequestParam(value="meddratoken", defaultValue="") String meddraToken,
     		@RequestParam(value="codingschemes", defaultValue="") String codingschemes,
     		@RequestParam(value="fields", defaultValue="") String fields,
     		@RequestParam(value="separator", defaultValue=DEFAULT_SEPARATOR) char separator,
@@ -96,6 +116,8 @@ public class CodeSystemVersionBulkDownloadController extends AbstractBulkDownloa
 		if(StringUtils.isBlank(codingschemes)){
 			throw new UserInputException("'codingschemes' parameter is required.");
 		}
+		
+		boolean isValidMeddraToken = StringUtils.isNotBlank(meddraToken) && this.mssoUserValidator.isValid(meddraToken);
 
 		List<String> fieldsList;
 		if(StringUtils.isBlank(fields)){
@@ -124,9 +146,20 @@ public class CodeSystemVersionBulkDownloadController extends AbstractBulkDownloa
 			
 			references.add(reference);
 		}
+		
+		Set<CodingSchemeReference> exclusions = new HashSet<CodingSchemeReference>();
+		exclusions.addAll(this.nciMetaExclusions);
+		if(! isValidMeddraToken){
+			exclusions.addAll(this.meddraExclusions);
+		}
 
 		try {
-			this.codeSystemVersionBulkDownloader.download(response.getOutputStream(), references, fieldsList, separator);
+			this.codeSystemVersionBulkDownloader.download(
+					response.getOutputStream(), 
+					references, 
+					exclusions,
+					fieldsList, 
+					separator);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -149,6 +182,35 @@ public class CodeSystemVersionBulkDownloadController extends AbstractBulkDownloa
 		sb.append("filename - (Optional) Output file name. Default: " + DEFAULT_FILE_NAME);
 		
 		return sb.toString();
+	}
+	
+	private Set<CodingSchemeReference> getMeddraCodingSchemes(){
+		return this.doGetCodingSchemeReferences(MEDDRA_NAME);
+	}
+	
+	private Set<CodingSchemeReference> getNciMetaCodingSchemes(){
+		return this.doGetCodingSchemeReferences(NCI_META_NAME);
+	}
+	
+	private Set<CodingSchemeReference> doGetCodingSchemeReferences(String name){
+		Set<CodingSchemeReference> references = new HashSet<CodingSchemeReference>();
+		try {
+			for(CodingSchemeRendering scheme : lexBigService.getSupportedCodingSchemes().getCodingSchemeRendering()){
+				if(scheme.getCodingSchemeSummary().getLocalName().equals(name)){
+					CodingSchemeReference reference = new CodingSchemeReference();
+					reference.setCodingScheme(
+							scheme.getCodingSchemeSummary().getCodingSchemeURI());
+					reference.setVersionOrTag(
+							Constructors.createCodingSchemeVersionOrTagFromVersion(scheme.getCodingSchemeSummary().getRepresentsVersion()));
+				
+					references.add(reference);
+				}
+			}
+		} catch (LBInvocationException e) {
+			return null;
+		}
+		
+		return references;
 	}
 	
 	private String getAvailableCodingSchemesString(){

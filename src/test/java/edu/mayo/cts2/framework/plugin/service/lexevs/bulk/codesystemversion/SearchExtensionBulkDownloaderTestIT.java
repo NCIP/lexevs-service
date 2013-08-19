@@ -27,7 +27,7 @@ public class SearchExtensionBulkDownloaderTestIT extends AbstractTestITBase {
 		CodingSchemeReference codingScheme = new CodingSchemeReference();
 		codingScheme.setCodingScheme("Automobiles");
 		
-		this.downloader.download(out, new HashSet<CodingSchemeReference>(Arrays.asList(codingScheme)), 
+		this.downloader.download(out, new HashSet<CodingSchemeReference>(Arrays.asList(codingScheme)), null,
 			Arrays.asList(
 					SearchExtensionBulkDownloader.CODE_FIELD,
 					SearchExtensionBulkDownloader.DESCRIPTION_FIELD
