@@ -117,3 +117,10 @@ $USER_HOME
 Install the resulting WAR file in ```target/``` to the ```webapps/``` directory of a Tomcat installation.
 
 
+### You will find more details about <PROJECTNAME> in the following links:
+
+    *  https://tracker.nci.nih.gov/browse/LEXEVS
+    *  https://wiki.nci.nih.gov/display/EVS/LexEVS+Servers+and+APIs+Summary
+    *  https://github.com/NCIP/lexevs-service>
+
+
