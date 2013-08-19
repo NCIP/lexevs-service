@@ -85,7 +85,7 @@ public class CodeSystemVersionBulkDownloadController extends AbstractBulkDownloa
 	 * @param separator the separator
 	 * @throws LBException the lB exception
 	 */
-	@RequestMapping(value="/export/codingscheme")
+	@RequestMapping(value="/exporter/codingscheme")
     public void download(
     		HttpServletResponse response,
     		@RequestParam(value="codingschemes", defaultValue="") String codingschemes,
