@@ -88,7 +88,7 @@ public class MapVersionBulkDownloadController extends AbstractBulkDownloadContro
 	 * @param separator the separator
 	 * @throws LBException the lB exception
 	 */
-	@RequestMapping(value="/export/map")
+	@RequestMapping(value="/exporter/map")
     public void download(
     		HttpServletResponse response,
     		@RequestParam(value="map", required=true) String map,
