@@ -25,14 +25,13 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service.association;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.LexGrid.LexBIG.DataModel.Collections.AssociationList;
 import org.LexGrid.LexBIG.DataModel.Core.AssociatedConcept;
 import org.LexGrid.LexBIG.DataModel.Core.Association;
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.springframework.stereotype.Component;
-
 import edu.mayo.cts2.framework.model.association.AssociationDirectoryEntry;
+import edu.mayo.cts2.framework.model.core.CodeSystemVersionReference;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
 import edu.mayo.cts2.framework.model.core.StatementTarget;
 import edu.mayo.cts2.framework.model.core.URIAndEntityName;
@@ -96,14 +95,7 @@ public class AssociatedConceptToAssociationTransform
 		
 		if(associations != null){
 			for (Association association : associations.getAssociation()) {
-				AssociationDirectoryEntry entry = new AssociationDirectoryEntry();
-				entry.setSubject(uriEntityName);
-				entry.setAssertedBy(
-					this.getTransformUtils().toCodeSystemVersionReference(
-							this.getCodingSchemeNameTranslator().translateFromLexGrid(subject.getCodingSchemeName()), 
-							subject.getCodingSchemeVersion(),
-							subject.getCodingSchemeURI()));
-
+				//We can reuse these in each entry
 				PredicateReference predReference = new PredicateReference();
 				predReference.setName(association.getAssociationName());
 				predReference.setUri(
@@ -112,12 +104,18 @@ public class AssociatedConceptToAssociationTransform
 									subject.getCodingSchemeURI(),
 									subject.getCodingSchemeVersion(),
 									association.getAssociationName()));
-	
-				entry.setPredicate(predReference);
+				CodeSystemVersionReference codeSystemVersionReference = this.getTransformUtils().toCodeSystemVersionReference(
+						this.getCodingSchemeNameTranslator().translateFromLexGrid(subject.getCodingSchemeName()), 
+						subject.getCodingSchemeVersion(),
+						subject.getCodingSchemeURI());
 	
 				for (AssociatedConcept target : association.getAssociatedConcepts()
 						.getAssociatedConcept()) {
 					if(counter++ >= ref.getStart()){
+						AssociationDirectoryEntry entry = new AssociationDirectoryEntry();
+						entry.setSubject(uriEntityName);
+						entry.setAssertedBy(codeSystemVersionReference);
+						entry.setPredicate(predReference);
 						StatementTarget st = new StatementTarget();
 						uriEntityName = new URIAndEntityName();
 						uriEntityName.setName(target.getCode());
