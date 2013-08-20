@@ -19,6 +19,7 @@ import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.codingSchemes.CodingScheme;
 import org.LexGrid.commonTypes.Property;
+import org.LexGrid.commonTypes.PropertyQualifier;
 import org.apache.commons.lang.StringUtils;
 import org.lexgrid.valuesets.LexEVSValueSetDefinitionServices;
 import org.springframework.stereotype.Component;
@@ -75,6 +76,8 @@ public class TransformUtils implements LexEvsChangeEventObserver {
 	private Set<String> valueSetDefinitionUrisCache;
 	
 	private Object mutex = new Object();
+	
+	private static final String VERSION_QUALIFIER_NAME = "version";
 
 	/**
 	 * To property.
@@ -236,7 +239,8 @@ public class TransformUtils implements LexEvsChangeEventObserver {
 					ModelUtils.createScopedEntityName(reference.getCode(), namespace));
 			} else {
 				String resolvedAgainstUri = valueSetCodeSystemVersionProp.getValue().getContent();
-				String resolvedAgainstVersion = valueSetCodeSystemVersionProp.getPropertyQualifier()[0].getValue().getContent();
+				String resolvedAgainstVersion = 
+						this.findQualifier(valueSetCodeSystemVersionProp, VERSION_QUALIFIER_NAME).getValue().getContent();
 				
 				CodingScheme actualCodingScheme = this.resolveCodingScheme(resolvedAgainstUri, resolvedAgainstVersion);
 				
@@ -253,6 +257,16 @@ public class TransformUtils implements LexEvsChangeEventObserver {
 				}
 			}
 		}
+	}
+	
+	private PropertyQualifier findQualifier(Property property, String qualifierName){
+		for(PropertyQualifier qual : property.getPropertyQualifier()){
+			if(qual.getPropertyQualifierName().equals(qualifierName)){
+				return qual;
+			}
+		}
+		
+		throw new RuntimeException("Error finding Property Qualifier: " + qualifierName);
 	}
 	
 	private CodingScheme resolveCodingScheme(String identifier, String version){
