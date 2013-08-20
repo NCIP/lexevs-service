@@ -183,6 +183,7 @@ public class LexEvsAssociationQueryService extends AbstractLexEvsService impleme
 				new CodedNodeGraphCallback(ref, direction),
 				null, 
 				null).
+				restrict(restrictions).
 				addStart(page.getStart()).
 				addMaxToReturn(page.getMaxToReturn());
 		

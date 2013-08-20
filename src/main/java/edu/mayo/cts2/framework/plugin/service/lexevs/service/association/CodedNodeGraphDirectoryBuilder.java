@@ -10,12 +10,15 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service.association;
 
 import java.util.Set;
 
+import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeGraph;
+import org.LexGrid.LexBIG.Utility.Constructors;
 
 import edu.mayo.cts2.framework.filter.directory.AbstractStateBuildingDirectoryBuilder;
 import edu.mayo.cts2.framework.filter.match.StateAdjustingPropertyReference;
 import edu.mayo.cts2.framework.model.association.AssociationDirectoryEntry;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
+import edu.mayo.cts2.framework.service.command.restriction.AssociationQueryServiceRestrictions;
 
 public class CodedNodeGraphDirectoryBuilder 
 	extends 
@@ -30,6 +33,24 @@ public class CodedNodeGraphDirectoryBuilder
 				callback, 
 				matchAlgorithmReferences,
 				stateAdjustingPropertyReferences);
+	}
+	
+	public CodedNodeGraphDirectoryBuilder restrict(AssociationQueryServiceRestrictions restrictions){
+		if(restrictions != null && 
+				restrictions.getPredicate() != null &&
+				restrictions.getPredicate().getEntityName() != null &&
+				restrictions.getPredicate().getEntityName().getName() != null){
+			String predicateName = restrictions.getPredicate().getEntityName().getName();
+			
+			try {
+				this.updateState(
+						this.getState().restrictToAssociations(Constructors.createNameAndValueList(predicateName), null));
+			} catch (LBException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		
+		return this;
 	}
 
 }
