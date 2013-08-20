@@ -130,7 +130,11 @@ public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform
 				this.add(entry.getValueSetDefinitionReference(), cts2Entry);
 			}
 			
-			cts2Entry.setEntryOrder(entry.getRuleOrder());
+			Long order = entry.getRuleOrder();
+			if(order == null || order == 0){
+				order = 1l;
+			}
+			cts2Entry.setEntryOrder(order);
 			cts2Entry.setOperator(this.toSetOperator(entry.getOperator()));
 			
 			cts2VSD.addEntry(cts2Entry);
