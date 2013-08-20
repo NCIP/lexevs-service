@@ -37,10 +37,10 @@ public class CodedNodeGraphDirectoryBuilder
 	
 	public CodedNodeGraphDirectoryBuilder restrict(AssociationQueryServiceRestrictions restrictions){
 		if(restrictions != null && 
-				restrictions.getPredicate() != null &&
-				restrictions.getPredicate().getEntityName() != null &&
-				restrictions.getPredicate().getEntityName().getName() != null){
-			String predicateName = restrictions.getPredicate().getEntityName().getName();
+				restrictions.getPredicateEntity() != null &&
+				restrictions.getPredicateEntity().getEntityName() != null &&
+				restrictions.getPredicateEntity().getEntityName().getName() != null){
+			String predicateName = restrictions.getPredicateEntity().getEntityName().getName();
 			
 			try {
 				this.updateState(
