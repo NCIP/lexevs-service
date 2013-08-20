@@ -335,8 +335,12 @@ public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform
 			//as the starting entity.		
 			SupportedAssociation supportedAssociation = 
 					this.findAssociation(lexEvsVSD.getMappings(), association);
-			predicate.setNamespace(supportedAssociation.getEntityCodeNamespace());
-			predicate.setUri(supportedAssociation.getUri());
+			
+			if(supportedAssociation == null){
+				predicate.setNamespace(supportedCodingScheme.getLocalId());
+			} else {
+				predicate.setNamespace(supportedAssociation.getEntityCodeNamespace());
+			}
 			
 			ref.setPredicate(predicate);
 			
