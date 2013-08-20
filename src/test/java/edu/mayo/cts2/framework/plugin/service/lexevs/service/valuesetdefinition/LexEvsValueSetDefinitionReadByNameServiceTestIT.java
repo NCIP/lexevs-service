@@ -17,6 +17,7 @@ import org.junit.Test;
 
 import edu.mayo.cts2.framework.model.extension.LocalIdValueSetDefinition;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ValueSetDefinitionUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractReadServiceTest;
 import edu.mayo.cts2.framework.service.profile.ReadService;
 import edu.mayo.cts2.framework.service.profile.valuesetdefinition.name.ValueSetDefinitionReadId;
@@ -44,12 +45,16 @@ public class LexEvsValueSetDefinitionReadByNameServiceTestIT
 
 	@Override
 	protected ValueSetDefinitionReadId getGoodIdentifier() {
-		return new ValueSetDefinitionReadId("05MW", ModelUtils.nameOrUriFromName("Property Reference Test 1"));
+		return new ValueSetDefinitionReadId("75d925fb", ModelUtils.nameOrUriFromName("Property Reference Test 1"));
 	}
 
 	@Override
 	protected ValueSetDefinitionReadId getBadIdentifier() {
 		return new ValueSetDefinitionReadId("__NONE__", ModelUtils.nameOrUriFromName("Property Reference Test 1"));
+	}
+	
+	public static void main(String[] args){
+		System.out.println(ValueSetDefinitionUtils.getValueSetDefinitionLocalId("SRITEST:AUTO:AllDomesticANDGM"));
 	}
 
 }

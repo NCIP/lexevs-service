@@ -8,7 +8,10 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.resolvedvalueset;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.StringWriter;
 import java.util.HashSet;
@@ -20,7 +23,6 @@ import javax.xml.transform.stream.StreamResult;
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContents;
 import org.junit.Test;
-import org.springframework.beans.factory.InitializingBean;
 
 import edu.mayo.cts2.framework.core.xml.Cts2Marshaller;
 import edu.mayo.cts2.framework.model.command.Page;
@@ -31,7 +33,6 @@ import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
-import edu.mayo.cts2.framework.plugin.service.lexevs.event.LexEvsChangeEventObserver;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonTestUtils;
 import edu.mayo.cts2.framework.service.command.restriction.ResolvedValueSetResolutionEntityRestrictions;
@@ -63,7 +64,7 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT
 	public void testGetResolution() throws Exception {
 		ResolvedValueSetReadId identifier = new ResolvedValueSetReadId("1",
 				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"),
-				ModelUtils.nameOrUriFromName("5ER0"));
+				ModelUtils.nameOrUriFromName("571eb4e6"));
 		
 		DirectoryResult<EntitySynopsis> dirResult = service.getResolution(
 				identifier, null, new Page());
@@ -91,7 +92,7 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT
 	public void testGetResolutionNotFoundDefintionValueSet() throws Exception {
 		ResolvedValueSetReadId identifier = new ResolvedValueSetReadId("1",
 				ModelUtils.nameOrUriFromName("__INVALID__"),
-				ModelUtils.nameOrUriFromName("5ER0"));
+				ModelUtils.nameOrUriFromName("571eb4e6"));
 		
 		DirectoryResult<EntitySynopsis> dirResult = service.getResolution(
 				identifier, null, new Page());
@@ -103,7 +104,7 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT
 	public void testGetResolutionNotFoundId() throws Exception {
 		ResolvedValueSetReadId identifier = new ResolvedValueSetReadId("__INVALID__",
 				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"),
-				ModelUtils.nameOrUriFromName("5ER0"));
+				ModelUtils.nameOrUriFromName("571eb4e6"));
 		
 		DirectoryResult<EntitySynopsis> dirResult = service.getResolution(
 				identifier, null, new Page());
@@ -115,7 +116,7 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT
 	public void testGetResolutionEntitiesNoFilter() {
 		ResolvedValueSetReadId identifier = new ResolvedValueSetReadId("1",
 				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"),
-				ModelUtils.nameOrUriFromName("5ER0"));
+				ModelUtils.nameOrUriFromName("571eb4e6"));
 		
 		DirectoryResult<EntityDirectoryEntry> dirResult = service.getEntities(
 				identifier, null, null, new Page());
@@ -126,7 +127,7 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT
 	public void testGetResolutionEntitiesNoFilterValidXML() throws Exception {
 		ResolvedValueSetReadId identifier = new ResolvedValueSetReadId("1",
 				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"),
-				ModelUtils.nameOrUriFromName("5ER0"));
+				ModelUtils.nameOrUriFromName("571eb4e6"));
 		
 		DirectoryResult<EntityDirectoryEntry> dirResult = service.getEntities(
 				identifier, null, null, new Page());
@@ -143,7 +144,7 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT
 	public void testGetResolutionEntitiesWithFilter() {
 		ResolvedValueSetReadId identifier = new ResolvedValueSetReadId("1",
 				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"),
-				ModelUtils.nameOrUriFromName("5ER0"));
+				ModelUtils.nameOrUriFromName("571eb4e6"));
 		
 		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
 		  		  StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), 
@@ -163,7 +164,7 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT
 	public void testGetResolutionEntitiesWithEntityRestriction() {
 		ResolvedValueSetReadId identifier = new ResolvedValueSetReadId("1",
 				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"),
-				ModelUtils.nameOrUriFromName("5ER0"));
+				ModelUtils.nameOrUriFromName("571eb4e6"));
 		
 		ResolvedValueSetResolutionQueryImpl query= new ResolvedValueSetResolutionQueryImpl();
 		ResolvedValueSetResolutionEntityRestrictions entityRestriction= new ResolvedValueSetResolutionEntityRestrictions();
@@ -187,7 +188,7 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT
 	public void testGetResolutionValidXML() throws Exception {
 		ResolvedValueSetReadId identifier = new ResolvedValueSetReadId("1",
 				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"),
-				ModelUtils.nameOrUriFromName("5ER0"));
+				ModelUtils.nameOrUriFromName("571eb4e6"));
 		
 		ResolvedValueSetResult<EntitySynopsis> dirResult = service.getResolution(
 				identifier, null, new Page());
@@ -204,7 +205,7 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT
 	public void testGetResolutionValidHasValidHeader() throws Exception {
 		ResolvedValueSetReadId identifier = new ResolvedValueSetReadId("1",
 				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"),
-				ModelUtils.nameOrUriFromName("5ER0"));
+				ModelUtils.nameOrUriFromName("571eb4e6"));
 		
 		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
 		  		  StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), 
@@ -223,7 +224,7 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT
 	public void testGetResolutionHasCorrectHrefs() throws Exception {
 		ResolvedValueSetReadId identifier = new ResolvedValueSetReadId("1",
 				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"),
-				ModelUtils.nameOrUriFromName("5ER0"));
+				ModelUtils.nameOrUriFromName("571eb4e6"));
 		
 		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
 		  		  StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), 
@@ -243,7 +244,7 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT
 	public void testGetResolutionHasCorrectUri() throws Exception {
 		ResolvedValueSetReadId identifier = new ResolvedValueSetReadId("1",
 				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"),
-				ModelUtils.nameOrUriFromName("5ER0"));
+				ModelUtils.nameOrUriFromName("571eb4e6"));
 		
 		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
 		  		  StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), 

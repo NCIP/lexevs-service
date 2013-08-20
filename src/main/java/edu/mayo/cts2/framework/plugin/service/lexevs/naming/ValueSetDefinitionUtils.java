@@ -8,6 +8,8 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.naming;
 
+import java.util.zip.CRC32;
+
 public final class ValueSetDefinitionUtils {
 	
 	private ValueSetDefinitionUtils(){
@@ -15,10 +17,10 @@ public final class ValueSetDefinitionUtils {
 	}
 
 	public static String getValueSetDefinitionLocalId(String definitionUri){
-		String hash = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(definitionUri.getBytes());
-		return 
-			org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(definitionUri.getBytes()).
-				substring(hash.length() - 5, hash.length() - 1);
+	    CRC32 crc = new CRC32();
+	    crc.update(definitionUri.getBytes());
+	    
+	    return Long.toHexString(crc.getValue());
 	}
 	
 }

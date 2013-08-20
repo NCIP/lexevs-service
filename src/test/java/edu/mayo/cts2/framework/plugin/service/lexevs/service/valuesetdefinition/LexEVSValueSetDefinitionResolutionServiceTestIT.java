@@ -51,7 +51,7 @@ public class LexEVSValueSetDefinitionResolutionServiceTestIT extends
 	@Test
 	public void testGetResolution() throws Exception {	
 		ValueSetDefinitionReadId defintionId = 
-			new ValueSetDefinitionReadId("5ER0", ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"));
+			new ValueSetDefinitionReadId("571eb4e6", ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"));
 		
 		DirectoryResult<EntitySynopsis> dirResult = service.
 				resolveDefinition(defintionId, null, null, null, null, null, new Page());
@@ -66,7 +66,7 @@ public class LexEVSValueSetDefinitionResolutionServiceTestIT extends
 	@Test
 	public void testGetResolutionEntities() throws Exception {	
 		ValueSetDefinitionReadId defintionId = 
-			new ValueSetDefinitionReadId("5ER0", ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"));
+			new ValueSetDefinitionReadId("571eb4e6", ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"));
 		
 		DirectoryResult<EntityDirectoryEntry> dirResult = service.
 				resolveDefinitionAsEntityDirectory(defintionId, null, null, null, null, null, new Page());
@@ -81,7 +81,7 @@ public class LexEVSValueSetDefinitionResolutionServiceTestIT extends
 	@Test
 	public void testGetResolutionComplete() throws Exception {	
 		ValueSetDefinitionReadId defintionId = 
-			new ValueSetDefinitionReadId("5ER0", ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"));
+			new ValueSetDefinitionReadId("571eb4e6", ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"));
 		
 		ResolvedValueSet resolution = service.resolveDefinitionAsCompleteSet(defintionId, null, null, null);
 		assertNotNull(resolution);

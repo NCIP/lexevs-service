@@ -75,7 +75,7 @@ public class LexEVSResolvedValuesetQueryServiceTestIT extends
 		ResolvedValueSetQueryServiceRestrictions restrictions = new ResolvedValueSetQueryServiceRestrictions();
 		Set<NameOrURI> valueSetDefinitions = new HashSet<NameOrURI>();
 		valueSetDefinitions.add(ModelUtils
-				.nameOrUriFromName("5ER0"));
+				.nameOrUriFromName("571eb4e6"));
 		restrictions.setValueSetDefinitions(valueSetDefinitions);
 
 		// Create query with restriction

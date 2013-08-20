@@ -12,6 +12,9 @@ import java.net.URI;
 
 import javax.annotation.Resource;
 
+import org.LexGrid.LexBIG.Exceptions.LBException;
+import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.LexGrid.codingSchemes.CodingScheme;
 import org.LexGrid.naming.Mappings;
 import org.LexGrid.naming.SupportedAssociation;
 import org.LexGrid.naming.SupportedCodingScheme;
@@ -79,6 +82,9 @@ public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform
 	
 	@Resource
 	private ValueSetNameTranslator valueSetNameTranslator;
+	
+	@Resource
+	private LexBIGService lexBigService;
 
 	public ValueSetDefinitionListEntry transformFullDescription(org.LexGrid.valueSets.ValueSetDefinition lexEvsVSD) {
 		if (lexEvsVSD == null) {
@@ -261,10 +267,30 @@ public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform
 			this.findNamespace(lexEvsVSD.getMappings(), namespace);
 		
 		if(supportedNamespace == null){
-			throw new RuntimeException("EntityRefernece: " + 
+			log.warn("EntityRefernece: " + 
 					entityReference.getEntityCodeNamespace()  +
 					":" + entityReference.getEntityCode() +
 					" does not have a valid namespace.");
+			
+			try {
+				CodingScheme cs = this.lexBigService.resolveCodingScheme(namespace, null);
+				SupportedNamespace sns = new SupportedNamespace();
+				sns.setContent(cs.getCodingSchemeName());
+				sns.setEquivalentCodingScheme(cs.getCodingSchemeName());
+				sns.setLocalId(cs.getCodingSchemeName());
+				sns.setUri(cs.getCodingSchemeURI());
+				
+				supportedNamespace = sns;
+			} catch (LBException e) {
+				log.info(e);
+				
+				//we have to punt here
+				SupportedNamespace sns = new SupportedNamespace();
+				sns.setContent("unknown");
+				sns.setEquivalentCodingScheme("unknown");
+				sns.setLocalId("unknown");
+				sns.setUri("unknown");
+			}
 		}
 		
 		uriAndName.setUri(
