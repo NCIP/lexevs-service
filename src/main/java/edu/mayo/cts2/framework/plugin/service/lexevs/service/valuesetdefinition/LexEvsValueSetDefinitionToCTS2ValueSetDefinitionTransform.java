@@ -338,8 +338,18 @@ public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform
 			
 			if(supportedAssociation == null){
 				predicate.setNamespace(supportedCodingScheme.getLocalId());
+				predicate.setUri(UriUtils.combine(
+						supportedCodingScheme.getUri(),
+						association));
 			} else {
 				predicate.setNamespace(supportedAssociation.getEntityCodeNamespace());
+				if(StringUtils.isNotBlank(supportedAssociation.getUri())){
+					predicate.setUri(supportedAssociation.getUri());
+				} else {
+					predicate.setUri(UriUtils.combine(
+						supportedCodingScheme.getUri(),
+						association));
+				}
 			}
 			
 			ref.setPredicate(predicate);
