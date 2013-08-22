@@ -102,7 +102,20 @@ public class CodeSystemVersionBulkDownloadController extends AbstractBulkDownloa
 			throw new UserInputException("'codingschemes' parameter is required.");
 		}
 		
-		boolean isValidMeddraToken = StringUtils.isNotBlank(meddraToken) && this.mssoUserValidator.isValid(meddraToken);
+		boolean isValidMeddraToken = false;
+		if(StringUtils.isNotBlank(meddraToken)){
+			boolean validates = this.mssoUserValidator.isValid(meddraToken);
+			if(! validates){
+		        try {
+					response.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid MedDRA token.");
+					return;
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			} else {
+				isValidMeddraToken = true;
+			}
+		}
 
 		List<String> fieldsList;
 		if(StringUtils.isBlank(fields)){
