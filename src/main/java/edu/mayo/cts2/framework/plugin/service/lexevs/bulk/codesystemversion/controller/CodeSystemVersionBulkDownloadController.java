@@ -174,10 +174,10 @@ public class CodeSystemVersionBulkDownloadController extends AbstractBulkDownloa
 		StringBuilder sb = new StringBuilder();
 		sb.append("codingschemes - (Optional) CodingSchemes to include (comma-separated). Default: " + DEFAULT_CODING_SCHEMES +"\n");
 		sb.append("\tFormat: codingSchemeName[:version]  - example: 'MyCodingScheme' or 'MyCodingScheme:1.0'\n");
-		sb.append("\tAvailable: all," + this.getAvailableCodingSchemesString() +"\n");
 		sb.append("fields - (Optional) Content fields to output. Default: "+ DEFAULT_FIELDS + "\n");
 		sb.append("separator -(Optional) One character field separator. Default: " + DEFAULT_SEPARATOR +"\n");
 		sb.append("filename - (Optional) Output file name. Default: " + DEFAULT_FILE_NAME);
+		sb.append("meddratoken - (Optional) MedDRA authorization token. If not supplied, MedDRA content will be excluded.");
 		
 		return sb.toString();
 	}
@@ -211,6 +211,7 @@ public class CodeSystemVersionBulkDownloadController extends AbstractBulkDownloa
 		return references;
 	}
 	
+	@SuppressWarnings("unused")
 	private String getAvailableCodingSchemesString(){
 		List<String> schemes = new ArrayList<String>();
 		try {
