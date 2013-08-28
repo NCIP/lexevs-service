@@ -119,7 +119,7 @@ Install the resulting WAR file in ```target/``` to the ```webapps/``` directory 
 
 ### You will find more details in the following links:
 *  https://tracker.nci.nih.gov/browse/LEXEVS
-*  https://wiki.nci.nih.gov/display/EVS/LexEVS+Servers+and+APIs+Summary
+*  https://wiki.nci.nih.gov/x/0BwhAQ
 *  https://github.com/NCIP/lexevs-service>
 
 
