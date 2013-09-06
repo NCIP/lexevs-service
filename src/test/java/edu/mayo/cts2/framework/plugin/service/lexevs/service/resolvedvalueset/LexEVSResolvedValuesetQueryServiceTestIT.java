@@ -39,7 +39,7 @@ import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 
 @LoadContents({
 		@LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosAndGM.xml"),
-		@LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosButGM.xml"), })
+		@LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosButGM.xml") })
 public class LexEVSResolvedValuesetQueryServiceTestIT extends
 		AbstractTestITBase {
 
