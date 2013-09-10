@@ -35,6 +35,7 @@ import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescripti
  *  @author <a href="mailto:hardie.linda@mayo.edu">Linda Hardie</a>
  *
  */
+@Ignore
 @LoadContents({
 @LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml"),
 @LoadContent(contentPath="lexevs/test-content/Automobiles.xml")})
