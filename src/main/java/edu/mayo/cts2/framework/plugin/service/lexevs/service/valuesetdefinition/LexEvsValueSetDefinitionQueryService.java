@@ -90,15 +90,20 @@ public class LexEvsValueSetDefinitionQueryService extends AbstractLexEvsService
 				int maxResults) {
 			List<T> returnList = new ArrayList<T>();
 
-			for(String uri : state){
-				org.LexGrid.valueSets.ValueSetDefinition definition;
-				try {
-					definition = definitionServices.getValueSetDefinition(new URI(uri), null);
-				} catch (Exception e) {
-					throw new RuntimeException(e);
+			int counter = 0;
+			for(String uri : state){ 
+				if(counter >= start && returnList.size() < maxResults){
+					org.LexGrid.valueSets.ValueSetDefinition definition;
+					try {
+						definition = definitionServices.getValueSetDefinition(new URI(uri), null);
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+					
+					returnList.add(this.transformClosure.transform(definition));
 				}
 				
-				returnList.add(this.transformClosure.transform(definition));
+				counter++;
 			}
 			
 			return 

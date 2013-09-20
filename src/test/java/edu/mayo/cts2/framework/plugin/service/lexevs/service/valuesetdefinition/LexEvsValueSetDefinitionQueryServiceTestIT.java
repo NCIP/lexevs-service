@@ -24,7 +24,6 @@ import edu.mayo.cts2.framework.core.xml.Cts2Marshaller;
 import edu.mayo.cts2.framework.core.xml.DelegatingMarshaller;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
-import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinition;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinitionDirectoryEntry;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinitionListEntry;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;

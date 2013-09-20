@@ -60,7 +60,7 @@ public class AssociatedConceptToAssociationTransform
 
 		URIAndEntityName uriEntityName = new URIAndEntityName();
 		uriEntityName.setName(subject.getCode());
-		uriEntityName.setNamespace(subject.getCodeNamespace());
+		uriEntityName.setNamespace(this.sanitizeNamespace(subject.getCodeNamespace()));
 		uriEntityName.setUri(this.getUriHandler().getEntityUri(subject));
 		uriEntityName.setHref(this.getTransformUtils().createEntityHref(subject));
 		
@@ -104,7 +104,7 @@ public class AssociatedConceptToAssociationTransform
 						StatementTarget st = new StatementTarget();
 						uriEntityName = new URIAndEntityName();
 						uriEntityName.setName(target.getCode());
-						uriEntityName.setNamespace(target.getCodeNamespace());
+						uriEntityName.setNamespace(this.sanitizeNamespace(target.getCodeNamespace()));
 						uriEntityName.setUri(this.getUriHandler().getEntityUri(target));
 						uriEntityName.setHref(this.getTransformUtils().createEntityHref(target));
 						st.setEntity(uriEntityName);

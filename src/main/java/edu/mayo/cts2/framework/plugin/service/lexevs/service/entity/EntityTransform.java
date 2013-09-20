@@ -52,7 +52,6 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.transform.AbstractBaseTrans
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriResolver;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResolvedValueSetUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResolvedValueSetUtils.UriVersionPair;
-import edu.mayo.cts2.framework.plugin.service.lexevs.utility.XmlUtils;
 
 /**
  * CTS2 <-> LexEVS Transform dealing with Entities and EntityDescriptions. 
@@ -365,19 +364,6 @@ public class EntityTransform
 		
 		return returnList;
 	}
-	
-	protected String sanitizeNamespace(String namespace){
-		namespace = this.getCodingSchemeNameTranslator().translateFromLexGrid(namespace);
 
-		boolean isNamespaceValidNCName = XmlUtils.isNCName(namespace);
-		if(isNamespaceValidNCName){
-			return namespace;
-		} else {
-			//Last ditch effort... generate a random namespace.
-			//If it gets here, it probably needs to be added
-			//to the UriResolver.
-			return "ns" + Integer.toString(namespace.hashCode());
-		}
-	}
 
 }

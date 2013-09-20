@@ -16,6 +16,7 @@ import edu.mayo.cts2.framework.core.url.UrlConstructor;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodingSchemeNameTranslator;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.XmlUtils;
 
 public abstract class AbstractBaseTransform<
 	DescriptionDataType, 
@@ -84,6 +85,20 @@ public abstract class AbstractBaseTransform<
 	public void setCodingSchemeNameTranslator(
 			CodingSchemeNameTranslator codingSchemeNameTranslator) {
 		this.codingSchemeNameTranslator = codingSchemeNameTranslator;
+	}
+	
+	protected String sanitizeNamespace(String namespace){
+		namespace = this.getCodingSchemeNameTranslator().translateFromLexGrid(namespace);
+
+		boolean isNamespaceValidNCName = XmlUtils.isNCName(namespace);
+		if(isNamespaceValidNCName){
+			return namespace;
+		} else {
+			//Last ditch effort... generate a random namespace.
+			//If it gets here, it probably needs to be added
+			//to the UriResolver.
+			return "ns" + Integer.toString(namespace.hashCode());
+		}
 	}
 
 }

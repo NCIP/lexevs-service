@@ -8,6 +8,7 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.resolvedvalueset;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -15,8 +16,12 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.LexGrid.LexBIG.DataModel.Core.types.CodingSchemeVersionStatus;
+import org.LexGrid.LexBIG.DataModel.InterfaceElements.CodingSchemeRendering;
 import org.LexGrid.LexBIG.Exceptions.LBException;
+import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
 import org.LexGrid.codingSchemes.CodingScheme;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.filter.match.ContainsMatcher;
@@ -31,6 +36,7 @@ import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSetDirectoryEntry;
+import edu.mayo.cts2.framework.plugin.service.lexevs.event.LexEvsChangeEventObserver;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonPageUtils;
@@ -42,14 +48,22 @@ import edu.mayo.cts2.framework.service.profile.resolvedvalueset.ResolvedValueSet
 import edu.mayo.cts2.framework.service.profile.resolvedvalueset.ResolvedValueSetQueryService;
 @Component
 public class LexEvsResolvedValueSetQueryService extends AbstractLexEvsService
-		implements ResolvedValueSetQueryService {
+		implements LexEvsChangeEventObserver, ResolvedValueSetQueryService, InitializingBean {
 	@Resource 
 	private CommonResolvedValueSetUtils resolverUtils;
 	@Resource
 	private ResolvedCodingSchemeTransform transform;
 	@Resource
 	private VersionNameConverter nameConverter;
+	
+	private Object mutex = new Object();
 
+	private Set<String> activeCache = new HashSet<String>();
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.onChange();
+	}
 
 	@Override
 	public Set<? extends MatchAlgorithmReference> getSupportedMatchAlgorithms() {
@@ -136,7 +150,7 @@ public class LexEvsResolvedValueSetQueryService extends AbstractLexEvsService
 	}
 	
 	private List<CodingScheme>  processQuery(ResolvedValueSetQuery query) throws LBException{
-		List<CodingScheme> csList= getLexEVSResolvedService().listAllResolvedValueSets();
+		List<CodingScheme> csList= this.filterInactive(getLexEVSResolvedService().listAllResolvedValueSets());
 		List<CodingScheme> restrictedList= resolverUtils.restrictByQuery(csList, query);
 		if (query!= null) {
 			restrictedList= CommonSearchFilterUtils.filterLexCodingSchemeList(restrictedList, query.getFilterComponent(), nameConverter);
@@ -144,4 +158,48 @@ public class LexEvsResolvedValueSetQueryService extends AbstractLexEvsService
 		return restrictedList;
 	}
 	
+	private List<CodingScheme> filterInactive(List<CodingScheme> codingSchemes){
+		if(codingSchemes == null){
+			return null;
+		}
+		
+		List<CodingScheme> returnList = new ArrayList<CodingScheme>();
+		
+		synchronized(this.mutex){
+			for(CodingScheme cs : codingSchemes){
+				if(this.activeCache.contains(
+						this.getKey(cs.getCodingSchemeURI(), cs.getRepresentsVersion()))){
+					returnList.add(cs);
+				}
+			}
+		}
+		
+		return returnList;
+	}
+
+	@Override
+	public void onChange() {
+		synchronized(this.mutex){
+			this.activeCache.clear();
+			
+			try {
+				for(CodingSchemeRendering cs : 
+					this.getLexBigService().getSupportedCodingSchemes().getCodingSchemeRendering()){
+					if(cs.getRenderingDetail().getVersionStatus().equals(CodingSchemeVersionStatus.ACTIVE)){
+						this.activeCache.add(
+								this.getKey(
+										cs.getCodingSchemeSummary().getCodingSchemeURI(),
+										cs.getCodingSchemeSummary().getRepresentsVersion()));
+					}
+				}
+			} catch (LBInvocationException e) {
+				throw new IllegalStateException(e);
+			}
+		}	
+	}
+	
+	private String getKey(String uri, String version){
+		return uri + version;
+	}
+
 }
