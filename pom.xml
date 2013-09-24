@@ -8,7 +8,7 @@
 	</parent>
 
 	<artifactId>lexevs-service</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>${packaging}</packaging>
 
 	<description>A CTS2 Framework Service Plugin based on LexEVS</description>
@@ -46,7 +46,7 @@
 
 	<scm>
 		<developerConnection>scm:git:git@github.com:cts2/lexevs-service.git</developerConnection>
-	  <tag>lexevs-service-1.0.0</tag>
+	  <tag>HEAD</tag>
   </scm>
 
 	<distributionManagement>
