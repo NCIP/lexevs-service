@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -9,7 +8,7 @@
 	</parent>
 
 	<artifactId>lexevs-service</artifactId>
-	<version>0.1.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<packaging>${packaging}</packaging>
 
 	<description>A CTS2 Framework Service Plugin based on LexEVS</description>
@@ -47,7 +46,8 @@
 
 	<scm>
 		<developerConnection>scm:git:git@github.com:cts2/lexevs-service.git</developerConnection>
-	</scm>
+	  <tag>lexevs-service-1.0.0</tag>
+  </scm>
 
 	<distributionManagement>
 		<site>
@@ -62,8 +62,8 @@
 		<lexevs.remote.version>6.0</lexevs.remote.version>
 		<cagrid.version>1.3</cagrid.version>
 		<spring-security.version>${org.springframework-version}</spring-security.version>
-		<webapp.classifier></webapp.classifier>
-		<osgi.bundle.classifier></osgi.bundle.classifier>
+		<webapp.classifier />
+		<osgi.bundle.classifier />
 	</properties>
 
 	<profiles>
