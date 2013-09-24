@@ -122,4 +122,6 @@ Install the resulting WAR file in ```target/``` to the ```webapps/``` directory 
 * [LexEVS Servers and API's](https://wiki.nci.nih.gov/x/0BwhAQ)
 * [Source Code](https://github.com/NCIP/lexevs-service>)
 
+Travis Build Status
 
+[![Build Status](https://travis-ci.org/NCIP/lexevs-service.png?branch=master)](https://travis-ci.org/NCIP/lexevs-service)
