@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
-import edu.mayo.cts2.framework.model.core.PropertyReference;
+import edu.mayo.cts2.framework.model.core.ComponentReference;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.mapversion.MapEntryDirectoryEntry;
@@ -144,7 +144,7 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	 * @see edu.mayo.cts2.framework.service.profile.BaseQueryService#getSupportedSearchReferences()
 	 */
 	@Override
-	public Set<? extends PropertyReference> getSupportedSearchReferences() {
+	public Set<? extends ComponentReference> getSupportedSearchReferences() {
 		return CommonSearchFilterUtils.getLexSupportedSearchReferences();
 	}
 
@@ -157,8 +157,8 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	 * @see edu.mayo.cts2.framework.service.profile.BaseQueryService#getSupportedSortReferences()
 	 */
 	@Override
-	public Set<? extends PropertyReference> getSupportedSortReferences() {
-		return new HashSet<PropertyReference>();
+	public Set<? extends ComponentReference> getSupportedSortReferences() {
+		return new HashSet<ComponentReference>();
 	}
 
 	/* (non-Javadoc)

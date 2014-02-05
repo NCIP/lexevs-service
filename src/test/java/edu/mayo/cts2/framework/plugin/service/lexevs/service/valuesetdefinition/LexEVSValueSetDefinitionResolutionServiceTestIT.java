@@ -19,7 +19,7 @@ import org.junit.Test;
 
 import edu.mayo.cts2.framework.core.xml.Cts2Marshaller;
 import edu.mayo.cts2.framework.model.command.Page;
-import edu.mayo.cts2.framework.model.core.EntitySynopsis;
+import edu.mayo.cts2.framework.model.core.URIAndEntityName;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
@@ -53,8 +53,8 @@ public class LexEVSValueSetDefinitionResolutionServiceTestIT extends
 		ValueSetDefinitionReadId defintionId = 
 			new ValueSetDefinitionReadId("571eb4e6", ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"));
 		
-		DirectoryResult<EntitySynopsis> dirResult = service.
-				resolveDefinition(defintionId, null, null, null, null, null, new Page());
+		DirectoryResult<URIAndEntityName> dirResult = service.
+				resolveDefinition(defintionId, null, null, null, null, new Page());
 
 		assertNotNull(dirResult);
 		int expecting = 1;
@@ -83,10 +83,10 @@ public class LexEVSValueSetDefinitionResolutionServiceTestIT extends
 		ValueSetDefinitionReadId defintionId = 
 			new ValueSetDefinitionReadId("571eb4e6", ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"));
 		
-		ResolvedValueSet resolution = service.resolveDefinitionAsCompleteSet(defintionId, null, null, null);
+		ResolvedValueSet resolution = service.resolveDefinitionAsCompleteSet(defintionId, null, null, null, null);
 		assertNotNull(resolution);
 		
-		assertEquals(1, resolution.getMemberCount());
+		assertEquals(1, resolution.getEntryCount());
 	}
 		
 	@Test
@@ -95,8 +95,8 @@ public class LexEVSValueSetDefinitionResolutionServiceTestIT extends
 		ValueSetDefinitionReadId defintionId = 
 			new ValueSetDefinitionReadId("__INVALID__", ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"));
 		
-		DirectoryResult<EntitySynopsis> dirResult = service.
-				resolveDefinition(defintionId, null, null, null, null, null, new Page());
+		DirectoryResult<URIAndEntityName> dirResult = service.
+				resolveDefinition(defintionId, null, null, null, null, new Page());
 
 		assertNull(dirResult);
 	}
@@ -107,8 +107,8 @@ public class LexEVSValueSetDefinitionResolutionServiceTestIT extends
 		ValueSetDefinitionReadId defintionId = 
 			new ValueSetDefinitionReadId("INVALID", ModelUtils.nameOrUriFromName("INVALID"));
 		
-		DirectoryResult<EntitySynopsis> dirResult = service.
-				resolveDefinition(defintionId, null, null, null, null, null, new Page());
+		DirectoryResult<URIAndEntityName> dirResult = service.
+				resolveDefinition(defintionId, null, null, null, null, new Page());
 
 		assertNull(dirResult);
 	}

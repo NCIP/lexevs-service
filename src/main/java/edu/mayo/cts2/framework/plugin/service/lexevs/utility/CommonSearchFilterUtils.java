@@ -31,8 +31,8 @@ import org.LexGrid.codingSchemes.CodingScheme;
 
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
+import edu.mayo.cts2.framework.model.core.ComponentReference;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
-import edu.mayo.cts2.framework.model.core.PropertyReference;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.types.ActiveOrAll;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
@@ -55,13 +55,13 @@ public final class CommonSearchFilterUtils {
 		return new HashSet<MatchAlgorithmReference>(Arrays.asList(exactMatch,contains,startsWith));
 	}
 
-	public static Set<PropertyReference> getLexSupportedSearchReferences() {
+	public static Set<ComponentReference> getLexSupportedSearchReferences() {
 		
-		PropertyReference name = StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference();		
-		PropertyReference about = StandardModelAttributeReference.ABOUT.getPropertyReference();	
-		PropertyReference description = StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference();
+		ComponentReference name = StandardModelAttributeReference.RESOURCE_NAME.getComponentReference();		
+		ComponentReference about = StandardModelAttributeReference.ABOUT.getComponentReference();	
+		ComponentReference description = StandardModelAttributeReference.RESOURCE_SYNOPSIS.getComponentReference();
 		
-		return new HashSet<PropertyReference>(Arrays.asList(name,about,description));
+		return new HashSet<ComponentReference>(Arrays.asList(name,about,description));
 	}
 
 
@@ -171,8 +171,8 @@ public final class CommonSearchFilterUtils {
 		
 		// Collect Property References
 		MatchAlgorithmReference cts2MatchAlgorithmReference = cts2Filter.getMatchAlgorithmReference();
-		PropertyReference cts2PropertyReference = cts2Filter.getPropertyReference();
-		String cts2SearchAttribute = cts2PropertyReference.getReferenceTarget().getName();
+		ComponentReference cts2ComponentReference = cts2Filter.getComponentReference();
+		String cts2SearchAttribute = cts2ComponentReference.getAttributeReference();
 		
 		String cts2MatchValue = cts2Filter.getMatchValue();	
 		String sourceValue = null;
@@ -355,8 +355,8 @@ public final class CommonSearchFilterUtils {
 			
 			// Collect Property References
 			MatchAlgorithmReference cts2MatchAlgorithmReference = cts2ResolvedFilter.getMatchAlgorithmReference();
-			PropertyReference cts2PropertyReference = cts2ResolvedFilter.getPropertyReference();
-			String cts2SearchAttribute = cts2PropertyReference.getReferenceTarget().getName();
+			ComponentReference cts2ComponentReference = cts2ResolvedFilter.getComponentReference();
+			String cts2SearchAttribute = cts2ComponentReference.getAttributeReference();
 			
 			String cts2MatchValue = cts2ResolvedFilter.getMatchValue();	
 			String sourceValue = CommonSearchFilterUtils.determineSourceValue(cts2SearchAttribute, lexCodingSchemeRendering, nameConverter);
@@ -377,8 +377,8 @@ public final class CommonSearchFilterUtils {
 		
 		// Collect Property References
 		MatchAlgorithmReference cts2MatchAlgorithmReference = cts2ResolvedFilter.getMatchAlgorithmReference();
-		PropertyReference cts2PropertyReference = cts2ResolvedFilter.getPropertyReference();
-		String cts2SearchAttribute = cts2PropertyReference.getReferenceTarget().getName();
+		ComponentReference cts2ComponentReference = cts2ResolvedFilter.getComponentReference();
+		String cts2SearchAttribute = cts2ComponentReference.getPropertyReference().getName();
 		
 		String cts2MatchValue = cts2ResolvedFilter.getMatchValue();	
 		String sourceValue = null;

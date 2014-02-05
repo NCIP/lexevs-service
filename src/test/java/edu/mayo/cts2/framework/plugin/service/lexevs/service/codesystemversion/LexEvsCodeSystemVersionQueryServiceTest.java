@@ -168,7 +168,7 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	// Count with All VALID Default filters
 	// -------------------------------------
 	@Test
-	public void testCount_FilterDefault_PropertyReferencesValidIndex_AllSchemes() throws Exception {
+	public void testCount_FilterDefault_ComponentReferencesValidIndex_AllSchemes() throws Exception {
 		FakeLexEvsSystem<CodeSystemVersionCatalogEntry, CodeSystemVersionCatalogEntrySummary, CodeSystemVersionQueryImpl, LexEvsCodeSystemVersionQueryService> fakeLexEvs;
 		fakeLexEvs = new FakeLexEvsSystem<CodeSystemVersionCatalogEntry, CodeSystemVersionCatalogEntrySummary, CodeSystemVersionQueryImpl, LexEvsCodeSystemVersionQueryService>();
 		LexEvsCodeSystemVersionQueryService service = this.createService(fakeLexEvs, true); 
@@ -183,7 +183,7 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	// Count with VALID values with one MISMATCHED
 	// --------------------------------------------
 	@Test
-	public void testCount_FilterDefault_PropertyReferencesWrongIndex_AllSchemes() throws Exception {
+	public void testCount_FilterDefault_ComponentReferencesWrongIndex_AllSchemes() throws Exception {
 		FakeLexEvsSystem<CodeSystemVersionCatalogEntry, CodeSystemVersionCatalogEntrySummary, CodeSystemVersionQueryImpl, LexEvsCodeSystemVersionQueryService> fakeLexEvs;
 		fakeLexEvs = new FakeLexEvsSystem<CodeSystemVersionCatalogEntry, CodeSystemVersionCatalogEntrySummary, CodeSystemVersionQueryImpl, LexEvsCodeSystemVersionQueryService>();
 		LexEvsCodeSystemVersionQueryService service = this.createService(fakeLexEvs, true); 
@@ -231,7 +231,7 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 		}
 	}
 	@Test
-	public void testGetResourceSummaries_DeepCompare_PropertyReferences_MatchingAlgorithms_Pages_CodindgSchemes_Substrings() throws Exception {
+	public void testGetResourceSummaries_DeepCompare_ComponentReferences_MatchingAlgorithms_Pages_CodindgSchemes_Substrings() throws Exception {
 		Page page = new Page();		
 		FakeLexEvsSystem<CodeSystemVersionCatalogEntry, CodeSystemVersionCatalogEntrySummary, CodeSystemVersionQueryImpl, LexEvsCodeSystemVersionQueryService> fakeLexEvs;
 		fakeLexEvs = new FakeLexEvsSystem<CodeSystemVersionCatalogEntry, CodeSystemVersionCatalogEntrySummary, CodeSystemVersionQueryImpl, LexEvsCodeSystemVersionQueryService>();
@@ -244,7 +244,7 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filters, null, null);
 		DirectoryResult<CodeSystemVersionCatalogEntrySummary> directoryResult = null; 
 		
-		fakeLexEvs.executeGetResourceSummariesWithDeepComparisonForEachPropertyReference(service, directoryResult, query, null, page, lastPage);		
+		fakeLexEvs.executeGetResourceSummariesWithDeepComparisonForEachComponentReference(service, directoryResult, query, null, page, lastPage);		
 	}
 	
 	// -----------  Test getResourceList
@@ -279,7 +279,7 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 	}
 	
 	@Test
-	public void testGetResourceList_DeepCompare_PropertyReferences_MatchingAlgorithms_Pages_CodindgSchemes_Substrings() throws Exception {
+	public void testGetResourceList_DeepCompare_ComponentReferences_MatchingAlgorithms_Pages_CodindgSchemes_Substrings() throws Exception {
 		Page page = new Page();		
 		FakeLexEvsSystem<CodeSystemVersionCatalogEntry, CodeSystemVersionCatalogEntrySummary, CodeSystemVersionQueryImpl, LexEvsCodeSystemVersionQueryService> fakeLexEvs;
 		fakeLexEvs = new FakeLexEvsSystem<CodeSystemVersionCatalogEntry, CodeSystemVersionCatalogEntrySummary, CodeSystemVersionQueryImpl, LexEvsCodeSystemVersionQueryService>();
@@ -292,6 +292,6 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filters, null, null);
 		DirectoryResult<CodeSystemVersionCatalogEntry> directoryResult = null; 
 		
-		fakeLexEvs.executeGetResourceListWithDeepComparisonForEachPropertyReference(service, directoryResult, query, null, page, lastPage);		
+		fakeLexEvs.executeGetResourceListWithDeepComparisonForEachComponentReference(service, directoryResult, query, null, page, lastPage);		
 	}
 }

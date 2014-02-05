@@ -27,7 +27,7 @@ import org.junit.Test;
 import edu.mayo.cts2.framework.core.xml.Cts2Marshaller;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
-import edu.mayo.cts2.framework.model.core.EntitySynopsis;
+import edu.mayo.cts2.framework.model.core.URIAndEntityName;
 import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
@@ -66,7 +66,7 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT
 				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"),
 				ModelUtils.nameOrUriFromName("571eb4e6"));
 		
-		DirectoryResult<EntitySynopsis> dirResult = service.getResolution(
+		DirectoryResult<URIAndEntityName> dirResult = service.getResolution(
 				identifier, null, new Page());
 
 		assertNotNull(dirResult);
@@ -82,7 +82,7 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT
 				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"),
 				ModelUtils.nameOrUriFromName("__INVALID__"));
 		
-		DirectoryResult<EntitySynopsis> dirResult = service.getResolution(
+		DirectoryResult<URIAndEntityName> dirResult = service.getResolution(
 				identifier, null, new Page());
 
 		assertNull(dirResult);
@@ -94,7 +94,7 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT
 				ModelUtils.nameOrUriFromName("__INVALID__"),
 				ModelUtils.nameOrUriFromName("571eb4e6"));
 		
-		DirectoryResult<EntitySynopsis> dirResult = service.getResolution(
+		DirectoryResult<URIAndEntityName> dirResult = service.getResolution(
 				identifier, null, new Page());
 
 		assertNull(dirResult);
@@ -106,7 +106,7 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT
 				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"),
 				ModelUtils.nameOrUriFromName("571eb4e6"));
 		
-		DirectoryResult<EntitySynopsis> dirResult = service.getResolution(
+		DirectoryResult<URIAndEntityName> dirResult = service.getResolution(
 				identifier, null, new Page());
 
 		assertNull(dirResult);
@@ -146,7 +146,7 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT
 				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"),
 				ModelUtils.nameOrUriFromName("571eb4e6"));
 		
-		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
+		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getComponentReference(), 
 		  		  StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), 
 		  		"GM");
 		
@@ -190,10 +190,10 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT
 				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"),
 				ModelUtils.nameOrUriFromName("571eb4e6"));
 		
-		ResolvedValueSetResult<EntitySynopsis> dirResult = service.getResolution(
+		ResolvedValueSetResult<URIAndEntityName> dirResult = service.getResolution(
 				identifier, null, new Page());
 
-		for (EntitySynopsis synopsis: dirResult.getEntries()) {
+		for (URIAndEntityName synopsis: dirResult.getEntries()) {
 			
 			StringWriter sw = new StringWriter();
 			StreamResult result= new StreamResult(sw);
@@ -207,11 +207,11 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT
 				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"),
 				ModelUtils.nameOrUriFromName("571eb4e6"));
 		
-		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
+		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getComponentReference(), 
 		  		  StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), 
 		  		"GM");
 		
-		ResolvedValueSetResult<EntitySynopsis> dirResult = service.getResolution(
+		ResolvedValueSetResult<URIAndEntityName> dirResult = service.getResolution(
 				identifier, filter, new Page());
 
 		assertNotNull(dirResult.getResolvedValueSetHeader());
@@ -226,14 +226,14 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT
 				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"),
 				ModelUtils.nameOrUriFromName("571eb4e6"));
 		
-		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
+		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getComponentReference(), 
 		  		  StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), 
 		  		"GM");
 		
-		ResolvedValueSetResult<EntitySynopsis> dirResult = service.getResolution(
+		ResolvedValueSetResult<URIAndEntityName> dirResult = service.getResolution(
 				identifier, filter, new Page());
 
-		EntitySynopsis synopsis = dirResult.getEntries().get(0);
+		URIAndEntityName synopsis = dirResult.getEntries().get(0);
 		String href = synopsis.getHref();
 			
 		assertNotNull(href);
@@ -246,14 +246,14 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT
 				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"),
 				ModelUtils.nameOrUriFromName("571eb4e6"));
 		
-		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference(), 
+		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_NAME.getComponentReference(), 
 		  		  StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference(), 
 		  		"GM");
 		
-		ResolvedValueSetResult<EntitySynopsis> dirResult = service.getResolution(
+		ResolvedValueSetResult<URIAndEntityName> dirResult = service.getResolution(
 				identifier, filter, new Page());
 
-		EntitySynopsis synopsis = dirResult.getEntries().get(0);
+		URIAndEntityName synopsis = dirResult.getEntries().get(0);
 		String uri = synopsis.getUri();
 		
 		assertEquals("urn:oid:11.11.0.1:GM", uri);		

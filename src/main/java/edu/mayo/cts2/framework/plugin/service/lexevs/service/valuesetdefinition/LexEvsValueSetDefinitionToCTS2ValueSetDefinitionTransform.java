@@ -41,7 +41,6 @@ import edu.mayo.cts2.framework.model.core.URIAndEntityName;
 import edu.mayo.cts2.framework.model.core.ValueSetReference;
 import edu.mayo.cts2.framework.model.core.types.AssociationDirection;
 import edu.mayo.cts2.framework.model.core.types.SetOperator;
-import edu.mayo.cts2.framework.model.core.types.TargetReferenceType;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.model.valuesetdefinition.AssociatedEntitiesReference;
 import edu.mayo.cts2.framework.model.valuesetdefinition.CompleteCodeSystemReference;
@@ -222,10 +221,9 @@ public class LexEvsValueSetDefinitionToCTS2ValueSetDefinitionTransform
 		FilterComponent filter = new FilterComponent();
 		filter.setMatchAlgorithm(new MatchAlgorithmReference());
 		filter.getMatchAlgorithm().setContent(matchAlgorithm);
-		filter.setReferenceTarget(new URIAndEntityName());
-		filter.getReferenceTarget().setName(propName);
-		filter.getReferenceTarget().setUri(propUri);
-		filter.setReferenceType(TargetReferenceType.PROPERTY);
+		filter.setPropertyReference(new URIAndEntityName());
+		filter.getPropertyReference().setName(propName);
+		filter.getPropertyReference().setUri(propUri);
 		
 		filter.setMatchValue(matchValue);
 		

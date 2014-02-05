@@ -20,7 +20,7 @@ import org.LexGrid.commonTypes.EntityDescription;
 import scala.actors.threadpool.Arrays;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
-import edu.mayo.cts2.framework.model.core.PropertyReference;
+import edu.mayo.cts2.framework.model.core.ComponentReference;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 
@@ -30,9 +30,9 @@ import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
  *
  */
 public class FakeLexEvsData {	
-	final static PropertyReference ABOUT_REF = StandardModelAttributeReference.ABOUT.getPropertyReference();
-	final static PropertyReference RESOURCE_SYNOPSIS_REF = StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference();
-	final static PropertyReference RESOURCE_NAME_REF = StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference();
+	final static ComponentReference ABOUT_REF = StandardModelAttributeReference.ABOUT.getComponentReference();
+	final static ComponentReference RESOURCE_SYNOPSIS_REF = StandardModelAttributeReference.RESOURCE_SYNOPSIS.getComponentReference();
+	final static ComponentReference RESOURCE_NAME_REF = StandardModelAttributeReference.RESOURCE_NAME.getComponentReference();
 	
 	final static MatchAlgorithmReference CONTAINS_REF = StandardMatchAlgorithmReference.CONTAINS.getMatchAlgorithmReference();
 	final static MatchAlgorithmReference STARTS_WITH_REF = StandardMatchAlgorithmReference.STARTS_WITH.getMatchAlgorithmReference();
@@ -56,18 +56,18 @@ public class FakeLexEvsData {
 		
 		
 		private int index;
-		private PropertyReference propertyReference;
-		DataField(int index, PropertyReference propertyReference){
+		private ComponentReference componentReference;
+		DataField(int index, ComponentReference componentReference){
 			this.index = index;
-			this.propertyReference = propertyReference;
+			this.componentReference = componentReference;
 		}
 		
 		public int index(){
 			return this.index;
 		}
 		
-		public PropertyReference propertyReference(){
-			return this.propertyReference;
+		public ComponentReference componentReference(){
+			return this.componentReference;
 		}
 	}
 
@@ -153,10 +153,10 @@ public class FakeLexEvsData {
 	}
 
 	public String getScheme_DataField(int schemeIndex,
-			PropertyReference propertyReference) {
+			ComponentReference componentReference) {
 		String results = null;
 		if(schemeIndex < this.codeSystemCount){
-			int fieldIndex = this.getPropertyReferenceIndex(propertyReference);
+			int fieldIndex = this.getComponentReferenceIndex(componentReference);
 			
 			results = this.codeSystemList.get(schemeIndex)[fieldIndex];
 		}
@@ -176,13 +176,13 @@ public class FakeLexEvsData {
 		return answer;
 	}
 	
-	private int getPropertyReferenceIndex(PropertyReference propertyReference) {
+	private int getComponentReferenceIndex(ComponentReference componentReference) {
 		int index = 0;
 		DataField [] fields = DataField.values();
 		for(int i=0; i < fields.length; i++){
-			PropertyReference ref = fields[i].propertyReference();
+			ComponentReference ref = fields[i].componentReference();
 			if(ref != null){
-				if(ref.equals(propertyReference)){
+				if(ref.equals(componentReference)){
 					index = i;
 				}
 			}
@@ -203,10 +203,10 @@ public class FakeLexEvsData {
 					while(found && filterIterator.hasNext()){
 						ResolvedFilter filter = filterIterator.next();
 						String matchAlgorithmReferenceName = filter.getMatchAlgorithmReference().getContent().toLowerCase();
-						PropertyReference propertyReference = filter.getPropertyReference();
+						ComponentReference componentReference = filter.getComponentReference();
 						String matchValue = filter.getMatchValue().toLowerCase();
 				
-						String dataValue = this.getScheme_DataField(schemeIndex, propertyReference).toLowerCase();
+						String dataValue = this.getScheme_DataField(schemeIndex, componentReference).toLowerCase();
 						if(matchAlgorithmReferenceName.equals(EXACT_MATCH)){
 							if(dataValue.equals(matchValue) == false){
 								found = false;
@@ -235,7 +235,7 @@ public class FakeLexEvsData {
 		return count;
 	}
 
-	public void setProperty(CodingSchemeSummary codingSchemeSummary, int schemeIndex, PropertyReference property) {
+	public void setProperty(CodingSchemeSummary codingSchemeSummary, int schemeIndex, ComponentReference property) {
 		if(property.equals(RESOURCE_SYNOPSIS_REF)){
 			EntityDescription codingSchemeDescription = new EntityDescription();
 			codingSchemeDescription.setContent(this.getScheme_DataField(schemeIndex, DataField.RESOURCE_SYNOPSIS)); 

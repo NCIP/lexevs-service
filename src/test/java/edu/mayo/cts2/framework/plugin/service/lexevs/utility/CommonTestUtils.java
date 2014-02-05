@@ -15,7 +15,7 @@ import java.util.Set;
 
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
-import edu.mayo.cts2.framework.model.core.PropertyReference;
+import edu.mayo.cts2.framework.model.core.ComponentReference;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.entity.EntityDescriptionQueryImpl;
 import edu.mayo.cts2.framework.service.command.restriction.EntityDescriptionQueryServiceRestrictions;
@@ -73,14 +73,14 @@ public class CommonTestUtils {
 				matchAlgorithmReference, 
 				matchValue, 
 				codeSystemVersion,
-				StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference());
+				StandardModelAttributeReference.RESOURCE_SYNOPSIS.getComponentReference());
 	}
 	
-	public static EntityDescriptionQuery createQuery(String matchAlgorithmReference, String matchValue, String codeSystemVersion, PropertyReference propertyReference){
+	public static EntityDescriptionQuery createQuery(String matchAlgorithmReference, String matchValue, String codeSystemVersion, ComponentReference componentReference){
 		// Create filters for query
 		// ------------------------
 		Set<ResolvedFilter> filters = new HashSet<ResolvedFilter>();	
-		ResolvedFilter filter = CommonTestUtils.createFilter(matchAlgorithmReference,  matchValue, propertyReference);				
+		ResolvedFilter filter = CommonTestUtils.createFilter(matchAlgorithmReference,  matchValue, componentReference);				
 		filters.add(filter);
 		
 		// Create restriction for query
@@ -93,11 +93,11 @@ public class CommonTestUtils {
 		return query;
 	}
 
-	public static ResolvedFilter createFilter(String matchAlgorithmReference, String matchValue, PropertyReference propertyReference){
+	public static ResolvedFilter createFilter(String matchAlgorithmReference, String matchValue, ComponentReference componentReference){
 		ResolvedFilter filter = new ResolvedFilter();			
 		filter.setMatchAlgorithmReference(new MatchAlgorithmReference(matchAlgorithmReference));
 		filter.setMatchValue(matchValue);
-		filter.setPropertyReference(propertyReference);				// Should this field be used??			
+		filter.setComponentReference(componentReference);				// Should this field be used??			
 		return filter;
 	}
 
@@ -105,20 +105,20 @@ public class CommonTestUtils {
 
 	
 	// FILTER METHODS
-	public static ResolvedFilter createFilter(PropertyReference property, MatchAlgorithmReference algorithm, String matchValue){
+	public static ResolvedFilter createFilter(ComponentReference property, MatchAlgorithmReference algorithm, String matchValue){
 		ResolvedFilter filter = new ResolvedFilter();
 		filter.setMatchValue(matchValue);
 		filter.setMatchAlgorithmReference(algorithm);
-		filter.setPropertyReference(property);
+		filter.setComponentReference(property);
 		
 		return filter;
 	}
 
-	public static Set<ResolvedFilter> createFilterSet(PropertyReference property, MatchAlgorithmReference algorithm, String matchValue){
+	public static Set<ResolvedFilter> createFilterSet(ComponentReference property, MatchAlgorithmReference algorithm, String matchValue){
 		ResolvedFilter filter = new ResolvedFilter();
 		filter.setMatchValue(matchValue);
 		filter.setMatchAlgorithmReference(algorithm);
-		filter.setPropertyReference(property);
+		filter.setComponentReference(property);
 		
 		Set<ResolvedFilter> filterSet = new HashSet<ResolvedFilter>(
 				Arrays.asList(filter));
@@ -128,19 +128,19 @@ public class CommonTestUtils {
 	
 	public static Set<ResolvedFilter> createFilterSet(String about_contains, String resourceSynopsis_startsWith, String resourceName_exactMatch){
 		ResolvedFilter aboutFilter = createFilter(
-				StandardModelAttributeReference.ABOUT.getPropertyReference(),
+				StandardModelAttributeReference.ABOUT.getComponentReference(),
 				StandardMatchAlgorithmReference.CONTAINS
 						.getMatchAlgorithmReference(), about_contains);
 
 		ResolvedFilter synopsisFilter = createFilter(
 				StandardModelAttributeReference.RESOURCE_SYNOPSIS
-						.getPropertyReference(),
+						.getComponentReference(),
 				StandardMatchAlgorithmReference.STARTS_WITH
 						.getMatchAlgorithmReference(), resourceSynopsis_startsWith);
 
 		ResolvedFilter nameFilter = createFilter(
 				StandardModelAttributeReference.RESOURCE_NAME
-						.getPropertyReference(),
+						.getComponentReference(),
 				StandardMatchAlgorithmReference.EXACT_MATCH
 						.getMatchAlgorithmReference(), resourceName_exactMatch);
 		

@@ -27,10 +27,9 @@ import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogE
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
-import edu.mayo.cts2.framework.model.core.PropertyReference;
+import edu.mayo.cts2.framework.model.core.ComponentReference;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.core.URIAndEntityName;
-import edu.mayo.cts2.framework.model.core.types.TargetReferenceType;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
@@ -150,14 +149,13 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 	}
 
 	@Override
-	public Set<? extends PropertyReference> getSupportedSearchReferences() {
-		Set<PropertyReference> references = new HashSet<PropertyReference>(
+	public Set<? extends ComponentReference> getSupportedSearchReferences() {
+		Set<ComponentReference> references = new HashSet<ComponentReference>(
 				CommonSearchFilterUtils.getLexSupportedSearchReferences());
 		
-		PropertyReference tag = new PropertyReference();
-		tag.setReferenceType(TargetReferenceType.ATTRIBUTE);
-		tag.setReferenceTarget(new URIAndEntityName());
-		tag.getReferenceTarget().setName("tag");
+		ComponentReference tag = new ComponentReference();
+		tag.setPropertyReference(new URIAndEntityName());
+		tag.getPropertyReference().setName("tag");
 		
 		references.add(tag);
 		
@@ -177,8 +175,8 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 	}
 
 	@Override
-	public Set<? extends PropertyReference> getSupportedSortReferences() {
-		return new HashSet<PropertyReference>();
+	public Set<? extends ComponentReference> getSupportedSortReferences() {
+		return new HashSet<ComponentReference>();
 	}
 
 	public MappingExtension getMappingExtension() {

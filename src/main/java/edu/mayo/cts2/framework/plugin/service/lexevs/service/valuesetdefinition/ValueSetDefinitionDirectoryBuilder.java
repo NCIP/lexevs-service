@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.mayo.cts2.framework.filter.directory.AbstractStateBuildingDirectoryBuilder;
-import edu.mayo.cts2.framework.filter.match.StateAdjustingPropertyReference;
+import edu.mayo.cts2.framework.filter.match.StateAdjustingComponentReference;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 
 /**
@@ -28,15 +28,15 @@ public class ValueSetDefinitionDirectoryBuilder<T> extends AbstractStateBuilding
 	 * @param initialState the initial state
 	 * @param callback the callback
 	 * @param matchAlgorithmReferences the match algorithm references
-	 * @param stateAdjustingPropertyReferences the state adjusting property references
+	 * @param stateAdjustingComponentReferences the state adjusting property references
 	 */
 	public ValueSetDefinitionDirectoryBuilder(
 			List<String> uris,
 			AbstractStateBuildingDirectoryBuilder.Callback<List<String>, T> callback,
 			Set<MatchAlgorithmReference> matchAlgorithmReferences,
-			Set<StateAdjustingPropertyReference<List<String>>> stateAdjustingPropertyReferences) {
+			Set<StateAdjustingComponentReference<List<String>>> stateAdjustingComponentReferences) {
 		super(uris, callback, matchAlgorithmReferences,
-				stateAdjustingPropertyReferences);
+				stateAdjustingComponentReferences);
 	}
 
 }

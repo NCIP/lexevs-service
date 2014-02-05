@@ -30,10 +30,10 @@ import edu.mayo.cts2.framework.filter.match.StartsWithMatcher;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
-import edu.mayo.cts2.framework.model.core.EntitySynopsis;
+import edu.mayo.cts2.framework.model.core.URIAndEntityName;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
-import edu.mayo.cts2.framework.model.core.PropertyReference;
+import edu.mayo.cts2.framework.model.core.ComponentReference;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.entity.EntityDescription;
@@ -100,19 +100,19 @@ ResolvedValueSetResolutionService {
 	}
 
 	@Override
-	public Set<? extends PropertyReference> getSupportedSearchReferences() {
-		PropertyReference
-		name = StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference();
-		PropertyReference
-			about = StandardModelAttributeReference.ABOUT.getPropertyReference();
-		PropertyReference
-			description = StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference();
+	public Set<? extends ComponentReference> getSupportedSearchReferences() {
+		ComponentReference
+		name = StandardModelAttributeReference.RESOURCE_NAME.getComponentReference();
+		ComponentReference
+			about = StandardModelAttributeReference.ABOUT.getComponentReference();
+		ComponentReference
+			description = StandardModelAttributeReference.RESOURCE_SYNOPSIS.getComponentReference();
 		
-		return new HashSet<PropertyReference>(Arrays.asList(name,about,description));
+		return new HashSet<ComponentReference>(Arrays.asList(name,about,description));
 	}
 
 	@Override
-	public Set<? extends PropertyReference> getSupportedSortReferences() {
+	public Set<? extends ComponentReference> getSupportedSortReferences() {
 		return null;
 	}
 
@@ -127,7 +127,7 @@ ResolvedValueSetResolutionService {
 	}
 
 	@Override
-	public ResolvedValueSetResult<EntitySynopsis> getResolution(
+	public ResolvedValueSetResult<URIAndEntityName> getResolution(
 			ResolvedValueSetReadId identifier,
 			Set<ResolvedFilter> filterComponent, 
 			Page page) {
@@ -150,9 +150,9 @@ ResolvedValueSetResolutionService {
 		query.setRestrictions(entityRestrictions);
 		DirectoryResult<EntityDirectoryEntry> result = this.lexEvsEntityQueryService.getResourceSummaries(
 				query, null, page);
-		List<EntitySynopsis> transformedResult= transform.transform(result);
+		List<URIAndEntityName> transformedResult= transform.transform(result);
 		
-		return new ResolvedValueSetResult<EntitySynopsis>(
+		return new ResolvedValueSetResult<URIAndEntityName>(
 				this.getResolvedValueSetHeader(codingScheme), 
 				transformedResult, 
 				result.isAtEnd());
@@ -164,15 +164,15 @@ ResolvedValueSetResolutionService {
 		page.setPage(0);
 		page.setMaxToReturn(Integer.MAX_VALUE);
 				
-		ResolvedValueSetResult<EntitySynopsis> resolution = this.getResolution(identifier, null, page);
+		ResolvedValueSetResult<URIAndEntityName> resolution = this.getResolution(identifier, null, page);
 		if(resolution == null){
 			return null;
 		}
 		
 		ResolvedValueSet resolvedValueSet = new ResolvedValueSet();
 		resolvedValueSet.setResolutionInfo(resolution.getResolvedValueSetHeader());
-		for(EntitySynopsis synopsis : resolution.getEntries()){
-			resolvedValueSet.addMember(synopsis);
+		for(URIAndEntityName synopsis : resolution.getEntries()){
+			resolvedValueSet.addEntry(synopsis);
 		}
 		
 		return resolvedValueSet;		

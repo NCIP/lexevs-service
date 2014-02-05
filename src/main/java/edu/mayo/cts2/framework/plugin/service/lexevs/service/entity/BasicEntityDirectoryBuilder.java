@@ -15,7 +15,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import edu.mayo.cts2.framework.filter.directory.AbstractStateBuildingDirectoryBuilder;
-import edu.mayo.cts2.framework.filter.match.StateAdjustingPropertyReference;
+import edu.mayo.cts2.framework.filter.match.StateAdjustingComponentReference;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
@@ -45,7 +45,7 @@ public class BasicEntityDirectoryBuilder<T> extends AbstractStateBuildingDirecto
 			EntityUriResolver entityUriResolver,
 			AbstractStateBuildingDirectoryBuilder.Callback<String, T> callback,
 			Set<MatchAlgorithmReference> matchAlgorithmReferences,
-			Set<StateAdjustingPropertyReference<String>> stateAdjustingPropertyReferences) {
+			Set<StateAdjustingComponentReference<String>> stateAdjustingPropertyReferences) {
 		super("", callback, matchAlgorithmReferences,
 				stateAdjustingPropertyReferences);
 		

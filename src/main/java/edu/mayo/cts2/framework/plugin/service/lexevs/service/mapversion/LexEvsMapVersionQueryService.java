@@ -33,7 +33,7 @@ import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.core.EntityReferenceList;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
-import edu.mayo.cts2.framework.model.core.PropertyReference;
+import edu.mayo.cts2.framework.model.core.ComponentReference;
 import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
@@ -474,7 +474,7 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	}
 
 	@Override
-	public Set<? extends PropertyReference> getSupportedSearchReferences() {
+	public Set<? extends ComponentReference> getSupportedSearchReferences() {
 		return CommonSearchFilterUtils.getLexSupportedSearchReferences();
 	}
 
@@ -504,8 +504,8 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 	// Methods returning empty lists or sets
 	// -------------------------------------
 	@Override
-	public Set<? extends PropertyReference> getSupportedSortReferences() {
-		return new HashSet<PropertyReference>();
+	public Set<? extends ComponentReference> getSupportedSortReferences() {
+		return new HashSet<ComponentReference>();
 	}
 
 	@Override

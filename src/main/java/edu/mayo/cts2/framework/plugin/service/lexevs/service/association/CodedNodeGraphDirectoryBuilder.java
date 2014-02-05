@@ -15,7 +15,7 @@ import org.LexGrid.LexBIG.LexBIGService.CodedNodeGraph;
 import org.LexGrid.LexBIG.Utility.Constructors;
 
 import edu.mayo.cts2.framework.filter.directory.AbstractStateBuildingDirectoryBuilder;
-import edu.mayo.cts2.framework.filter.match.StateAdjustingPropertyReference;
+import edu.mayo.cts2.framework.filter.match.StateAdjustingComponentReference;
 import edu.mayo.cts2.framework.model.association.AssociationDirectoryEntry;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.command.restriction.AssociationQueryServiceRestrictions;
@@ -28,7 +28,7 @@ public class CodedNodeGraphDirectoryBuilder
 			CodedNodeGraph initialState,
 			Callback<CodedNodeGraph, AssociationDirectoryEntry> callback,
 			Set<MatchAlgorithmReference> matchAlgorithmReferences,
-			Set<StateAdjustingPropertyReference<CodedNodeGraph>> stateAdjustingPropertyReferences) {
+			Set<StateAdjustingComponentReference<CodedNodeGraph>> stateAdjustingPropertyReferences) {
 		super(initialState, 
 				callback, 
 				matchAlgorithmReferences,
@@ -37,10 +37,10 @@ public class CodedNodeGraphDirectoryBuilder
 	
 	public CodedNodeGraphDirectoryBuilder restrict(AssociationQueryServiceRestrictions restrictions){
 		if(restrictions != null && 
-				restrictions.getPredicateEntity() != null &&
-				restrictions.getPredicateEntity().getEntityName() != null &&
-				restrictions.getPredicateEntity().getEntityName().getName() != null){
-			String predicateName = restrictions.getPredicateEntity().getEntityName().getName();
+				restrictions.getPredicate() != null &&
+				restrictions.getPredicate().getEntityName() != null &&
+				restrictions.getPredicate().getEntityName().getName() != null){
+			String predicateName = restrictions.getPredicate().getEntityName().getName();
 			
 			try {
 				this.updateState(

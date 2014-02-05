@@ -4,8 +4,8 @@
 
 	<parent>
 		<groupId>edu.mayo.cts2.framework</groupId>
-		<artifactId>base-service-plugin</artifactId>
-		<version>0.8.4</version>
+		<artifactId>cts2-base-service-plugin</artifactId>
+		<version>1.1.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>lexevs-service</artifactId>
@@ -580,27 +580,27 @@
 
 		<dependency>
 			<groupId>edu.mayo.cts2.framework</groupId>
-			<artifactId>service</artifactId>
+			<artifactId>cts2-service</artifactId>
 			<version>${develpment.framework.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>edu.mayo.cts2.framework</groupId>
-			<artifactId>plugin-util</artifactId>
+			<artifactId>cts2-plugin-util</artifactId>
 			<version>${develpment.framework.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>edu.mayo.cts2.framework</groupId>
-			<artifactId>webapp-rest-extensions</artifactId>
+			<artifactId>cts2-webapp-rest-extensions</artifactId>
 			<version>${develpment.framework.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>edu.mayo.cts2.framework</groupId>
-			<artifactId>core</artifactId>
+			<artifactId>cts2-core</artifactId>
 			<version>${develpment.framework.version}</version>
 			<type>test-jar</type>
 			<scope>test</scope>

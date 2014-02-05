@@ -23,7 +23,7 @@ import edu.mayo.cts2.framework.core.url.UrlConstructor;
 import edu.mayo.cts2.framework.model.core.CodeSystemReference;
 import edu.mayo.cts2.framework.model.core.CodeSystemVersionReference;
 import edu.mayo.cts2.framework.model.core.DescriptionInCodeSystem;
-import edu.mayo.cts2.framework.model.core.EntitySynopsis;
+import edu.mayo.cts2.framework.model.core.URIAndEntityName;
 import edu.mayo.cts2.framework.model.core.NameAndMeaningReference;
 import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.core.ValueSetDefinitionReference;
@@ -129,8 +129,8 @@ public class ResolvedCodingSchemeTransform {
 		return list;
 	}
 
-	EntitySynopsis transform(EntityDirectoryEntry entry) {
-		EntitySynopsis synopsis = new EntitySynopsis();
+	URIAndEntityName transform(EntityDirectoryEntry entry) {
+		URIAndEntityName synopsis = new URIAndEntityName();
 		ScopedEntityName scopedEntity = entry.getName();
 		if (scopedEntity != null) {
 			synopsis.setName(scopedEntity.getName());
@@ -146,11 +146,11 @@ public class ResolvedCodingSchemeTransform {
 		return synopsis;
 	}
 
-	List<EntitySynopsis> transform(DirectoryResult<EntityDirectoryEntry> data) {
-		List<EntitySynopsis> list = new ArrayList<EntitySynopsis>();
+	List<URIAndEntityName> transform(DirectoryResult<EntityDirectoryEntry> data) {
+		List<URIAndEntityName> list = new ArrayList<URIAndEntityName>();
 		if (data != null) {
 			for (EntityDirectoryEntry entry : data.getEntries()) {
-				EntitySynopsis synopsis = transform(entry);
+				URIAndEntityName synopsis = transform(entry);
 				list.add(synopsis);
 			}
 		}

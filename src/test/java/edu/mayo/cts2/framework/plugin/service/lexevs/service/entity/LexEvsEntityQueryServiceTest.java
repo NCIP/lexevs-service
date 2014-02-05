@@ -136,7 +136,7 @@ public class LexEvsEntityQueryServiceTest {
 	// Count with All VALID Default filters
 	// -------------------------------------
 	@Test
-	public void testCount_FilterDefault_PropertyReferencesValidIndex_AllSchemes() throws Exception {
+	public void testCount_FilterDefault_ComponentReferencesValidIndex_AllSchemes() throws Exception {
 		FakeLexEvsSystem<EntityDescription, EntityDirectoryEntry, EntityDescriptionQuery, LexEvsEntityQueryService> fakeLexEvs;
 		fakeLexEvs = new FakeLexEvsSystem<EntityDescription, EntityDirectoryEntry, EntityDescriptionQuery, LexEvsEntityQueryService>();
 		LexEvsEntityQueryService service = this.createService(fakeLexEvs, true); 
@@ -154,7 +154,7 @@ public class LexEvsEntityQueryServiceTest {
 	// Count with VALID values with one MISMATCHED
 	// --------------------------------------------
 	@Test
-	public void testCount_FilterDefault_PropertyReferencesWrongIndex_AllSchemes() throws Exception {
+	public void testCount_FilterDefault_ComponentReferencesWrongIndex_AllSchemes() throws Exception {
 		FakeLexEvsSystem<EntityDescription, EntityDirectoryEntry, EntityDescriptionQuery, LexEvsEntityQueryService> fakeLexEvs;
 		fakeLexEvs = new FakeLexEvsSystem<EntityDescription, EntityDirectoryEntry, EntityDescriptionQuery, LexEvsEntityQueryService>();
 		LexEvsEntityQueryService service = this.createService(fakeLexEvs, true); 
@@ -208,7 +208,7 @@ public class LexEvsEntityQueryServiceTest {
 		}
 	}
 	@Test
-	public void testGetResourceSummaries_DeepCompare_PropertyReferences_MatchingAlgorithms_Pages_CodindgSchemes_Substrings() throws Exception {
+	public void testGetResourceSummaries_DeepCompare_ComponentReferences_MatchingAlgorithms_Pages_CodindgSchemes_Substrings() throws Exception {
 		Page page = new Page();		
 		FakeLexEvsSystem<EntityDescription, EntityDirectoryEntry, EntityDescriptionQuery, LexEvsEntityQueryService> fakeLexEvs;
 		fakeLexEvs = new FakeLexEvsSystem<EntityDescription, EntityDirectoryEntry, EntityDescriptionQuery, LexEvsEntityQueryService>();
@@ -224,7 +224,7 @@ public class LexEvsEntityQueryServiceTest {
 		EntityDescriptionQuery query = new EntityDescriptionQueryImpl(null, filters, restrictions);
 		DirectoryResult<EntityDirectoryEntry> directoryResult = null;
 		
-		fakeLexEvs.executeGetResourceSummariesWithDeepComparisonForEachPropertyReference(service, directoryResult, query, RESOURCE_NAME, page, lastPage);		
+		fakeLexEvs.executeGetResourceSummariesWithDeepComparisonForEachComponentReference(service, directoryResult, query, RESOURCE_NAME, page, lastPage);		
 	}
 	
 	// -----------  Test getResourceList
@@ -263,7 +263,7 @@ public class LexEvsEntityQueryServiceTest {
 	}
 	
 	@Test
-	public void testGetResourceList_DeepCompare_PropertyReferences_MatchingAlgorithms_Pages_CodindgSchemes_Substrings() throws Exception {
+	public void testGetResourceList_DeepCompare_ComponentReferences_MatchingAlgorithms_Pages_CodindgSchemes_Substrings() throws Exception {
 		Page page = new Page();		
 		FakeLexEvsSystem<EntityDescription, EntityDirectoryEntry, EntityDescriptionQuery, LexEvsEntityQueryService> fakeLexEvs;
 		fakeLexEvs = new FakeLexEvsSystem<EntityDescription, EntityDirectoryEntry, EntityDescriptionQuery, LexEvsEntityQueryService>();
@@ -280,7 +280,7 @@ public class LexEvsEntityQueryServiceTest {
 		EntityDescriptionQuery query = new EntityDescriptionQueryImpl(null, filters, restrictions);
 		DirectoryResult<EntityDescription> directoryResult = null; 
 		
-		fakeLexEvs.executeGetResourceListWithDeepComparisonForEachPropertyReference(service, directoryResult, query, RESOURCE_NAME, page, lastPage);		
+		fakeLexEvs.executeGetResourceListWithDeepComparisonForEachComponentReference(service, directoryResult, query, RESOURCE_NAME, page, lastPage);		
 	}
 	
 }
