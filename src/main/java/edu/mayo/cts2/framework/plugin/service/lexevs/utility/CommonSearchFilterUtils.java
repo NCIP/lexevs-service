@@ -28,6 +28,7 @@ import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet.SearchDesignationOption;
 import org.LexGrid.codingSchemes.CodingScheme;
+import org.LexGrid.valueSets.ValueSetDefinition;
 
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
@@ -139,6 +140,7 @@ public final class CommonSearchFilterUtils {
 		return sourceValue;
 	}	
 	
+
 	
 	public static List<CodingScheme> filterLexCodingSchemeList(
 			List<CodingScheme> lexCodingSchemeList,
@@ -187,6 +189,62 @@ public final class CommonSearchFilterUtils {
 		return filteredLexCodingSchemeList;
 	}
 	
+	public static List<ValueSetDefinition> filterLexValueSetDefinitionList(
+			List<ValueSetDefinition> lexVSDefinitionList,
+			Set<ResolvedFilter> cts2Filters) {
+		
+		List<ValueSetDefinition> lexFilteredValueSetList = lexVSDefinitionList;
+		
+		if(lexVSDefinitionList != null && cts2Filters != null){
+			Iterator<ResolvedFilter> cts2FilterIterator = cts2Filters.iterator();
+			while (cts2FilterIterator.hasNext() && (lexVSDefinitionList.size() > 0)) {
+				ResolvedFilter cts2ResolvedFilter = cts2FilterIterator.next();
+				lexFilteredValueSetList = filterLexValueSetDefinitionList(lexVSDefinitionList, 
+						cts2ResolvedFilter);
+			}
+		}
+		
+		return lexFilteredValueSetList;
+	}
+	public static List<ValueSetDefinition> filterLexValueSetDefinitionList(List<ValueSetDefinition> lexVSDefinitionList,
+			ResolvedFilter cts2Filter){
+		boolean caseSensitive = false;
+		List<ValueSetDefinition> filteredVSDefinitionList = new ArrayList<ValueSetDefinition>();
+		// Collect Property References
+		MatchAlgorithmReference cts2MatchAlgorithmReference = cts2Filter.getMatchAlgorithmReference();
+		ComponentReference cts2ComponentReference = cts2Filter.getComponentReference();
+		String cts2SearchAttribute = cts2ComponentReference.getAttributeReference();
+		
+		String cts2MatchValue = cts2Filter.getMatchValue();	
+		String sourceValue = null;
+		
+		for (ValueSetDefinition lexValueSet : lexVSDefinitionList) {
+			sourceValue = CommonSearchFilterUtils.determineVSSourceValue(cts2SearchAttribute, lexValueSet);
+			if (CommonStringUtils.executeMatchAlgorithm(sourceValue, cts2MatchValue, cts2MatchAlgorithmReference, caseSensitive)) {
+				filteredVSDefinitionList.add(lexValueSet);
+			} 
+		}
+		
+		return filteredVSDefinitionList;
+	}
+	
+	private static String determineVSSourceValue(String cts2SearchAttribute,
+			ValueSetDefinition lexValueSet) {
+			String sourceValue = null;
+			if(lexValueSet == null){
+				return sourceValue;
+			}
+			if (cts2SearchAttribute.equals(Constants.ATTRIBUTE_NAME_ABOUT)) {
+				sourceValue = lexValueSet.getValueSetDefinitionURI();
+			} else if (cts2SearchAttribute.equals(Constants.ATTRIBUTE_NAME_RESOURCE_SYNOPSIS)) {
+				sourceValue = lexValueSet.getEntityDescription().getContent();
+			} else if (cts2SearchAttribute.equals(Constants.ATTRIBUTE_NAME_RESOURCE_NAME)) {
+				sourceValue = 
+						lexValueSet.getValueSetDefinitionName();
+			}
+			return sourceValue;
+	}
+
 	public static <T extends ResourceQuery> CodedNodeSet filterLexCodedNodeSet(CodedNodeSet lexCodedNodeSet, QueryData<T> queryData){
 		if(lexCodedNodeSet != null){
 			// Apply restrictions if they exists
