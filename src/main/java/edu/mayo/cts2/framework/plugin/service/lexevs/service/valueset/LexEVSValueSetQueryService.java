@@ -64,69 +64,6 @@ LexEvsChangeEventObserver, ValueSetQueryService, InitializingBean {
 
 	private Set<String> activeCache = new HashSet<String>();
 	
-//	private interface TransformClosure<T>{
-//		T transform(org.LexGrid.valueSets.ValueSetDefinition item);
-//	}
-	
-//	private final Callback<List<String>, ValueSetCatalogEntryListEntry> 
-//	listCallack = 
-//		new DefinitionCallback<ValueSetCatalogEntryListEntry>(
-//			new TransformClosure<ValueSetCatalogEntryListEntry>() {
-//
-//
-//				@Override
-//				public ValueSetCatalogEntryListEntry transform(ValueSetDefinition item) {
-//					return transformer.transformFullDescription(item);
-//				}
-//
-//			});
-
-//private final Callback<List<String>, ValueSetCatalogEntrySummary> summariesCallback = 
-//	new DefinitionCallback<ValueSetCatalogEntrySummary>(
-//		new TransformClosure<ValueSetCatalogEntrySummary>() {
-//
-//			@Override
-//			public ValueSetCatalogEntrySummary transform(
-//					ValueSetDefinition item) {
-//				return transformer.transformSummaryDescription(item);
-//			}
-//
-//		});
-
-//	@Override
-//	public DirectoryResult<ValueSetCatalogEntrySummary> getResourceSummaries(
-//			ValueSetQuery query, SortCriteria sortCriteria, Page page) {
-//		List<String> uris = this.definitionServices.listValueSetDefinitionURIs();
-//		
-//		ValueSetDirectoryBuilder<ValueSetCatalogEntrySummary> builder = 
-//			new ValueSetDirectoryBuilder<ValueSetCatalogEntrySummary>(
-//					uris, 
-//					this.summariesCallback, 
-//					null, 
-//					null);
-//		
-//		return builder.
-//				addMaxToReturn(page.getMaxToReturn()).
-//				addStart(page.getStart()).
-//				resolve();
-//	}
-//	@Override
-//	public DirectoryResult<ValueSetDefinitionDirectoryEntry> getResourceSummaries(
-//			ValueSetQuery query, SortCriteria sortCriteria, Page page) {
-//		try {
-//		List<ValueSetDefinition> restrictedList= processQuery(query);
-//		List<ValueSetDefinitionDirectoryEntry> results= transformer.transform(restrictedList);
-//		List<ValueSetDefinitionDirectoryEntry> pagedResult = CommonPageUtils.getPage(results, page);
-//        boolean moreResults = results.size() > page.getEnd();
-//		
-//		
-//		
-//		return new DirectoryResult<ValueSetDefinitionDirectoryEntry>(pagedResult,!moreResults);
-//
-//		}catch (Exception ex) {
-//			throw new RuntimeException(ex);
-//		}
-//	}
 
 	@Override
 	public DirectoryResult<ValueSetCatalogEntrySummary> getResourceSummaries(
@@ -148,48 +85,13 @@ LexEvsChangeEventObserver, ValueSetQueryService, InitializingBean {
 		}
 	}
 
-//	@Override
-//	public DirectoryResult<ValueSetCatalogEntryListEntry> getResourceList(
-//			ValueSetQuery query, SortCriteria sortCriteria, Page page) {
-//		List<String> uris = this.definitionServices.listValueSetDefinitionURIs();
-//		
-//		ValueSetDirectoryBuilder<ValueSetCatalogEntryListEntry> builder = 
-//			new ValueSetDirectoryBuilder<ValueSetCatalogEntryListEntry>(
-//					uris, 
-//					this.listCallack, 
-//					null, 
-//					null);
-//		
-//		return builder.
-//				addMaxToReturn(page.getMaxToReturn()).
-//				addStart(page.getStart()).
-//				resolve();
-//	}
+
 	
 
 	@Override
 	public DirectoryResult<ValueSetCatalogEntryListEntry> getResourceList(
 			ValueSetQuery query, SortCriteria sortCriteria, Page page) {
-//		List<String> uris = this.definitionServices.listValueSetDefinitionURIs();
-//		List<ValueSetCatalogEntryListEntry> definitions = new ArrayList<ValueSetCatalogEntryListEntry>();
-//		
-//		for(String uri: uris){
-//			try {
-//			URI u = new URI(uri);
-//			
-//				definitions.add(transformer.transformFullDescription(this.definitionServices.getValueSetDefinition(u, null)));
-//
-//			} catch (LBException e) {
-//				throw new RuntimeException(e);
-//			} catch (URISyntaxException e) {
-//				throw new RuntimeException(e);
-//			}
-//		}
-//			List<ValueSetCatalogEntryListEntry> pagedResult = CommonPageUtils
-//					.getPage(definitions, page);
-//			boolean moreResults = definitions.size() > page.getEnd();
-//			return new DirectoryResult<ValueSetCatalogEntryListEntry>(
-//					pagedResult, !moreResults);
+
 		throw new UnsupportedOperationException();
 	
 	}
@@ -232,12 +134,12 @@ LexEvsChangeEventObserver, ValueSetQueryService, InitializingBean {
 				.getComponentReference();
 		ComponentReference description = StandardModelAttributeReference.RESOURCE_SYNOPSIS
 				.getComponentReference();
-//		ComponentReference about = StandardModelAttributeReference.ABOUT
-//				.getComponentReference();
+		ComponentReference about = StandardModelAttributeReference.ABOUT
+				.getComponentReference();
 //		ComponentReference keyword = StandardModelAttributeReference.KEYWORD
 //				.getComponentReference();
 		return new HashSet<ComponentReference>(Arrays.asList(name,
-				description));
+				description, about));
 	}
 
 	@Override
@@ -292,7 +194,17 @@ LexEvsChangeEventObserver, ValueSetQueryService, InitializingBean {
 	}
 	
 	private List<ValueSetDefinition> getValueSetDefinitions(){
-		return null;
+		List<String> uris = definitionServices.listValueSetDefinitionURIs();
+		List<ValueSetDefinition> definitions = new ArrayList<ValueSetDefinition>();
+		
+		for(String uri: uris){
+			try {
+				definitions.add(definitionServices.getValueSetDefinition(new URI(uri), null));
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			} 
+		}
+		return definitions;
 	}
 	
 	private List<ValueSetDefinition> filterInactive(List<ValueSetDefinition> valuesets){
@@ -316,49 +228,6 @@ LexEvsChangeEventObserver, ValueSetQueryService, InitializingBean {
 		
 	}
 	
-//private class DefinitionCallback<T> implements Callback<List<String>, T> {
-//		
-//		private TransformClosure<T> transformClosure;
-//		
-//		private DefinitionCallback(TransformClosure<T> transformClosure){
-//			super();
-//			this.transformClosure = transformClosure;
-//		}
-//
-//		@Override
-//		public DirectoryResult<T> execute(List<String> state, int start,
-//				int maxResults) {
-//			List<T> returnList = new ArrayList<T>();
-//
-//			int counter = 0;
-//			for(String uri : state){ 
-//				if(counter >= start && returnList.size() < maxResults){
-//					org.LexGrid.valueSets.ValueSetDefinition definition;
-//					try {
-//						definition = definitionServices.getValueSetDefinition(new URI(uri), null);
-//					} catch (Exception e) {
-//						throw new RuntimeException(e);
-//					}
-//					
-//					returnList.add(this.transformClosure.transform(definition));
-//				}
-//				
-//				counter++;
-//			}
-//			
-//			return 
-//				new DirectoryResult<T>(
-//						returnList, 
-//						start + maxResults > state.size());
-//		}
-//
-//		@Override
-//		public int executeCount(List<String> state) {
-//			return state.size();
-//		}
-//		
-//
-//	}
 	
 	private String getKey(String uri, String name){
 		return uri + name;

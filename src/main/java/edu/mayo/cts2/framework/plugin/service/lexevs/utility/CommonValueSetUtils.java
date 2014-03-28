@@ -15,6 +15,7 @@ import org.LexGrid.commonTypes.PropertyQualifier;
 import org.LexGrid.valueSets.ValueSetDefinition;
 import org.lexgrid.valuesets.LexEVSValueSetDefinitionServices;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.event.LexEvsChangeEventObserver;
@@ -22,6 +23,7 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ValueSetNameTranslat
 import edu.mayo.cts2.framework.service.command.restriction.ValueSetQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.profile.valueset.ValueSetQuery;
 
+@Component
 public class CommonValueSetUtils implements InitializingBean,
 		LexEvsChangeEventObserver {
 	
@@ -44,15 +46,11 @@ public class CommonValueSetUtils implements InitializingBean,
 			List<ValueSetDefinition> lexValueSets, ValueSetQuery query)
 			throws LBException {
 		List<ValueSetDefinition> temp = new ArrayList<ValueSetDefinition>();
-		List<ValueSetDefinition> inValueSets = new ArrayList<ValueSetDefinition>();
 		if (query == null
 				|| query.getRestrictions() == null) {
 			return lexValueSets;
 		}
-//		ValueSetQueryServiceRestrictions restrictions = query
-//				.getRestrictions();
-
-		temp= filterOnCodingSchemes(inValueSets, query.getRestrictions().getCodesystem());
+		temp= filterOnCodingSchemes(lexValueSets, query.getRestrictions().getCodesystem());
 		return temp;
 	}
 

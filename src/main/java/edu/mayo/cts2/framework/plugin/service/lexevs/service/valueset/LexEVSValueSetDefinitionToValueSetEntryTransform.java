@@ -1,27 +1,23 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.valueset;
 
-import java.util.List;
-
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.valueSets.ValueSetDefinition;
 import org.lexgrid.valuesets.LexEVSValueSetDefinitionServices;
+import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.model.core.EntryDescription;
-import edu.mayo.cts2.framework.model.core.ResourceVersionDescriptionDirectoryEntry;
 import edu.mayo.cts2.framework.model.core.ValueSetDefinitionReference;
-import edu.mayo.cts2.framework.model.core.ValueSetReference;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
-import edu.mayo.cts2.framework.model.valueset.ValueSetCatalogEntry;
 import edu.mayo.cts2.framework.model.valueset.ValueSetCatalogEntryListEntry;
 import edu.mayo.cts2.framework.model.valueset.ValueSetCatalogEntrySummary;
-import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinitionDirectoryEntry;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ValueSetNamePair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ValueSetNameTranslator;
 import edu.mayo.cts2.framework.plugin.service.lexevs.transform.AbstractBaseTransform;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
 
+@Component
 public class LexEVSValueSetDefinitionToValueSetEntryTransform
 		extends
 		AbstractBaseTransform<ValueSetCatalogEntryListEntry, 
@@ -47,11 +43,6 @@ public class LexEVSValueSetDefinitionToValueSetEntryTransform
 	@Override
 	public ValueSetCatalogEntryListEntry transformFullDescription(
 			ValueSetDefinition data) {
-		
-//		ValueSetCatalogEntryListEntry vsCatEntry = new ValueSetCatalogEntryListEntry();
-//		ValueSetCatalogEntry entry = new ValueSetCatalogEntry();
-//
-//		vsCatEntry.setEntry(entry);
 
 		throw new UnsupportedOperationException();
 
@@ -83,7 +74,6 @@ public class LexEVSValueSetDefinitionToValueSetEntryTransform
 		vsdReference = this.getTransformUtils().toValueSetDefinitionReference(
 				data.getValueSetDefinitionName(),
 				data.getValueSetDefinitionURI());
-		;
 		vsCatEntry.setCurrentDefinition(vsdReference);
 		vsCatEntry.setResourceName(data.getValueSetDefinitionName());
 
