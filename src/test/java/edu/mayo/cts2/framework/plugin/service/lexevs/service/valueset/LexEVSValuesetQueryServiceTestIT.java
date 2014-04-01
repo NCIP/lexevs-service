@@ -1,3 +1,11 @@
+/*
+* Copyright: (c) Mayo Foundation for Medical Education and
+* Research (MFMER). All rights reserved. MAYO, MAYO CLINIC, and the
+* triple-shield Mayo logo are trademarks and service marks of MFMER.
+*
+* Distributed under the OSI-approved BSD 3-Clause License.
+* See http://ncip.github.com/lexevs-service/LICENSE.txt for details.
+*/
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.valueset;
 
 import static org.junit.Assert.assertEquals;
@@ -34,6 +42,10 @@ import edu.mayo.cts2.framework.service.command.restriction.ValueSetQueryServiceR
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 
+/**
+ * @author <a href="mailto:scott.bauer@mayo.edu">Scott Bauer</a>
+ *
+ */
 @LoadContents({
 	@LoadContent(contentPath = "lexevs/test-content/valueset/vdTestData.xml") })
 public class LexEVSValuesetQueryServiceTestIT extends AbstractTestITBase {

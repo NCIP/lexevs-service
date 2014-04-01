@@ -1,7 +1,14 @@
+/*
+* Copyright: (c) Mayo Foundation for Medical Education and
+* Research (MFMER). All rights reserved. MAYO, MAYO CLINIC, and the
+* triple-shield Mayo logo are trademarks and service marks of MFMER.
+*
+* Distributed under the OSI-approved BSD 3-Clause License.
+* See http://ncip.github.com/lexevs-service/LICENSE.txt for details.
+*/
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.valueset;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -11,18 +18,14 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.Exceptions.LBException;
-import org.LexGrid.codingSchemes.CodingScheme;
 import org.LexGrid.valueSets.ValueSetDefinition;
 import org.lexgrid.valuesets.LexEVSValueSetDefinitionServices;
-import org.lexgrid.valuesets.impl.LexEVSValueSetDefinitionServicesImpl;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
-import edu.mayo.cts2.framework.filter.directory.AbstractStateBuildingDirectoryBuilder.Callback;
 import edu.mayo.cts2.framework.filter.match.ContainsMatcher;
 import edu.mayo.cts2.framework.filter.match.ExactMatcher;
 import edu.mayo.cts2.framework.filter.match.ResolvableMatchAlgorithmReference;
-import edu.mayo.cts2.framework.filter.match.StartsWithMatcher;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.core.ComponentReference;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
@@ -32,8 +35,6 @@ import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.valueset.ValueSetCatalogEntryListEntry;
 import edu.mayo.cts2.framework.model.valueset.ValueSetCatalogEntrySummary;
-import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSetDirectoryEntry;
-import edu.mayo.cts2.framework.model.valuesetdefinition.ValueSetDefinitionDirectoryEntry;
 import edu.mayo.cts2.framework.plugin.service.lexevs.event.LexEvsChangeEventObserver;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonPageUtils;
@@ -41,10 +42,13 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterU
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonValueSetUtils;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
-import edu.mayo.cts2.framework.service.profile.resolvedvalueset.ResolvedValueSetQuery;
 import edu.mayo.cts2.framework.service.profile.valueset.ValueSetQuery;
 import edu.mayo.cts2.framework.service.profile.valueset.ValueSetQueryService;
 
+/**
+ * @author <a href="mailto:scott.bauer@mayo.edu">Scott Bauer</a>
+ *
+ */
 @Component
 public class LexEVSValueSetQueryService extends AbstractLexEvsService implements
 LexEvsChangeEventObserver, ValueSetQueryService, InitializingBean {
@@ -52,13 +56,11 @@ LexEvsChangeEventObserver, ValueSetQueryService, InitializingBean {
 	@Resource 
 	private CommonValueSetUtils valueSetUtils;
 	
-	
-	//Probably don't need this
 	@Resource
 	private LexEVSValueSetDefinitionServices definitionServices;
 	
 	@Resource
-	private LexEVSValueSetDefinitionToValueSetEntryTransform transformer;
+	private ValueSetTransform transformer;
 	
 	private Object mutex = new Object();
 
@@ -120,11 +122,6 @@ LexEvsChangeEventObserver, ValueSetQueryService, InitializingBean {
 		returnSet.add(ResolvableMatchAlgorithmReference
 				.toResolvableMatchAlgorithmReference(contains,
 						new ContainsMatcher()));
-//		MatchAlgorithmReference startsWith = StandardMatchAlgorithmReference.STARTS_WITH
-//				.getMatchAlgorithmReference();
-//		returnSet.add(ResolvableMatchAlgorithmReference
-//				.toResolvableMatchAlgorithmReference(startsWith,
-//						new StartsWithMatcher()));
 		return returnSet;
 	}
 
@@ -136,25 +133,23 @@ LexEvsChangeEventObserver, ValueSetQueryService, InitializingBean {
 				.getComponentReference();
 		ComponentReference about = StandardModelAttributeReference.ABOUT
 				.getComponentReference();
-//		ComponentReference keyword = StandardModelAttributeReference.KEYWORD
-//				.getComponentReference();
 		return new HashSet<ComponentReference>(Arrays.asList(name,
 				description, about));
 	}
 
 	@Override
 	public Set<? extends ComponentReference> getSupportedSortReferences() {
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Set<PredicateReference> getKnownProperties() {
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public List<DocumentedNamespaceReference> getKnownNamespaceList() {
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -231,7 +226,6 @@ LexEvsChangeEventObserver, ValueSetQueryService, InitializingBean {
 	
 	private String getKey(String uri, String name){
 		return uri + name;
-		//TODO Update to value set definition key of some kind
 }
 
 

@@ -1,3 +1,11 @@
+/*
+* Copyright: (c) Mayo Foundation for Medical Education and
+* Research (MFMER). All rights reserved. MAYO, MAYO CLINIC, and the
+* triple-shield Mayo logo are trademarks and service marks of MFMER.
+*
+* Distributed under the OSI-approved BSD 3-Clause License.
+* See http://ncip.github.com/lexevs-service/LICENSE.txt for details.
+*/
 package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
 
 import java.net.URI;
@@ -10,29 +18,24 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.Exceptions.LBException;
-import org.LexGrid.commonTypes.Property;
-import org.LexGrid.commonTypes.PropertyQualifier;
 import org.LexGrid.valueSets.ValueSetDefinition;
 import org.lexgrid.valuesets.LexEVSValueSetDefinitionServices;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
-import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.event.LexEvsChangeEventObserver;
-import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ValueSetNameTranslator;
-import edu.mayo.cts2.framework.service.command.restriction.ValueSetQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.profile.valueset.ValueSetQuery;
 
+/**
+ * @author <a href="mailto:scott.bauer@mayo.edu">Scott Bauer</a>
+ *
+ */
 @Component
 public class CommonValueSetUtils implements InitializingBean,
 		LexEvsChangeEventObserver {
 	
 	@Resource
 	private LexEVSValueSetDefinitionServices definitionServices;
-	
-	//Not sure I need this either
-	@Resource
-	private ValueSetNameTranslator valueSetNameTranslator;
 	
 	private Set<UriNamePair> valueSets = new HashSet<UriNamePair>();
 	
@@ -42,6 +45,12 @@ public class CommonValueSetUtils implements InitializingBean,
 		super();
 	}
 	
+	/**
+	 * @param lexValueSets
+	 * @param query
+	 * @return
+	 * @throws LBException
+	 */
 	public List<ValueSetDefinition> restrictByQuery(
 			List<ValueSetDefinition> lexValueSets, ValueSetQuery query)
 			throws LBException {
@@ -54,6 +63,11 @@ public class CommonValueSetUtils implements InitializingBean,
 		return temp;
 	}
 
+	/**
+	 * @param lexValueSets
+	 * @param list
+	 * @return
+	 */
 	private List<ValueSetDefinition> filterOnCodingSchemes(
 			List<ValueSetDefinition> lexValueSets,
 			List<String> list) {
@@ -67,6 +81,11 @@ public class CommonValueSetUtils implements InitializingBean,
 		return temp;
 	}
 
+	/**
+	 * @param vsd
+	 * @param list
+	 * @return
+	 */
 	private boolean matchesAbsoluteCodingSchemeVersionReferences(
 			ValueSetDefinition vsd,
 			List<String> list) {
@@ -83,12 +102,18 @@ public class CommonValueSetUtils implements InitializingBean,
 	}
 
 
+	/* (non-Javadoc)
+	 * @see edu.mayo.cts2.framework.plugin.service.lexevs.event.LexEvsChangeEventObserver#onChange()
+	 */
 	@Override
 	public void onChange() {
 		this.buildValueSetCache();
 
 	}
 
+	/**
+	 * Prebuild a cache of value set identifiers.
+	 */
 	private void buildValueSetCache() {
 		synchronized(this.mutex){
 			this.valueSets.clear();
@@ -111,6 +136,10 @@ public class CommonValueSetUtils implements InitializingBean,
 		}
 	}
 
+	/**
+	 * @author <a href="mailto:scott.bauer@mayo.edu">Scott Bauer</a>
+	 *
+	 */
 	public static class UriNamePair {
 		private String uri;
 		private String name;
@@ -153,6 +182,10 @@ public class CommonValueSetUtils implements InitializingBean,
 			return true;
 		}	
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		this.buildValueSetCache();
