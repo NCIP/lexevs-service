@@ -76,6 +76,8 @@ public class LexEvsEntityReadServiceTestIT extends
 		assertNotNull(namedEntityDescription.getAbout());
 		ScopedEntityName scopedEntityName2 = namedEntityDescription.getEntityID();
 		assertNotNull(scopedEntityName2);
+		assertEquals("lexgrid.org", entityDescription.getNamedEntity().getDesignation(0).getAssertedInCodeSystemVersion());
+		assertEquals("en", entityDescription.getNamedEntity().getDesignation(0).getLanguage().getContent());
 		assertEquals("005",scopedEntityName2.getName());
 		assertEquals("Automobiles",scopedEntityName2.getNamespace());
 	}	

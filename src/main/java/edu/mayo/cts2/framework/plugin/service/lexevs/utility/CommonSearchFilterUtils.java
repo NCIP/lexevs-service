@@ -234,14 +234,16 @@ public final class CommonSearchFilterUtils {
 			if(lexValueSet == null){
 				return sourceValue;
 			}
+
 			if (cts2SearchAttribute.equals(Constants.ATTRIBUTE_NAME_ABOUT)) {
 				sourceValue = lexValueSet.getValueSetDefinitionURI();
 			} else if (cts2SearchAttribute.equals(Constants.ATTRIBUTE_NAME_RESOURCE_SYNOPSIS)) {
-				sourceValue = lexValueSet.getEntityDescription().getContent();
+				sourceValue = lexValueSet.getValueSetDefinitionName();
 			} else if (cts2SearchAttribute.equals(Constants.ATTRIBUTE_NAME_RESOURCE_NAME)) {
 				sourceValue = 
 						lexValueSet.getValueSetDefinitionName();
 			}
+			
 			return sourceValue;
 	}
 

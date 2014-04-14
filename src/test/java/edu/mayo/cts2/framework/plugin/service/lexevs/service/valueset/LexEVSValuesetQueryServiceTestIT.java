@@ -13,7 +13,6 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -30,14 +29,9 @@ import edu.mayo.cts2.framework.core.xml.DelegatingMarshaller;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
-import edu.mayo.cts2.framework.model.service.core.NameOrURI;
-import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.model.valueset.ValueSetCatalogEntrySummary;
-import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSetDirectoryEntry;
-import edu.mayo.cts2.framework.plugin.service.lexevs.service.resolvedvalueset.ResolvedValueSetQueryImpl;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonTestUtils;
-import edu.mayo.cts2.framework.service.command.restriction.ResolvedValueSetQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.command.restriction.ValueSetQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
@@ -140,6 +134,29 @@ public class LexEVSValuesetQueryServiceTestIT extends AbstractTestITBase {
 		assertEquals("Expecting " + expecting + " but got " + actual,
 				expecting, actual);
 	}
+	
+	// -------------------------
+	// Count with valid filters
+	// -------------------------
+	@Test
+	public void testGetCountWithValidFilterOnResourceSynopsis() throws Exception {
+		// Build query using filters
+		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(
+				StandardModelAttributeReference.RESOURCE_SYNOPSIS
+						.getComponentReference(),
+				StandardMatchAlgorithmReference.CONTAINS
+						.getMatchAlgorithmReference(), "All");
+
+		// Build query using filters
+		ValueSetQueryImpl query = new ValueSetQueryImpl(null,
+				filter, null, null);
+
+		int expecting = 4;
+		int actual = this.service.count(query);
+		assertEquals("Expecting " + expecting + " but got " + actual,
+				expecting, actual);
+	}
+	
 	
 	@Test
 	public void testSummariesValidXml() throws Exception {
