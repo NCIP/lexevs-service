@@ -6,7 +6,7 @@
                   <map>
                         <entry key="APPLICATION_SERVICE_BEAN" value-ref="LexEVSApplicationService"/>
                         <entry key="AUTHENTICATION_SERVICE_BEAN" value-ref="EvsAuthenticationProvider"/>
-                        <entry key="APPLICATION_SERVICE_URL" value="http://localhost:8080/lexevsapi60/http/applicationService"/>
+                        <entry key="APPLICATION_SERVICE_URL" value="http://lexevsapi61.nci.nih.gov/lexevsapi61/http/applicationService"/>
                         <entry key="APPLICATION_SERVICE_CONFIG" value-ref="LexEVSApplicationServiceConfig"/>
                   </map>
             </constructor-arg>
@@ -38,7 +38,7 @@
       </bean>     
       
        <bean id="AppService" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean" singleton="false">
-            <property name="serviceUrl" value="http://localhost:8080/lexevsapi60/http/applicationService"/>
+            <property name="serviceUrl" value="http://lexevsapi61.nci.nih.gov/lexevsapi61/http/applicationService"/>
             <property name="serviceInterface" value="org.LexGrid.LexBIG.caCore.interfaces.LexEVSApplicationService"/>
             <property name="httpInvokerRequestExecutor">
                  <bean class="org.LexGrid.LexBIG.caCore.client.proxy.ProxyUnwrappingHttpInvokerRequestExecutor">
@@ -50,7 +50,7 @@
       <bean id="EvsAuthenticationProvider" class="org.acegisecurity.providers.rcp.RemoteAuthenticationProvider">
             <property name="remoteAuthenticationManager">
                   <bean class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean">
-                      <property name="serviceUrl" value="http://localhost:8080/lexevsapi60/http/applicationService"/>
+                      <property name="serviceUrl" value="http://lexevsapi61.nci.nih.gov/lexevsapi61/http/applicationService"/>
                       <property name="serviceInterface" value="org.acegisecurity.providers.rcp.RemoteAuthenticationManager"/>
                   </bean>
             </property>

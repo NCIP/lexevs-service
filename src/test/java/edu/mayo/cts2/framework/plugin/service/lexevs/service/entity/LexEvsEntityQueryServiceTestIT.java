@@ -154,7 +154,7 @@ public class LexEvsEntityQueryServiceTestIT
 		// ------------
 //		Set<ResolvedFilter> filters = CommonTestUtils.createFilterSet(StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference(),, "Jaguar")
 		EntityDescriptionQuery query = CommonTestUtils.createQuery("startsWith", "Jaguar", "Automobiles-1.0", 
-			StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference());	
+			StandardModelAttributeReference.RESOURCE_SYNOPSIS.getComponentReference());	
 				
 		// Call getResourceSummaries from service
 		// --------------------------------------

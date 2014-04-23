@@ -169,7 +169,7 @@ public class LexEVSResolvedValuesetQueryServiceTestIT extends
 	public void testGetCountWithValidFilterOnAbout() throws Exception {
 		// Build query using filters
 		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(
-				StandardModelAttributeReference.ABOUT.getPropertyReference(),
+				StandardModelAttributeReference.ABOUT.getComponentReference(),
 				StandardMatchAlgorithmReference.CONTAINS
 						.getMatchAlgorithmReference(),
 				"SRITEST:AUTO:AllDomesticButGM");
@@ -192,7 +192,7 @@ public class LexEVSResolvedValuesetQueryServiceTestIT extends
 		// Build query using filters
 		Set<ResolvedFilter> filter = CommonTestUtils.createFilterSet(
 				StandardModelAttributeReference.RESOURCE_NAME
-						.getPropertyReference(),
+						.getComponentReference(),
 				StandardMatchAlgorithmReference.CONTAINS
 						.getMatchAlgorithmReference(), "All");
 

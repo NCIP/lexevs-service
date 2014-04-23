@@ -63,6 +63,12 @@ public class LexEvsMapVersionQueryServiceTest {
 			public String translateToLexGrid(String name) {
 				return name;
 			}
+
+			@Override
+			public String translateLexGridURIToLexGrid(String uri) {
+				// TODO Auto-generated method stub
+				return null;
+			}
 	
 		}));
 		
@@ -98,6 +104,13 @@ public class LexEvsMapVersionQueryServiceTest {
 			public String translateToLexGrid(String name) {
 				return name;
 			}
+
+			@Override
+			public String translateLexGridURIToLexGrid(String uri) {
+				return uri;
+			}
+			
+			
 	
 		}));
 		service.setCodingSchemeToMapVersionTransform(transform);
@@ -165,7 +178,7 @@ public class LexEvsMapVersionQueryServiceTest {
 	// Count with All VALID Default filters
 	// -------------------------------------
 	@Test
-	public void testCount_FilterDefault_PropertyReferencesValidIndex_AllSchemes() throws Exception {
+	public void testCount_FilterDefault_ComponentReferencesValidIndex_AllSchemes() throws Exception {
 		FakeLexEvsSystem<MapVersion, MapVersionDirectoryEntry, MapVersionQuery, LexEvsMapVersionQueryService> fakeLexEvs;
 		fakeLexEvs = new FakeLexEvsSystem<MapVersion, MapVersionDirectoryEntry, MapVersionQuery, LexEvsMapVersionQueryService>();
 		LexEvsMapVersionQueryService service = this.createService(fakeLexEvs, true); 
@@ -180,7 +193,7 @@ public class LexEvsMapVersionQueryServiceTest {
 	// Count with VALID values with one MISMATCHED
 	// --------------------------------------------
 	@Test
-	public void testCount_FilterDefault_PropertyReferencesWrongIndex_AllSchemes() throws Exception {
+	public void testCount_FilterDefault_ComponentReferencesWrongIndex_AllSchemes() throws Exception {
 		FakeLexEvsSystem<MapVersion, MapVersionDirectoryEntry, MapVersionQuery, LexEvsMapVersionQueryService> fakeLexEvs;
 		fakeLexEvs = new FakeLexEvsSystem<MapVersion, MapVersionDirectoryEntry, MapVersionQuery, LexEvsMapVersionQueryService>();
 		LexEvsMapVersionQueryService service = this.createService(fakeLexEvs, true); 
@@ -230,7 +243,7 @@ public class LexEvsMapVersionQueryServiceTest {
 	
 	@Test
 	@Ignore
-	public void testGetResourceSummaries_DeepCompare_PropertyReferences_MatchingAlgorithms_Pages_CodindgSchemes_Substrings() throws Exception {
+	public void testGetResourceSummaries_DeepCompare_ComponentReferences_MatchingAlgorithms_Pages_CodindgSchemes_Substrings() throws Exception {
 		Page page = new Page();		
 		FakeLexEvsSystem<MapVersion, MapVersionDirectoryEntry, MapVersionQuery, LexEvsMapVersionQueryService> fakeLexEvs;
 		fakeLexEvs = new FakeLexEvsSystem<MapVersion, MapVersionDirectoryEntry, MapVersionQuery, LexEvsMapVersionQueryService>();
@@ -243,7 +256,7 @@ public class LexEvsMapVersionQueryServiceTest {
 		MapVersionQueryImpl query = new MapVersionQueryImpl(null, filters, null, null);
 		DirectoryResult<MapVersionDirectoryEntry> directoryResult = null; 
 		
-		fakeLexEvs.executeGetResourceSummariesWithDeepComparisonForEachPropertyReference(service, directoryResult, query, CODE_SYSTEM_NAME, page, lastPage);		
+		fakeLexEvs.executeGetResourceSummariesWithDeepComparisonForEachComponentReference(service, directoryResult, query, CODE_SYSTEM_NAME, page, lastPage);		
 	}
 
 }

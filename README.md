@@ -116,6 +116,8 @@ $USER_HOME
 
 Install the resulting WAR file in ```target/``` to the ```webapps/``` directory of a Tomcat installation.
 
+Normally Tomcat will need to be started with JVM options set for increased heap size and permgen size:
+CATALINA_OPTS="-Xmx2048m -XX:MaxPermSize=128m
 
 ### You will find more details in the following links:
 * [LexEVS Home](https://tracker.nci.nih.gov/browse/LEXEVS)

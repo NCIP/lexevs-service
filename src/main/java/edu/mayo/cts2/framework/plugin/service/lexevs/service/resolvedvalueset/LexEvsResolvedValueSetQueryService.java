@@ -31,7 +31,7 @@ import edu.mayo.cts2.framework.filter.match.StartsWithMatcher;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
-import edu.mayo.cts2.framework.model.core.PropertyReference;
+import edu.mayo.cts2.framework.model.core.ComponentReference;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
@@ -87,18 +87,18 @@ public class LexEvsResolvedValueSetQueryService extends AbstractLexEvsService
 	}
 
 	@Override
-	public Set<? extends PropertyReference> getSupportedSearchReferences() {
-		PropertyReference name = StandardModelAttributeReference.RESOURCE_NAME
-				.getPropertyReference();
-		PropertyReference description = StandardModelAttributeReference.RESOURCE_SYNOPSIS
-				.getPropertyReference();
-		return new HashSet<PropertyReference>(Arrays.asList(name,
+	public Set<? extends ComponentReference> getSupportedSearchReferences() {
+		ComponentReference name = StandardModelAttributeReference.RESOURCE_NAME
+				.getComponentReference();
+		ComponentReference description = StandardModelAttributeReference.RESOURCE_SYNOPSIS
+				.getComponentReference();
+		return new HashSet<ComponentReference>(Arrays.asList(name,
 				description));
 
 	}
 
 	@Override
-	public Set<? extends PropertyReference> getSupportedSortReferences() {
+	public Set<? extends ComponentReference> getSupportedSortReferences() {
 		return null;
 	}
 

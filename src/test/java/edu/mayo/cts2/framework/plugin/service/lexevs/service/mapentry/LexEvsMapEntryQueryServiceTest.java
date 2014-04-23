@@ -127,7 +127,7 @@ public class LexEvsMapEntryQueryServiceTest {
 	// -------------------------------------
 	@Test
 	@Ignore
-	public void testCount_FilterDefault_PropertyReferencesValidIndex_AllSchemes() throws Exception {
+	public void testCount_FilterDefault_ComponentReferencesValidIndex_AllSchemes() throws Exception {
 		FakeLexEvsSystem<MapEntry, MapEntryDirectoryEntry, MapEntryQuery, LexEvsMapEntryQueryService> fakeLexEvs;
 		fakeLexEvs = new FakeLexEvsSystem<MapEntry, MapEntryDirectoryEntry, MapEntryQuery, LexEvsMapEntryQueryService>();
 		LexEvsMapEntryQueryService service = this.createService(fakeLexEvs, true); 
@@ -142,7 +142,7 @@ public class LexEvsMapEntryQueryServiceTest {
 	// Count with VALID values with one MISMATCHED
 	// --------------------------------------------
 	@Test
-	public void testCount_FilterDefault_PropertyReferencesWrongIndex_AllSchemes() throws Exception {
+	public void testCount_FilterDefault_ComponentReferencesWrongIndex_AllSchemes() throws Exception {
 		FakeLexEvsSystem<MapEntry, MapEntryDirectoryEntry, MapEntryQuery, LexEvsMapEntryQueryService> fakeLexEvs;
 		fakeLexEvs = new FakeLexEvsSystem<MapEntry, MapEntryDirectoryEntry, MapEntryQuery, LexEvsMapEntryQueryService>();
 		LexEvsMapEntryQueryService service = this.createService(fakeLexEvs, true); 
@@ -192,7 +192,7 @@ public class LexEvsMapEntryQueryServiceTest {
 	}
 	
 	@Test
-	public void testGetResourceSummaries_DeepCompare_PropertyReferences_MatchingAlgorithms_Pages_CodindgSchemes_Substrings() throws Exception {
+	public void testGetResourceSummaries_DeepCompare_ComponentReferences_MatchingAlgorithms_Pages_CodindgSchemes_Substrings() throws Exception {
 		Page page = new Page();		
 		FakeLexEvsSystem<MapEntry, MapEntryDirectoryEntry, MapEntryQuery, LexEvsMapEntryQueryService> fakeLexEvs;
 		fakeLexEvs = new FakeLexEvsSystem<MapEntry, MapEntryDirectoryEntry, MapEntryQuery, LexEvsMapEntryQueryService>();
@@ -205,7 +205,7 @@ public class LexEvsMapEntryQueryServiceTest {
 		MapEntryQueryImpl query = new MapEntryQueryImpl(null, filters, null, null);
 		DirectoryResult<MapEntryDirectoryEntry> directoryResult = null; 
 		
-		fakeLexEvs.executeGetResourceSummariesWithDeepComparisonForEachPropertyReference(service, directoryResult, query, CODE_SYSTEM_NAME, page, lastPage);		
+		fakeLexEvs.executeGetResourceSummariesWithDeepComparisonForEachComponentReference(service, directoryResult, query, CODE_SYSTEM_NAME, page, lastPage);		
 	}
 
 }

@@ -23,7 +23,7 @@ import edu.mayo.cts2.framework.core.url.UrlConstructor;
 import edu.mayo.cts2.framework.model.core.CodeSystemReference;
 import edu.mayo.cts2.framework.model.core.CodeSystemVersionReference;
 import edu.mayo.cts2.framework.model.core.DescriptionInCodeSystem;
-import edu.mayo.cts2.framework.model.core.EntitySynopsis;
+import edu.mayo.cts2.framework.model.core.URIAndEntityName;
 import edu.mayo.cts2.framework.model.core.NameAndMeaningReference;
 import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.core.ValueSetDefinitionReference;
@@ -31,6 +31,7 @@ import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSetDirectoryEntry;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSetHeader;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodingSchemeNameTranslator;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ResolvedValueSetNameTranslator;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ResolvedValueSetNameTriple;
 import edu.mayo.cts2.framework.plugin.service.lexevs.transform.TransformUtils;
@@ -54,6 +55,9 @@ public class ResolvedCodingSchemeTransform {
 	
 	@Resource
 	private TransformUtils transformUtils;
+	
+	@Resource
+	private CodingSchemeNameTranslator codingSchemeNameTranslator;
 
 	List<ResolvedValueSetDirectoryEntry> transform(List<CodingScheme> listcs) {
 		List<ResolvedValueSetDirectoryEntry> rvsde_list = new ArrayList<ResolvedValueSetDirectoryEntry>();
@@ -115,22 +119,24 @@ public class ResolvedCodingSchemeTransform {
 					}
 				}
 
+				String lexSchemeName = codingSchemeNameTranslator.translateLexGridURIToLexGrid(uri);
 				CodeSystemVersionReference csvr = new CodeSystemVersionReference();
 				CodeSystemReference csr = new CodeSystemReference();
 				csr.setUri(uri);
-				csr.setContent(uri);
+				csr.setContent(lexSchemeName);
 				csvr.setCodeSystem(csr);
 				
 				NameAndMeaningReference versionRef = new NameAndMeaningReference();
-				versionRef.setContent(version);
+				versionRef.setContent(lexSchemeName + "-" + version);
 				csvr.setVersion(versionRef);
+				list.add(csvr);
 			}
 		}
 		return list;
 	}
 
-	EntitySynopsis transform(EntityDirectoryEntry entry) {
-		EntitySynopsis synopsis = new EntitySynopsis();
+	URIAndEntityName transform(EntityDirectoryEntry entry) {
+		URIAndEntityName synopsis = new URIAndEntityName();
 		ScopedEntityName scopedEntity = entry.getName();
 		if (scopedEntity != null) {
 			synopsis.setName(scopedEntity.getName());
@@ -146,11 +152,11 @@ public class ResolvedCodingSchemeTransform {
 		return synopsis;
 	}
 
-	List<EntitySynopsis> transform(DirectoryResult<EntityDirectoryEntry> data) {
-		List<EntitySynopsis> list = new ArrayList<EntitySynopsis>();
+	List<URIAndEntityName> transform(DirectoryResult<EntityDirectoryEntry> data) {
+		List<URIAndEntityName> list = new ArrayList<URIAndEntityName>();
 		if (data != null) {
 			for (EntityDirectoryEntry entry : data.getEntries()) {
-				EntitySynopsis synopsis = transform(entry);
+				URIAndEntityName synopsis = transform(entry);
 				list.add(synopsis);
 			}
 		}

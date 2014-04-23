@@ -9,7 +9,9 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.naming;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -95,6 +97,19 @@ public class DefaultValueSetNameTranslator
 			
 			return null;
 		}
+	}
+	
+	public String getRegularValueSetCurrentDefinition(String valueSetName){
+		try {
+			List<String> vsdURIs = lexEVSValueSetDefinitionServices.listValueSetDefinitions(valueSetName);
+			if(vsdURIs.size() >= 1){
+				//returning the last in the list -- not sure if it matters
+				return vsdURIs.get(vsdURIs.size() - 1);
+			}
+		} catch (LBException e) {
+			throw new RuntimeException(e);
+		}
+		return null;
 	}
 
 	@Override

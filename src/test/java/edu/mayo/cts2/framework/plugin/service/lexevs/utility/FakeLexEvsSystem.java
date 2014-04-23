@@ -28,7 +28,7 @@ import org.easymock.IAnswer;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
-import edu.mayo.cts2.framework.model.core.PropertyReference;
+import edu.mayo.cts2.framework.model.core.ComponentReference;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.FakeLexEvsData.DataField;
@@ -85,7 +85,7 @@ public class FakeLexEvsSystem <DescriptionTemplate, EntryTemplate, QueryTemplate
 			CodingSchemeSummary codingSchemeSummary = new CodingSchemeSummary();
 
 			if (withData) {
-				for (PropertyReference property : service
+				for (ComponentReference property : service
 						.getSupportedSearchReferences()) {
 					fakeData.setProperty(codingSchemeSummary, schemeIndex,
 							property);
@@ -242,9 +242,9 @@ public class FakeLexEvsSystem <DescriptionTemplate, EntryTemplate, QueryTemplate
 			synopsisIndex = resourceSynopsisValid ? schemeIndex	: ((schemeIndex + 1) % schemeCount);
 			nameIndex = resourceNameValid ? schemeIndex	: ((schemeIndex + 1) % schemeCount);
 
-			aboutValue = fakeData.getScheme_DataField(aboutIndex, StandardModelAttributeReference.ABOUT.getPropertyReference());
-			synopsisValue = fakeData.getScheme_DataField(synopsisIndex, StandardModelAttributeReference.RESOURCE_SYNOPSIS.getPropertyReference());
-			nameValue = fakeData.getScheme_DataField(nameIndex, StandardModelAttributeReference.RESOURCE_NAME.getPropertyReference());
+			aboutValue = fakeData.getScheme_DataField(aboutIndex, StandardModelAttributeReference.ABOUT.getComponentReference());
+			synopsisValue = fakeData.getScheme_DataField(synopsisIndex, StandardModelAttributeReference.RESOURCE_SYNOPSIS.getComponentReference());
+			nameValue = fakeData.getScheme_DataField(nameIndex, StandardModelAttributeReference.RESOURCE_NAME.getComponentReference());
 
 			filters = CommonTestUtils.createFilterSet(aboutValue,
 					synopsisValue, nameValue);
@@ -276,7 +276,7 @@ public class FakeLexEvsSystem <DescriptionTemplate, EntryTemplate, QueryTemplate
 
 			// Enter filters into query
 			Set<ResolvedFilter> filters = CommonTestUtils.createFilterSet(
-					dataField.propertyReference(), matchAlgorithmReference,
+					dataField.componentReference(), matchAlgorithmReference,
 					testValue);
 			for (ResolvedFilter filter : filters) {
 				query.getFilterComponent().add(filter);
@@ -305,7 +305,7 @@ public class FakeLexEvsSystem <DescriptionTemplate, EntryTemplate, QueryTemplate
 		}
 	}
 
-	public void executeGetResourceSummariesWithDeepComparisonForEachPropertyReference(
+	public void executeGetResourceSummariesWithDeepComparisonForEachComponentReference(
 			Service service, DirectoryResult<EntryTemplate> directoryResult,
 			QueryTemplate query, 
 			String codeSystemRestriction,
@@ -385,7 +385,7 @@ public class FakeLexEvsSystem <DescriptionTemplate, EntryTemplate, QueryTemplate
 		for (int start = 0; start < testValue.length(); start++) {
 			for (int end = start; end < testValue.length(); end++) {
 				testValue = testValue.substring(start, end);
-				Set<ResolvedFilter> filters = CommonTestUtils.createFilterSet(dataField.propertyReference(), matchAlgorithmReference, testValue);
+				Set<ResolvedFilter> filters = CommonTestUtils.createFilterSet(dataField.componentReference(), matchAlgorithmReference, testValue);
 				for (ResolvedFilter filter : filters) {
 					query.getFilterComponent().add(filter);
 				}
@@ -435,7 +435,7 @@ public class FakeLexEvsSystem <DescriptionTemplate, EntryTemplate, QueryTemplate
 		}
 	}
 
-	public void executeGetResourceListWithDeepComparisonForEachPropertyReference(
+	public void executeGetResourceListWithDeepComparisonForEachComponentReference(
 			Service service, DirectoryResult<DescriptionTemplate> directoryResult,
 			QueryTemplate query, 
 			String codeSystemRestriction,
@@ -516,7 +516,7 @@ public class FakeLexEvsSystem <DescriptionTemplate, EntryTemplate, QueryTemplate
 			for (int end = start; end < testValue.length(); end++) {
 				testValue = testValue.substring(start, end);
 				Set<ResolvedFilter> filters = CommonTestUtils.createFilterSet(
-						dataField.propertyReference(), matchAlgorithmReference,
+						dataField.componentReference(), matchAlgorithmReference,
 						testValue);
 				for (ResolvedFilter filter : filters) {
 					query.getFilterComponent().add(filter);

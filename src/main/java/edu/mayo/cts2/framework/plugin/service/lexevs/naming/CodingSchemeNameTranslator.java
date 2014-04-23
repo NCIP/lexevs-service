@@ -14,4 +14,8 @@ public interface CodingSchemeNameTranslator {
 	
 	public String translateToLexGrid(String name);
 
+	public String translateLexGridURIToLexGrid(String uri);
+	
+	
+
 }

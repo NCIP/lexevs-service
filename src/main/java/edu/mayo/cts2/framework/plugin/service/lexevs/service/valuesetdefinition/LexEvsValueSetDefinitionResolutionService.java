@@ -19,11 +19,11 @@ import org.springframework.stereotype.Component;
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
-import edu.mayo.cts2.framework.model.core.EntitySynopsis;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
-import edu.mayo.cts2.framework.model.core.PropertyReference;
+import edu.mayo.cts2.framework.model.core.ComponentReference;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
+import edu.mayo.cts2.framework.model.core.URIAndEntityName;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
@@ -55,12 +55,12 @@ public class LexEvsValueSetDefinitionResolutionService extends AbstractLexEvsSer
 	}
 
 	@Override
-	public Set<? extends PropertyReference> getSupportedSearchReferences() {
+	public Set<? extends ComponentReference> getSupportedSearchReferences() {
 		return this.resolvedValueSetResolutionService.getSupportedSearchReferences();
 	}
 
 	@Override
-	public Set<? extends PropertyReference> getSupportedSortReferences() {
+	public Set<? extends ComponentReference> getSupportedSortReferences() {
 		return this.resolvedValueSetResolutionService.getSupportedSortReferences();
 	}
 
@@ -74,34 +74,34 @@ public class LexEvsValueSetDefinitionResolutionService extends AbstractLexEvsSer
 		return this.resolvedValueSetResolutionService.getKnownNamespaceList();
 	}
 
-	@Override
-	public ResolvedValueSetResult<EntitySynopsis> resolveDefinition(
-			ValueSetDefinitionReadId definitionId,
-			Set<NameOrURI> codeSystemVersions, 
-			NameOrURI tag,
-			ResolvedValueSetResolutionEntityQuery query,
-			SortCriteria sortCriteria, 
-			ResolvedReadContext readContext,
-			Page page) {
-		String definitionName = definitionId.getName();
-		
-		ResolvedValueSetReadId id = new ResolvedValueSetReadId(
-			ResolvedValueSetNameTranslator.RESOLVED_VS_LOCAL_ID, 
-			definitionId.getValueSet(), 
-			ModelUtils.nameOrUriFromName(definitionName));
-		
-		Set<ResolvedFilter> filters = null;
-		if(query != null){
-			filters = query.getFilterComponent();
-		}
-		
-		try {
-			return this.resolvedValueSetResolutionService.getResolution(id, filters, page);
-		} catch (InvaildVersionNameException e) {
-			//Invalid name - return null;
-			return null;
-		}
-	}
+//	@Override
+//	public ResolvedValueSetResult<EntitySynopsis> resolveDefinition(
+//			ValueSetDefinitionReadId definitionId,
+//			Set<NameOrURI> codeSystemVersions, 
+//			NameOrURI tag,
+//			ResolvedValueSetResolutionEntityQuery query,
+//			SortCriteria sortCriteria, 
+//			ResolvedReadContext readContext,
+//			Page page) {
+//		String definitionName = definitionId.getName();
+//		
+//		ResolvedValueSetReadId id = new ResolvedValueSetReadId(
+//			ResolvedValueSetNameTranslator.RESOLVED_VS_LOCAL_ID, 
+//			definitionId.getValueSet(), 
+//			ModelUtils.nameOrUriFromName(definitionName));
+//		
+//		Set<ResolvedFilter> filters = null;
+//		if(query != null){
+//			filters = query.getFilterComponent();
+//		}
+//		
+//		try {
+//			return this.resolvedValueSetResolutionService.getResolution(id, filters, page);
+//		} catch (InvaildVersionNameException e) {
+//			//Invalid name - return null;
+//			return null;
+//		}
+//	}
 
 	@Override
 	public ResolvedValueSetResult<EntityDirectoryEntry> resolveDefinitionAsEntityDirectory(
@@ -125,13 +125,40 @@ public class LexEvsValueSetDefinitionResolutionService extends AbstractLexEvsSer
 		}
 	}
 
+
+	@Override
+	public ResolvedValueSetResult<URIAndEntityName> resolveDefinition(
+			ValueSetDefinitionReadId definitionId,
+			Set<NameOrURI> codeSystemVersions, NameOrURI tag,
+			SortCriteria sortCriteria, ResolvedReadContext readContext,
+			Page page) {
+		String definitionName = definitionId.getName();
+		
+		ResolvedValueSetReadId id = new ResolvedValueSetReadId(
+			ResolvedValueSetNameTranslator.RESOLVED_VS_LOCAL_ID, 
+			definitionId.getValueSet(), 
+			ModelUtils.nameOrUriFromName(definitionName));
+		
+		Set<ResolvedFilter> filters = null;
+//		if(query != null){
+//			filters = query.getFilterComponent();
+//		}
+		
+		try {
+			return this.resolvedValueSetResolutionService.getResolution(id, filters, page);
+		} catch (InvaildVersionNameException e) {
+			//Invalid name - return null;
+			return null;
+		}
+	}
+
 	@Override
 	public ResolvedValueSet resolveDefinitionAsCompleteSet(
 			ValueSetDefinitionReadId definitionId,
-			Set<NameOrURI> codeSystemVersions, 
-			NameOrURI tag,
-			ResolvedReadContext readContext) {
-		String definitionName = definitionId.getName();
+			Set<NameOrURI> codeSystemVersions, NameOrURI tag,
+			SortCriteria sortCriteria, ResolvedReadContext readContext) {
+		// TODO Auto-generated method stub
+	String definitionName = definitionId.getName();
 		
 		ResolvedValueSetReadId id = new ResolvedValueSetReadId(
 			ResolvedValueSetNameTranslator.RESOLVED_VS_LOCAL_ID, 

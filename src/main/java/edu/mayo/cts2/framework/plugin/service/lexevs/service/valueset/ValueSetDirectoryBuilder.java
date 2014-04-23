@@ -6,7 +6,7 @@
 * Distributed under the OSI-approved BSD 3-Clause License.
 * See http://ncip.github.com/lexevs-service/LICENSE.txt for details.
 */
-package edu.mayo.cts2.framework.plugin.service.lexevs.service.valuesetdefinition;
+package edu.mayo.cts2.framework.plugin.service.lexevs.service.valueset;
 
 import java.util.List;
 import java.util.Set;
@@ -16,21 +16,14 @@ import edu.mayo.cts2.framework.filter.match.StateAdjustingComponentReference;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 
 /**
- * A Basic EntityDirectoryBuilder.
+ * @author <a href="mailto:scott.bauer@mayo.edu">Scott Bauer</a>
  *
- * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
+ * @param <T>
  */
-public class ValueSetDefinitionDirectoryBuilder<T> extends AbstractStateBuildingDirectoryBuilder<List<String>,T> {
+public class ValueSetDirectoryBuilder<T> extends
+AbstractStateBuildingDirectoryBuilder<List<String>,T> {
 
-	/**
-	 * Instantiates a new basic entity directory builder.
-	 *
-	 * @param initialState the initial state
-	 * @param callback the callback
-	 * @param matchAlgorithmReferences the match algorithm references
-	 * @param stateAdjustingComponentReferences the state adjusting property references
-	 */
-	public ValueSetDefinitionDirectoryBuilder(
+	public ValueSetDirectoryBuilder(
 			List<String> uris,
 			AbstractStateBuildingDirectoryBuilder.Callback<List<String>, T> callback,
 			Set<MatchAlgorithmReference> matchAlgorithmReferences,

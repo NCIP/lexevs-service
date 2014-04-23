@@ -8,6 +8,10 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs;
 
+import javax.annotation.Resource;
+
+import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.LexGrid.LexBIG.caCore.interfaces.LexEVSApplicationService;
 import org.lexgrid.valuesets.LexEVSValueSetDefinitionServices;
 import org.lexgrid.valuesets.impl.LexEVSValueSetDefinitionServicesImpl;
 import org.springframework.beans.factory.FactoryBean;
@@ -20,10 +24,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class LexEVSValueSetDefinitionServicesFactory implements
 		FactoryBean<LexEVSValueSetDefinitionServices> {
+	
+	@Resource
+	private LexBIGService lbs;
 
 	@Override
 	public LexEVSValueSetDefinitionServices getObject() throws Exception {
-		return LexEVSValueSetDefinitionServicesImpl.defaultInstance();
+		if(this.lbs instanceof LexEVSApplicationService) {
+			return ((LexEVSApplicationService) lbs ).getLexEVSValueSetDefinitionServices();
+		} else {
+			return LexEVSValueSetDefinitionServicesImpl.defaultInstance();
+		}
 	}
 
 	@Override

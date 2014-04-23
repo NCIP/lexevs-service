@@ -11,24 +11,29 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service.valuesetdefinition
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
+import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContents;
 import org.junit.Test;
 
 import edu.mayo.cts2.framework.core.xml.Cts2Marshaller;
 import edu.mayo.cts2.framework.model.command.Page;
-import edu.mayo.cts2.framework.model.core.EntitySynopsis;
+import edu.mayo.cts2.framework.model.core.URIAndEntityName;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSet;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ValueSetDefinitionUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
+import edu.mayo.cts2.framework.service.profile.valuesetdefinition.ResolvedValueSetResult;
 import edu.mayo.cts2.framework.service.profile.valuesetdefinition.name.ValueSetDefinitionReadId;
-
-@LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosAndGM.xml")
+@LoadContents({
+@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
+@LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml"),
+@LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosAndGM.xml")})
 public class LexEVSValueSetDefinitionResolutionServiceTestIT extends
 		AbstractTestITBase {
 
@@ -53,14 +58,16 @@ public class LexEVSValueSetDefinitionResolutionServiceTestIT extends
 		ValueSetDefinitionReadId defintionId = 
 			new ValueSetDefinitionReadId("571eb4e6", ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"));
 		
-		DirectoryResult<EntitySynopsis> dirResult = service.
-				resolveDefinition(defintionId, null, null, null, null, null, new Page());
+		ResolvedValueSetResult<URIAndEntityName>dirResult = service.
+				resolveDefinition(defintionId, null, null, null, null, new Page());
 
 		assertNotNull(dirResult);
 		int expecting = 1;
 		int actual = dirResult.getEntries().size();
 		assertEquals("Expecting " + expecting + " but got " + actual,
 				expecting, actual);
+		assertTrue(dirResult.getResolvedValueSetHeader().getResolvedUsingCodeSystem().length > 0);
+	     
 	}
 	
 	@Test
@@ -83,10 +90,13 @@ public class LexEVSValueSetDefinitionResolutionServiceTestIT extends
 		ValueSetDefinitionReadId defintionId = 
 			new ValueSetDefinitionReadId("571eb4e6", ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"));
 		
-		ResolvedValueSet resolution = service.resolveDefinitionAsCompleteSet(defintionId, null, null, null);
+		ResolvedValueSet resolution = service.resolveDefinitionAsCompleteSet(defintionId, null, null, null, null);
 		assertNotNull(resolution);
-		
-		assertEquals(1, resolution.getMemberCount());
+		String codeSystem = resolution.getResolutionInfo().getResolvedUsingCodeSystem(0).getCodeSystem().getContent();
+		String CTS2version = resolution.getResolutionInfo().getResolvedUsingCodeSystem(0).getVersion().getContent();
+		assertEquals("Expected: Automobiles but got  " + codeSystem, "Automobiles", codeSystem);
+		assertEquals("Expected Automobiles-1.0 but got " + CTS2version, "Automobiles-1.0", CTS2version);
+		assertEquals(1, resolution.getEntryCount());
 	}
 		
 	@Test
@@ -95,8 +105,8 @@ public class LexEVSValueSetDefinitionResolutionServiceTestIT extends
 		ValueSetDefinitionReadId defintionId = 
 			new ValueSetDefinitionReadId("__INVALID__", ModelUtils.nameOrUriFromName("All Domestic Autos AND GM"));
 		
-		DirectoryResult<EntitySynopsis> dirResult = service.
-				resolveDefinition(defintionId, null, null, null, null, null, new Page());
+		DirectoryResult<URIAndEntityName> dirResult = service.
+				resolveDefinition(defintionId, null, null, null, null, new Page());
 
 		assertNull(dirResult);
 	}
@@ -107,8 +117,8 @@ public class LexEVSValueSetDefinitionResolutionServiceTestIT extends
 		ValueSetDefinitionReadId defintionId = 
 			new ValueSetDefinitionReadId("INVALID", ModelUtils.nameOrUriFromName("INVALID"));
 		
-		DirectoryResult<EntitySynopsis> dirResult = service.
-				resolveDefinition(defintionId, null, null, null, null, null, new Page());
+		DirectoryResult<URIAndEntityName> dirResult = service.
+				resolveDefinition(defintionId, null, null, null, null, new Page());
 
 		assertNull(dirResult);
 	}

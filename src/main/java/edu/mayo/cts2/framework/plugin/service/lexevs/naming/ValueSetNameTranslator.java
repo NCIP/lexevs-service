@@ -17,5 +17,7 @@ public interface ValueSetNameTranslator {
 	public ValueSetNamePair getDefinitionNameAndVersion(String uri);
 
 	public ValueSetNamePair getCurrentDefinition(String valueSetName);
+	
+	public String getRegularValueSetCurrentDefinition(String valueSetName);
 
 }

@@ -60,6 +60,11 @@ public class LexEvsMapQueryServiceTest {
 			public String translateToLexGrid(String name) {
 				return name;
 			}
+
+			@Override
+			public String translateLexGridURIToLexGrid(String uri) {
+				return uri;
+			}
 	
 		}));
 		service.setMappingExtension(new MappingExtensionImpl(fakeLexEvs));
@@ -127,7 +132,7 @@ public class LexEvsMapQueryServiceTest {
 	// Count with All VALID Default filters
 	// -------------------------------------
 	@Test
-	public void testCount_FilterDefault_PropertyReferencesValidIndex_AllSchemes() throws Exception {
+	public void testCount_FilterDefault_ComponentReferencesValidIndex_AllSchemes() throws Exception {
 		FakeLexEvsSystem<MapCatalogEntry, MapCatalogEntrySummary, MapQuery, LexEvsMapQueryService> fakeLexEvs;
 		fakeLexEvs = new FakeLexEvsSystem<MapCatalogEntry, MapCatalogEntrySummary, MapQuery, LexEvsMapQueryService>();
 		LexEvsMapQueryService service = this.createService(fakeLexEvs, true); 
@@ -142,7 +147,7 @@ public class LexEvsMapQueryServiceTest {
 	// Count with VALID values with one MISMATCHED
 	// --------------------------------------------
 	@Test
-	public void testCount_FilterDefault_PropertyReferencesWrongIndex_AllSchemes() throws Exception {
+	public void testCount_FilterDefault_ComponentReferencesWrongIndex_AllSchemes() throws Exception {
 		FakeLexEvsSystem<MapCatalogEntry, MapCatalogEntrySummary, MapQuery, LexEvsMapQueryService> fakeLexEvs;
 		fakeLexEvs = new FakeLexEvsSystem<MapCatalogEntry, MapCatalogEntrySummary, MapQuery, LexEvsMapQueryService>();
 		LexEvsMapQueryService service = this.createService(fakeLexEvs, true); 
@@ -192,7 +197,7 @@ public class LexEvsMapQueryServiceTest {
 	
 	@Test
 	@Ignore
-	public void testGetResourceSummaries_DeepCompare_PropertyReferences_MatchingAlgorithms_Pages_CodindgSchemes_Substrings() throws Exception {
+	public void testGetResourceSummaries_DeepCompare_ComponentReferences_MatchingAlgorithms_Pages_CodindgSchemes_Substrings() throws Exception {
 		Page page = new Page();		
 		FakeLexEvsSystem<MapCatalogEntry, MapCatalogEntrySummary, MapQuery, LexEvsMapQueryService> fakeLexEvs;
 		fakeLexEvs = new FakeLexEvsSystem<MapCatalogEntry, MapCatalogEntrySummary, MapQuery, LexEvsMapQueryService>();
@@ -205,6 +210,6 @@ public class LexEvsMapQueryServiceTest {
 		MapQueryImpl query = new MapQueryImpl(null, filters, null, null);
 		DirectoryResult<MapCatalogEntrySummary> directoryResult = null; 
 		
-		fakeLexEvs.executeGetResourceSummariesWithDeepComparisonForEachPropertyReference(service, directoryResult, query, CODE_SYSTEM_NAME, page, lastPage);		
+		fakeLexEvs.executeGetResourceSummariesWithDeepComparisonForEachComponentReference(service, directoryResult, query, CODE_SYSTEM_NAME, page, lastPage);		
 	}
 }

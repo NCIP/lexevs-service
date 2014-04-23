@@ -37,6 +37,7 @@ import edu.mayo.cts2.framework.model.core.Comment;
 import edu.mayo.cts2.framework.model.core.Definition;
 import edu.mayo.cts2.framework.model.core.DescriptionInCodeSystem;
 import edu.mayo.cts2.framework.model.core.EntityReference;
+import edu.mayo.cts2.framework.model.core.LanguageReference;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
 import edu.mayo.cts2.framework.model.core.Property;
 import edu.mayo.cts2.framework.model.core.StatementTarget;
@@ -321,6 +322,12 @@ public class EntityTransform
 				ModelUtils.toTsAnyType(presentation.getValue().getContent()));
 			
 			designation.setDesignationRole(role);
+			LanguageReference lref = new LanguageReference();
+			lref.setContent(presentation.getLanguage());
+			designation.setLanguage(lref);
+			if(presentation.getSource().length > 0){
+			designation.setAssertedInCodeSystemVersion(presentation.getSource()[0].getContent());
+			}
 			
 			returnList.add(designation);
 		}
