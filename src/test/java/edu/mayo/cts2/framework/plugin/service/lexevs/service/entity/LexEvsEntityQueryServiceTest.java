@@ -61,6 +61,11 @@ public class LexEvsEntityQueryServiceTest {
 					public String translateToLexGrid(String name) {
 						return name;
 					}
+
+					@Override
+					public String translateLexGridURIToLexGrid(String uri) {
+						return uri;
+					}
 			
 		}));
 		

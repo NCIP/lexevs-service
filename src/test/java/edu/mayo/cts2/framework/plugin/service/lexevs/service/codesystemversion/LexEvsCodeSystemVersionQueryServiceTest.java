@@ -71,6 +71,11 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 				public String translateToLexGrid(String name) {
 					return name;
 				}
+
+				@Override
+				public String translateLexGridURIToLexGrid(String uri) {
+					return uri;
+				}
 		
 				}));
 		
@@ -100,6 +105,11 @@ public class LexEvsCodeSystemVersionQueryServiceTest {
 					@Override
 					public String translateToLexGrid(String name) {
 						return name;
+					}
+
+					@Override
+					public String translateLexGridURIToLexGrid(String uri) {
+						return uri;
 					}
 			
 		}));

@@ -27,6 +27,11 @@ public class VersionNameConverterTest {
 			public String translateToLexGrid(String name) {
 				return name;
 			}
+
+			@Override
+			public String translateLexGridURIToLexGrid(String uri) {
+				return uri;
+			}
 	
 		});
 		
@@ -48,6 +53,11 @@ public class VersionNameConverterTest {
 			@Override
 			public String translateToLexGrid(String name) {
 				return name;
+			}
+
+			@Override
+			public String translateLexGridURIToLexGrid(String uri) {
+				return uri;
 			}
 	
 		});
@@ -71,6 +81,11 @@ public class VersionNameConverterTest {
 			public String translateToLexGrid(String name) {
 				return name;
 			}
+
+			@Override
+			public String translateLexGridURIToLexGrid(String uri) {
+				return uri;
+			}
 	
 		});
 		
@@ -92,6 +107,12 @@ public class VersionNameConverterTest {
 			public String translateToLexGrid(String name) {
 				return name;
 			}
+
+			@Override
+			public String translateLexGridURIToLexGrid(String uri) {
+				// TODO Auto-generated method stub
+				return uri;
+			}
 	
 		});
 		
@@ -112,6 +133,11 @@ public class VersionNameConverterTest {
 			@Override
 			public String translateToLexGrid(String name) {
 				return name;
+			}
+
+			@Override
+			public String translateLexGridURIToLexGrid(String uri) {
+				return uri;
 			}
 	
 		});

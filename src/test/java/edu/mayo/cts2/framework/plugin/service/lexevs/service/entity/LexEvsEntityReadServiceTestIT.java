@@ -11,6 +11,7 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.StringWriter;
 
@@ -24,6 +25,7 @@ import org.junit.Test;
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.core.EntityReference;
 import edu.mayo.cts2.framework.model.core.ScopedEntityName;
+import edu.mayo.cts2.framework.model.entity.Designation;
 import edu.mayo.cts2.framework.model.entity.EntityDescription;
 import edu.mayo.cts2.framework.model.entity.NamedEntityDescription;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
@@ -76,7 +78,13 @@ public class LexEvsEntityReadServiceTestIT extends
 		assertNotNull(namedEntityDescription.getAbout());
 		ScopedEntityName scopedEntityName2 = namedEntityDescription.getEntityID();
 		assertNotNull(scopedEntityName2);
-		assertEquals("lexgrid.org", entityDescription.getNamedEntity().getDesignation(0).getAssertedInCodeSystemVersion());
+		boolean found = false;
+		for(Designation d: entityDescription.getNamedEntity().getDesignation()){
+			if(d.getAssertedInCodeSystemVersion()!= null && d.getAssertedInCodeSystemVersion().equals("lexgrid.org")){
+				found = true;
+			}
+		}
+		assertTrue(found);
 		assertEquals("en", entityDescription.getNamedEntity().getDesignation(0).getLanguage().getContent());
 		assertEquals("005",scopedEntityName2.getName());
 		assertEquals("Automobiles",scopedEntityName2.getNamespace());

@@ -31,6 +31,7 @@ import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSetDirectoryEntry;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSetHeader;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodingSchemeNameTranslator;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ResolvedValueSetNameTranslator;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ResolvedValueSetNameTriple;
 import edu.mayo.cts2.framework.plugin.service.lexevs.transform.TransformUtils;
@@ -54,6 +55,9 @@ public class ResolvedCodingSchemeTransform {
 	
 	@Resource
 	private TransformUtils transformUtils;
+	
+	@Resource
+	private CodingSchemeNameTranslator codingSchemeNameTranslator;
 
 	List<ResolvedValueSetDirectoryEntry> transform(List<CodingScheme> listcs) {
 		List<ResolvedValueSetDirectoryEntry> rvsde_list = new ArrayList<ResolvedValueSetDirectoryEntry>();
@@ -115,15 +119,17 @@ public class ResolvedCodingSchemeTransform {
 					}
 				}
 
+				String lexSchemeName = codingSchemeNameTranslator.translateLexGridURIToLexGrid(uri);
 				CodeSystemVersionReference csvr = new CodeSystemVersionReference();
 				CodeSystemReference csr = new CodeSystemReference();
 				csr.setUri(uri);
-				csr.setContent(uri);
+				csr.setContent(lexSchemeName);
 				csvr.setCodeSystem(csr);
 				
 				NameAndMeaningReference versionRef = new NameAndMeaningReference();
-				versionRef.setContent(version);
+				versionRef.setContent(lexSchemeName + "-" + version);
 				csvr.setVersion(versionRef);
+				list.add(csvr);
 			}
 		}
 		return list;

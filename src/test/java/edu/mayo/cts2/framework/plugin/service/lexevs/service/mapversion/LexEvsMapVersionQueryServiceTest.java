@@ -63,6 +63,12 @@ public class LexEvsMapVersionQueryServiceTest {
 			public String translateToLexGrid(String name) {
 				return name;
 			}
+
+			@Override
+			public String translateLexGridURIToLexGrid(String uri) {
+				// TODO Auto-generated method stub
+				return null;
+			}
 	
 		}));
 		
@@ -98,6 +104,13 @@ public class LexEvsMapVersionQueryServiceTest {
 			public String translateToLexGrid(String name) {
 				return name;
 			}
+
+			@Override
+			public String translateLexGridURIToLexGrid(String uri) {
+				return uri;
+			}
+			
+			
 	
 		}));
 		service.setCodingSchemeToMapVersionTransform(transform);

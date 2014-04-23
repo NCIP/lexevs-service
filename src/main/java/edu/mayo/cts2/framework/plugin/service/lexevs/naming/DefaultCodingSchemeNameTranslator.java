@@ -43,6 +43,7 @@ public class DefaultCodingSchemeNameTranslator implements
 
 	private Map<String, String> lexgridToAliasMap = new HashMap<String, String>();
 	private Map<String, String> aliasToLexGridMap = new HashMap<String, String>();
+	private Map<String, String> lexgridUriToLexGridNameMap = new HashMap<String, String>();
 
 	private Object mutex = new Object();
 
@@ -55,6 +56,7 @@ public class DefaultCodingSchemeNameTranslator implements
 		synchronized(this.mutex){
 			this.lexgridToAliasMap.clear();
 			this.aliasToLexGridMap.clear();
+			this.lexgridUriToLexGridNameMap.clear();
 			
 			try {
 				for (CodingSchemeRendering csr : this.lexBigService
@@ -77,7 +79,9 @@ public class DefaultCodingSchemeNameTranslator implements
 						}
 
 						this.lexgridToAliasMap.put(lexgridName, officialName);
+						
 					}
+					this.lexgridUriToLexGridNameMap.put(csr.getCodingSchemeSummary().getCodingSchemeURI(), csr.getCodingSchemeSummary().getLocalName());
 				}
 			} catch (LBInvocationException e) {
 				this.log.warn(e);
@@ -109,6 +113,18 @@ public class DefaultCodingSchemeNameTranslator implements
 		}
 	}
 
+	@Override
+	public String translateLexGridURIToLexGrid(String uri) {
+		synchronized (this.mutex) {
+			String lexgridName = this.lexgridUriToLexGridNameMap.get(uri);
+			if (lexgridName != null) {
+				return lexgridName;
+			} else {
+				return uri;
+			}
+		}
+	}
+	
 	protected void scheduleflushCache() {
 		TimerTask flushTask = new TimerTask() {
 			@Override
