@@ -131,7 +131,7 @@ public class SearchExtensionEntityQueryService
 				int maxResults) {
 			ResolvedConceptReferencesIterator iterator;
 			try {
-				iterator = searchExtension.search(state, toCodingSchemeReference(this.codeSystemVersions), MatchAlgorithm.LUCENE);
+				iterator = searchExtension.search(state, toCodingSchemeReference(this.codeSystemVersions), null, MatchAlgorithm.LUCENE, false, true);
 			} catch (LBParameterException e) {
 				throw new RuntimeException(e);
 			}

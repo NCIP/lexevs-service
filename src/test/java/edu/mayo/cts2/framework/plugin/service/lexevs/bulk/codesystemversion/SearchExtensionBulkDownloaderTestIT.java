@@ -45,7 +45,10 @@ public class SearchExtensionBulkDownloaderTestIT extends AbstractTestITBase {
 		String result = new String(out.toByteArray());
 		
 		assertTrue(result, result.contains("C0001|Car"));
-		assertTrue(result, result.contains("73|Oldsmobile"));
+		
+		// By default, we are not returning inactive entities.  
+		// Oldsmobile should not be there.
+		assertTrue(result, !result.contains("73|Oldsmobile"));
 		//... etc...
 	}
 }

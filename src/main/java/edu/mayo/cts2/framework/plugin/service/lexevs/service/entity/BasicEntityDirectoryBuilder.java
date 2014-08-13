@@ -19,6 +19,7 @@ import edu.mayo.cts2.framework.filter.match.StateAdjustingComponentReference;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
+import edu.mayo.cts2.framework.model.service.core.types.ActiveOrAll;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQuery;
 
 /**
@@ -57,13 +58,27 @@ public class BasicEntityDirectoryBuilder<T> extends AbstractStateBuildingDirecto
 			EntityDescriptionQuery query) {
 		if(query != null){
 			this.restrict(query.getFilterComponent());
+			StringBuilder entityQueryString = new StringBuilder("(");
+			ActiveOrAll active= ActiveOrAll.ACTIVE_ONLY;
+			
+			if (query.getReadContext() != null) {
+				active= query.getReadContext().getActive();
+			}
+			if (active.equals(ActiveOrAll.ACTIVE_ONLY)) {
+				entityQueryString.append("*:* AND NOT active:false");
+			} else {
+				entityQueryString.append("*:*");
+			}
 			
 			if(query.getRestrictions() != null &&
 					CollectionUtils.isNotEmpty(query.getRestrictions().getEntities())){
+				boolean addEndBracket = false;
+				if (entityQueryString.length() >0) {
+					addEndBracket = true;
+					entityQueryString.append(" (");
+				}
 				
 				Set<EntityNameOrURI> entities = query.getRestrictions().getEntities();
-				
-				StringBuilder entityQueryString = new StringBuilder("(");
 				
 				Set<String> entitySearchStrings = new HashSet<String>();
 				
@@ -77,12 +92,16 @@ public class BasicEntityDirectoryBuilder<T> extends AbstractStateBuildingDirecto
 					
 					entitySearchStrings.add(this.entityNameQueryBuilder.buildQuery(name));
 				}
+				
 				entityQueryString.append(StringUtils.join(entitySearchStrings, " OR "));
 				
-				entityQueryString.append(")");
+				if (addEndBracket) {
+					entityQueryString.append(")");
+				}
 				
-				this.updateState(this.getState() + entityQueryString.toString());
 			}
+			entityQueryString.append(")");
+			this.updateState(this.getState() + entityQueryString.toString());
 		}
 		
 		return this;
