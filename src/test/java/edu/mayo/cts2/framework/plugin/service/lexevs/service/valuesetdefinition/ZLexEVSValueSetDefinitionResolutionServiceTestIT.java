@@ -34,7 +34,7 @@ import edu.mayo.cts2.framework.service.profile.valuesetdefinition.name.ValueSetD
 @LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
 @LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml"),
 @LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosAndGM.xml")})
-public class LexEVSValueSetDefinitionResolutionServiceTestIT extends
+public class ZLexEVSValueSetDefinitionResolutionServiceTestIT extends
 		AbstractTestITBase {
 
 	@Resource
