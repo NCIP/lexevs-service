@@ -265,6 +265,7 @@ public class SearchExtensionEntityQueryService
 				text = QueryParser.escape(text);
 	            StringBuilder sb = new StringBuilder();
 	            sb.append("(");
+	            sb.append("(");
 	            for(String token : text.split("\\s+")){
 	               sb.append("description:");
 	               sb.append(token);
@@ -273,6 +274,7 @@ public class SearchExtensionEntityQueryService
 	            sb.append(")");
 	            sb.append(" OR description:\""+text+"\"");
 	            sb.append(" OR exactDescription:\"" + QueryParser.escape(text) + "\"");
+	            sb.append(")");
 	            return sb.toString().trim();
 			} else if(matchAlgorithm.getContent().equals(
 					StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference().getContent())){

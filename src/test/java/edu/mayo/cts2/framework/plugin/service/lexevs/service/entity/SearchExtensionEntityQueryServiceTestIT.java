@@ -34,6 +34,7 @@ import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.service.core.types.ActiveOrAll;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractQueryServiceTest;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonTestUtils;
 import edu.mayo.cts2.framework.service.command.restriction.EntityDescriptionQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.profile.QueryService;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQuery;
@@ -186,6 +187,93 @@ public class SearchExtensionEntityQueryServiceTestIT
 			fail();
 		}
 	}
+	
+	
+	@Test
+	public void testGetResourceSummaries_Filter_contains() throws Exception {
+		// Test filter contains on active entity (GE) (active is set by default).
+		
+		// NOTE:  The CTS2 "word starts with" filtered query maps to the LexEVS "contains" registered
+		//   filter extension
+		
+		// Create query
+		// ------------
+		EntityDescriptionQuery query = CommonTestUtils.createQuery("contains", "GE", "Automobiles-1.0");	
+				
+		// Call getResourceSummaries from service
+		// --------------------------------------
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
+		
+		
+		// Test results
+		// ------------
+		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() = 1, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() == 1);		
+	}
+	
+	@Test
+	public void testGetResourceSummaries_Filter_containsTwoSearchTerms() throws Exception {
+		// Test filter contains on active entity with 2 search terms (General Motors) (active is set by default).
+		
+		// NOTE:  The CTS2 "word starts with" filtered query maps to the LexEVS "contains" registered
+		//   filter extension
+		
+		// Create query
+		// ------------
+		EntityDescriptionQuery query = CommonTestUtils.createQuery("contains", "General Motors", "Automobiles-1.0");	
+				
+		// Call getResourceSummaries from service
+		// --------------------------------------
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
+		
+		
+		// Test results
+		// ------------
+		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() = 1, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() == 1);		
+	}
+	
+	@Test
+	public void testGetResourceSummaries_Filter_contains_Inactive() throws Exception {
+		// Test filter contains on inactive entity (Oldsmobile).
+		
+		// NOTE:  The CTS2 "word starts with" filtered query maps to the LexEVS "contains" registered
+		//   filter extension
+		
+		// Create query
+		// ------------
+		EntityDescriptionQueryImpl query = (EntityDescriptionQueryImpl)CommonTestUtils.createQuery("contains", "Olds", "Automobiles-1.0");	
+		
+		ResolvedReadContext resolvedReadContext = new ResolvedReadContext();
+		resolvedReadContext.setActive(ActiveOrAll.ACTIVE_AND_INACTIVE);
+		query.setReadContext(resolvedReadContext);
+				
+		// Call getResourceSummaries from service
+		// --------------------------------------
+		SortCriteria sortCriteria = null;
+		Page page = new Page();
+		DirectoryResult<EntityDirectoryEntry> directoryResult = this.service.getResourceSummaries(query, sortCriteria, page);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
+		
+		
+		// Test results
+		// ------------
+		List<EntityDirectoryEntry> list = directoryResult.getEntries();		
+		assertNotNull("Expecting data returned but list is null", list);
+		String msg = "Expecting list.size() = 1, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() == 1);	
+
+	}	
 	
 	@Ignore
 	@Override
