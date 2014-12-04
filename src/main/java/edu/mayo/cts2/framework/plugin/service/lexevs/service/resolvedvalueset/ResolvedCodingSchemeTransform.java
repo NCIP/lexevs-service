@@ -95,7 +95,7 @@ public class ResolvedCodingSchemeTransform {
 		
 		ValueSetDefinitionReference resolutionOf = 
 			this.transformUtils.toValueSetDefinitionReference(
-				cs.getCodingSchemeName(), 
+				cs.getFormalName(), 
 				cs.getCodingSchemeURI());
 		
 		header.setResolutionOf(resolutionOf);
