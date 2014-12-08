@@ -95,7 +95,7 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT
 		assertEquals("Expecting " + expecting + " but got " + actual,
 				expecting, actual);
 	}
-	
+
 	@Test
 	public void testGetResolutionNotFoundDefintion() throws Exception {
 		ResolvedValueSetReadId identifier = new ResolvedValueSetReadId("1",

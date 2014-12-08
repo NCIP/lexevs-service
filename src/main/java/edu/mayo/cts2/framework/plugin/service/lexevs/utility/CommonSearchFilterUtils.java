@@ -78,7 +78,7 @@ public final class CommonSearchFilterUtils {
 		
 		for(int index=0; index < renderingCount; index++){
 			lexRenderingSummary = lexCodingSchemeRenderingList.getCodingSchemeRendering(index).getCodingSchemeSummary();
-			lexRenderingFormalName = lexRenderingSummary.getFormalName();
+			lexRenderingFormalName = lexRenderingSummary.getFormalName() != null ? lexRenderingSummary.getFormalName() : lexRenderingSummary.getLocalName();
 			lexRenderingVersion = lexRenderingSummary.getRepresentsVersion();
 	
 			if(lexRenderingFormalName.equals(queryData.getLexSchemeName()) && 
