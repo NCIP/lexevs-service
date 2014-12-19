@@ -45,7 +45,7 @@ public class DefaultResolvedValueSetNameTranslator
 		
 		try {
 			for(CodingScheme codingScheme : this.lexEVSResolvedService.listAllResolvedValueSets()){
-				String valueSetId = codingScheme.getCodingSchemeName();
+				String valueSetId = codingScheme.getFormalName();
 				String valueSetDefId = 
 					ValueSetDefinitionUtils.getValueSetDefinitionLocalId(codingScheme.getCodingSchemeURI());
 				String localId = RESOLVED_VS_LOCAL_ID;
@@ -55,7 +55,7 @@ public class DefaultResolvedValueSetNameTranslator
 				
 				this.valueSetToNameVersionMap.put(
 					triple, 
-					new NameVersionPair(codingScheme.getCodingSchemeName(), codingScheme.getRepresentsVersion()));
+					new NameVersionPair(codingScheme.getFormalName(), codingScheme.getRepresentsVersion()));
 				
 				this.uriToValueSetToNameVersionMap.put(codingScheme.getCodingSchemeURI(), triple);
 			}

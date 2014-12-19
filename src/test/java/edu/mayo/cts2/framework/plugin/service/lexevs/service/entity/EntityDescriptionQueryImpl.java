@@ -63,7 +63,7 @@ public class EntityDescriptionQueryImpl implements EntityDescriptionQuery{
 
 	@Override
 	public ResolvedReadContext getReadContext() {
-		return null;
+		return this.readContext;
 	}
 
 	public void setReadContext(ResolvedReadContext context){
