@@ -71,17 +71,17 @@ public final class CommonSearchFilterUtils {
 			CodingSchemeRenderingList lexCodingSchemeRenderingList,
 			QueryData<T> queryData){
 		boolean found = false;
-		String lexRenderingLocalName, lexRenderingVersion;
+		String lexRenderingFormalName, lexRenderingVersion;
 		CodingSchemeSummary lexRenderingSummary;
 		
 		int renderingCount = lexCodingSchemeRenderingList.getCodingSchemeRenderingCount();
 		
 		for(int index=0; index < renderingCount; index++){
 			lexRenderingSummary = lexCodingSchemeRenderingList.getCodingSchemeRendering(index).getCodingSchemeSummary();
-			lexRenderingLocalName = lexRenderingSummary.getLocalName();
+			lexRenderingFormalName = lexRenderingSummary.getFormalName() != null ? lexRenderingSummary.getFormalName() : lexRenderingSummary.getLocalName();
 			lexRenderingVersion = lexRenderingSummary.getRepresentsVersion();
 	
-			if(lexRenderingLocalName.equals(queryData.getLexSchemeName()) && 
+			if(lexRenderingFormalName.equals(queryData.getLexSchemeName()) && 
 				lexRenderingVersion.equals(queryData.getLexVersionOrTag().getVersion())){
 				found = true;
 			}

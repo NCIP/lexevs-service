@@ -44,7 +44,8 @@ import edu.mayo.cts2.framework.service.profile.valuesetdefinition.ResolvedValueS
 
 @LoadContents({
 	@LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosAndGM.xml"),
-	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")})
+	@LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosAndGMTooLong.xml"),
+	@LoadContent(contentPath = "lexevs/test-content/Automobiles.xml")})
 public class LexEVSResolvedValuesetResolutionServiceTestIT 
 	extends AbstractTestITBase {
 
@@ -76,6 +77,25 @@ public class LexEVSResolvedValuesetResolutionServiceTestIT
 				expecting, actual);
 	}
 	
+	@Test
+	public void testGetResolutionTooLong() throws Exception {
+		// Test retrieving a value set resolution with a coding scheme name > 50 characters
+		// This is matching on the codingScheme's formal name which is 250 characters in length.
+		
+		ResolvedValueSetReadId identifier = new ResolvedValueSetReadId("1",
+				ModelUtils.nameOrUriFromName("All Domestic Autos AND GM  with a name longer than 50 characters"),
+				ModelUtils.nameOrUriFromName("5e258620"));
+		
+		DirectoryResult<URIAndEntityName> dirResult = service.getResolution(
+				identifier, null, new Page());
+
+		assertNotNull(dirResult);
+		int expecting = 1;
+		int actual = dirResult.getEntries().size();
+		assertEquals("Expecting " + expecting + " but got " + actual,
+				expecting, actual);
+	}
+
 	@Test
 	public void testGetResolutionNotFoundDefintion() throws Exception {
 		ResolvedValueSetReadId identifier = new ResolvedValueSetReadId("1",
