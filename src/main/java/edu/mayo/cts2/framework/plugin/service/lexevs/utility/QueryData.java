@@ -236,7 +236,8 @@ public final class QueryData <Query extends ResourceQuery>{
 		EntityDescriptionQueryServiceRestrictions localCts2Restrictions = cts2Query.getRestrictions();
 		this.cts2Restrictions = localCts2Restrictions;
 		this.cts2Filters = cts2Query.getFilterComponent();
-				
+		this.readContext = cts2Query.getReadContext();
+		
 		// Not needed?
 //		query.getEntitiesFromAssociationsQuery();
 //		restrictions.getHierarchyRestriction();

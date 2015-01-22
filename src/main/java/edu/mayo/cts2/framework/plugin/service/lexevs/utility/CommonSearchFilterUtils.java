@@ -26,6 +26,7 @@ import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
 import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
+import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet.ActiveOption;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet.SearchDesignationOption;
 import org.LexGrid.codingSchemes.CodingScheme;
 import org.LexGrid.valueSets.ValueSetDefinition;
@@ -247,7 +248,7 @@ public final class CommonSearchFilterUtils {
 			return sourceValue;
 	}
 
-	public static <T extends ResourceQuery> CodedNodeSet filterLexCodedNodeSet(CodedNodeSet lexCodedNodeSet, QueryData<T> queryData){
+	public static <T extends ResourceQuery> CodedNodeSet filterLexCodedNodeSet(CodedNodeSet lexCodedNodeSet, QueryData<T> queryData) throws  LBParameterException, LBInvocationException  {
 		if(lexCodedNodeSet != null){
 			// Apply restrictions if they exists
 			Set<EntityNameOrURI> cts2Entities = queryData.getCts2Entities();
@@ -260,6 +261,24 @@ public final class CommonSearchFilterUtils {
 				for(ResolvedFilter cts2Filter : cts2Filters){
 					lexCodedNodeSet = CommonSearchFilterUtils.filterLexCodedNodeSet(lexCodedNodeSet, cts2Filter);
 				}
+			}
+			
+			ResolvedReadContext readContext = queryData.getReadContext();
+			
+			if(readContext != null) {
+				 
+					if(readContext.getActive() == null || 
+					   readContext.getActive().equals(ActiveOrAll.ACTIVE_AND_INACTIVE)){
+						
+						// set to all
+						lexCodedNodeSet.restrictToStatus(ActiveOption.ALL, null);
+						
+					}
+					else if (readContext.getActive().equals(ActiveOrAll.ACTIVE_ONLY)){
+						
+						// set to active only
+						lexCodedNodeSet.restrictToStatus(ActiveOption.ACTIVE_ONLY, null);
+					}
 			}
 		}
 		

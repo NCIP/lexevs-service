@@ -78,6 +78,7 @@ uriResolutionServiceUrl=https://informatics.mayo.edu/cts2/services/uriresolver/
 * ```showHomePage``` - (true/false) Show a Home/Welcome page at the root context ("/").
 * ```allowSoap``` - (true/false) Turn on/off the SOAP API.
 * ```supportEmail``` - The email address to direct unexpected user encountered errors.
+* ```alternateHomePage``` - Home page URL to use instead of the standard framework home page.
 
 ___Example - webapp-config.properties___
 ```
@@ -87,6 +88,7 @@ showStackTrace=false
 showHomePage=false
 allowSoap=false
 supportEmail=support@yourservice.org
+alternateHomePage=http://alternateHomepage.com
 ```
 
 #### _server-context.properties_ (Optional)

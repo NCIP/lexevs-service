@@ -12,6 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.List;
 import java.util.Set;
@@ -20,6 +21,7 @@ import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.junit.Test;
+import org.junit.internal.runners.statements.Fail;
 
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
@@ -30,6 +32,8 @@ import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.entity.EntityListEntry;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.service.core.Query;
+import edu.mayo.cts2.framework.model.service.core.ReadContext;
+import edu.mayo.cts2.framework.model.service.core.types.ActiveOrAll;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractQueryServiceTest;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonTestUtils;
@@ -63,8 +67,7 @@ public class LexEvsEntityQueryServiceTestIT
 		int actual = this.service.count(null);
 		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
 	}
-	
-	
+		
 	@Test
 	public void testGetResourceSummaries_CodingSchemeExists_andNotEmpty() throws Exception {
 		final NameOrURI name = ModelUtils.nameOrUriFromName("Automobiles-1.0");
@@ -92,11 +95,107 @@ public class LexEvsEntityQueryServiceTestIT
 		String msg = "Expecting list.size() > 0, instead list.size() = " + list.size();
 		assertTrue(msg, list.size() > 0);		
 	}
+		
+	@Test
+	public void testGetResourceList_ActiveEntities() throws Exception {
+		final NameOrURI name = ModelUtils.nameOrUriFromName("Automobiles-1.0");
+		
+		// Test to return only active entities
+		
+		// Create restriction for query
+		// ----------------------------
+		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
+		restrictions.getCodeSystemVersions().add(ModelUtils.nameOrUriFromName(name.getName()));
+		
+		// Create query, no filters
+		// -------------------------
+		ResolvedReadContext resolvedReadContext = new ResolvedReadContext();
+		resolvedReadContext.setActive(ActiveOrAll.ACTIVE_ONLY);
+		
+		EntityDescriptionQueryImpl query = new EntityDescriptionQueryImpl(null, null, restrictions);	
+		query.setReadContext(resolvedReadContext);
+				
+		// Call getResourceSummaries from service
+		// --------------------------------------
+		SortCriteria sortCriteria = null;
+		Page page = new Page();		
+		DirectoryResult<EntityListEntry> directoryResult = this.service.getResourceList(query, sortCriteria, page);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
+		
+		// Test results
+		// ------------
+		List<EntityListEntry> list = directoryResult.getEntries();
+		assertNotNull("Expecting data returned but list is null", list);
+		
+		String msg = "Expecting list.size() > 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() > 0);	
+		
+		EntityListEntry entry = null;
+		for(int x=0; x<list.size(); x ++){
+			entry = list.get(x);
+			// Oldsmobile entity ID is 73.  By default, it is set to inactive.
+			if (entry.getEntry().getNamedEntity().getEntityID().getName().equals("73")){
+				fail();
+			}
+		}
+	}
+	
+	@Test
+	public void testGetResourceList_ActiveAndInactiveEntities() throws Exception {
+		final NameOrURI name = ModelUtils.nameOrUriFromName("Automobiles-1.0");
+		
+		// Test to return only active and inactive entities
+		
+		// Create restriction for query
+		// ----------------------------
+		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
+		restrictions.getCodeSystemVersions().add(ModelUtils.nameOrUriFromName(name.getName()));
+		
+		// Create query, no filters
+		// -------------------------
+		ResolvedReadContext resolvedReadContext = new ResolvedReadContext();
+		resolvedReadContext.setActive(ActiveOrAll.ACTIVE_AND_INACTIVE);
+		
+		EntityDescriptionQueryImpl query = new EntityDescriptionQueryImpl(null, null, restrictions);	
+		query.setReadContext(resolvedReadContext);
+				
+		// Call getResourceSummaries from service
+		// --------------------------------------
+		SortCriteria sortCriteria = null;
+		Page page = new Page();		
+		DirectoryResult<EntityListEntry> directoryResult = this.service.getResourceList(query, sortCriteria, page);
+		assertNotNull("Expecting data returned but instead directoryResult is null", directoryResult);
+		
+		// Test results
+		// ------------
+		List<EntityListEntry> list = directoryResult.getEntries();
+		assertNotNull("Expecting data returned but list is null", list);
+		
+		String msg = "Expecting list.size() > 0, instead list.size() = " + list.size();
+		assertTrue(msg, list.size() > 0);	
+		
+		EntityListEntry entry = null;
+		boolean foundInactive = false;
+		
+		for(int x=0; x<list.size(); x ++){
+			entry = list.get(x);
+			// Oldsmobile entity ID is 73.  By default, it is set to inactive.
+			if (!foundInactive && entry.getEntry().getNamedEntity().getEntityID().getName().equals("73")){
+				foundInactive = true;
+				break;				
+			}
+		}
+		
+		// if we didn't find an inactive entity, fail
+		if (!foundInactive) {
+			fail();
+		}
+	}
 	
 	@Test
 	public void testGetResourceList_CodingSchemeExists_andNotEmpty() throws Exception {
 		final NameOrURI name = ModelUtils.nameOrUriFromName("Automobiles-1.0");
-		
+
 		// Create restriction for query
 		// ----------------------------
 		EntityDescriptionQueryServiceRestrictions restrictions = new EntityDescriptionQueryServiceRestrictions();
