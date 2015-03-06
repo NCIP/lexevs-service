@@ -126,7 +126,7 @@ public class SearchExtensionBulkDownloader
 		}
 		
 		try {
-			itr = searchExtension.search(null, codingSchemes, excludedCodingSchemes, MatchAlgorithm.LUCENE);
+			itr = searchExtension.search(null, codingSchemes, excludedCodingSchemes, MatchAlgorithm.LUCENE, false, false);
 		} catch (LBParameterException e) {
 			throw new RuntimeException(e);
 		}
