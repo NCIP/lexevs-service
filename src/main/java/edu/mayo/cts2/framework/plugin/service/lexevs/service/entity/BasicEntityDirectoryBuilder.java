@@ -58,18 +58,24 @@ public class BasicEntityDirectoryBuilder<T> extends AbstractStateBuildingDirecto
 			EntityDescriptionQuery query) {
 		if(query != null){
 			this.restrict(query.getFilterComponent());
-			StringBuilder entityQueryString = new StringBuilder("(");
+
+			StringBuilder entityQueryString = new StringBuilder("");
+
 			ActiveOrAll active= ActiveOrAll.ACTIVE_ONLY;
-			
+
 			if (query.getReadContext() != null) {
 				active= query.getReadContext().getActive();
 			}
+			boolean addOuterEndBracket = false;
 			if (active.equals(ActiveOrAll.ACTIVE_ONLY)) {
-				entityQueryString.append("*:* AND NOT active:false");
-			} else {
-				entityQueryString.append("*:*");
+				if (entityQueryString.length() == 0) {
+					entityQueryString.append("(");
+					addOuterEndBracket = true;
+				}
+
+				entityQueryString.append(" NOT active:false");
 			}
-			
+
 			if(query.getRestrictions() != null &&
 					CollectionUtils.isNotEmpty(query.getRestrictions().getEntities())){
 				boolean addEndBracket = false;
@@ -77,11 +83,11 @@ public class BasicEntityDirectoryBuilder<T> extends AbstractStateBuildingDirecto
 					addEndBracket = true;
 					entityQueryString.append(" (");
 				}
-				
+
 				Set<EntityNameOrURI> entities = query.getRestrictions().getEntities();
-				
+
 				Set<String> entitySearchStrings = new HashSet<String>();
-				
+
 				for(EntityNameOrURI nameOrUri : entities){
 					ScopedEntityName name;
 					if(nameOrUri.getEntityName() != null){
@@ -89,22 +95,24 @@ public class BasicEntityDirectoryBuilder<T> extends AbstractStateBuildingDirecto
 					} else {
 						name = this.entityUriResolver.resolveUri(nameOrUri.getUri());
 					}
-					
+
 					entitySearchStrings.add(this.entityNameQueryBuilder.buildQuery(name));
 				}
-				
+
 				entityQueryString.append(StringUtils.join(entitySearchStrings, " OR "));
-				
+
 				if (addEndBracket) {
 					entityQueryString.append(")");
 				}
-				
+
 			}
-			entityQueryString.append(")");
+
+			if (addOuterEndBracket)
+				entityQueryString.append(")");
+
 			this.updateState(this.getState() + entityQueryString.toString());
 		}
-		
+
 		return this;
 	}
-
 }
