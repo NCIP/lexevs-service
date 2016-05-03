@@ -24,6 +24,7 @@ import org.LexGrid.LexBIG.Extensions.Generic.LexBIGServiceConvenienceMethods;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
+import org.LexGrid.commonTypes.PropertyQualifier;
 import org.LexGrid.concepts.Entity;
 import org.LexGrid.concepts.Presentation;
 import org.apache.commons.lang.BooleanUtils;
@@ -110,7 +111,7 @@ public class EntityTransform
 				codingSchemeName,
 				reference.getCodingSchemeURI(),
 				reference.getCodingSchemeVersion(),
-				entity.getProperty()));
+				entity.getAllProperties()));
 		namedEntity.setDefinition(this.toDefinition(entity.getDefinition()));
 		namedEntity.setNote(this.toNote(entity.getComment()));
 		
@@ -168,6 +169,7 @@ public class EntityTransform
 		
 		for(org.LexGrid.concepts.Comment comment : comments){
 			Comment cts2Comment = new Comment();
+			
 			cts2Comment.setValue(
 				ModelUtils.toTsAnyType(comment.getValue().getContent()));
 			
@@ -176,7 +178,7 @@ public class EntityTransform
 		
 		return returnList;
 	}
-	
+		
 	private List<Definition> toDefinition(org.LexGrid.concepts.Definition... definitions) {
 		List<Definition> returnList = new ArrayList<Definition>();
 		
@@ -184,7 +186,7 @@ public class EntityTransform
 			Definition cts2Definition = new Definition();
 			cts2Definition.setValue(
 				ModelUtils.toTsAnyType(definition.getValue().getContent()));
-			
+
 			returnList.add(cts2Definition);
 		}
 		
@@ -219,10 +221,44 @@ public class EntityTransform
 			
 			cts2Prop.addValue(target);
 			
+			for(PropertyQualifier qualifier: property.getPropertyQualifier()){
+				cts2Prop.addPropertyQualifier(this.toProperty(codingSchemeName, codingSchemeUri, codingSchemeVersion, qualifier));
+			}
+			
 			returnList.add(cts2Prop);
 		}
 		
 		return returnList;
+	}
+	
+	private Property toProperty(
+			String codingSchemeName,
+			String codingSchemeUri,
+			String codingSchemeVersion,
+			org.LexGrid.commonTypes.PropertyQualifier propertyQualifier) {
+		
+		
+			Property cts2Prop = new Property();
+			
+			String propertyName = propertyQualifier.getPropertyQualifierName();
+			
+			String predicateUri = this.getUriHandler().getPredicateUri(
+				codingSchemeUri, codingSchemeVersion, propertyName);
+
+			PredicateReference ref = new PredicateReference();
+			ref.setName(propertyQualifier.getPropertyQualifierName());
+			ref.setNamespace(this.sanitizeNamespace(codingSchemeName));
+			ref.setUri(predicateUri);
+
+			cts2Prop.setPredicate(ref);
+			
+			StatementTarget target = new StatementTarget();
+			target.setLiteral(
+				ModelUtils.createOpaqueData(propertyQualifier.getValue().getContent()));
+			
+			cts2Prop.addValue(target);
+	
+		return cts2Prop;
 	}
 
 	@Override
@@ -310,7 +346,7 @@ public class EntityTransform
 		
 		for(Presentation presentation : presentations){
 			Designation designation = new Designation();
-			
+
 			DesignationRole role;
 			if(BooleanUtils.toBoolean(presentation.isIsPreferred())){
 				role = DesignationRole.PREFERRED;
@@ -326,9 +362,9 @@ public class EntityTransform
 			lref.setContent(presentation.getLanguage());
 			designation.setLanguage(lref);
 			if(presentation.getSource().length > 0){
-			designation.setAssertedInCodeSystemVersion(presentation.getSource()[0].getContent());
+				designation.setAssertedInCodeSystemVersion(presentation.getSource()[0].getContent());
 			}
-			
+
 			returnList.add(designation);
 		}
 		

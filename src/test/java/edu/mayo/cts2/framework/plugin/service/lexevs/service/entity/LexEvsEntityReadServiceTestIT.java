@@ -24,7 +24,9 @@ import org.junit.Test;
 
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.core.EntityReference;
+import edu.mayo.cts2.framework.model.core.Property;
 import edu.mayo.cts2.framework.model.core.ScopedEntityName;
+import edu.mayo.cts2.framework.model.core.StatementTarget;
 import edu.mayo.cts2.framework.model.entity.Designation;
 import edu.mayo.cts2.framework.model.entity.EntityDescription;
 import edu.mayo.cts2.framework.model.entity.NamedEntityDescription;
@@ -147,6 +149,28 @@ public class LexEvsEntityReadServiceTestIT extends
 		boolean existsFlag = this.service.exists(identifier, readContext);
 		
 		assertEquals(true, existsFlag);
+	}	
+	
+	@Test
+	public void testPropertyQualifier() throws Exception {
+		EntityNameOrURI entity = new EntityNameOrURI();
+		ScopedEntityName scopedEntityName = new ScopedEntityName();
+		scopedEntityName.setNamespace("Automobiles");
+		scopedEntityName.setName("A0001");
+		entity.setEntityName(scopedEntityName);
+		
+		NameOrURI codeSystemVersion = ModelUtils.nameOrUriFromName("Automobiles-1.0");
+			
+		EntityDescriptionReadId identifier = new EntityDescriptionReadId(entity,codeSystemVersion);		
+		ResolvedReadContext readContext = null;
+		
+		EntityDescription a0001 = this.service.read(identifier, readContext);
+
+		int propertyCount = a0001.getNamedEntity().getProperty(2).getPropertyQualifierCount();
+		assertTrue(propertyCount == 2);
+		
+		int propertyQualifierValueCount = a0001.getNamedEntity().getProperty(2).getPropertyQualifier(0).getValueCount();
+		assertTrue(1 == propertyQualifierValueCount);
 	}	
 	
 	@Test
