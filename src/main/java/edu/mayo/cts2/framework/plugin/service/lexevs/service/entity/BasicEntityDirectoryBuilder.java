@@ -61,25 +61,12 @@ public class BasicEntityDirectoryBuilder<T> extends AbstractStateBuildingDirecto
 
 			StringBuilder entityQueryString = new StringBuilder("");
 
-			ActiveOrAll active= ActiveOrAll.ACTIVE_ONLY;
-
-			if (query.getReadContext() != null) {
-				active= query.getReadContext().getActive();
-			}
 			boolean addOuterEndBracket = false;
-			if (active.equals(ActiveOrAll.ACTIVE_ONLY)) {
-				if (entityQueryString.length() == 0) {
-					entityQueryString.append("(");
-					addOuterEndBracket = true;
-				}
-
-				entityQueryString.append(" NOT active:false");
-			}
 
 			if(query.getRestrictions() != null &&
 					CollectionUtils.isNotEmpty(query.getRestrictions().getEntities())){
 				boolean addEndBracket = false;
-				if (entityQueryString.length() >0) {
+				if (entityQueryString.length() > 0) {
 					addEndBracket = true;
 					entityQueryString.append(" (");
 				}
