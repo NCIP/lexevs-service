@@ -22,6 +22,7 @@ import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.EntityNameOrURIList;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
+import edu.mayo.cts2.framework.model.service.core.types.ActiveOrAll;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
@@ -41,6 +42,7 @@ import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
 import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.lexevs.dao.index.indexer.LuceneLoaderCodeIndexer;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
@@ -81,8 +83,8 @@ public class SearchExtensionEntityQueryService
 	private class SearchExtensionSummariesCallback extends
 		AbstractSearchExtensionCallback<EntityDirectoryEntry>{
 
-		private SearchExtensionSummariesCallback(Set<NameOrURI> codeSystemVersions){
-			super(codeSystemVersions);
+		private SearchExtensionSummariesCallback(Set<NameOrURI> codeSystemVersions, boolean includeInactive, boolean includeAnonymous){
+			super(codeSystemVersions, includeInactive, includeAnonymous);
 		}
 		
 		@Override
@@ -94,10 +96,14 @@ public class SearchExtensionEntityQueryService
 	private abstract class AbstractSearchExtensionCallback<T> implements Callback<String,T>{
 
 		private List<NameOrURI> codeSystemVersions;
+		private boolean includeInactive;
+		private boolean includeAnonymous;
 		
-		private AbstractSearchExtensionCallback(Set<NameOrURI> codeSystemVersions){
+		private AbstractSearchExtensionCallback(Set<NameOrURI> codeSystemVersions, boolean includeInactive, boolean includeAnonymous){
 			super();
 			this.codeSystemVersions = this.removeNulls(codeSystemVersions);
+			this.includeInactive = includeInactive;
+			this.includeAnonymous = includeAnonymous;
 		}
 
 		private <I> List<I> removeNulls(Iterable<I> items) {
@@ -120,7 +126,7 @@ public class SearchExtensionEntityQueryService
 				int maxResults) {
 			ResolvedConceptReferencesIterator iterator;
 			try {
-				iterator = searchExtension.search(state, toCodingSchemeReference(this.codeSystemVersions), null, MatchAlgorithm.LUCENE, false, true);
+				iterator = searchExtension.search(state, toCodingSchemeReference(this.codeSystemVersions), null, MatchAlgorithm.LUCENE, this.includeAnonymous, this.includeInactive);
 			} catch (LBParameterException e) {
 				throw new RuntimeException(e);
 			}
@@ -128,7 +134,12 @@ public class SearchExtensionEntityQueryService
 			ResolvedConceptReferenceList list;
 			boolean atEnd;
 			try {
-				list = iterator.get(start, start + maxResults);
+				int total = iterator.numberRemaining();
+				int position = start + maxResults;
+
+				int end = Math.min(total, position);
+				list = iterator.get(start, end);
+
 				atEnd = iterator.numberRemaining() <= start + maxResults;
 			} catch (Exception e) {
 				throw new RuntimeException(e);
@@ -183,6 +194,18 @@ public class SearchExtensionEntityQueryService
 		throw new UnsupportedOperationException();
 	}
 
+	private boolean getIncludeInactive(EntityDescriptionQuery query) {
+		boolean includeInactive = false;
+
+		if(query != null && query.getReadContext() != null && query.getReadContext().getActive() != null) {
+			if(query.getReadContext().getActive().equals(ActiveOrAll.ACTIVE_AND_INACTIVE)) {
+				includeInactive = true;
+			}
+		}
+
+		return includeInactive;
+	}
+
 	@Override
 	public DirectoryResult<EntityDirectoryEntry> getResourceSummaries(
 			EntityDescriptionQuery query, 
@@ -191,7 +214,7 @@ public class SearchExtensionEntityQueryService
 		return new BasicEntityDirectoryBuilder<EntityDirectoryEntry>(
 				this.entityNameQueryBuilder,
 				this.entityUriResolver,
-				new SearchExtensionSummariesCallback(query.getRestrictions().getCodeSystemVersions()), 
+				new SearchExtensionSummariesCallback(query.getRestrictions().getCodeSystemVersions(), this.getIncludeInactive(query), false),
 				this.getSupportedMatchAlgorithms(), 
 				this.getSupportedSearchReferences()).
 				restrict(query).
@@ -213,7 +236,7 @@ public class SearchExtensionEntityQueryService
 		return new BasicEntityDirectoryBuilder<EntityDirectoryEntry>(
 				this.entityNameQueryBuilder,
 				this.entityUriResolver,
-				new SearchExtensionSummariesCallback(query.getRestrictions().getCodeSystemVersions()), 
+				new SearchExtensionSummariesCallback(query.getRestrictions().getCodeSystemVersions(), this.getIncludeInactive(query), false),
 				this.getSupportedMatchAlgorithms(), 
 				this.getSupportedSearchReferences()).restrict(query.getFilterComponent()).count();
 	}
@@ -245,6 +268,10 @@ public class SearchExtensionEntityQueryService
 			return "code:" + QueryParser.escape(string);
 		}
 	};
+
+	private String getTextQuery(String text) {
+		return "(+" + LuceneLoaderCodeIndexer.PROPERTY_VALUE_FIELD + ":" + text.toLowerCase() + " +isPreferred:T +propertyType:presentation)";
+	}
 	
 	private StateUpdater<String> RESOURCE_SYNOPSIS_STATE_UPDATER = new AbstractStateUpdater(){
 		@Override
@@ -256,18 +283,16 @@ public class SearchExtensionEntityQueryService
 	            sb.append("(");
 	            sb.append("(");
 	            for(String token : text.split("\\s+")){
-	               sb.append("description:");
-	               sb.append(token);
-	               sb.append("* ");
+	               sb.append(getTextQuery(token + "*"));
 	            }
 	            sb.append(")");
-	            sb.append(" OR description:\""+text+"\"");
-	            sb.append(" OR exactDescription:\"" + QueryParser.escape(text) + "\"");
+	            sb.append(" OR " + getTextQuery("\""+text+"\""));
+	            sb.append(" OR " + getTextQuery("\"" + QueryParser.escape(text) + "\""));
 	            sb.append(")");
 	            return sb.toString().trim();
 			} else if(matchAlgorithm.getContent().equals(
 					StandardMatchAlgorithmReference.EXACT_MATCH.getMatchAlgorithmReference().getContent())){
-				return "exactDescription:\"" + QueryParser.escape(text) + "\"";
+				return getTextQuery("\"" + QueryParser.escape(text) + "\"");
 			} else if(matchAlgorithm.getContent().equals(LUCENE_QUERY)){
 				return text;
 			} else {
