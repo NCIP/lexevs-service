@@ -8,27 +8,40 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.uri;
 
-import static org.junit.Assert.*;
-
+import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriResolver.IdType;
+import org.LexGrid.LexBIG.test.BaseContentLoadingInMemoryTest;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.test.context.ContextConfiguration;
 
-import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriResolver.IdType;
+import static org.junit.Assert.*;
 
-public class RestUriResolverTest {
+@ContextConfiguration("/test-lexevs-context.xml")
+public class RestUriResolverTest extends BaseContentLoadingInMemoryTest {
 
 	RestUriResolver resolver;
 
+	@Value("${uriResolutionServiceUrl}")
+	private String uriResolutionServiceUrl;
+
+	@Test
+	public void testNotNullUriResolverUrl() {
+		assertNotNull(this.uriResolutionServiceUrl);
+	}
+
+
 	@Before
 	public void SetUp() throws Exception {
-		resolver = new RestUriResolver(
-				"https://informatics.mayo.edu/cts2/services/uriresolver");
-		
+
+		resolver = new RestUriResolver(this.uriResolutionServiceUrl);
 		resolver.loadClojureScripts();
 	}
 
+
 	@Test
 	public void TestIdToName() {
+
 		assertEquals("LNC", resolver.idToName(
 				"http://id.nlm.nih.gov/cui/C1136323", IdType.CODE_SYSTEM));
 	}
