@@ -25,6 +25,8 @@ import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
 import org.LexGrid.commonTypes.PropertyQualifier;
+import org.LexGrid.commonTypes.Source;
+import org.LexGrid.commonTypes.types.PropertyTypes;
 import org.LexGrid.concepts.Entity;
 import org.LexGrid.concepts.Presentation;
 import org.apache.commons.lang.BooleanUtils;
@@ -202,11 +204,55 @@ public class EntityTransform
 		
 		for(org.LexGrid.commonTypes.Property property : properties){
 			Property cts2Prop = new Property();
+			String propertyName = null;
+			String predicateUri = null;
+			String propertyTypeUri = null;
 			
-			String propertyName = property.getPropertyName();
-			
-			String predicateUri = this.getUriHandler().getPredicateUri(
-				codingSchemeUri, codingSchemeVersion, propertyName);
+			String propertyType = property.getPropertyType();
+									
+			if (propertyType.equals(PropertyTypes.PROPERTY.value())) {
+
+				propertyName = property.getPropertyName();  
+				predicateUri = this.getUriHandler().getPredicateUri(
+					codingSchemeUri, codingSchemeVersion, propertyName);
+			}
+			else if (propertyType.equals(PropertyTypes.PRESENTATION.value())) {
+				Presentation p = (Presentation) property;
+				if (p != null && p.isIsPreferred() != null && p.isIsPreferred()) {
+					propertyTypeUri = EntityConstants.ENTITY_PREDICATE_URI_PRESENTATION_PREFERRED;
+				}
+				else {
+					propertyTypeUri = EntityConstants.ENTITY_PREDICATE_URI_PRESENTATION_ALTERNATE;
+				}
+				
+				propertyName = property.getPropertyType();  
+				predicateUri = EntityConstants.ENTITY_PREDICATE_BASE_URI + propertyTypeUri;
+				
+				// create a property qualifier for the lexevs representaionalForm
+				if (p.getRepresentationalForm() != null) {
+					cts2Prop.addPropertyQualifier(this.toProperty(codingSchemeName, codingSchemeUri, 
+							codingSchemeVersion, p.getRepresentationalForm()));
+				}
+				
+			}
+			else if (propertyType.equals(PropertyTypes.DEFINITION.value())) {
+				org.LexGrid.concepts.Definition d = (org.LexGrid.concepts.Definition) property;
+				
+				if (d != null && d.isIsPreferred() != null && d.isIsPreferred()) {
+					propertyTypeUri = EntityConstants.ENTITY_PREDICATE_URI_DEFINITION_PREFERRED;
+				}
+				else {
+					propertyTypeUri = EntityConstants.ENTITY_PREDICATE_URI_DEFINITION;
+				}
+				
+				propertyName = property.getPropertyType();  
+				predicateUri = EntityConstants.ENTITY_PREDICATE_BASE_URI + propertyTypeUri;
+				
+			}
+			else if (propertyType.equals(PropertyTypes.COMMENT.value())) {
+				propertyName = property.getPropertyType();  
+				predicateUri = EntityConstants.ENTITY_PREDICATE_BASE_URI + EntityConstants.ENTITY_PREDICATE_URI_COMMENT;
+			}
 
 			PredicateReference ref = new PredicateReference();
 			ref.setName(property.getPropertyName());
@@ -221,8 +267,14 @@ public class EntityTransform
 			
 			cts2Prop.addValue(target);
 			
+			// create a property qualifier for each lexevs PropertyQualifier
 			for(PropertyQualifier qualifier: property.getPropertyQualifier()){
 				cts2Prop.addPropertyQualifier(this.toProperty(codingSchemeName, codingSchemeUri, codingSchemeVersion, qualifier));
+			}
+			
+			// create a property qualifier for each lexevs Source
+			for(Source source: property.getSource()){
+				cts2Prop.addPropertyQualifier(this.toProperty(codingSchemeName, codingSchemeUri, codingSchemeVersion, source));
 			}
 			
 			returnList.add(cts2Prop);
@@ -231,6 +283,84 @@ public class EntityTransform
 		return returnList;
 	}
 	
+	/**
+	 * Create a property qualifier from a lexevs representationalForm
+	 * @param codingSchemeName
+	 * @param codingSchemeUri
+	 * @param codingSchemeVersion
+	 * @param representationalForm
+	 * @return
+	 */
+	private Property toProperty(
+			String codingSchemeName,
+			String codingSchemeUri,
+			String codingSchemeVersion,
+			String representationalForm) {
+				
+			Property cts2Prop = new Property();
+			
+			String predicateUri = EntityConstants.ENTITY_PREDICATE_BASE_URI + 
+					EntityConstants.ENTITY_PREDICATE_URI_PROPERTY_SOURCE;
+
+			PredicateReference ref = new PredicateReference();
+			ref.setName(EntityConstants.ENTITY_PREDICATE_URI_PROPERTY_SOURCE);
+			ref.setNamespace(EntityConstants.ENTITY_NAME_SPACE);
+			ref.setUri(predicateUri);
+
+			cts2Prop.setPredicate(ref);
+			
+			StatementTarget target = new StatementTarget();
+			target.setLiteral(
+				ModelUtils.createOpaqueData(representationalForm));
+			
+			cts2Prop.addValue(target);
+	
+		return cts2Prop;
+	}
+	
+	/**
+	 * Create a property qualifier from a lexevs org.LexGrid.commonTypes.Source
+	 * @param codingSchemeName
+	 * @param codingSchemeUri
+	 * @param codingSchemeVersion
+	 * @param source
+	 * @return
+	 */
+	private Property toProperty(
+			String codingSchemeName,
+			String codingSchemeUri,
+			String codingSchemeVersion,
+			org.LexGrid.commonTypes.Source source) {
+				
+			Property cts2Prop = new Property();
+			
+			String predicateUri = EntityConstants.ENTITY_PREDICATE_BASE_URI + 
+					EntityConstants.ENTITY_PREDICATE_URI_PROPERTY_SOURCE;
+
+			PredicateReference ref = new PredicateReference();
+			ref.setName(EntityConstants.ENTITY_PREDICATE_URI_PROPERTY_SOURCE);
+			ref.setNamespace(EntityConstants.ENTITY_NAME_SPACE);
+			ref.setUri(predicateUri);
+
+			cts2Prop.setPredicate(ref);
+			
+			StatementTarget target = new StatementTarget();
+			target.setLiteral(
+				ModelUtils.createOpaqueData(source.getContent()));
+			
+			cts2Prop.addValue(target);
+	
+		return cts2Prop;
+	}
+	
+	/**
+	 * Create a property qualifier from a lexevs org.LexGrid.commonTypes.PropertyQualifier
+	 * @param codingSchemeName
+	 * @param codingSchemeUri
+	 * @param codingSchemeVersion
+	 * @param propertyQualifier
+	 * @return
+	 */
 	private Property toProperty(
 			String codingSchemeName,
 			String codingSchemeUri,
