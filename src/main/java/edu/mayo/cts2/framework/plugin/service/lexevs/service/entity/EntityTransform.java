@@ -230,8 +230,7 @@ public class EntityTransform
 				
 				// create a property qualifier for the lexevs representaionalForm
 				if (p.getRepresentationalForm() != null) {
-					cts2Prop.addPropertyQualifier(this.toProperty(codingSchemeName, codingSchemeUri, 
-							codingSchemeVersion, p.getRepresentationalForm()));
+					cts2Prop.addPropertyQualifier(this.toProperty(p.getRepresentationalForm()));
 				}
 				
 			}
@@ -274,7 +273,7 @@ public class EntityTransform
 			
 			// create a property qualifier for each lexevs Source
 			for(Source source: property.getSource()){
-				cts2Prop.addPropertyQualifier(this.toProperty(codingSchemeName, codingSchemeUri, codingSchemeVersion, source));
+				cts2Prop.addPropertyQualifier(this.toProperty(source));
 			}
 			
 			returnList.add(cts2Prop);
@@ -285,25 +284,17 @@ public class EntityTransform
 	
 	/**
 	 * Create a property qualifier from a lexevs representationalForm
-	 * @param codingSchemeName
-	 * @param codingSchemeUri
-	 * @param codingSchemeVersion
 	 * @param representationalForm
 	 * @return
 	 */
-	private Property toProperty(
-			String codingSchemeName,
-			String codingSchemeUri,
-			String codingSchemeVersion,
-			String representationalForm) {
-				
+	private Property toProperty(String representationalForm) {
 			Property cts2Prop = new Property();
 			
 			String predicateUri = EntityConstants.ENTITY_PREDICATE_BASE_URI + 
-					EntityConstants.ENTITY_PREDICATE_URI_PROPERTY_SOURCE;
+					EntityConstants.ENTITY_PREDICATE_URI_PROPERTY_REPRESENTATIONAL_FORM;
 
 			PredicateReference ref = new PredicateReference();
-			ref.setName(EntityConstants.ENTITY_PREDICATE_URI_PROPERTY_SOURCE);
+			ref.setName(EntityConstants.ENTITY_PREDICATE_URI_PROPERTY_REPRESENTATIONAL_FORM);
 			ref.setNamespace(EntityConstants.ENTITY_NAME_SPACE);
 			ref.setUri(predicateUri);
 
@@ -320,18 +311,10 @@ public class EntityTransform
 	
 	/**
 	 * Create a property qualifier from a lexevs org.LexGrid.commonTypes.Source
-	 * @param codingSchemeName
-	 * @param codingSchemeUri
-	 * @param codingSchemeVersion
 	 * @param source
-	 * @return
+	 * @return Property
 	 */
-	private Property toProperty(
-			String codingSchemeName,
-			String codingSchemeUri,
-			String codingSchemeVersion,
-			org.LexGrid.commonTypes.Source source) {
-				
+	private Property toProperty(org.LexGrid.commonTypes.Source source) {
 			Property cts2Prop = new Property();
 			
 			String predicateUri = EntityConstants.ENTITY_PREDICATE_BASE_URI + 
@@ -366,17 +349,15 @@ public class EntityTransform
 			String codingSchemeUri,
 			String codingSchemeVersion,
 			org.LexGrid.commonTypes.PropertyQualifier propertyQualifier) {
-		
-		
 			Property cts2Prop = new Property();
 			
 			String propertyName = propertyQualifier.getPropertyQualifierName();
-			
+
 			String predicateUri = this.getUriHandler().getPredicateUri(
 				codingSchemeUri, codingSchemeVersion, propertyName);
 
 			PredicateReference ref = new PredicateReference();
-			ref.setName(propertyQualifier.getPropertyQualifierName());
+			ref.setName(propertyName);
 			ref.setNamespace(this.sanitizeNamespace(codingSchemeName));
 			ref.setUri(predicateUri);
 
