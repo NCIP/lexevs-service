@@ -22,7 +22,7 @@ public class RestUriResolverTest {
 	@Before
 	public void SetUp() throws Exception {
 		resolver = new RestUriResolver(
-				"https://informatics.mayo.edu/cts2/services/uriresolver");
+				"http://uriresolver.nci.nih.gov");
 		
 		resolver.loadClojureScripts();
 	}
