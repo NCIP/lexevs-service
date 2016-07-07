@@ -8,13 +8,14 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 
-import javax.annotation.Resource;
-
-import org.apache.lucene.queryParser.QueryParser;
-import org.springframework.stereotype.Component;
-
 import edu.mayo.cts2.framework.model.core.ScopedEntityName;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodingSchemeNameTranslator;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+
+;
 
 @Component
 public class EntityNameQueryBuilder {
