@@ -5,11 +5,11 @@
 	<parent>
 		<groupId>edu.mayo.cts2.framework</groupId>
 		<artifactId>cts2-base-service-plugin</artifactId>
-		<version>1.2.0.FINAL</version>
+		<version>1.2.1.FINAL</version>
 	</parent>
 
 	<artifactId>lexevs-service</artifactId>
-	<version>1.5.0.FINAL</version>
+	<version>1.5.1.FINAL</version>
 	<packaging>${packaging}</packaging>
 
 	<description>A CTS2 Framework Service Plugin based on LexEVS</description>
@@ -654,6 +654,20 @@
 
 		<dependency>
 			<groupId>edu.mayo.cts2.framework</groupId>
+			<artifactId>cts2-core</artifactId>
+			<version>${develpment.framework.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>edu.mayo.cts2.framework</groupId>
+			<artifactId>cts2-model</artifactId>
+			<version>${develpment.framework.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>edu.mayo.cts2.framework</groupId>
 			<artifactId>cts2-plugin-util</artifactId>
 			<version>${develpment.framework.version}</version>
 		</dependency>
@@ -663,6 +677,14 @@
 			<artifactId>cts2-webapp-rest-extensions</artifactId>
 			<version>${develpment.framework.version}</version>
 			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>edu.mayo.cts2.framework</groupId>
+			<artifactId>cts2-webapp</artifactId>
+			<version>${develpment.framework.version}</version>
+			<classifier>classes</classifier>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>
