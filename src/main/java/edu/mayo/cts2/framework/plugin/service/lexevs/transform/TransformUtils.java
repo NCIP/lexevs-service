@@ -8,22 +8,6 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.transform;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.annotation.Resource;
-
-import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
-import org.LexGrid.LexBIG.Exceptions.LBException;
-import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
-import org.LexGrid.LexBIG.Utility.Constructors;
-import org.LexGrid.codingSchemes.CodingScheme;
-import org.LexGrid.commonTypes.Property;
-import org.LexGrid.commonTypes.PropertyQualifier;
-import org.apache.commons.lang.StringUtils;
-import org.lexgrid.valuesets.LexEVSValueSetDefinitionServices;
-import org.springframework.stereotype.Component;
-
 import edu.mayo.cts2.framework.core.url.UrlConstructor;
 import edu.mayo.cts2.framework.model.core.CodeSystemReference;
 import edu.mayo.cts2.framework.model.core.CodeSystemVersionReference;
@@ -43,6 +27,20 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ValueSetNameTranslat
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriHandler;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResolvedValueSetUtils;
+import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
+import org.LexGrid.LexBIG.Exceptions.LBException;
+import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.LexGrid.LexBIG.Utility.Constructors;
+import org.LexGrid.codingSchemes.CodingScheme;
+import org.LexGrid.commonTypes.Property;
+import org.LexGrid.commonTypes.PropertyQualifier;
+import org.apache.commons.lang.StringUtils;
+import org.lexgrid.valuesets.LexEVSValueSetDefinitionServices;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Common Transformation Utilities.
@@ -288,7 +286,7 @@ public class TransformUtils implements LexEvsChangeEventObserver {
 		uriAndName.setName(resolvedConceptReference.getCode());
 		uriAndName.setNamespace(resolvedConceptReference.getCodeNamespace());
 		uriAndName.setUri(this.uriHandler.getEntityUri(resolvedConceptReference));
-		
+
 		return uriAndName;
 	}
 
