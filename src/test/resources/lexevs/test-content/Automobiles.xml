@@ -100,11 +100,17 @@
       <lgCon:entityType>concept</lgCon:entityType>
       <lgCon:presentation language="en" propertyName="textualPresentation" propertyId="t1" isPreferred="true" matchIfNoContext="true">
         <lgCommon:value dataType="textplain">Automobile</lgCommon:value>
-      </lgCon:presentation>
+       </lgCon:presentation>
       <lgCon:definition language="en" propertyName="definition" propertyId="p1" isPreferred="true">
         <lgCommon:value dataType="textplain">An automobile</lgCommon:value>
       </lgCon:definition>
       <lgCon:property propertyId="gp1" propertyName="genericProperty">
+	      <lgCommon:propertyQualifier  propertyQualifierName="propertyQualifier1">
+	        	<lgCommon:value>propertyQualifierValue1</lgCommon:value>
+	      </lgCommon:propertyQualifier>
+	      <lgCommon:propertyQualifier  propertyQualifierName="propertyQualifier2">
+	        	<lgCommon:value>propertyQualifierValue2</lgCommon:value>
+	      </lgCommon:propertyQualifier>
         <lgCommon:value dataType="text/plain">A Generic Property</lgCommon:value>
       </lgCon:property>
     </lgCon:entity>
