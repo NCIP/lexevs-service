@@ -8,23 +8,22 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.uri;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
+import clojure.lang.RT;
+import clojure.lang.Var;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import clojure.lang.RT;
-import clojure.lang.Var;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Client service based on an external URI Resolver JSON Service.
  *
  * @author <a href="mailto:kevin.peterson@mayo.edu">Kevin Peterson</a>
  */
-@Component
+@Component("restUriResolver")
 public class RestUriResolver implements UriResolver, InitializingBean {
 
 	@Value("${uriResolutionServiceUrl}")
