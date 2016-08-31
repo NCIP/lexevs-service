@@ -274,7 +274,9 @@ ResolvedValueSetResolutionService {
 				ResolvedValueSetResolutionEntityRestrictions restrictions = 
 						query.getResolvedValueSetResolutionEntityRestrictions();
 				
-				entityRestrictions.getCodeSystemVersions().add(restrictions.getCodeSystemVersion());
+				if (restrictions.getCodeSystemVersion() != null)
+					entityRestrictions.getCodeSystemVersions().add(restrictions.getCodeSystemVersion());
+
 				entityRestrictions.setEntities(restrictions.getEntities());
 			}
 		

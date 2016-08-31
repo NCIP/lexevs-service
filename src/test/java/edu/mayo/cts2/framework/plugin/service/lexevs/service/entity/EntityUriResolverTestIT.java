@@ -8,16 +8,17 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import edu.mayo.cts2.framework.model.core.ScopedEntityName;
+import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
+import org.junit.Test;
+import org.springframework.test.annotation.IfProfileValue;
 
 import javax.annotation.Resource;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
-import edu.mayo.cts2.framework.model.core.ScopedEntityName;
-import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
-
+@IfProfileValue(name = "spring.profiles.active", value = "withUriResolver")
 public class EntityUriResolverTestIT extends AbstractTestITBase {
 	
 	@Resource
