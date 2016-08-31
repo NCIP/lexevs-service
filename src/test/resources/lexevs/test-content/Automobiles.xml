@@ -261,8 +261,16 @@
       <lgCon:presentation propertyName="textualPresentation" propertyId="p1" isPreferred="true">
         <lgCommon:value>Third Code in cycle</lgCommon:value>
       </lgCon:presentation>
-    </lgCon:entity>  
-    
+    </lgCon:entity>
+
+    <lgCon:entity entityCode="Has:Colon" entityCodeNamespace="Automobiles" isActive="true">
+      <lgCommon:entityDescription>Has Colon</lgCommon:entityDescription>
+      <lgCon:entityType>concept</lgCon:entityType>
+      <lgCon:presentation propertyName="textualPresentation" propertyId="p1" isPreferred="true">
+        <lgCommon:value>Has Colon</lgCommon:value>
+      </lgCon:presentation>
+    </lgCon:entity>
+
     <lgCon:associationEntity entityCode="AssocEntity" entityCodeNamespace="Automobiles"
     	forwardName="GoingForward" reverseName="GoingBackward" isTransitive="true" isNavigable="true">
     	<lgCommon:entityDescription>An AssociationEntity</lgCommon:entityDescription>

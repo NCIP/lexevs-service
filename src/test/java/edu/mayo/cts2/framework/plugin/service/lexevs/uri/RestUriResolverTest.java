@@ -8,27 +8,51 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.uri;
 
-import static org.junit.Assert.*;
-
+import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriResolver.IdType;
+import org.LexGrid.LexBIG.test.BaseContentLoadingInMemoryTest;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.test.annotation.IfProfileValue;
+import org.springframework.test.context.ContextConfiguration;
 
-import edu.mayo.cts2.framework.plugin.service.lexevs.uri.UriResolver.IdType;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-public class RestUriResolverTest {
+@ContextConfiguration("/test-lexevs-context.xml")
+@IfProfileValue(name = "spring.profiles.active", value = "withUriResolver")
+public class RestUriResolverTest extends BaseContentLoadingInMemoryTest {
 
 	RestUriResolver resolver;
 
+	@Value("${uriResolutionServiceUrl}")
+	private String uriResolutionServiceUrl;
+
+	@Test
+	public void testNotNullUriResolverUrl() {
+		assertNotNull(this.uriResolutionServiceUrl);
+	}
+
+
 	@Before
 	public void SetUp() throws Exception {
+<<<<<<< HEAD
 		resolver = new RestUriResolver(
 				"http://uriresolver.nci.nih.gov/URI_Resolver-1.0.0");
 		
+=======
+
+		resolver = new RestUriResolver(this.uriResolutionServiceUrl);
+>>>>>>> 27fd45df71ba96e15e6dc2e649d06738fb3cb8d5
 		resolver.loadClojureScripts();
 	}
 
+
 	@Test
 	public void TestIdToName() {
+
 		assertEquals("LNC", resolver.idToName(
 				"http://id.nlm.nih.gov/cui/C1136323", IdType.CODE_SYSTEM));
 	}
