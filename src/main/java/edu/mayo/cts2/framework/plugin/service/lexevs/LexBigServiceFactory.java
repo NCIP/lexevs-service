@@ -33,8 +33,6 @@ public class LexBigServiceFactory implements FactoryBean<LexBIGService>, Disposa
 	private LexBIGService lexBIGService;
 
 	private String lexevsRemoteApiUrl;
-
-	private Boolean useRemoteApi;
 	
 	private String lgConfigFile;
 	
@@ -49,18 +47,15 @@ public class LexBigServiceFactory implements FactoryBean<LexBIGService>, Disposa
 			this.log.warn("Waiting for the Configuration Service to start...");
 			Thread.sleep(4000);
 		}
-		if (BooleanUtils.toBoolean(this.useRemoteApi) && StringUtils.isNotBlank(this.lexevsRemoteApiUrl)) {
-			return (LexEVSApplicationService) ApplicationServiceProvider
-					.getApplicationServiceFromUrl(this.lexevsRemoteApiUrl, "EvsServiceInfo");
-		} else {
-			if(StringUtils.isBlank(this.lgConfigFile)){
-				throw new IllegalStateException(LG_CONFIG_FILE_ENV + " value is empty.");
-			}
-			System.setProperty(LG_CONFIG_FILE_ENV, this.lgConfigFile);
-			
-			this.lexBIGService = LexBIGServiceImpl.defaultInstance();
-			return this.lexBIGService;
+		
+		if(StringUtils.isBlank(this.lgConfigFile)){
+			throw new IllegalStateException(LG_CONFIG_FILE_ENV + " value is empty.");
 		}
+		System.setProperty(LG_CONFIG_FILE_ENV, this.lgConfigFile);
+		
+		this.lexBIGService = LexBIGServiceImpl.defaultInstance();
+		return this.lexBIGService;
+		
 	}
 
 	/* (non-Javadoc)
@@ -90,7 +85,6 @@ public class LexBigServiceFactory implements FactoryBean<LexBIGService>, Disposa
 	public void updateCallback(Map<String,?> properties){
 		this.lexevsRemoteApiUrl = (String)properties.get("lexevsRemoteApiUrl");
 		this.lgConfigFile = (String)properties.get(LG_CONFIG_FILE_ENV);
-		this.useRemoteApi = BooleanUtils.toBoolean(properties.get("useRemoteApi").toString());
 		
 		this.hasBeenConfigured = true;
 	}
@@ -101,14 +95,6 @@ public class LexBigServiceFactory implements FactoryBean<LexBIGService>, Disposa
 
 	public void setLexevsRemoteApiUrl(String lexevsRemoteApiUrl) {
 		this.lexevsRemoteApiUrl = lexevsRemoteApiUrl;
-	}
-
-	public Boolean getUseRemoteApi() {
-		return useRemoteApi;
-	}
-
-	public void setUseRemoteApi(Boolean useRemoteApi) {
-		this.useRemoteApi = useRemoteApi;
 	}
 
 	public String getLgConfigFile() {

@@ -57,16 +57,12 @@ osgi.suppress=true
 #### _lexevs.properties_ (Required)
 Parameters:
 * ```service.pid``` - The identifier of the LexEVS Service Plugin. Must be ```edu.mayo.cts2.framework.plugin.service.lexevs```
-* ```lexevsRemoteApiUrl``` - The URL of the Remote LexEVS API.
-* ```useRemoteApi``` - (true/false) ```true``` to use the Remote LexEVS API, ```false``` to use a local LexEVS installation.
 * ```LG_CONFIG_FILE``` - The path to the LexEVS ```lbconfig.props``` file to use when running against a local LexEVS installation
 * ```uriResolutionServiceUrl``` - The URL to the URI Resolution Service, must be ```https://informatics.mayo.edu/cts2/services/uriresolver/```
 
 ___Example - lexevs.properties___
 ```
 service.pid=edu.mayo.cts2.framework.plugin.service.lexevs
-lexevsRemoteApiUrl=
-useRemoteApi=false
 LG_CONFIG_FILE=/Applications/LexEVS/resources/config/lbconfig.props
 uriResolutionServiceUrl=https://informatics.mayo.edu/cts2/services/uriresolver/
 ```
