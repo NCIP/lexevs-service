@@ -8,14 +8,10 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs;
 
-import gov.nih.nci.system.client.ApplicationServiceProvider;
-
 import java.util.Map;
 
 import org.LexGrid.LexBIG.Impl.LexBIGServiceImpl;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
-import org.LexGrid.LexBIG.caCore.interfaces.LexEVSApplicationService;
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.DisposableBean;
