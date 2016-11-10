@@ -22,10 +22,12 @@ import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
 import edu.mayo.cts2.framework.model.core.ComponentReference;
+import edu.mayo.cts2.framework.model.core.EntityReferenceList;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.core.URIAndEntityName;
 import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
+import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSet;
@@ -171,6 +173,12 @@ public class LexEvsValueSetDefinitionResolutionService extends AbstractLexEvsSer
 			//Invalid name - return null;
 			return null;
 		}
+	}
+
+	@Override
+	public EntityReferenceList contains(ValueSetDefinitionReadId definitionId, Set<EntityNameOrURI> entities) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }
