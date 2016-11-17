@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>edu.mayo.cts2.framework</groupId>
 		<artifactId>cts2-base-service-plugin</artifactId>
-		<version>1.2.2-SNAPSHOT</version>
+		<version>1.2.2.SNAPSHOT.1</version>
 	</parent>
 
 	<artifactId>lexevs-service</artifactId>
