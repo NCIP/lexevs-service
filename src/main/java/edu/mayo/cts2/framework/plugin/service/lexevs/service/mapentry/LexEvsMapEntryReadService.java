@@ -109,6 +109,14 @@ public class LexEvsMapEntryReadService extends AbstractLexEvsService implements 
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+		
+		if(resolvedConceptReferencesIterator != null) {
+			try {
+				resolvedConceptReferencesIterator.release();
+			}catch (LBException e) {
+				throw new RuntimeException(e);
+			}
+		}
 
 		return resolvedConceptReference;
 	}
