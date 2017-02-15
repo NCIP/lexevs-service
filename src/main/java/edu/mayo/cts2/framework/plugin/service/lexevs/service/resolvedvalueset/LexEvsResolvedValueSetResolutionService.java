@@ -63,6 +63,7 @@ import edu.mayo.cts2.framework.service.profile.resolvedvalueset.ResolvedValueSet
 import edu.mayo.cts2.framework.service.profile.resolvedvalueset.name.ResolvedValueSetReadId;
 import edu.mayo.cts2.framework.service.profile.valuesetdefinition.ResolvedValueSetResolutionEntityQuery;
 import edu.mayo.cts2.framework.service.profile.valuesetdefinition.ResolvedValueSetResult;
+import edu.stanford.smi.protegex.owl.swrl.bridge.exceptions.NotImplementedException;
 
 @Component
 public class LexEvsResolvedValueSetResolutionService extends AbstractLexEvsService implements
@@ -331,4 +332,8 @@ ResolvedValueSetResolutionService {
 		throw new NotImplementedException("The contains method has not been implemented");
 	}
 	
+	@Override
+	public EntityReferenceList contains(ResolvedValueSetReadId identifier, Set<EntityNameOrURI> entities) {
+		return null;
+	}
 }

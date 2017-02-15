@@ -181,4 +181,10 @@ public class LexEvsValueSetDefinitionResolutionService extends AbstractLexEvsSer
 		return null;
 	}
 	
+	@Override
+	public EntityReferenceList contains(ValueSetDefinitionReadId definitionId, Set<EntityNameOrURI> entities) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 }
