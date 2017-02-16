@@ -330,5 +330,4 @@ ResolvedValueSetResolutionService {
 	public EntityReferenceList contains(ResolvedValueSetReadId identifier, Set<EntityNameOrURI> entities) {
 		throw new NotImplementedException("The contains method has not been implemented");
 	}
-	
 }

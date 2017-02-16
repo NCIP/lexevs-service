@@ -61,11 +61,13 @@ public final class CommonUtils {
 			nameConverter.getCodingSchemeNameTranslator().translateToLexGrid(entityName.getNamespace()), 
 			codingSchemeName.getName());
 		
+		ResolvedConceptReferencesIterator lexResolvedConceptReferencesIterator = null;
+		
 		try {
 			lexCodedNodeSet = lexBigService.getNodeSet(codingSchemeName.getName(), versionOrTag, null);
 			lexCodedNodeSet = lexCodedNodeSet.restrictToCodes(referenceList);
 			
-			ResolvedConceptReferencesIterator lexResolvedConceptReferencesIterator = lexCodedNodeSet.resolve(null, null, null);
+			lexResolvedConceptReferencesIterator = lexCodedNodeSet.resolve(null, null, null);
 			
 			if(! lexResolvedConceptReferencesIterator.hasNext()){
 				return null;
@@ -74,7 +76,15 @@ public final class CommonUtils {
 			}
 		} catch (LBException e) {
 			throw new RuntimeException(e);
-		}
+		} finally {
+			if(lexResolvedConceptReferencesIterator != null) {
+				try {
+					lexResolvedConceptReferencesIterator.release();
+				}catch (LBException e) {
+					throw new RuntimeException(e);
+				}
+			}
+ 		}
 		
 	}
 
