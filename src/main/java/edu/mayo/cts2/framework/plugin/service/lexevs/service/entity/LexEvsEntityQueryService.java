@@ -18,6 +18,7 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.Core.ConceptReference;
+import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
 import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Exceptions.LBResourceUnavailableException;
@@ -100,6 +101,14 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 					count = iterator.numberRemaining();
 				} catch (LBResourceUnavailableException e) {
 					throw new RuntimeException(e);
+				} finally {
+					if(iterator != null) {
+						try {
+							iterator.release();
+						}catch (LBException e) {
+							throw new RuntimeException(e);
+						}
+					}
 				}
 			}
 		}
