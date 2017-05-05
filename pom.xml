@@ -209,6 +209,8 @@
 						WEB-INF/lib/axis-saaj*.jar,
 						WEB-INF/lib/xercesImpl*.jar,
 						WEB-INF/lib/commons-codec-1.2.jar,
+						WEB-INF/lib/slf4j-api-1.5.8.jar,
+						WEB-INF/lib/slf4j-log4j12-1.5.8.jar
 					</packagingExcludes>
 				</configuration>
 				<executions>
