@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>lexevs-service</artifactId>
-	<version>1.6.0.RC.5</version>
+	<version>1.6.0.FINAL</version>
 	<packaging>${packaging}</packaging>
 
 	<description>A CTS2 Framework Service Plugin based on LexEVS</description>
@@ -59,7 +59,7 @@
 	<properties>
 		<forkMode>never</forkMode>
 
-		<lexevs.version>6.5.0.RC.1</lexevs.version>
+		<lexevs.version>6.5.0.FINAL</lexevs.version>
 		
 		<!-- TODO remove dependencies and related cod for remote.version, sdk.version, cagrid.version. -->
 		<!-- These components are used anymore. -->
