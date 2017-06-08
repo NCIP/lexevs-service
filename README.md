@@ -49,6 +49,8 @@ uriResolutionServiceUrl=https://informatics.mayo.edu/cts2/services/uriresolver/
 * ```allowSoap``` - (true/false) Turn on/off the SOAP API.
 * ```supportEmail``` - The email address to direct unexpected user encountered errors.
 * ```alternateHomePage``` - Home page URL to use instead of the standard framework home page.
+* ```maxToReturn``` - Number of entries to return for each call.  This includes, calls to entities, value sets, associations, etc. If not specified, the internal default is 50.
+
 
 ___Example - webapp-config.properties___
 ```
@@ -59,6 +61,7 @@ showHomePage=false
 allowSoap=false
 supportEmail=support@yourservice.org
 alternateHomePage=http://alternateHomepage.com
+maxToReturn=100
 ```
 
 #### _server-context.properties_ (Optional)
