@@ -9,11 +9,7 @@
 	</parent>
 
 	<artifactId>lexevs-service</artifactId>
-<<<<<<< HEAD
-	<version>1.4.0.1.FINAL</version>
-=======
 	<version>1.5.1.FINAL</version>
->>>>>>> 27fd45df71ba96e15e6dc2e649d06738fb3cb8d5
 	<packaging>${packaging}</packaging>
 
 	<description>A CTS2 Framework Service Plugin based on LexEVS</description>
