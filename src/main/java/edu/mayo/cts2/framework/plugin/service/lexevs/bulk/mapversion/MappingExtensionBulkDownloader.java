@@ -17,6 +17,7 @@ import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.DataModel.Core.ResolvedConceptReference;
 import org.LexGrid.LexBIG.Exceptions.LBParameterException;
+import org.LexGrid.LexBIG.Exceptions.LBResourceUnavailableException;
 import org.LexGrid.LexBIG.Extensions.Generic.CodingSchemeReference;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.Impl.helpers.ResolvedConceptReferencesIteratorAdapter;
@@ -180,6 +181,12 @@ public class MappingExtensionBulkDownloader
 		}
 		
 		this.doWrite(outputStream, new ResolvedConceptReferencesIteratorAdapter(itr), separator, fields);
+		
+		try {
+			itr.release();
+		} catch (LBResourceUnavailableException e) {
+			itr = null;
+		}
 	}
 
 	@Override
