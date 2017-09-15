@@ -65,8 +65,6 @@
 		<!-- These components are used anymore. -->
 		<lexevs.remote.version>6.4.1</lexevs.remote.version>
 		<spring-security.version>${org.springframework-version}</spring-security.version>
-		<webapp.classifier></webapp.classifier>
-		<osgi.bundle.classifier></osgi.bundle.classifier>
 	</properties>
 
 	<profiles>
