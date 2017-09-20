@@ -58,12 +58,7 @@
 
 	<properties>
 		<forkMode>never</forkMode>
-
 		<lexevs.version>6.5.0.FINAL</lexevs.version>
-		
-		<!-- TODO remove dependencies and related cod for remote.version, sdk.version, cagrid.version. -->
-		<!-- These components are used anymore. -->
-		<lexevs.remote.version>6.4.1</lexevs.remote.version>
 		<spring-security.version>${org.springframework-version}</spring-security.version>
 	</properties>
 
@@ -166,7 +161,11 @@
 							edu.mayo.cts2.framework.model.service.statement,
 							edu.mayo.cts2.framework.model.service.valueset,
 							edu.mayo.cts2.framework.model.service.valuesetdefinition,
+							edu.mayo.cts2.framework.model.service.core,
+							edu.mayo.cts2.framework.model.core,
+							edu.mayo.cts2.framework.model.association,
 							edu.mayo.cts2.framework.service.provider,
+							
 							net.sf.cglib.proxy,
 							org.aspectj.lang.annotation,
 							org.aspectj.weaver.reflect,
@@ -440,19 +439,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
-		<dependency>
-			<groupId>lexevs</groupId>
-			<artifactId>lexevs-remote-client</artifactId>
-			<version>${lexevs.remote.version}</version>
-		</dependency>
-
-		<!-- dependency>
-			<groupId>lexevs</groupId>
-			<artifactId>lexevs-remote-security</artifactId>
-			<version>${lexevs.remote.version}</version>
-		</dependency-->
-
 		<dependency>
 			<groupId>commons-discovery</groupId>
 			<artifactId>commons-discovery</artifactId>
