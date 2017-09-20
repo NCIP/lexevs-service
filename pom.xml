@@ -447,11 +447,11 @@
 			<version>${lexevs.remote.version}</version>
 		</dependency>
 
-		<dependency>
+		<!-- dependency>
 			<groupId>lexevs</groupId>
 			<artifactId>lexevs-remote-security</artifactId>
 			<version>${lexevs.remote.version}</version>
-		</dependency>
+		</dependency-->
 
 		<dependency>
 			<groupId>commons-discovery</groupId>

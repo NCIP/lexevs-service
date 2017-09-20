@@ -11,7 +11,7 @@ package edu.mayo.cts2.framework.plugin.service.lexevs;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
-import org.LexGrid.LexBIG.caCore.interfaces.LexEVSApplicationService;
+//import org.LexGrid.LexBIG.caCore.interfaces.LexEVSApplicationService;
 import org.lexgrid.valuesets.LexEVSValueSetDefinitionServices;
 import org.lexgrid.valuesets.impl.LexEVSValueSetDefinitionServicesImpl;
 import org.springframework.beans.factory.FactoryBean;
@@ -30,13 +30,13 @@ public class LexEVSValueSetDefinitionServicesFactory implements
 
 	@Override
 	public LexEVSValueSetDefinitionServices getObject() throws Exception {
-		if(this.lbs instanceof LexEVSApplicationService) {
-			return ((LexEVSApplicationService) lbs ).getLexEVSValueSetDefinitionServices();
-		} else {
+//		if(this.lbs instanceof LexEVSApplicationService) {
+//			return ((LexEVSApplicationService) lbs ).getLexEVSValueSetDefinitionServices();
+//		} else {
 			return LexEVSValueSetDefinitionServicesImpl.defaultInstance();
-		}
-	}
-
+//		}
+}
+	
 	@Override
 	public Class<?> getObjectType() {
 		return LexEVSValueSetDefinitionServices.class;
