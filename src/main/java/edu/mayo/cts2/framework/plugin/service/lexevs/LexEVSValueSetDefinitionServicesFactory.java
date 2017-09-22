@@ -30,12 +30,8 @@ public class LexEVSValueSetDefinitionServicesFactory implements
 
 	@Override
 	public LexEVSValueSetDefinitionServices getObject() throws Exception {
-//		if(this.lbs instanceof LexEVSApplicationService) {
-//			return ((LexEVSApplicationService) lbs ).getLexEVSValueSetDefinitionServices();
-//		} else {
-			return LexEVSValueSetDefinitionServicesImpl.defaultInstance();
-//		}
-}
+		return LexEVSValueSetDefinitionServicesImpl.defaultInstance();
+	}
 	
 	@Override
 	public Class<?> getObjectType() {
