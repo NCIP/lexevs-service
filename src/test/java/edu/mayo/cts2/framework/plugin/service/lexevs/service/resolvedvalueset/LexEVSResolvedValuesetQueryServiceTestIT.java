@@ -38,8 +38,8 @@ import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 
 @LoadContents({
-		@LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosAndGM.xml"),
-		@LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosButGM.xml") })
+		@LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosAndGM.xml", loader = "LexGrid_ResolvedValueSetLoader"),
+		@LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosButGM.xml", loader = "LexGrid_ResolvedValueSetLoader") })
 public class LexEVSResolvedValuesetQueryServiceTestIT extends
 		AbstractTestITBase {
 
