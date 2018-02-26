@@ -43,8 +43,8 @@ import edu.mayo.cts2.framework.service.profile.resolvedvalueset.name.ResolvedVal
 import edu.mayo.cts2.framework.service.profile.valuesetdefinition.ResolvedValueSetResult;
 
 @LoadContents({
-	@LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosAndGM.xml"),
-	@LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosAndGMTooLong.xml"),
+	@LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosAndGM.xml", loader = "LexGrid_ResolvedValueSetLoader"),
+	@LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosAndGMTooLong.xml", loader = "LexGrid_ResolvedValueSetLoader"),
 	@LoadContent(contentPath = "lexevs/test-content/Automobiles.xml")})
 public class LexEVSResolvedValuesetResolutionServiceTestIT 
 	extends AbstractTestITBase {
