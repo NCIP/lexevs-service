@@ -58,8 +58,7 @@
 
 	<properties>
 		<forkMode>never</forkMode>
-		<!-- lexevs.version>6.5.0.FINAL</lexevs.version-->
-		<lexevs.version>6.5.1.SNAPSHOT.5</lexevs.version>
+		<lexevs.version>6.5.1.SNAPSHOT.6</lexevs.version>
 		<spring-security.version>${org.springframework-version}</spring-security.version>
 	</properties>
 
