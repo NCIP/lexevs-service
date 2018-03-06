@@ -10,9 +10,11 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -49,8 +51,9 @@ import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersi
  *
  */
 @LoadContents({
-@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
-@LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml")})
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
+	@LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml"),
+	@LoadContent(contentPath="lexevs/test-content/owl2/owl2-special-cases-Defined-Annotated.owl", loader = "OWL2Loader")})
 public class LexEvsCodeSystemVersionQueryServiceTestIT
 	extends AbstractQueryServiceTest<CodeSystemVersionCatalogEntryListEntry, 
 		CodeSystemVersionCatalogEntrySummary, 
@@ -59,8 +62,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 	private final static String ABOUT_CONTAINS = "11.11.0.1";
 	private final static String RESOURCESYNOPSIS_STARTSWITH = "Auto";
 	private final static String RESOURCENAME_EXACTMATCH = "Automobiles-1.0";
-	
-	
+		
 	@Resource
 	private LexEvsCodeSystemVersionQueryService service;
 
@@ -129,7 +131,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		// Build query using filters
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, null, readContext, null);
 
-		int expecting = 1;
+		int expecting = 2;
 		int actual = this.service.count(query);
 		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
 		
@@ -162,7 +164,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filters, null, null);
 
 		try {
-			int expecting = 1;
+			int expecting = 2;
 			int actual = this.service.getResourceSummaries(query, null, new Page()).getEntries().size();
 			assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
 		} finally {
@@ -186,7 +188,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		// Build query using filters
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, null, readContext, null);
 
-		int expecting = 2;
+		int expecting = 3;
 		int actual = this.service.count(query);
 		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
 		
@@ -598,7 +600,28 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
 	}
 
+	@Test
+	public void testOwl2CodeSystemVersionQuery() throws Exception {
+		// Build query using no filters
+		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, null, null, null);
 
+		List<CodeSystemVersionCatalogEntryListEntry> entries = this.service.getResourceList(query, null, new Page()).getEntries();
+		
+		int expecting = 3;
+		int actual = entries.size();
+		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
+
+		boolean found = false;
+				
+		for(CodeSystemVersionCatalogEntryListEntry entry :entries) {
+			if (entry.getEntry().getCodeSystemVersionName().equals("owl2lexevs-0.1.5") && 
+				entry.getEntry().getDocumentURI().equals("http://ncicb.nci.nih.gov/xml/owl/EVS/owl2lexevs.owl/0.1.5")) {
+				found = true;
+				break;
+			}
+		}
+		assertTrue(found);
+	}
 	@Override
 	protected QueryService<CodeSystemVersionCatalogEntryListEntry, CodeSystemVersionCatalogEntrySummary, CodeSystemVersionQuery> getService() {
 		return this.service;
