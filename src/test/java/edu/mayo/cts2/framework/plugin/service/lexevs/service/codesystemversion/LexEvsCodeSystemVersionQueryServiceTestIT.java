@@ -24,7 +24,28 @@ import org.LexGrid.LexBIG.Impl.LexBIGServiceImpl;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContents;
+import org.LexGrid.util.assertedvaluesets.AssertedValueSetParameters;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.util.CharArraySet;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.BooleanClause.Occur;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.join.QueryBitSetProducer;
+import org.apache.lucene.search.join.ScoreMode;
+import org.apache.lucene.search.join.ToParentBlockJoinQuery;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.lexevs.dao.index.service.search.SourceAssertedValueSetSearchIndexService;
+import org.lexevs.locator.LexEvsServiceLocator;
+import org.lexgrid.valuesets.sourceasserted.SourceAssertedValueSetService;
+import org.lexgrid.valuesets.sourceasserted.impl.SourceAssertedValueSetServiceImpl;
 
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntryListEntry;
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntrySummary;
@@ -62,16 +83,105 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 	private final static String ABOUT_CONTAINS = "11.11.0.1";
 	private final static String RESOURCESYNOPSIS_STARTSWITH = "Auto";
 	private final static String RESOURCENAME_EXACTMATCH = "Automobiles-1.0";
+	
+	private static SourceAssertedValueSetService sourceAssertedValueSetService;
+	private static SourceAssertedValueSetSearchIndexService sourceAssertedValueSetSearchIndexService;
 		
 	@Resource
 	private LexEvsCodeSystemVersionQueryService service;
 
+	@BeforeClass
+	public static void createIndex() throws Exception {
+		sourceAssertedValueSetSearchIndexService = 
+				LexEvsServiceLocator.getInstance().getIndexServiceManager().getAssertedValueSetIndexService();
+		sourceAssertedValueSetSearchIndexService.createIndex(Constructors.createAbsoluteCodingSchemeVersionReference(
+				"http://ncicb.nci.nih.gov/xml/owl/EVS/owl2lexevs.owl", "0.1.5"));
+		
+		AssertedValueSetParameters params = new AssertedValueSetParameters.Builder("0.1.5").
+				assertedDefaultHierarchyVSRelation("Concept_In_Subset").
+				codingSchemeName("owl2lexevs").
+				codingSchemeURI("http://ncicb.nci.nih.gov/xml/owl/EVS/owl2lexevs.owl")
+				.build();
+		sourceAssertedValueSetService = SourceAssertedValueSetServiceImpl.getDefaultValueSetServiceForVersion(params);
+	}
+	
+	
 	// ---- Test methods ----
 	@Test
 	public void testSetUp() {
 		assertNotNull(this.service);
 	}
 
+	
+	@Test
+	public void queryPropertyTest() throws ParseException {
+		// Testing the indexing
+		
+		BooleanQuery.Builder builder = new BooleanQuery.Builder();
+		builder.add(new TermQuery(new Term("isParentDoc", "true")), Occur.MUST_NOT);
+		builder.add(new TermQuery(new Term("code", "C99998")), Occur.MUST);
+		builder.add(new TermQuery(new Term("propertyName", "Contributing_Source")), Occur.MUST);
+		QueryParser propValueParser = new QueryParser("propertyValue", sourceAssertedValueSetSearchIndexService.getAnalyzer());
+		builder.add(propValueParser.createBooleanQuery("propertyValue", "FDA"), Occur.MUST);
+		Query query = builder.build();
+		QueryBitSetProducer parentFilter;
+		parentFilter = new QueryBitSetProducer(
+					new QueryParser("isParentDoc", new StandardAnalyzer(new CharArraySet(0, true))).parse("true"));
+		ToParentBlockJoinQuery blockJoinQuery = new ToParentBlockJoinQuery(query, parentFilter, ScoreMode.Total);
+
+		List<ScoreDoc> docs = sourceAssertedValueSetSearchIndexService.query(null, blockJoinQuery);
+		assertNotNull(docs);
+		assertTrue(docs.size() > 0);
+		ScoreDoc sd = docs.get(0);
+		Document doc = sourceAssertedValueSetSearchIndexService.getById(sd.doc);
+		assertNotNull(doc);
+		
+		boolean fieldFound = false;
+		
+		List<IndexableField> fields =  doc.getFields();
+		for(IndexableField field: fields) {
+			if (field.name().equals("entityCode")  &&
+				field.stringValue().equals("C99998") ) {
+				fieldFound = true;
+			}
+		}
+			
+		assertTrue(fieldFound);
+	}
+	
+	@Test
+	public void queryPublishPropertyTest() throws ParseException {
+		BooleanQuery.Builder builder = new BooleanQuery.Builder();
+		builder.add(new TermQuery(new Term("isParentDoc", "true")), Occur.MUST_NOT);
+		builder.add(new TermQuery(new Term("code", "C99999")), Occur.MUST);
+		builder.add(new TermQuery(new Term("propertyName", "Publish_Value_Set")), Occur.MUST);
+		QueryParser propValueParser = new QueryParser("propertyValue", sourceAssertedValueSetSearchIndexService.getAnalyzer());
+		builder.add(propValueParser.createBooleanQuery("propertyValue", "Yes"), Occur.MUST);
+		Query query = builder.build();
+		QueryBitSetProducer parentFilter;
+		parentFilter = new QueryBitSetProducer(
+					new QueryParser("isParentDoc", new StandardAnalyzer(new CharArraySet(0, true))).parse("true"));
+		ToParentBlockJoinQuery blockJoinQuery = new ToParentBlockJoinQuery(query, parentFilter, ScoreMode.Total);
+
+		List<ScoreDoc> docs = sourceAssertedValueSetSearchIndexService.query(null, blockJoinQuery);
+		assertNotNull(docs);
+		assertTrue(docs.size() > 0);
+		ScoreDoc sd = docs.get(0);
+		Document doc = sourceAssertedValueSetSearchIndexService.getById(sd.doc);
+		assertNotNull(doc);
+		
+		boolean fieldFound = false;
+		
+		List<IndexableField> fields =  doc.getFields();
+		for(IndexableField field: fields) {
+			if (field.name().equals("entityCode")  &&
+				field.stringValue().equals("C99999") ) {
+				fieldFound = true;
+			}
+		}
+			
+		assertTrue(fieldFound);
+	}
 	
 	@Test
 	public void testCountWithNullQuery() throws Exception {
