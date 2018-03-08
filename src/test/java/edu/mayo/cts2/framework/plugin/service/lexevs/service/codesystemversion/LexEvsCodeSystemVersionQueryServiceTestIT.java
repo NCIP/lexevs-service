@@ -154,6 +154,10 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 	
 	@Test
 	public void queryPublishPropertyTest() throws ParseException {
+		
+		SourceAssertedValueSetSearchIndexService sourceAssertedValueSetSearchIndexService = 
+				LexEvsServiceLocator.getInstance().getIndexServiceManager().getAssertedValueSetIndexService();
+		
 		BooleanQuery.Builder builder = new BooleanQuery.Builder();
 		builder.add(new TermQuery(new Term("isParentDoc", "true")), Occur.MUST_NOT);
 		builder.add(new TermQuery(new Term("code", "C99999")), Occur.MUST);
