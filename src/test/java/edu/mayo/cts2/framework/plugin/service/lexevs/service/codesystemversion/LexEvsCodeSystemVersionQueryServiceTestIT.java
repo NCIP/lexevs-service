@@ -65,6 +65,7 @@ import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 import edu.mayo.cts2.framework.service.profile.QueryService;
 import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersionQuery;
 //import edu.mayo.cts2.framework.plugin.service.lexevs.utility.PrintUtility;
+import edu.stanford.smi.protegex.owl.ui.individuals.AssertedTypesListPanel;
 
 /**
  *  @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
@@ -119,9 +120,12 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		
 		SourceAssertedValueSetSearchIndexService sourceAssertedValueSetSearchIndexService = 
 				LexEvsServiceLocator.getInstance().getIndexServiceManager().getAssertedValueSetIndexService();
+		
+		assertTrue(sourceAssertedValueSetSearchIndexService != null);
+		
 		sourceAssertedValueSetSearchIndexService.createIndex(Constructors.createAbsoluteCodingSchemeVersionReference(
 				"http://ncicb.nci.nih.gov/xml/owl/EVS/owl2lexevs.owl", "0.1.5"));
-		
+				
 		BooleanQuery.Builder builder = new BooleanQuery.Builder();
 		builder.add(new TermQuery(new Term("isParentDoc", "true")), Occur.MUST_NOT);
 		builder.add(new TermQuery(new Term("code", "C99998")), Occur.MUST);
