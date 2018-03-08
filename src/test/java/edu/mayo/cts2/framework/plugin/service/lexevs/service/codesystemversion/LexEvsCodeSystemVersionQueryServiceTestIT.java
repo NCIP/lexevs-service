@@ -85,17 +85,17 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 	private final static String RESOURCENAME_EXACTMATCH = "Automobiles-1.0";
 	
 //	private static SourceAssertedValueSetService sourceAssertedValueSetService;
-	private static SourceAssertedValueSetSearchIndexService sourceAssertedValueSetSearchIndexService;
+//	private static SourceAssertedValueSetSearchIndexService sourceAssertedValueSetSearchIndexService;
 		
 	@Resource
 	private LexEvsCodeSystemVersionQueryService service;
 
-	@BeforeClass
-	public static void createIndex() throws Exception {
-		sourceAssertedValueSetSearchIndexService = 
-				LexEvsServiceLocator.getInstance().getIndexServiceManager().getAssertedValueSetIndexService();
-		sourceAssertedValueSetSearchIndexService.createIndex(Constructors.createAbsoluteCodingSchemeVersionReference(
-				"http://ncicb.nci.nih.gov/xml/owl/EVS/owl2lexevs.owl", "0.1.5"));
+//	@BeforeClass
+//	public static void createIndex() throws Exception {
+//		sourceAssertedValueSetSearchIndexService = 
+//				LexEvsServiceLocator.getInstance().getIndexServiceManager().getAssertedValueSetIndexService();
+//		sourceAssertedValueSetSearchIndexService.createIndex(Constructors.createAbsoluteCodingSchemeVersionReference(
+//				"http://ncicb.nci.nih.gov/xml/owl/EVS/owl2lexevs.owl", "0.1.5"));
 //		
 //		AssertedValueSetParameters params = new AssertedValueSetParameters.Builder("0.1.5").
 //				assertedDefaultHierarchyVSRelation("Concept_In_Subset").
@@ -103,7 +103,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 //				codingSchemeURI("http://ncicb.nci.nih.gov/xml/owl/EVS/owl2lexevs.owl")
 //				.build();
 //		sourceAssertedValueSetService = SourceAssertedValueSetServiceImpl.getDefaultValueSetServiceForVersion(params);
-	}
+//	}
 	
 	
 	// ---- Test methods ----
@@ -119,6 +119,8 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		
 		SourceAssertedValueSetSearchIndexService sourceAssertedValueSetSearchIndexService = 
 				LexEvsServiceLocator.getInstance().getIndexServiceManager().getAssertedValueSetIndexService();
+		sourceAssertedValueSetSearchIndexService.createIndex(Constructors.createAbsoluteCodingSchemeVersionReference(
+				"http://ncicb.nci.nih.gov/xml/owl/EVS/owl2lexevs.owl", "0.1.5"));
 		
 		BooleanQuery.Builder builder = new BooleanQuery.Builder();
 		builder.add(new TermQuery(new Term("isParentDoc", "true")), Occur.MUST_NOT);
@@ -152,43 +154,43 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		assertTrue(fieldFound);
 	}
 	
-	@Test
-	public void queryPublishPropertyTest() throws ParseException {
-		
-		SourceAssertedValueSetSearchIndexService sourceAssertedValueSetSearchIndexService = 
-				LexEvsServiceLocator.getInstance().getIndexServiceManager().getAssertedValueSetIndexService();
-		
-		BooleanQuery.Builder builder = new BooleanQuery.Builder();
-		builder.add(new TermQuery(new Term("isParentDoc", "true")), Occur.MUST_NOT);
-		builder.add(new TermQuery(new Term("code", "C99999")), Occur.MUST);
-		builder.add(new TermQuery(new Term("propertyName", "Publish_Value_Set")), Occur.MUST);
-		QueryParser propValueParser = new QueryParser("propertyValue", sourceAssertedValueSetSearchIndexService.getAnalyzer());
-		builder.add(propValueParser.createBooleanQuery("propertyValue", "Yes"), Occur.MUST);
-		Query query = builder.build();
-		QueryBitSetProducer parentFilter;
-		parentFilter = new QueryBitSetProducer(
-					new QueryParser("isParentDoc", new StandardAnalyzer(new CharArraySet(0, true))).parse("true"));
-		ToParentBlockJoinQuery blockJoinQuery = new ToParentBlockJoinQuery(query, parentFilter, ScoreMode.Total);
-
-		List<ScoreDoc> docs = sourceAssertedValueSetSearchIndexService.query(null, blockJoinQuery);
-		assertNotNull(docs);
-		assertTrue(docs.size() > 0);
-		ScoreDoc sd = docs.get(0);
-		Document doc = sourceAssertedValueSetSearchIndexService.getById(sd.doc);
-		assertNotNull(doc);
-		
-		boolean fieldFound = false;
-		
-		List<IndexableField> fields =  doc.getFields();
-		for(IndexableField field: fields) {
-			if (field.name().equals("entityCode")  &&
-				field.stringValue().equals("C99999") ) {
-				fieldFound = true;
-			}
-		}
-			
-		assertTrue(fieldFound);
-	}
+//	@Test
+//	public void queryPublishPropertyTest() throws ParseException {
+//		
+//		SourceAssertedValueSetSearchIndexService sourceAssertedValueSetSearchIndexService = 
+//				LexEvsServiceLocator.getInstance().getIndexServiceManager().getAssertedValueSetIndexService();
+//		
+//		BooleanQuery.Builder builder = new BooleanQuery.Builder();
+//		builder.add(new TermQuery(new Term("isParentDoc", "true")), Occur.MUST_NOT);
+//		builder.add(new TermQuery(new Term("code", "C99999")), Occur.MUST);
+//		builder.add(new TermQuery(new Term("propertyName", "Publish_Value_Set")), Occur.MUST);
+//		QueryParser propValueParser = new QueryParser("propertyValue", sourceAssertedValueSetSearchIndexService.getAnalyzer());
+//		builder.add(propValueParser.createBooleanQuery("propertyValue", "Yes"), Occur.MUST);
+//		Query query = builder.build();
+//		QueryBitSetProducer parentFilter;
+//		parentFilter = new QueryBitSetProducer(
+//					new QueryParser("isParentDoc", new StandardAnalyzer(new CharArraySet(0, true))).parse("true"));
+//		ToParentBlockJoinQuery blockJoinQuery = new ToParentBlockJoinQuery(query, parentFilter, ScoreMode.Total);
+//
+//		List<ScoreDoc> docs = sourceAssertedValueSetSearchIndexService.query(null, blockJoinQuery);
+//		assertNotNull(docs);
+//		assertTrue(docs.size() > 0);
+//		ScoreDoc sd = docs.get(0);
+//		Document doc = sourceAssertedValueSetSearchIndexService.getById(sd.doc);
+//		assertNotNull(doc);
+//		
+//		boolean fieldFound = false;
+//		
+//		List<IndexableField> fields =  doc.getFields();
+//		for(IndexableField field: fields) {
+//			if (field.name().equals("entityCode")  &&
+//				field.stringValue().equals("C99999") ) {
+//				fieldFound = true;
+//			}
+//		}
+//			
+//		assertTrue(fieldFound);
+//	}
 	
 	@Test
 	public void testCountWithNullQuery() throws Exception {
