@@ -84,7 +84,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 	private final static String RESOURCESYNOPSIS_STARTSWITH = "Auto";
 	private final static String RESOURCENAME_EXACTMATCH = "Automobiles-1.0";
 	
-	private static SourceAssertedValueSetService sourceAssertedValueSetService;
+//	private static SourceAssertedValueSetService sourceAssertedValueSetService;
 	private static SourceAssertedValueSetSearchIndexService sourceAssertedValueSetSearchIndexService;
 		
 	@Resource
@@ -96,13 +96,13 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 				LexEvsServiceLocator.getInstance().getIndexServiceManager().getAssertedValueSetIndexService();
 		sourceAssertedValueSetSearchIndexService.createIndex(Constructors.createAbsoluteCodingSchemeVersionReference(
 				"http://ncicb.nci.nih.gov/xml/owl/EVS/owl2lexevs.owl", "0.1.5"));
-		
-		AssertedValueSetParameters params = new AssertedValueSetParameters.Builder("0.1.5").
-				assertedDefaultHierarchyVSRelation("Concept_In_Subset").
-				codingSchemeName("owl2lexevs").
-				codingSchemeURI("http://ncicb.nci.nih.gov/xml/owl/EVS/owl2lexevs.owl")
-				.build();
-		sourceAssertedValueSetService = SourceAssertedValueSetServiceImpl.getDefaultValueSetServiceForVersion(params);
+//		
+//		AssertedValueSetParameters params = new AssertedValueSetParameters.Builder("0.1.5").
+//				assertedDefaultHierarchyVSRelation("Concept_In_Subset").
+//				codingSchemeName("owl2lexevs").
+//				codingSchemeURI("http://ncicb.nci.nih.gov/xml/owl/EVS/owl2lexevs.owl")
+//				.build();
+//		sourceAssertedValueSetService = SourceAssertedValueSetServiceImpl.getDefaultValueSetServiceForVersion(params);
 	}
 	
 	
@@ -116,6 +116,9 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 	@Test
 	public void queryPropertyTest() throws ParseException {
 		// Testing the indexing
+		
+		SourceAssertedValueSetSearchIndexService sourceAssertedValueSetSearchIndexService = 
+				LexEvsServiceLocator.getInstance().getIndexServiceManager().getAssertedValueSetIndexService();
 		
 		BooleanQuery.Builder builder = new BooleanQuery.Builder();
 		builder.add(new TermQuery(new Term("isParentDoc", "true")), Occur.MUST_NOT);
