@@ -123,8 +123,8 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		
 		assertTrue(sourceAssertedValueSetSearchIndexService != null);
 		
-		sourceAssertedValueSetSearchIndexService.createIndex(Constructors.createAbsoluteCodingSchemeVersionReference(
-				"http://ncicb.nci.nih.gov/xml/owl/EVS/owl2lexevs.owl", "0.1.5"));
+//		sourceAssertedValueSetSearchIndexService.createIndex(Constructors.createAbsoluteCodingSchemeVersionReference(
+//				"http://ncicb.nci.nih.gov/xml/owl/EVS/owl2lexevs.owl", "0.1.5"));
 				
 		BooleanQuery.Builder builder = new BooleanQuery.Builder();
 		builder.add(new TermQuery(new Term("isParentDoc", "true")), Occur.MUST_NOT);
