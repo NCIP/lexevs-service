@@ -41,7 +41,8 @@ import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
  *
  */
 @LoadContents({
-	@LoadContent(contentPath = "lexevs/test-content/valueset/vdTestData.xml") })
+	@LoadContent(contentPath = "lexevs/test-content/valueset/vdTestData.xml"),
+	@LoadContent(contentPath = "lexevs/test-content/owl2/owl2-special-cases-Defined-Annotated.owl", loader = "OWL2Loader")})
 public class LexEVSValuesetQueryServiceTestIT extends AbstractTestITBase {
 
 	private Cts2Marshaller marshaller = new DelegatingMarshaller();

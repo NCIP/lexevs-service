@@ -1,5 +1,18 @@
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.entity;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+
+import javax.annotation.Resource;
+
+import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
+import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContents;
+import org.junit.Test;
+import org.mockito.Mockito;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
+
 import edu.mayo.cts2.framework.core.config.ServerContext;
 import edu.mayo.cts2.framework.core.config.TestServerContext;
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
@@ -10,19 +23,10 @@ import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersi
 import edu.mayo.cts2.framework.webapp.naming.CodeSystemVersionNameResolver;
 import edu.mayo.cts2.framework.webapp.rest.command.RestReadContext;
 import edu.mayo.cts2.framework.webapp.rest.controller.EntityDescriptionController;
-import org.LexGrid.LexBIG.test.LexEvsTestRunner;
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockHttpServletRequest;
 
-import javax.annotation.Resource;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-
-@LexEvsTestRunner.LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+@LoadContents({
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
+	@LoadContent(contentPath = "lexevs/test-content/owl2/owl2-special-cases-Defined-Annotated.owl", loader = "OWL2Loader") })
 public class LexEvsEntityQueryServiceIntegrationTestIT extends AbstractTestITBase {
 
     @Resource

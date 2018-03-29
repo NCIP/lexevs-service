@@ -13,6 +13,7 @@ import static org.junit.Assert.assertNotNull;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
+import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContents;
 import org.junit.Test;
 
 import edu.mayo.cts2.framework.model.extension.LocalIdValueSetDefinition;
@@ -24,7 +25,9 @@ import edu.mayo.cts2.framework.service.profile.valuesetdefinition.name.ValueSetD
  * @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
  *
  */
-@LoadContent(contentPath="lexevs/test-content/valueset/VSDOnlyTest.xml")
+@LoadContents({
+	@LoadContent(contentPath="lexevs/test-content/valueset/VSDOnlyTest.xml"),
+	@LoadContent(contentPath = "lexevs/test-content/owl2/owl2-special-cases-Defined-Annotated.owl", loader = "OWL2Loader") })
 public class LexEvsValueSetDefinitionReadByUriServiceTestIT
 	extends AbstractReadServiceTest<LocalIdValueSetDefinition, ValueSetDefinitionReadId> {
 

@@ -29,9 +29,9 @@ import edu.mayo.cts2.framework.filter.match.ExactMatcher;
 import edu.mayo.cts2.framework.filter.match.ResolvableMatchAlgorithmReference;
 import edu.mayo.cts2.framework.filter.match.StartsWithMatcher;
 import edu.mayo.cts2.framework.model.command.Page;
+import edu.mayo.cts2.framework.model.core.ComponentReference;
 import edu.mayo.cts2.framework.model.core.MatchAlgorithmReference;
 import edu.mayo.cts2.framework.model.core.PredicateReference;
-import edu.mayo.cts2.framework.model.core.ComponentReference;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
 import edu.mayo.cts2.framework.model.directory.DirectoryResult;
 import edu.mayo.cts2.framework.model.service.core.DocumentedNamespaceReference;
@@ -59,6 +59,7 @@ public class LexEvsResolvedValueSetQueryService extends AbstractLexEvsService
 	private Object mutex = new Object();
 
 	private Set<String> activeCache = new HashSet<String>();
+	private Set<String> activeCacheValueSets = new HashSet<String>();
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -149,7 +150,7 @@ public class LexEvsResolvedValueSetQueryService extends AbstractLexEvsService
 		this.resolverUtils = resolverUtils;
 	}
 	
-	private List<CodingScheme>  processQuery(ResolvedValueSetQuery query) throws LBException{
+	private List<CodingScheme>  processQuery(ResolvedValueSetQuery query) throws LBException{		
 		List<CodingScheme> csList= this.filterInactive(getLexEVSResolvedService().listAllResolvedValueSets());
 		List<CodingScheme> restrictedList= resolverUtils.restrictByQuery(csList, query);
 		if (query!= null) {
@@ -167,8 +168,8 @@ public class LexEvsResolvedValueSetQueryService extends AbstractLexEvsService
 		
 		synchronized(this.mutex){
 			for(CodingScheme cs : codingSchemes){
-				if(this.activeCache.contains(
-						this.getKey(cs.getCodingSchemeURI(), cs.getRepresentsVersion()))){
+				if(this.activeCache.contains(this.getKey(cs.getCodingSchemeURI(), cs.getRepresentsVersion())) ||
+					this.activeCacheValueSets.contains(this.getKey(cs.getCodingSchemeURI(), cs.getRepresentsVersion()))){
 					returnList.add(cs);
 				}
 			}
@@ -181,6 +182,7 @@ public class LexEvsResolvedValueSetQueryService extends AbstractLexEvsService
 	public void onChange() {
 		synchronized(this.mutex){
 			this.activeCache.clear();
+			this.activeCacheValueSets.clear();
 			
 			try {
 				for(CodingSchemeRendering cs : 
@@ -193,6 +195,20 @@ public class LexEvsResolvedValueSetQueryService extends AbstractLexEvsService
 					}
 				}
 			} catch (LBInvocationException e) {
+				throw new IllegalStateException(e);
+			}
+			
+			// get resolved vs
+			try {
+				 List<CodingScheme> resolvedVSList = this.getLexEVSResolvedService().listAllResolvedValueSets();
+				 for (CodingScheme cs : resolvedVSList ){
+					this.activeCacheValueSets.add(
+						this.getKey(
+							cs.getCodingSchemeURI(),
+							cs.getRepresentsVersion()));
+				}
+				 
+			} catch (LBException e) {
 				throw new IllegalStateException(e);
 			}
 		}	

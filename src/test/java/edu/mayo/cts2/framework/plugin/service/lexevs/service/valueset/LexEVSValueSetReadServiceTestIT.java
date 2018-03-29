@@ -13,6 +13,7 @@ import static org.junit.Assert.*;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
+import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContents;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,7 +26,9 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
  * @author <a href="mailto:scott.bauer@mayo.edu">Scott Bauer</a>
  *
  */
-@LoadContent(contentPath="lexevs/test-content/valueset/VSDOnlyTest.xml")
+@LoadContents({
+	@LoadContent(contentPath="lexevs/test-content/valueset/VSDOnlyTest.xml"),
+	@LoadContent(contentPath = "lexevs/test-content/owl2/owl2-special-cases-Defined-Annotated.owl", loader = "OWL2Loader")})
 public class LexEVSValueSetReadServiceTestIT extends
 AbstractTestITBase {
 
