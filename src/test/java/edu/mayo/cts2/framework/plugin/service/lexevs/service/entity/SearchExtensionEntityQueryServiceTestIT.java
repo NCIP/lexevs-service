@@ -46,8 +46,9 @@ import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescripti
  */
 //@Ignore
 @LoadContents({
-@LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml"),
-@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")})
+	@LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml"),
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
+	@LoadContent(contentPath = "lexevs/test-content/owl2/owl2-special-cases-Defined-Annotated.owl", loader = "OWL2Loader")})
 public class SearchExtensionEntityQueryServiceTestIT 
 	extends AbstractQueryServiceTest<EntityListEntry, EntityDirectoryEntry, EntityDescriptionQuery> {
 	

@@ -34,13 +34,11 @@ import edu.mayo.cts2.framework.service.profile.mapentry.name.MapEntryReadId;
  *  @author <a href="mailto:hardie.linda@mayo.edu">Linda Hardie</a>
  *
  */
-@LoadContents(
-	{
-		@LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml"),
-		@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
-		@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
-	}
-)
+@LoadContents({
+	@LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml"),
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
+	@LoadContent(contentPath="lexevs/test-content/testMapping.xml"),
+	@LoadContent(contentPath = "lexevs/test-content/owl2/owl2-special-cases-Defined-Annotated.owl", loader = "OWL2Loader")})
 public class LexEvsMapEntryReadServiceTestIT 
 	extends AbstractReadServiceTest<MapEntry, MapEntryReadId> {
 

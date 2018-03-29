@@ -11,10 +11,14 @@ package edu.mayo.cts2.framework.plugin.service.lexevs;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
+import org.LexGrid.util.assertedvaluesets.AssertedValueSetParameters;
+import org.lexevs.locator.LexEvsServiceLocator;
+import org.lexevs.system.constants.SystemVariables;
 import org.lexgrid.resolvedvalueset.LexEVSResolvedValueSetService;
 import org.lexgrid.resolvedvalueset.impl.LexEVSResolvedValueSetServiceImpl;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.stereotype.Component;
+
 
 /**
  * @author <a href="mailto:kanjamala.pradip@mayo.edu">Pradip Kanjamala</a>
@@ -28,8 +32,25 @@ public class LexEVSResolvedValueSetServiceFactory implements
 	private LexBIGService lbs;
 
 	@Override
-	public LexEVSResolvedValueSetService getObject() throws Exception {
-		return new LexEVSResolvedValueSetServiceImpl(lbs);	
+	public LexEVSResolvedValueSetService getObject() throws Exception {	
+		// get lbconfig properties
+		SystemVariables variables = LexEvsServiceLocator.getInstance().getSystemResourceService().getSystemVariables();
+		String csVersion = variables.getAssertedValueSetVersion();
+		String csName = variables.getAssertedValueSetCodingSchemeName();
+		String csURI = variables.getAssertedValueSetCodingSchemeURI();
+		String hierarchyVSRelation = variables.getAssertedValueSetHierarchyVSRelation();
+				
+		// Set the asserted value set params
+		AssertedValueSetParameters params = new AssertedValueSetParameters.Builder(csVersion).
+			assertedDefaultHierarchyVSRelation(hierarchyVSRelation).
+			codingSchemeName(csName).
+			codingSchemeURI(csURI)
+			.build();
+		
+		LexEVSResolvedValueSetServiceImpl lrvssi = new LexEVSResolvedValueSetServiceImpl(lbs);
+		lrvssi.initParams(params);
+		
+		return lrvssi;  
 	}
 
 	@Override

@@ -25,8 +25,8 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
 @LoadContents({
 	@LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml"),
 	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
-	@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
-})
+	@LoadContent(contentPath="lexevs/test-content/testMapping.xml"),
+	@LoadContent(contentPath = "lexevs/test-content/owl2/owl2-special-cases-Defined-Annotated.owl", loader = "OWL2Loader")})
 public class MappingExtensionBulkDownloaderTestIT extends AbstractTestITBase {
 
 	@Resource

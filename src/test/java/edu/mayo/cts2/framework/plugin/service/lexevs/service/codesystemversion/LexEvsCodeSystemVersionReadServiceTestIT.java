@@ -20,6 +20,7 @@ import javax.annotation.Resource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
+import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContents;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -39,7 +40,9 @@ import edu.mayo.cts2.framework.service.profile.ReadService;
  *  @author <a href="mailto:hardie.linda@mayo.edu">Linda Hardie</a>
  *
  */
-@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+@LoadContents({
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
+	@LoadContent(contentPath = "lexevs/test-content/owl2/owl2-special-cases-Defined-Annotated.owl", loader = "OWL2Loader") })
 public class LexEvsCodeSystemVersionReadServiceTestIT 
 	extends AbstractReadServiceTest<CodeSystemVersionCatalogEntry, NameOrURI> {
 	
