@@ -35,17 +35,32 @@ public class LexEVSResolvedValueSetServiceFactory implements
 	public LexEVSResolvedValueSetService getObject() throws Exception {	
 		// get lbconfig properties
 		SystemVariables variables = LexEvsServiceLocator.getInstance().getSystemResourceService().getSystemVariables();
-		String csVersion = variables.getAssertedValueSetVersion();
+		//String csVersion = variables.getAssertedValueSetVersion();
+		String csTag = variables.getAssertedValueSetCodingSchemeTag();
 		String csName = variables.getAssertedValueSetCodingSchemeName();
 		String csURI = variables.getAssertedValueSetCodingSchemeURI();
 		String hierarchyVSRelation = variables.getAssertedValueSetHierarchyVSRelation();
-				
+			
+		AssertedValueSetParameters params;
+		
 		// Set the asserted value set params
-		AssertedValueSetParameters params = new AssertedValueSetParameters.Builder(csVersion).
-			assertedDefaultHierarchyVSRelation(hierarchyVSRelation).
-			codingSchemeName(csName).
-			codingSchemeURI(csURI)
-			.build();
+		// create parameters with no tag set
+		if (csTag == null) {
+			params = new AssertedValueSetParameters.Builder().
+				assertedDefaultHierarchyVSRelation(hierarchyVSRelation).
+				codingSchemeName(csName).
+				codingSchemeURI(csURI)
+				.build();
+		}
+		// create parameters with a tag set
+		else {
+			params = new AssertedValueSetParameters.Builder().
+					assertedDefaultHierarchyVSRelation(hierarchyVSRelation).
+					codingSchemeName(csName).
+					codingSchemeURI(csURI).
+					codingSchemeTag(csTag)
+					.build();
+		}
 		
 		LexEVSResolvedValueSetServiceImpl lrvssi = new LexEVSResolvedValueSetServiceImpl(lbs);
 		lrvssi.initParams(params);
