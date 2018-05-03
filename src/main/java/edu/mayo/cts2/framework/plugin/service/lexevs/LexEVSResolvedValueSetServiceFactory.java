@@ -35,7 +35,6 @@ public class LexEVSResolvedValueSetServiceFactory implements
 	public LexEVSResolvedValueSetService getObject() throws Exception {	
 		// get lbconfig properties
 		SystemVariables variables = LexEvsServiceLocator.getInstance().getSystemResourceService().getSystemVariables();
-		//String csVersion = variables.getAssertedValueSetVersion();
 		String csTag = variables.getAssertedValueSetCodingSchemeTag();
 		String csName = variables.getAssertedValueSetCodingSchemeName();
 		String csURI = variables.getAssertedValueSetCodingSchemeURI();
