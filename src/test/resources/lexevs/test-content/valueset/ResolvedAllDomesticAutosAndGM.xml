@@ -48,10 +48,11 @@
         <lgNaming:supportedSource localId="lexgrid.org">lexgrid.org</lgNaming:supportedSource>
     </lgCS:mappings>
     <lgCS:properties>
-        <lgCommon:property propertyName="ontologyFormat"
+        <!-- This property is now being created by the post processing of the loader  -->
+        <!-- lgCommon:property propertyName="ontologyFormat"
             propertyId="ontologyFormat" propertyType="property">
             <lgCommon:value>RESOLVEDVALUESET</lgCommon:value>
-        </lgCommon:property>
+        </lgCommon:property-->
         <lgCommon:property
             propertyName="resolvedAgainstCodingSchemeVersion"
             propertyId="@_76bd9328-06b3-4719-83ac-c04fc2712fe8" propertyType="generic">

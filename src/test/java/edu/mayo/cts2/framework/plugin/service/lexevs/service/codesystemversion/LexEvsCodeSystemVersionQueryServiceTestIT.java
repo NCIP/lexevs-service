@@ -10,9 +10,11 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service.codesystemversion;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -22,7 +24,25 @@ import org.LexGrid.LexBIG.Impl.LexBIGServiceImpl;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContents;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.util.CharArraySet;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.BooleanClause.Occur;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.join.QueryBitSetProducer;
+import org.apache.lucene.search.join.ScoreMode;
+import org.apache.lucene.search.join.ToParentBlockJoinQuery;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.lexevs.dao.index.service.search.SourceAssertedValueSetSearchIndexService;
+import org.lexevs.locator.LexEvsServiceLocator;
 
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntryListEntry;
 import edu.mayo.cts2.framework.model.codesystemversion.CodeSystemVersionCatalogEntrySummary;
@@ -41,7 +61,6 @@ import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
 import edu.mayo.cts2.framework.service.meta.StandardModelAttributeReference;
 import edu.mayo.cts2.framework.service.profile.QueryService;
 import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersionQuery;
-//import edu.mayo.cts2.framework.plugin.service.lexevs.utility.PrintUtility;
 
 /**
  *  @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
@@ -49,8 +68,9 @@ import edu.mayo.cts2.framework.service.profile.codesystemversion.CodeSystemVersi
  *
  */
 @LoadContents({
-@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
-@LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml")})
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
+	@LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml"),
+	@LoadContent(contentPath="lexevs/test-content/owl2/owl2-special-cases-Defined-Annotated.owl", loader = "OWL2Loader")})
 public class LexEvsCodeSystemVersionQueryServiceTestIT
 	extends AbstractQueryServiceTest<CodeSystemVersionCatalogEntryListEntry, 
 		CodeSystemVersionCatalogEntrySummary, 
@@ -60,16 +80,94 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 	private final static String RESOURCESYNOPSIS_STARTSWITH = "Auto";
 	private final static String RESOURCENAME_EXACTMATCH = "Automobiles-1.0";
 	
-	
+	private static SourceAssertedValueSetSearchIndexService sourceAssertedValueSetSearchIndexService;
+		
 	@Resource
 	private LexEvsCodeSystemVersionQueryService service;
 
+	@BeforeClass
+	public static void createIndex() throws Exception {
+		sourceAssertedValueSetSearchIndexService = 
+				LexEvsServiceLocator.getInstance().getIndexServiceManager().getAssertedValueSetIndexService();
+		sourceAssertedValueSetSearchIndexService.createIndex(Constructors.createAbsoluteCodingSchemeVersionReference(
+				"http://ncicb.nci.nih.gov/xml/owl/EVS/owl2lexevs.owl", "0.1.5"));
+	}
+	
 	// ---- Test methods ----
 	@Test
 	public void testSetUp() {
 		assertNotNull(this.service);
 	}
 
+	
+	@Test
+	public void queryPropertyTest() throws ParseException {				
+		BooleanQuery.Builder builder = new BooleanQuery.Builder();
+		builder.add(new TermQuery(new Term("isParentDoc", "true")), Occur.MUST_NOT);
+		builder.add(new TermQuery(new Term("code", "C99998")), Occur.MUST);
+		builder.add(new TermQuery(new Term("propertyName", "Contributing_Source")), Occur.MUST);
+		QueryParser propValueParser = new QueryParser("propertyValue", sourceAssertedValueSetSearchIndexService.getAnalyzer());
+		builder.add(propValueParser.createBooleanQuery("propertyValue", "FDA"), Occur.MUST);
+		Query query = builder.build();
+		QueryBitSetProducer parentFilter;
+		parentFilter = new QueryBitSetProducer(
+					new QueryParser("isParentDoc", new StandardAnalyzer(new CharArraySet(0, true))).parse("true"));
+		ToParentBlockJoinQuery blockJoinQuery = new ToParentBlockJoinQuery(query, parentFilter, ScoreMode.Total);
+
+		List<ScoreDoc> docs = sourceAssertedValueSetSearchIndexService.query(null, blockJoinQuery);
+		assertNotNull(docs);
+		assertTrue(docs.size() > 0);
+		ScoreDoc sd = docs.get(0);
+		Document doc = sourceAssertedValueSetSearchIndexService.getById(sd.doc);
+		assertNotNull(doc);
+		
+		boolean fieldFound = false;
+		
+		List<IndexableField> fields =  doc.getFields();
+		for(IndexableField field: fields) {
+			if (field.name().equals("entityCode")  &&
+				field.stringValue().equals("C99998") ) {
+				fieldFound = true;
+			}
+		}
+			
+		assertTrue(fieldFound);
+	}
+	
+	@Test
+	public void queryPublishPropertyTest() throws ParseException {
+		
+		BooleanQuery.Builder builder = new BooleanQuery.Builder();
+		builder.add(new TermQuery(new Term("isParentDoc", "true")), Occur.MUST_NOT);
+		builder.add(new TermQuery(new Term("code", "C99999")), Occur.MUST);
+		builder.add(new TermQuery(new Term("propertyName", "Publish_Value_Set")), Occur.MUST);
+		QueryParser propValueParser = new QueryParser("propertyValue", sourceAssertedValueSetSearchIndexService.getAnalyzer());
+		builder.add(propValueParser.createBooleanQuery("propertyValue", "Yes"), Occur.MUST);
+		Query query = builder.build();
+		QueryBitSetProducer parentFilter;
+		parentFilter = new QueryBitSetProducer(
+					new QueryParser("isParentDoc", new StandardAnalyzer(new CharArraySet(0, true))).parse("true"));
+		ToParentBlockJoinQuery blockJoinQuery = new ToParentBlockJoinQuery(query, parentFilter, ScoreMode.Total);
+
+		List<ScoreDoc> docs = sourceAssertedValueSetSearchIndexService.query(null, blockJoinQuery);
+		assertNotNull(docs);
+		assertTrue(docs.size() > 0);
+		ScoreDoc sd = docs.get(0);
+		Document doc = sourceAssertedValueSetSearchIndexService.getById(sd.doc);
+		assertNotNull(doc);
+		
+		boolean fieldFound = false;
+		
+		List<IndexableField> fields =  doc.getFields();
+		for(IndexableField field: fields) {
+			if (field.name().equals("entityCode")  &&
+				field.stringValue().equals("C99999") ) {
+				fieldFound = true;
+			}
+		}
+			
+		assertTrue(fieldFound);
+	}
 	
 	@Test
 	public void testCountWithNullQuery() throws Exception {
@@ -129,7 +227,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		// Build query using filters
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, null, readContext, null);
 
-		int expecting = 1;
+		int expecting = 2;
 		int actual = this.service.count(query);
 		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
 		
@@ -162,7 +260,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, filters, null, null);
 
 		try {
-			int expecting = 1;
+			int expecting = 2;
 			int actual = this.service.getResourceSummaries(query, null, new Page()).getEntries().size();
 			assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
 		} finally {
@@ -186,7 +284,7 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		// Build query using filters
 		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, null, readContext, null);
 
-		int expecting = 2;
+		int expecting = 3;
 		int actual = this.service.count(query);
 		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
 		
@@ -598,7 +696,28 @@ public class LexEvsCodeSystemVersionQueryServiceTestIT
 		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
 	}
 
+	@Test
+	public void testOwl2CodeSystemVersionQuery() throws Exception {
+		// Build query using no filters
+		CodeSystemVersionQueryImpl query = new CodeSystemVersionQueryImpl(null, null, null, null);
 
+		List<CodeSystemVersionCatalogEntryListEntry> entries = this.service.getResourceList(query, null, new Page()).getEntries();
+		
+		int expecting = 3;
+		int actual = entries.size();
+		assertEquals("Expecting " + expecting + " but got " + actual, expecting, actual);
+
+		boolean found = false;
+				
+		for(CodeSystemVersionCatalogEntryListEntry entry :entries) {
+			if (entry.getEntry().getCodeSystemVersionName().equals("owl2lexevs-0.1.5") && 
+				entry.getEntry().getDocumentURI().equals("http://ncicb.nci.nih.gov/xml/owl/EVS/owl2lexevs.owl/0.1.5")) {
+				found = true;
+				break;
+			}
+		}
+		assertTrue(found);
+	}
 	@Override
 	protected QueryService<CodeSystemVersionCatalogEntryListEntry, CodeSystemVersionCatalogEntrySummary, CodeSystemVersionQuery> getService() {
 		return this.service;

@@ -33,12 +33,10 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
  * @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
  *
  */
-@LoadContents(
-		{
-			@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
-			@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
-		}
-)
+@LoadContents({
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
+	@LoadContent(contentPath="lexevs/test-content/testMapping.xml"),
+	@LoadContent(contentPath = "lexevs/test-content/owl2/owl2-special-cases-Defined-Annotated.owl", loader = "OWL2Loader")})
 public class LexEvsMapReadServiceTestIT extends AbstractTestITBase {
 
 	@Resource

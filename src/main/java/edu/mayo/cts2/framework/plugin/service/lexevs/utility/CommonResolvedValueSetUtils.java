@@ -76,8 +76,11 @@ public class CommonResolvedValueSetUtils
 	public void buildResolvedValueSetCache() {
 		synchronized(this.mutex){
 			this.resolvedValueSets.clear();
+			
 			try {
-				for(CodingScheme cs : this.lexEVSResolvedService.listAllResolvedValueSets()){
+				List<CodingScheme> codingSchemes = this.lexEVSResolvedService.listAllResolvedValueSets();
+			
+				for(CodingScheme cs : codingSchemes){
 					this.resolvedValueSets.add(new UriVersionPair(cs.getCodingSchemeURI(), cs.getRepresentsVersion()));
 				}
 			} catch (LBException e) {
