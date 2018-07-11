@@ -33,7 +33,8 @@ import edu.mayo.cts2.framework.service.profile.valuesetdefinition.name.ValueSetD
 @LoadContents({
 @LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
 @LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml"),
-@LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosAndGM.xml")})
+@LoadContent(contentPath = "lexevs/test-content/valueset/ResolvedAllDomesticAutosAndGM.xml", loader = "LexGrid_ResolvedValueSetLoader"),
+@LoadContent(contentPath = "lexevs/test-content/owl2/owl2-special-cases-Defined-Annotated.owl", loader = "OWL2Loader")})
 public class ZLexEVSValueSetDefinitionResolutionServiceTestIT extends
 		AbstractTestITBase {
 

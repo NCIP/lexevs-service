@@ -18,6 +18,7 @@ import javax.annotation.Resource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
+import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContents;
 import org.junit.Test;
 
 import edu.mayo.cts2.framework.core.xml.Cts2Marshaller;
@@ -32,7 +33,9 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
  * @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
  *
  */
-@LoadContent(contentPath="lexevs/test-content/valueset/vdTestData.xml")
+@LoadContents({
+	@LoadContent(contentPath="lexevs/test-content/valueset/vdTestData.xml"),
+	@LoadContent(contentPath = "lexevs/test-content/owl2/owl2-special-cases-Defined-Annotated.owl", loader = "OWL2Loader") })
 public class LexEvsValueSetDefinitionQueryServiceTestIT extends
 		AbstractTestITBase {
 

@@ -9,6 +9,7 @@
 package edu.mayo.cts2.framework.plugins.service;
 
 import java.util.Date;
+import java.util.List;
 
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.Collections.ExtensionDescriptionList;
@@ -154,4 +155,24 @@ public class LexBigServiceStub implements LexBIGService{
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public List<CodingScheme> getMinimalResolvedVSCodingSchemes() throws LBInvocationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<CodingScheme> getRegularResolvedVSCodingSchemes() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<CodingScheme> getSourceAssertedResolvedVSCodingSchemes() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
 }
