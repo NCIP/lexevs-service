@@ -15,10 +15,13 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
 import org.apache.commons.collections.CollectionUtils;
 import org.junit.Test;
 
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractTestITBase;
+
+@LoadContent(contentPath = "lexevs/test-content/owl2/owl2-special-cases-Defined-Annotated.owl", loader = "OWL2Loader") 
 public class DelegatingUriHandlerTestIT extends AbstractTestITBase {
 
 	@Resource

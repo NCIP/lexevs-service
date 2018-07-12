@@ -43,13 +43,11 @@ import edu.mayo.cts2.framework.service.command.restriction.MapVersionQueryServic
  * @author <a href="mailto:frutiger.kim@mayo.edu">Kim Frutiger</a>
  *
  */
-@LoadContents(
-		{
-			@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
-			@LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml"),
-			@LoadContent(contentPath="lexevs/test-content/testMapping.xml")
-		}
-)
+@LoadContents({
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
+	@LoadContent(contentPath="lexevs/test-content/German_Made_Parts.xml"),
+	@LoadContent(contentPath="lexevs/test-content/testMapping.xml"),
+	@LoadContent(contentPath = "lexevs/test-content/owl2/owl2-special-cases-Defined-Annotated.owl", loader = "OWL2Loader")})
 public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 
 	@Resource

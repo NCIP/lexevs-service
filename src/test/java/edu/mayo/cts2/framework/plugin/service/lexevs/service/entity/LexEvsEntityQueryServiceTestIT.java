@@ -20,8 +20,8 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
+import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContents;
 import org.junit.Test;
-import org.junit.internal.runners.statements.Fail;
 
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
@@ -32,7 +32,6 @@ import edu.mayo.cts2.framework.model.entity.EntityDirectoryEntry;
 import edu.mayo.cts2.framework.model.entity.EntityListEntry;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.service.core.Query;
-import edu.mayo.cts2.framework.model.service.core.ReadContext;
 import edu.mayo.cts2.framework.model.service.core.types.ActiveOrAll;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.test.AbstractQueryServiceTest;
@@ -48,7 +47,9 @@ import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescripti
  *  @author <a href="mailto:hardie.linda@mayo.edu">Linda Hardie</a>
  *
  */
-@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+@LoadContents({
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
+	@LoadContent(contentPath = "lexevs/test-content/owl2/owl2-special-cases-Defined-Annotated.owl", loader = "OWL2Loader") })
 public class LexEvsEntityQueryServiceTestIT 
 	extends AbstractQueryServiceTest<EntityListEntry, EntityDirectoryEntry, EntityDescriptionQuery> {
 	

@@ -20,13 +20,12 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContent;
+import org.LexGrid.LexBIG.test.LexEvsTestRunner.LoadContents;
 import org.junit.Test;
 
 import edu.mayo.cts2.framework.model.command.ResolvedReadContext;
 import edu.mayo.cts2.framework.model.core.EntityReference;
-import edu.mayo.cts2.framework.model.core.Property;
 import edu.mayo.cts2.framework.model.core.ScopedEntityName;
-import edu.mayo.cts2.framework.model.core.StatementTarget;
 import edu.mayo.cts2.framework.model.entity.Designation;
 import edu.mayo.cts2.framework.model.entity.EntityDescription;
 import edu.mayo.cts2.framework.model.entity.NamedEntityDescription;
@@ -42,7 +41,9 @@ import edu.mayo.cts2.framework.service.profile.entitydescription.name.EntityDesc
  *  @author <a href="mailto:hardie.linda@mayo.edu">Linda Hardie</a>
  *
  */
-@LoadContent(contentPath="lexevs/test-content/Automobiles.xml")
+@LoadContents({
+	@LoadContent(contentPath="lexevs/test-content/Automobiles.xml"),
+	@LoadContent(contentPath = "lexevs/test-content/owl2/owl2-special-cases-Defined-Annotated.owl", loader = "OWL2Loader") })
 public class LexEvsEntityReadServiceTestIT extends
 	AbstractReadServiceTest<EntityDescription, EntityDescriptionReadId> {
 
