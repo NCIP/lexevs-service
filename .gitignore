@@ -11,3 +11,4 @@
 .metadata
 bin/
 compiledVSDefinitions/
+.DS_Store
