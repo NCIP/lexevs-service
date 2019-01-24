@@ -17,6 +17,8 @@ import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
+import org.lexgrid.resolvedvalueset.LexEVSResolvedValueSetService;
+import org.lexgrid.valuesets.LexEVSValueSetDefinitionServices;
 
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.core.SortCriteria;
@@ -34,6 +36,8 @@ public final class CommonPageUtils {
 	
 	public static <T extends ResourceQuery> ResolvedConceptReferenceResults getPage(
 			LexBIGService lexBigService, 
+			LexEVSValueSetDefinitionServices vsDefinitionServices,
+			LexEVSResolvedValueSetService resolvedVSService,
 			QueryData<T> queryData,
 			SortCriteria cts2SortCriteria, 
 			Page page){
@@ -41,7 +45,8 @@ public final class CommonPageUtils {
 		ResolvedConceptReferencesIterator lexResolvedConceptIterator;
 		CodedNodeSet lexCodedNodeSet;
 		
-		lexCodedNodeSet = CommonResourceUtils.getLexCodedNodeSet(lexBigService, queryData, cts2SortCriteria);
+		lexCodedNodeSet = CommonResourceUtils.getLexCodedNodeSet(lexBigService, vsDefinitionServices, 
+				resolvedVSService, queryData, cts2SortCriteria);
 				
 		if(lexCodedNodeSet != null){
 			lexResolvedConceptIterator = CommonUtils.getLexResolvedConceptIterator(lexCodedNodeSet, cts2SortCriteria);
