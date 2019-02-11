@@ -61,6 +61,8 @@ import scala.actors.threadpool.Arrays;
 public final class CommonResourceUtils{
 	private static final String UNCHECKED = "unchecked";
 	private static final String RAWTYPES = "rawtypes";
+	private static List <CodingScheme> SOURCE_ASSERTED_CS = null;
+	
 	private LexEvsValueSetDefinitionQueryService valueSetDefinitionService;
 	
 	private CommonResourceUtils(){
@@ -230,12 +232,8 @@ public final class CommonResourceUtils{
 				
 				// Check if there are asserted value sets and if they match the query data
 				if(!dataExists){	
-					
-					CodingScheme resolvedCS = getCodingSchemeFromValueSetDefinition(resolvedVSService,
-							queryData.getLexSchemeName(),queryData.getLexVersionOrTag().getVersion());
-					
+					CodingScheme resolvedCS = resolvedVSService.listResolvedValueSetForDescription(queryData.getLexSchemeName());
 					if (resolvedCS != null){
-
 						CodedNodeSet cns = getCodedNodeSetForCodeScheme(
 								lexBigService, vsDefinitionServices,
 								resolvedCS,	queryData.getLexVersionOrTag());
@@ -257,45 +255,13 @@ public final class CommonResourceUtils{
 		
 		return lexCodedNodeSet;
 	}
-	
-	private static CodingScheme getCodingSchemeFromValueSetDefinition(
-			LexEVSResolvedValueSetService resolvedVSService, 
-			String codingSchemeName, 
-			String version) throws LBException {
-		
-		List <CodingScheme> sourceAssertedCodingSchemes = resolvedVSService.getMinimalResolvedValueSetSchemes();
-		CodingScheme foundScheme = null;
-		CodingScheme resolvedCS = null;
-		
-		// Get a list of the resolved value sets. 
-		// Check if the list of resolved value sets contains a coding scheme
-		// with the given name and version.  If it does, resolve that 
-		// coding scheme and return it.		
-		if (sourceAssertedCodingSchemes != null) {
-			for (CodingScheme cs : sourceAssertedCodingSchemes) {
-				if (cs.getCodingSchemeName().equals(codingSchemeName) && 
-						cs.getRepresentsVersion().equals(version)){
-					foundScheme = cs;
-					break;
-				}
-			}  
-		}
-		if (foundScheme != null){
-			try {
-				resolvedCS = resolvedVSService.getResolvedValueSetForValueSetURI(new URI(foundScheme.getCodingSchemeURI()));
-			} catch ( URISyntaxException e) {
-				resolvedCS = null;
-			}
-		}
-		return resolvedCS;
-	}
-		
+
 	private static CodedNodeSet getCodedNodeSetForCodeScheme(
 			LexBIGService lexBigService, 
 			LexEVSValueSetDefinitionServices vsDefinitionServices,
 			CodingScheme resolvedCS,
 			CodingSchemeVersionOrTag versionOrTag) throws LBException{
-		
+
 		ValueSetDefinition vsd = null;
 		try {
 			vsd = vsDefinitionServices.getValueSetDefinition(
@@ -306,10 +272,10 @@ public final class CommonResourceUtils{
 
 		CodedNodeSet cns = lexBigService.getNodeSet(vsd.getDefaultCodingScheme(), 
 				versionOrTag, null);
-		
+
 		ConceptReferenceList codeList = new ConceptReferenceList();
 		Entity[] entities = resolvedCS.getEntities().getEntity();
-		
+
 		String[] entityCodes = new String[entities.length];
 		for (int i = 0; i < entities.length; i++) {
 			entityCodes[i] = entities[i].getEntityCode();

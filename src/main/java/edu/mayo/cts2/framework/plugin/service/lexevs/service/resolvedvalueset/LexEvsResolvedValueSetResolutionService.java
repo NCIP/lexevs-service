@@ -58,6 +58,7 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ResolvedValueSetName
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.entity.LexEvsEntityQueryService;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceUtils;
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
 import edu.mayo.cts2.framework.service.command.restriction.EntityDescriptionQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.command.restriction.ResolvedValueSetResolutionEntityRestrictions;
@@ -88,6 +89,9 @@ ResolvedValueSetResolutionService {
 	
 	@Resource
 	private ResolvedValueSetNameTranslator resolvedValueSetNameTranslator;
+	
+	@Resource
+	private LexEVSResolvedValueSetService lexEVSResolvedValueSetService;
 	
 	@Override
 	public Set<? extends MatchAlgorithmReference> getSupportedMatchAlgorithms() {
@@ -224,8 +228,11 @@ ResolvedValueSetResolutionService {
 			Constructors.createCodingSchemeVersionOrTagFromVersion(versionNamePair.getVersion()));
 		
 		if (cs == null) {
-			cs = getCodingSchemeFromValueSetDefinition(
-					versionNamePair.getName(),versionNamePair.getVersion());
+			try {
+				cs = lexEVSResolvedValueSetService.listResolvedValueSetForDescription(versionNamePair.getName());
+			} catch (LBException e) {
+				cs = null;
+			}
 		}
 			
 		if (cs !=null) {
@@ -234,46 +241,7 @@ ResolvedValueSetResolutionService {
 			throw new RuntimeException("Cannot find CodingScheme for ResolvedValueSet Header: " + versionNamePair.getName());
 		}
 	}
-	
-	private CodingScheme getCodingSchemeFromValueSetDefinition(String codingSchemeName, String version) {
-		CodingScheme cs = null;
-		boolean found = false;
 		
-		// Get a list of the resolved value sets. 
-		// Check if the list of resolved value sets contains a coding scheme
-		// with the given name and version.  If it does, resolve that 
-		// coding scheme and return it.
-		try {
-			LexEVSResolvedValueSetService resolvedVSService = getLexEVSResolvedService();
-			LexEVSValueSetDefinitionServices vsDefinitionServices = getLexEVSValueSetDefinitionServices();
-			
-			// Check if there are asserted value sets and if they match the query data
-			List <CodingScheme> sourceAssertedCodingSchemes = resolvedVSService.getMinimalResolvedValueSetSchemes();
-			CodingScheme foundSceme = null;
-			
-			if (sourceAssertedCodingSchemes != null) {
-				for (CodingScheme codingScheme : sourceAssertedCodingSchemes) {
-					if (codingScheme.getCodingSchemeName().equals(codingSchemeName) && 
-							codingScheme.getRepresentsVersion().equals(version)){
-						found = true;
-						foundSceme = codingScheme;
-						break;
-					}
-				}  
-			}
-			if (found){
-				try {
-					cs = resolvedVSService.getResolvedValueSetForValueSetURI(new URI(foundSceme.getCodingSchemeURI()));
-				} catch ( URISyntaxException e) {
-					throw new LBException("Error creating URI for coding scheme: " + foundSceme.getCodingSchemeURI()); 
-				}
-			}
-		} catch (LBException e) {
-			cs = null;
-		}
-		return cs;
-	}
-	
 	@Override
 	public DirectoryResult<EntityDescription> getEntityList(
 			ResolvedValueSetReadId identifier,
