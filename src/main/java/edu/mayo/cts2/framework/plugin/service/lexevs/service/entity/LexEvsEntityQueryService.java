@@ -25,6 +25,8 @@ import org.LexGrid.LexBIG.Exceptions.LBResourceUnavailableException;
 import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
+import org.lexgrid.resolvedvalueset.LexEVSResolvedValueSetService;
+import org.lexgrid.valuesets.LexEVSValueSetDefinitionServices;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
@@ -70,7 +72,7 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 	
 	@Resource
 	private EntityTransform transformer;
-		
+			
 	// ------ Local methods ----------------------
 	public void setCodeSystemVersionNameConverter(
 			VersionNameConverter versionNameConverter) {
@@ -89,10 +91,14 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		int count = 0;
 		
 		LexBIGService lexBigService = this.getLexBigService();
+		
+		LexEVSValueSetDefinitionServices vsDefinitionServices = getLexEVSValueSetDefinitionServices();
+		LexEVSResolvedValueSetService resolvedVSService = getLexEVSResolvedService();
 		QueryData<EntityDescriptionQuery> queryData = new QueryData<EntityDescriptionQuery>(query, nameConverter);
 		
 		CodedNodeSet codedNodeSet;
-		codedNodeSet = CommonResourceUtils.getLexCodedNodeSet(lexBigService, queryData, null);
+		codedNodeSet = CommonResourceUtils.getLexCodedNodeSet(lexBigService, vsDefinitionServices, 
+				resolvedVSService, queryData, null);
 		
 		if(codedNodeSet != null){
 			ResolvedConceptReferencesIterator iterator = CommonUtils.getLexResolvedConceptIterator(codedNodeSet, null);
@@ -122,15 +128,17 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 		SortCriteria sortCriteria = null;
 		
 		LexBIGService lexBigService = this.getLexBigService();
+		LexEVSResolvedValueSetService resolvedVSService = getLexEVSResolvedService();
+		LexEVSValueSetDefinitionServices vsDefinitionServices = getLexEVSValueSetDefinitionServices();
+		
 		QueryData<EntityDescriptionQuery> queryData = new QueryData<EntityDescriptionQuery>(query, nameConverter);
 		
-		CodedNodeSet codedNodeSet = CommonResourceUtils.getLexCodedNodeSet(lexBigService, queryData, sortCriteria);
+		CodedNodeSet codedNodeSet = CommonResourceUtils.getLexCodedNodeSet(lexBigService, vsDefinitionServices, 
+				resolvedVSService, queryData, sortCriteria);
 		
 		// TODO: CodedNodeSet still needs to be filtered by restrictions:
 		// restrictions.getEntities  <<--- completed in getCodedNodeSet method
 		// restrictions.getTaggedCodeSystem -- *** unclear how to handle this restriction ****
-		
-		
 		
 		ScopedEntityName entityName = nameOrUri.getEntityName();
 		String uri = nameOrUri.getUri();
@@ -164,10 +172,14 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 			EntityDescriptionQuery query, SortCriteria sortCriteria, Page page) {
 		
 		LexBIGService lexBigService = this.getLexBigService();
+		LexEVSResolvedValueSetService resolvedVSService = getLexEVSResolvedService();
+		LexEVSValueSetDefinitionServices vsDefinitionServices = getLexEVSValueSetDefinitionServices();
+		
 		QueryData<EntityDescriptionQuery> queryData = new QueryData<EntityDescriptionQuery>(query, nameConverter);
 		
 		ResolvedConceptReferenceResults resolvedConceptReferenceResultsPage;
-		resolvedConceptReferenceResultsPage = CommonPageUtils.getPage(lexBigService, queryData, sortCriteria, page);
+		resolvedConceptReferenceResultsPage = CommonPageUtils.getPage(lexBigService, vsDefinitionServices, 
+				resolvedVSService, queryData, sortCriteria, page);
 
 		DirectoryResult<EntityListEntry> directoryResult;
 		directoryResult = CommonResourceUtils.createDirectoryResults(this.transformer, resolvedConceptReferenceResultsPage, Constants.FULL_DESCRIPTION);
@@ -179,11 +191,14 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 	public DirectoryResult<EntityDirectoryEntry> getResourceSummaries(EntityDescriptionQuery query, SortCriteria sortCriteria, Page page) {	
 		
 		LexBIGService lexBigService = this.getLexBigService();
+		LexEVSResolvedValueSetService resolvedVSService = getLexEVSResolvedService();
+		LexEVSValueSetDefinitionServices vsDefinitionServices = getLexEVSValueSetDefinitionServices();
 		
 		QueryData<EntityDescriptionQuery> queryData = new QueryData<EntityDescriptionQuery>(query, nameConverter);
 		
 		ResolvedConceptReferenceResults resolvedConceptReferenceResults;
-		resolvedConceptReferenceResults = CommonPageUtils.getPage(lexBigService, queryData, sortCriteria, page);
+		resolvedConceptReferenceResults = CommonPageUtils.getPage(lexBigService, vsDefinitionServices, 
+				resolvedVSService, queryData, sortCriteria, page);
 		
 		DirectoryResult<EntityDirectoryEntry> directoryResult;
 		directoryResult = CommonResourceUtils.createDirectoryResults(this.transformer, resolvedConceptReferenceResults, Constants.SUMMARY_DESCRIPTION);
@@ -252,6 +267,6 @@ public class LexEvsEntityQueryService extends AbstractLexEvsService
 	public int getOrder() {
 		return 1;
 	}
-
+	
 }
 
