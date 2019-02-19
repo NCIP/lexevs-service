@@ -174,5 +174,17 @@ public class LexBigServiceStub implements LexBIGService{
 		return null;
 	}
 
+	@Override
+	public String getLexEVSBuildVersion() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getLexEVSBuildTimestamp() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	
 }
