@@ -59,7 +59,7 @@
 	<properties>
 		<forkCount>4</forkCount>
         <reuseForks>false</reuseForks>
-		<lexevs.version>6.5.2.RC.6</lexevs.version>
+		<lexevs.version>6.5.2.LEXEVS.4392</lexevs.version>
 		<spring-security.version>${org.springframework-version}</spring-security.version>
 	</properties>
 
