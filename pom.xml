@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>lexevs-service</artifactId>
-	<version>1.6.2.RC.6</version>
+	<version>DEV</version>
 	<packaging>${packaging}</packaging>
 
 	<description>A CTS2 Framework Service Plugin based on LexEVS</description>
