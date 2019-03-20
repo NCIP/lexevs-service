@@ -40,13 +40,14 @@ public final class CommonPageUtils {
 			LexEVSResolvedValueSetService resolvedVSService,
 			QueryData<T> queryData,
 			SortCriteria cts2SortCriteria, 
-			Page page){
+			Page page,
+			String uri){
 		ResolvedConceptReferenceResults lexResolvedConceptResults = null;
 		ResolvedConceptReferencesIterator lexResolvedConceptIterator;
 		CodedNodeSet lexCodedNodeSet;
 		
 		lexCodedNodeSet = CommonResourceUtils.getLexCodedNodeSet(lexBigService, vsDefinitionServices, 
-				resolvedVSService, queryData, cts2SortCriteria);
+				resolvedVSService, queryData, cts2SortCriteria, uri);
 				
 		if(lexCodedNodeSet != null){
 			lexResolvedConceptIterator = CommonUtils.getLexResolvedConceptIterator(lexCodedNodeSet, cts2SortCriteria);

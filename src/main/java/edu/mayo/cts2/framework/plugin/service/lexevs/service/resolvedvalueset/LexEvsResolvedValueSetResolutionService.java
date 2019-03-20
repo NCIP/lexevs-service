@@ -21,6 +21,7 @@ import javax.annotation.Resource;
 import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.Exceptions.LBException;
+import org.LexGrid.LexBIG.LexBIGService.CodedNodeSet;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.codingSchemes.CodingScheme;
 import org.apache.commons.lang.NotImplementedException;
@@ -55,6 +56,7 @@ import edu.mayo.cts2.framework.model.valuesetdefinition.ResolvedValueSetHeader;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.NameVersionPair;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ResolvedValueSetNameTranslator;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ResolvedValueSetNameTriple;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ValueSetNameTranslator;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.entity.LexEvsEntityQueryService;
@@ -92,6 +94,9 @@ ResolvedValueSetResolutionService {
 	
 	@Resource
 	private LexEVSResolvedValueSetService lexEVSResolvedValueSetService;
+	
+	@Resource
+    private ValueSetNameTranslator valueSetNameTranslator;
 	
 	@Override
 	public Set<? extends MatchAlgorithmReference> getSupportedMatchAlgorithms() {
@@ -150,6 +155,10 @@ ResolvedValueSetResolutionService {
 			return null;
 		}
 		
+		String uriString = valueSetNameTranslator.getDefinitionUri(
+                    identifier.getValueSet().getName(),
+                    identifier.getValueSetDefinition().getName());
+		
 		String cts2VersionName = 
 			this.nameConverter.toCts2VersionName(codingScheme.getName(), codingScheme.getVersion());
 		
@@ -162,11 +171,11 @@ ResolvedValueSetResolutionService {
 
 		query.setRestrictions(entityRestrictions);
 		DirectoryResult<EntityDirectoryEntry> result = this.lexEvsEntityQueryService.getResourceSummaries(
-				query, null, page);
+				query, null, page, uriString);
 		List<URIAndEntityName> transformedResult= transform.transform(result);
 		
 		return new ResolvedValueSetResult<URIAndEntityName>(
-				this.getResolvedValueSetHeader(codingScheme), 
+				this.getResolvedValueSetHeader(codingScheme, uriString), 
 				transformedResult, 
 				result.isAtEnd());
 	}
@@ -222,18 +231,27 @@ ResolvedValueSetResolutionService {
 			new ResolvedValueSetNameTriple(valueSetId, definitionId, id));
 	}
 	
-	protected ResolvedValueSetHeader getResolvedValueSetHeader(NameVersionPair versionNamePair){	
+	protected ResolvedValueSetHeader getResolvedValueSetHeader(NameVersionPair versionNamePair){
+		return getResolvedValueSetHeader(versionNamePair, null);
+	}
+	
+	protected ResolvedValueSetHeader getResolvedValueSetHeader(NameVersionPair versionNamePair, String uri){	
+		
 		CodingScheme cs = resolve(
 			versionNamePair.getName(), 
 			Constructors.createCodingSchemeVersionOrTagFromVersion(versionNamePair.getVersion()));
-		
+
 		if (cs == null) {
-			try {
-				cs = lexEVSResolvedValueSetService.listResolvedValueSetForDescription(versionNamePair.getName());
-			} catch (LBException e) {
-				cs = null;
+			if (uri != null){
+				try {
+					URI csURI = new URI(uri);
+					cs = getLexEVSResolvedService().getResolvedValueSetForValueSetURI(csURI);
+				}
+				catch (URISyntaxException e) {
+					cs = null;
+				}
 			}
-		}
+		}		
 			
 		if (cs !=null) {
 			return transform.transformToResolvedValueSetHeader(cs);

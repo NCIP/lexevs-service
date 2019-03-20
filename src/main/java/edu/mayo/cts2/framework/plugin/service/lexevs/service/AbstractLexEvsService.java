@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import edu.mayo.cts2.framework.model.core.OpaqueData;
 import edu.mayo.cts2.framework.model.core.SourceReference;
 import edu.mayo.cts2.framework.model.util.ModelUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ValueSetNameTranslator;
 import edu.mayo.cts2.framework.service.profile.BaseService;
 
 /**
@@ -47,6 +48,9 @@ public abstract class AbstractLexEvsService implements BaseService {
 	
 	@Resource
 	private LexEVSValueSetDefinitionServices lexEVSValueSetDefinitionServices;
+	
+	@Resource
+    private ValueSetNameTranslator valueSetNameTranslator;
 	
 	@Override
 	public String getServiceName() {
@@ -92,5 +96,15 @@ public abstract class AbstractLexEvsService implements BaseService {
 	public void setLexEVSValueSetDefinitionServices(
 			LexEVSValueSetDefinitionServices lexEVSValueSetDefinitionServices) {
 		this.lexEVSValueSetDefinitionServices = lexEVSValueSetDefinitionServices;
+	}
+	
+	
+	public ValueSetNameTranslator getValueSetNameTranslator() {
+		return valueSetNameTranslator;
+	}
+
+	public void setValueSetNameTranslator(
+			ValueSetNameTranslator valueSetNameTranslator) {
+		this.valueSetNameTranslator = valueSetNameTranslator;
 	}
 }
