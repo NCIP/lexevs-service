@@ -37,6 +37,7 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsServi
 import edu.mayo.cts2.framework.plugin.service.lexevs.utility.Constants;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQuery;
 import edu.mayo.cts2.framework.service.profile.entitydescription.EntityDescriptionQueryService;
+import edu.mayo.cts2.framework.service.profile.resolvedvalueset.name.ResolvedValueSetReadId;
 import edu.mayo.cts2.framework.util.spring.AggregateService;
 
 @Component
@@ -54,6 +55,15 @@ public class DelegatingEntityQueryService extends AbstractLexEvsService
 			EntityDescriptionQuery query, 
 			SortCriteria sortCriteria, 
 			Page page) {
+		return this.getResourceSummaries(query, sortCriteria, page, null);
+	}
+	
+	@Override
+	public DirectoryResult<EntityDirectoryEntry> getResourceSummaries(
+			EntityDescriptionQuery query, 
+			SortCriteria sortCriteria, 
+			Page page,
+			String uri) {
 		return this.getDelegate(query, QueryType.SUMMARIES).getResourceSummaries(query, sortCriteria, page);
 	}
 
