@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>lexevs-service</artifactId>
-	<version>SNAPSHOT.DEV.SPRINT107.2019.05.02</version>
+	<version>DEV</version>
 	<packaging>${packaging}</packaging>
 
 	<description>A CTS2 Framework Service Plugin based on LexEVS</description>
@@ -59,7 +59,7 @@
 	<properties>
 		<forkCount>4</forkCount>
         <reuseForks>false</reuseForks>
-		<lexevs.version>DEV</lexevs.version>
+		<lexevs.version>SNAPSHOT.DEV.SPRINT107.2019.05.02</lexevs.version>
 		<spring-security.version>${org.springframework-version}</spring-security.version>
 	</properties>
 
