@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>lexevs-service</artifactId>
-	<version>DEV</version>
+	<version>SNAPSHOT.DEV.SPRINT107.2019.05.02</version>
 	<packaging>${packaging}</packaging>
 
 	<description>A CTS2 Framework Service Plugin based on LexEVS</description>
