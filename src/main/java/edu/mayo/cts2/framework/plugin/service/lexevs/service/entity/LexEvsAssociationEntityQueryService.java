@@ -135,6 +135,12 @@ public class LexEvsAssociationEntityQueryService extends AbstractLexEvsService
 	
 	@Override
 	public DirectoryResult<EntityDirectoryEntry> getResourceSummaries(EntityDescriptionQuery query, SortCriteria sortCriteria, Page page) {	
+		return getResourceSummaries(query, sortCriteria, page, null);
+	}
+	
+	@Override
+	public DirectoryResult<EntityDirectoryEntry> getResourceSummaries(EntityDescriptionQuery query, 
+			SortCriteria sortCriteria, Page page, String uri) {	
 		return this.doQuery(query, sortCriteria, this.entryClosure, page);
 	}
 

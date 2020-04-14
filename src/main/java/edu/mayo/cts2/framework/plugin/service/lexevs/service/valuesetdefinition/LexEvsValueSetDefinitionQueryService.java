@@ -126,6 +126,18 @@ public class LexEvsValueSetDefinitionQueryService extends AbstractLexEvsService
 	public DirectoryResult<ValueSetDefinitionDirectoryEntry> getResourceSummaries(
 			ValueSetDefinitionQuery query, 
 			SortCriteria sortCriteria, Page page) {
+		
+		return getResourceSummaries(query, sortCriteria, page, null);
+	}
+	
+	/* (non-Javadoc)
+	 * @see edu.mayo.cts2.framework.service.profile.QueryService#getResourceSummaries(edu.mayo.cts2.framework.service.profile.ResourceQuery, edu.mayo.cts2.framework.model.core.SortCriteria, edu.mayo.cts2.framework.model.command.Page, String)
+	 */
+	@Override
+	public DirectoryResult<ValueSetDefinitionDirectoryEntry> getResourceSummaries(
+			ValueSetDefinitionQuery query, 
+			SortCriteria sortCriteria, Page page,
+			String uri) {
 		List<String> uris = this.definitionServices.listValueSetDefinitionURIs();
 		
 		ValueSetDefinitionDirectoryBuilder<ValueSetDefinitionDirectoryEntry> builder = 

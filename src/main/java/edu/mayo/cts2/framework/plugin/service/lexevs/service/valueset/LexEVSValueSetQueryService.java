@@ -66,10 +66,15 @@ LexEvsChangeEventObserver, ValueSetQueryService, InitializingBean {
 
 	private Set<String> activeCache = new HashSet<String>();
 	
-
 	@Override
 	public DirectoryResult<ValueSetCatalogEntrySummary> getResourceSummaries(
 			ValueSetQuery query, SortCriteria sortCriteria, Page page) {
+		return getResourceSummaries(query, sortCriteria, page, null);
+	}
+
+	@Override
+	public DirectoryResult<ValueSetCatalogEntrySummary> getResourceSummaries(
+			ValueSetQuery query, SortCriteria sortCriteria, Page page, String uri) {
 		try {
 			List<ValueSetDefinition> restrictedList = processQuery(query);
 			List<ValueSetCatalogEntrySummary> results = new ArrayList<ValueSetCatalogEntrySummary>();
@@ -86,9 +91,6 @@ LexEvsChangeEventObserver, ValueSetQueryService, InitializingBean {
 			throw new RuntimeException(ex);
 		}
 	}
-
-
-	
 
 	@Override
 	public DirectoryResult<ValueSetCatalogEntryListEntry> getResourceList(
