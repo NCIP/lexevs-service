@@ -452,7 +452,7 @@ public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 		
 		DirectoryResult<MapVersionListEntry> resourceList = this.service.getResourceList(MapVersionQueryImpl, sortCriteria, page);
 		assertNotNull(resourceList);
-		assertEquals(0,resourceList.getEntries().size());
+		assertEquals(1,resourceList.getEntries().size());
 	}
 	
 	@Test
@@ -484,7 +484,7 @@ public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 		
 		DirectoryResult<MapVersionListEntry> resourceList = this.service.getResourceList(MapVersionQueryImpl, sortCriteria, page);
 		assertNotNull(resourceList);
-		assertEquals(0,resourceList.getEntries().size());
+		assertEquals(1,resourceList.getEntries().size());
 	}
 
 	@Test
@@ -565,7 +565,7 @@ public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 		
 		DirectoryResult<MapVersionListEntry> resourceList = this.service.getResourceList(MapVersionQueryImpl, sortCriteria, page);
 		assertNotNull(resourceList);
-		assertEquals(0,resourceList.getEntries().size());
+		assertEquals(1,resourceList.getEntries().size());
 	}
 	
 	@Test
@@ -680,7 +680,7 @@ public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 		
 		DirectoryResult<MapVersionListEntry> resourceList = this.service.getResourceList(MapVersionQueryImpl, sortCriteria, page);
 		assertNotNull(resourceList);
-		assertEquals(0,resourceList.getEntries().size());
+		assertEquals(1,resourceList.getEntries().size());
 	}
 	
 	@Test
@@ -712,7 +712,7 @@ public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 		
 		DirectoryResult<MapVersionListEntry> resourceList = this.service.getResourceList(MapVersionQueryImpl, sortCriteria, page);
 		assertNotNull(resourceList);
-		assertEquals(0,resourceList.getEntries().size());
+		assertEquals(1,resourceList.getEntries().size());
 	}
 
 	@Test
@@ -794,7 +794,7 @@ public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 		
 		DirectoryResult<MapVersionListEntry> resourceList = this.service.getResourceList(MapVersionQueryImpl, sortCriteria, page);
 		assertNotNull(resourceList);
-		assertEquals(0,resourceList.getEntries().size());
+		assertEquals(1,resourceList.getEntries().size());
 	}
 	
 	@Test
@@ -934,7 +934,7 @@ public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 		
 		DirectoryResult<MapVersionListEntry> resourceList = this.service.getResourceList(MapVersionQueryImpl, sortCriteria, page);
 		assertNotNull(resourceList);
-		assertEquals(0,resourceList.getEntries().size());
+		assertEquals(1,resourceList.getEntries().size());
 	}
 	
 	@Test
@@ -966,7 +966,7 @@ public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 		
 		DirectoryResult<MapVersionListEntry> resourceList = this.service.getResourceList(MapVersionQueryImpl, sortCriteria, page);
 		assertNotNull(resourceList);
-		assertEquals(0,resourceList.getEntries().size());
+		assertEquals(1,resourceList.getEntries().size());
 	}
 
 	@Test
@@ -1073,7 +1073,7 @@ public class LexEvsMapVersionQueryServiceTestIT extends AbstractTestITBase {
 		
 		DirectoryResult<MapVersionListEntry> resourceList = this.service.getResourceList(MapVersionQueryImpl, sortCriteria, page);
 		assertNotNull(resourceList);
-		assertEquals(0,resourceList.getEntries().size());
+		assertEquals(1,resourceList.getEntries().size());
 	}
 	
 	@Test
