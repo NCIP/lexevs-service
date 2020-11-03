@@ -136,10 +136,16 @@ public class LexEvsAssociationQueryService extends AbstractLexEvsService impleme
 		return returnList;
 	}
 	
-	
 	@Override
 	public DirectoryResult<AssociationDirectoryEntry> getResourceSummaries(
 			AssociationQuery query, SortCriteria sortCriteria, Page page) {
+
+		return getResourceSummaries(query, sortCriteria, page, null);
+	}
+	
+	@Override
+	public DirectoryResult<AssociationDirectoryEntry> getResourceSummaries(
+			AssociationQuery query, SortCriteria sortCriteria, Page page, String uri) {
 
 		if(! this.validateQuery(query)){
 			throw new UnsupportedOperationException();

@@ -434,6 +434,15 @@ public class LexEvsMapVersionQueryService extends AbstractLexEvsService
 			MapVersionQuery query, 
 			SortCriteria sortCriteria, 
 			Page page) {
+		
+		return getResourceSummaries(query, sortCriteria, page, null);
+	}
+	@Override
+	public DirectoryResult<MapVersionDirectoryEntry> getResourceSummaries(
+			MapVersionQuery query, 
+			SortCriteria sortCriteria, 
+			Page page,
+			String uri) {
 		LexBIGService lexBigService = this.getLexBigService();
 		QueryData<MapVersionQuery> queryData = new QueryData<MapVersionQuery>(query, null);
 				
