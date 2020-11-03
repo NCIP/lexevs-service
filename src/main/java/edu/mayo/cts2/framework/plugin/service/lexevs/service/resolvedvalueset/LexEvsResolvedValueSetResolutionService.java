@@ -8,6 +8,8 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.service.resolvedvalueset;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -16,11 +18,14 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.LexGrid.LexBIG.DataModel.Collections.CodingSchemeRenderingList;
 import org.LexGrid.LexBIG.DataModel.Core.CodingSchemeVersionOrTag;
 import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.codingSchemes.CodingScheme;
 import org.apache.commons.lang.NotImplementedException;
+import org.lexgrid.resolvedvalueset.LexEVSResolvedValueSetService;
+import org.lexgrid.valuesets.LexEVSValueSetDefinitionServices;
 import org.springframework.stereotype.Component;
 
 import edu.mayo.cts2.framework.core.url.UrlConstructor;
@@ -53,6 +58,8 @@ import edu.mayo.cts2.framework.plugin.service.lexevs.naming.ResolvedValueSetName
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.AbstractLexEvsService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.service.entity.LexEvsEntityQueryService;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonResourceUtils;
+import edu.mayo.cts2.framework.plugin.service.lexevs.utility.CommonSearchFilterUtils;
 import edu.mayo.cts2.framework.service.command.restriction.EntityDescriptionQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.command.restriction.ResolvedValueSetResolutionEntityRestrictions;
 import edu.mayo.cts2.framework.service.meta.StandardMatchAlgorithmReference;
@@ -82,6 +89,9 @@ ResolvedValueSetResolutionService {
 	
 	@Resource
 	private ResolvedValueSetNameTranslator resolvedValueSetNameTranslator;
+	
+	@Resource
+	private LexEVSResolvedValueSetService lexEVSResolvedValueSetService;
 	
 	@Override
 	public Set<? extends MatchAlgorithmReference> getSupportedMatchAlgorithms() {
@@ -217,13 +227,21 @@ ResolvedValueSetResolutionService {
 			versionNamePair.getName(), 
 			Constructors.createCodingSchemeVersionOrTagFromVersion(versionNamePair.getVersion()));
 		
+		if (cs == null) {
+			try {
+				cs = lexEVSResolvedValueSetService.listResolvedValueSetForDescription(versionNamePair.getName());
+			} catch (LBException e) {
+				cs = null;
+			}
+		}
+			
 		if (cs !=null) {
 			return transform.transformToResolvedValueSetHeader(cs);
 		} else {
 			throw new RuntimeException("Cannot find CodingScheme for ResolvedValueSet Header: " + versionNamePair.getName());
 		}
 	}
-	
+		
 	@Override
 	public DirectoryResult<EntityDescription> getEntityList(
 			ResolvedValueSetReadId identifier,
