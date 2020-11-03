@@ -211,6 +211,15 @@ public class SearchExtensionEntityQueryService
 			EntityDescriptionQuery query, 
 			SortCriteria sortCriteria, 
 			Page page) {
+		return getResourceSummaries(query, sortCriteria, page, null);
+	}
+	
+	@Override
+	public DirectoryResult<EntityDirectoryEntry> getResourceSummaries(
+			EntityDescriptionQuery query, 
+			SortCriteria sortCriteria, 
+			Page page,
+			String uri) {
 		return new BasicEntityDirectoryBuilder<EntityDirectoryEntry>(
 				this.entityNameQueryBuilder,
 				this.entityUriResolver,

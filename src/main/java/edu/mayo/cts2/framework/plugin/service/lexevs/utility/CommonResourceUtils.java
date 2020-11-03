@@ -8,6 +8,8 @@
 */
 package edu.mayo.cts2.framework.plugin.service.lexevs.utility;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +32,10 @@ import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Constructors;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
 import org.LexGrid.codingSchemes.CodingScheme;
+import org.LexGrid.concepts.Entity;
+import org.LexGrid.valueSets.ValueSetDefinition;
+import org.lexgrid.resolvedvalueset.LexEVSResolvedValueSetService;
+import org.lexgrid.valuesets.LexEVSValueSetDefinitionServices;
 
 import edu.mayo.cts2.framework.model.command.Page;
 import edu.mayo.cts2.framework.model.command.ResolvedFilter;
@@ -39,6 +45,7 @@ import edu.mayo.cts2.framework.model.service.core.EntityNameOrURI;
 import edu.mayo.cts2.framework.model.service.core.NameOrURI;
 import edu.mayo.cts2.framework.model.service.mapversion.types.MapRole;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.VersionNameConverter;
+import edu.mayo.cts2.framework.plugin.service.lexevs.service.valuesetdefinition.LexEvsValueSetDefinitionQueryService;
 import edu.mayo.cts2.framework.plugin.service.lexevs.transform.LexEvsToCTS2Transformer;
 import edu.mayo.cts2.framework.service.command.restriction.MapEntryQueryServiceRestrictions;
 import edu.mayo.cts2.framework.service.command.restriction.MapQueryServiceRestrictions.CodeSystemRestriction;
@@ -48,6 +55,9 @@ import edu.mayo.cts2.framework.service.profile.mapentry.MapEntryQuery;
 public final class CommonResourceUtils{
 	private static final String UNCHECKED = "unchecked";
 	private static final String RAWTYPES = "rawtypes";
+	private static List <CodingScheme> SOURCE_ASSERTED_CS = null;
+	
+	private LexEvsValueSetDefinitionQueryService valueSetDefinitionService;
 	
 	private CommonResourceUtils(){
 		super();
@@ -201,8 +211,12 @@ public final class CommonResourceUtils{
 
 	public static <T extends ResourceQuery> CodedNodeSet getLexCodedNodeSet(
 			LexBIGService lexBigService, 
+			LexEVSValueSetDefinitionServices vsDefinitionServices,
+			LexEVSResolvedValueSetService resolvedVSService,
 			QueryData<T> queryData,
-			SortCriteria cts2SortCriteria){
+			SortCriteria cts2SortCriteria,
+			String uriString){
+		
 		CodedNodeSet lexCodedNodeSet = null;
 		
 		if(queryData.hasNameAndVersion()){
@@ -210,18 +224,68 @@ public final class CommonResourceUtils{
 				LocalNameList lexLocalNameList = new LocalNameList();
 				
 				CodingSchemeRenderingList lexCodingSchemeRenderingList = lexBigService.getSupportedCodingSchemes();
-				boolean dataExists = CommonSearchFilterUtils.queryReturnsData(lexCodingSchemeRenderingList, queryData);			
+				boolean dataExists = CommonSearchFilterUtils.queryReturnsData(lexCodingSchemeRenderingList, queryData);		
+				
+				// Check if there are asserted value sets and if they match the query data
+				if(!dataExists && uriString != null){		
+					URI csURI = null;
+					CodingScheme resolvedCS = null;
+					try {
+						csURI = new URI(uriString);
+						resolvedCS = resolvedVSService.getResolvedValueSetForValueSetURI(csURI);
+					}
+					catch (URISyntaxException e) {}
+					 
+					if (resolvedCS != null){
+						CodedNodeSet cns = getCodedNodeSetForCodeScheme(
+								lexBigService, vsDefinitionServices,
+								resolvedCS,	queryData.getLexVersionOrTag());
+						cns = CommonSearchFilterUtils.filterLexCodedNodeSet(cns, queryData);
+						return cns;
+					}
+				}
+								
 				if(dataExists){
 					// Get Code Node Set from LexBIG service for given coding scheme
 					lexCodedNodeSet = lexBigService.getNodeSet(queryData.getLexSchemeName(), queryData.getLexVersionOrTag() , lexLocalNameList);
 					lexCodedNodeSet = CommonSearchFilterUtils.filterLexCodedNodeSet(lexCodedNodeSet, queryData);
 				}
+				
 			} catch (LBException e) {
 				throw new RuntimeException(e);
 			}
 		}
 		
 		return lexCodedNodeSet;
+	}
+
+	private static CodedNodeSet getCodedNodeSetForCodeScheme(
+			LexBIGService lexBigService, 
+			LexEVSValueSetDefinitionServices vsDefinitionServices,
+			CodingScheme resolvedCS,
+			CodingSchemeVersionOrTag versionOrTag) throws LBException{
+
+		ValueSetDefinition vsd = null;
+		try {
+			vsd = vsDefinitionServices.getValueSetDefinition(
+					 new URI(resolvedCS.getCodingSchemeURI()), resolvedCS.getRepresentsVersion());
+		} catch ( URISyntaxException e) {
+			throw new LBException("Error creating URI for coding scheme: " + resolvedCS.getCodingSchemeURI()); 
+		}
+
+		CodedNodeSet cns = lexBigService.getNodeSet(vsd.getDefaultCodingScheme(), 
+				versionOrTag, null);
+
+		ConceptReferenceList codeList = new ConceptReferenceList();
+		Entity[] entities = resolvedCS.getEntities().getEntity();
+
+		String[] entityCodes = new String[entities.length];
+		for (int i = 0; i < entities.length; i++) {
+			entityCodes[i] = entities[i].getEntityCode();
+		}						
+
+		codeList = Constructors.createConceptReferenceList(entityCodes);
+		return cns.restrictToCodes(codeList);
 	}
 	
 	public static MapResolvedConceptReferenceResults getLexMapReferenceResults(

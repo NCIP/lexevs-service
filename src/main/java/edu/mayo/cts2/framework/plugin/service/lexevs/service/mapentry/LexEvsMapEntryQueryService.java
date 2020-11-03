@@ -76,6 +76,16 @@ public class LexEvsMapEntryQueryService extends AbstractLexEvsService implements
 	@Override
 	public DirectoryResult<MapEntryDirectoryEntry> getResourceSummaries(
 			MapEntryQuery query, SortCriteria sortCriteria, Page page) {
+		
+		return getResourceSummaries(query, sortCriteria, page, null);
+	}
+	
+	/* (non-Javadoc)
+	 * @see edu.mayo.cts2.framework.service.profile.QueryService#getResourceSummaries(edu.mayo.cts2.framework.service.profile.ResourceQuery, edu.mayo.cts2.framework.model.core.SortCriteria, edu.mayo.cts2.framework.model.command.Page, String)
+	 */
+	@Override
+	public DirectoryResult<MapEntryDirectoryEntry> getResourceSummaries(
+			MapEntryQuery query, SortCriteria sortCriteria, Page page, String uri) {
 
 		DirectoryResult<MapEntryDirectoryEntry> cts2DirectoryResult;
 		if(this.validateMapEntryQuery(query)){

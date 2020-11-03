@@ -21,6 +21,7 @@ import org.LexGrid.LexBIG.DataModel.InterfaceElements.types.SortContext;
 import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Exceptions.LBInvocationException;
 import org.LexGrid.LexBIG.Extensions.Generic.GenericExtension;
+import org.LexGrid.LexBIG.Extensions.Generic.TerminologyServiceDesignation;
 import org.LexGrid.LexBIG.Extensions.Query.Filter;
 import org.LexGrid.LexBIG.Extensions.Query.Sort;
 import org.LexGrid.LexBIG.History.HistoryService;
@@ -170,6 +171,24 @@ public class LexBigServiceStub implements LexBIGService{
 
 	@Override
 	public List<CodingScheme> getSourceAssertedResolvedVSCodingSchemes() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getLexEVSBuildVersion() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getLexEVSBuildTimestamp() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public TerminologyServiceDesignation getTerminologyServiceObjectType(String uri) {
 		// TODO Auto-generated method stub
 		return null;
 	}
