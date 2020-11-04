@@ -17,6 +17,7 @@ import org.LexGrid.LexBIG.Exceptions.LBException;
 import org.LexGrid.LexBIG.Exceptions.LBParameterException;
 import org.LexGrid.LexBIG.Extensions.Generic.MappingExtension;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
+import org.LexGrid.custom.relations.TerminologyMapBean;
 
 import edu.mayo.cts2.framework.service.profile.QueryService;
 import edu.mayo.cts2.framework.service.profile.ResourceQuery;
@@ -132,6 +133,11 @@ public class MappingExtensionImpl<DescriptionTemplate, EntryTemplate, QueryTempl
 			CodingSchemeVersionOrTag codingSchemeVersionOrTag,
 			String relationsContainerName) throws LBException {
 		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public List<TerminologyMapBean> resolveBulkMapping(String mappingName, String mappingVersion){
 		return null;
 	}
 

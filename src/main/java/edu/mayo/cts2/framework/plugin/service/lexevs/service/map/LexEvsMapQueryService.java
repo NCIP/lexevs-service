@@ -75,6 +75,15 @@ public class LexEvsMapQueryService extends AbstractLexEvsService
 			MapQuery query, 
 			SortCriteria sortCriteria, 
 			Page page) {
+		return getResourceSummaries(query, sortCriteria, page, null);
+	}
+
+	@Override
+	public DirectoryResult<MapCatalogEntrySummary> getResourceSummaries(
+			MapQuery query, 
+			SortCriteria sortCriteria, 
+			Page page,
+			String uri) {
 		
 		LexBIGService lexBigService = this.getLexBigService();
 		QueryData<MapQuery> queryData = new QueryData<MapQuery>(query, null);

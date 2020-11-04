@@ -103,6 +103,12 @@ public class LexEvsCodeSystemVersionQueryService extends AbstractLexEvsService
 	@Override
 	public DirectoryResult<CodeSystemVersionCatalogEntrySummary> getResourceSummaries(
 			CodeSystemVersionQuery query, SortCriteria sortCriteria, Page page) {
+		return getResourceSummaries(query, sortCriteria, page, null);
+	}
+	
+	@Override
+	public DirectoryResult<CodeSystemVersionCatalogEntrySummary> getResourceSummaries(
+			CodeSystemVersionQuery query, SortCriteria sortCriteria, Page page, String uri) {
 		QueryData<CodeSystemVersionQuery> queryData = new QueryData<CodeSystemVersionQuery>(query, null);
 		
 		CodingSchemeRendering[] csRendering = this.getNonMappingAndNonResolvedValueSetCodingSchemes(queryData, sortCriteria);

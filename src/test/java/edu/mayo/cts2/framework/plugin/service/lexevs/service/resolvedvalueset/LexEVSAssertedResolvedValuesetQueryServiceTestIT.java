@@ -58,7 +58,7 @@ public class LexEVSAssertedResolvedValuesetQueryServiceTestIT extends
                 .getResourceSummaries(null, null, new Page());
 
         assertNotNull(dirResult);
-        int expecting = 4;
+        int expecting = 5;
         int actual = dirResult.getEntries().size();
         assertEquals("Expecting " + expecting + " but got " + actual,
                 expecting, actual);
