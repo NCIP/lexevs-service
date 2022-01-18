@@ -9,8 +9,8 @@
 	</parent>
 
 	<artifactId>lexevs-service</artifactId>
-	<version>1.6.5.RC1</version>
-	<packaging>${packaging}</packaging>
+	<version>6.5.5.RC1</version>
+<!-- <packaging>${packaging}</packaging> -->	
 
 	<description>A CTS2 Framework Service Plugin based on LexEVS</description>
 	<name>LexEVS Service Plugin</name>
@@ -111,7 +111,7 @@
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
-				<version>2.4.0</version>
+				<version>5.1.4</version>
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
@@ -126,8 +126,8 @@
 							!javax.xml.rpc*,
 							!javax.servlet.*,
 							!org.apache.avalon.*,
-							!org.apache.log,
-							!org.apache.log.*,
+							!org.apache.logging,
+							!org.apache.logging.*,
 							!com.ibm,
 							!com.ibm.*,
 							!org.jboss.*,
@@ -373,6 +373,12 @@
 			<groupId>lexevs</groupId>
 			<artifactId>lexbig-impl</artifactId>
 			<version>${lexevs.version}</version>
+            <exclusions>
+                <exclusion>
+					<groupId>slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>     
+                </exclusion>
+            </exclusions>
 		</dependency>
 
 		<dependency>
@@ -404,7 +410,13 @@
 			<artifactId>lexbig-impl</artifactId>
 			<version>${lexevs.version}</version>
 			<type>test-jar</type>
-			<scope>test</scope>
+			<scope>test</scope>   
+            <exclusions>
+                <exclusion>
+					<groupId>slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>     
+                </exclusion>
+            </exclusions>
 		</dependency>
 
 		<dependency>
@@ -503,11 +515,13 @@
 		    <artifactId>log4j-api</artifactId>
 		    <version>2.17.1</version>
 		</dependency>
+
 		<dependency>
 		    <groupId>org.apache.logging.log4j</groupId>
 		    <artifactId>log4j-core</artifactId>
 		    <version>2.17.1</version>
 		</dependency>
+
 
 		<dependency>
 			<groupId>mysql</groupId>
