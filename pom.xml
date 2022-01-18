@@ -10,7 +10,6 @@
 
 	<artifactId>lexevs-service</artifactId>
 	<version>6.5.5.RC1</version>
-<!-- <packaging>${packaging}</packaging> -->	
 
 	<description>A CTS2 Framework Service Plugin based on LexEVS</description>
 	<name>LexEVS Service Plugin</name>
@@ -206,8 +205,6 @@
 						WEB-INF/lib/axis-saaj*.jar,
 						WEB-INF/lib/xercesImpl*.jar,
 						WEB-INF/lib/commons-codec-1.2.jar,
-						<!-- WEB-INF/lib/slf4j-api-1.7.22.jar,
-						WEB-INF/lib/slf4j-log4j12-1.7.22.jar -->
 						WEB-INF/lib/log4j-slf4j-impl-2.17.1.jar,
 						WEB-INF/lib/slf4j-api-1.8.0-beta4.jar
 					</packagingExcludes>
@@ -505,11 +502,6 @@
 			<version>3.1.0.GA</version>
 		</dependency>
 
-		<!-- <dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.16</version>
-		</dependency> -->
 		<dependency>
 		    <groupId>org.apache.logging.log4j</groupId>
 		    <artifactId>log4j-api</artifactId>
@@ -547,11 +539,6 @@
 			<version>1.8.3</version>
 		</dependency>
 
-		<!-- <dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.22</version>
-		</dependency> -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
@@ -583,12 +570,6 @@
 			<artifactId>xml-apis</artifactId>
 			<version>1.4.01</version>
 		</dependency>
-
-		<!-- <dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.7.22</version>
-		</dependency> -->
 
 		<dependency>
 			<groupId>org.clojure</groupId>
