@@ -13,7 +13,8 @@ import java.util.Map;
 import org.LexGrid.LexBIG.Impl.LexBIGServiceImpl;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 
@@ -24,7 +25,7 @@ public class LexBigServiceFactory implements FactoryBean<LexBIGService>, Disposa
 
 	private static final String LG_CONFIG_FILE_ENV = "LG_CONFIG_FILE";
 	
-	protected Logger log = Logger.getLogger(this.getClass());
+	protected Logger log = LogManager.getLogger(this.getClass());
 
 	private LexBIGService lexBIGService;
 
