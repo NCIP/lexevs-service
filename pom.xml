@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>lexevs-service</artifactId>
-	<version>1.6.5.RC1</version>
+	<version>1.6.5.FINAL</version>
 
 	<description>A CTS2 Framework Service Plugin based on LexEVS</description>
 	<name>LexEVS Service Plugin</name>
@@ -58,7 +58,7 @@
 	<properties>
 		<forkCount>4</forkCount>
         <reuseForks>false</reuseForks>
-		<lexevs.version>6.5.5.RC1</lexevs.version>
+		<lexevs.version>6.5.5.FINAL</lexevs.version>
 		<spring-security.version>${org.springframework-version}</spring-security.version>
 	</properties>
 
