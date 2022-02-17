@@ -25,7 +25,8 @@ import org.LexGrid.LexBIG.Extensions.Generic.SearchExtension.MatchAlgorithm;
 import org.LexGrid.LexBIG.Impl.helpers.ResolvedConceptReferencesIteratorAdapter;
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
 import org.LexGrid.LexBIG.Utility.Iterators.ResolvedConceptReferencesIterator;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.compass.core.util.CollectionUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
@@ -48,7 +49,7 @@ public class SearchExtensionBulkDownloader
 	
 	private SearchExtension searchExtension;
 	
-	protected Logger log = Logger.getLogger(this.getClass());
+	protected Logger log = LogManager.getLogger(this.getClass());
 	
 	private final static Map<String, Extractor> EXTRACTOR_MAP = new HashMap<String,Extractor>(){
 
