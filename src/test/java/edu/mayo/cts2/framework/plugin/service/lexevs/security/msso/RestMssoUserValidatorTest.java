@@ -21,6 +21,7 @@ public class RestMssoUserValidatorTest {
 //		//dummy token -- insert a valid one here
 //		//assertTrue(validator.isValid("11111"));
 //	}
+
 	
 	@Test
 	public void testInValid(){
