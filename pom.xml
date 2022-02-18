@@ -58,9 +58,7 @@
 	<properties>
 		<forkCount>4</forkCount>
         <reuseForks>false</reuseForks>
-    
 		<lexevs.version>6.5.5.FINAL</lexevs.version>
-
 		<spring-security.version>${org.springframework-version}</spring-security.version>
 	</properties>
 
@@ -175,7 +173,7 @@
 						<_nouses>true</_nouses>
 					</instructions>
 				</configuration>
-			</plugin-->
+			</plugin>
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
