@@ -10,7 +10,8 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.transform;
 
 import javax.annotation.Resource;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import edu.mayo.cts2.framework.core.url.UrlConstructor;
 import edu.mayo.cts2.framework.plugin.service.lexevs.naming.CodingSchemeNameTranslator;
@@ -29,7 +30,7 @@ public abstract class AbstractBaseTransform<
 		DirectoryEntryDataType, 
 		DirectoryEntryDataIN> {
 	
-	protected Logger log = Logger.getLogger(this.getClass());
+	protected Logger log = LogManager.getLogger(this.getClass());
 	
 	@Resource
 	private TransformUtils transformUtils;

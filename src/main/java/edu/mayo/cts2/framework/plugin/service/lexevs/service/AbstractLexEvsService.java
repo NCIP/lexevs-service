@@ -11,7 +11,8 @@ package edu.mayo.cts2.framework.plugin.service.lexevs.service;
 import javax.annotation.Resource;
 
 import org.LexGrid.LexBIG.LexBIGService.LexBIGService;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.lexgrid.resolvedvalueset.LexEVSResolvedValueSetService;
 import org.lexgrid.valuesets.LexEVSValueSetDefinitionServices;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +30,7 @@ import edu.mayo.cts2.framework.service.profile.BaseService;
  */
 public abstract class AbstractLexEvsService implements BaseService {
 
-	protected Logger log = Logger.getLogger(this.getClass());
+	protected Logger log = LogManager.getLogger(this.getClass());
 
 	@Value("#{buildProperties.buildversion}")
 	private String buildVersion;
